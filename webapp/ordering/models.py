@@ -1,5 +1,6 @@
 from django.db import models
 from shared.models import Address
+from vokou import settings
 
 
 class Supplier(models.Model):
@@ -16,6 +17,7 @@ class OrderRound(models.Model):
 class Order(models.Model):
     products = models.ManyToManyField("Product", through="OrderProduct")
     order_round = models.ForeignKey("OrderRound")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
 
 
 class OrderProduct(models.Model):
