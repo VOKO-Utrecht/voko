@@ -5,7 +5,9 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class Address(models.Model):
-    city = models.CharField(max_length=255)
+    street_and_number = models.CharField(max_length=100)
+    zip_code = models.CharField(max_length=7)
+    city = models.CharField(max_length=100)
 
 
 class UserProfile(models.Model):
