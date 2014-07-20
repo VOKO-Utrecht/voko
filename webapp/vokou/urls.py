@@ -1,12 +1,9 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from accounts.views import LoginView
+from accounts.views import LoginView, RegisterView
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'webapp.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
-
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^login/', LoginView.as_view()),
+    url(r'^accounts/login/', LoginView.as_view()),
+    url(r'^accounts/register/', RegisterView.as_view()),
 )
