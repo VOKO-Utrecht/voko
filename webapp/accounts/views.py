@@ -13,3 +13,9 @@ class RegisterView(FormView):
     template_name = "accounts/register.html"
     form_class = VokoUserCreationForm
     success_url = "/todo"
+
+    def form_valid(self, form):
+        # This method is called when valid form data has been POSTed.
+        # It should return an HttpResponse.
+        form.save()
+        return super(RegisterView, self).form_valid(form)

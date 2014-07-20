@@ -1,10 +1,10 @@
 from django import forms
-from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from .models import VokoUser
 
 # Custom user forms based on examples from Two Scoops of Django.
+
 
 class VokoUserCreationForm(forms.ModelForm):
     password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
@@ -12,9 +12,10 @@ class VokoUserCreationForm(forms.ModelForm):
 
     class Meta:
         model = VokoUser
-        fields = ("email",)
+        fields = ("email", "first_name", "last_name")
 
     def clean_password2(self):
+        print "CALLING CLEAN_PASSW2"
         # Check that the two password entries match
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
@@ -26,6 +27,7 @@ class VokoUserCreationForm(forms.ModelForm):
         return password2
 
     def save(self, commit=True):
+        print "CALLING SAVE "
         # Save the provided password in hashed format
         user = super(VokoUserCreationForm, self).save(commit=False)
         user.set_password(self.cleaned_data["password1"])
