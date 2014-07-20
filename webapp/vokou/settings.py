@@ -10,7 +10,18 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from unipath import Path
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+PROJECT_DIR = Path(__file__).ancestor(2)
+MEDIA_ROOT = PROJECT_DIR.child("media")
+STATIC_ROOT = PROJECT_DIR.child("static")
+STATICFILES_DIRS = (
+    PROJECT_DIR.child("assets"),
+)
+TEMPLATE_DIRS = (
+    PROJECT_DIR.child("templates"),
+)
 
 
 # Quick-start development settings - unsuitable for production
@@ -36,7 +47,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'shared',
+    'accounts',
     'ordering',
 )
 
@@ -84,4 +95,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-AUTH_USER_MODEL = "shared.VokoUser"
+AUTH_USER_MODEL = "accounts.VokoUser"

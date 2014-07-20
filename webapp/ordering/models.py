@@ -1,5 +1,5 @@
 from django.db import models
-from shared.models import Address
+from accounts.models import Address
 from vokou import settings
 
 
