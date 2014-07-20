@@ -2,6 +2,7 @@
 
 ## Some notes
 1. This application depends on Django 1.7, RC1.
+2. It's been a while since I last crafted a Django application. 
 2. Because of time shortage,
    1. This app is not written TDD
    2. There will be no i18n support (at least initially)
