@@ -1,4 +1,4 @@
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
 from django.views.generic import FormView
 from accounts.forms import VokoUserCreationForm
 
@@ -19,3 +19,9 @@ class RegisterView(FormView):
         # It should return an HttpResponse.
         form.save()
         return super(RegisterView, self).form_valid(form)
+
+
+class PasswordResetView(FormView):
+    template_name = "accounts/passwordreset.html"
+    form_class = PasswordResetForm
+    success_url = "/todo"
