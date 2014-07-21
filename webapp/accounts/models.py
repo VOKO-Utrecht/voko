@@ -9,6 +9,9 @@ class Address(models.Model):
     zip_code = models.CharField(max_length=7)
     city = models.CharField(max_length=100)
 
+    def __unicode__(self):
+        return "%s - %s, %s" % (self.street_and_number, self.zip_code, self.city)
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL)
