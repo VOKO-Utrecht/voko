@@ -14,12 +14,12 @@ class Supplier(models.Model):
 
 
 class OrderRound(models.Model):
-    # orders open from <date> to <date>
-    # open to suppliers from <date> to <date>
     open_for_orders = models.DateField()
     closed_for_orders = models.DateField()
     collect_date = models.DateField()
+    # TODO: Set default values to the values of previous object
     markup_percentage = models.DecimalField(decimal_places=2, max_digits=5, default=5.0)
+    transaction_costs = models.DecimalField(decimal_places=2, max_digits=5, default=0.35)
 
     def __unicode__(self):
         return "Order round %d" % self.id
