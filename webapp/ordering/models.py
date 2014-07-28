@@ -4,6 +4,7 @@ from accounts.models import Address
 from vokou import settings
 
 # TODO use TimeStampedModel for all models
+# TODO: use slugs in relevant models (product, supplier, etc)
 
 class Supplier(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -51,7 +52,7 @@ class Product(models.Model):
     )
 
     name = models.CharField(max_length=50)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     unit_of_measurement = models.CharField(max_length=2, choices=UNITS)
     base_price = models.DecimalField(max_digits=6, decimal_places=2)
     supplier = models.ForeignKey("Supplier")
