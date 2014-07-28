@@ -29,7 +29,10 @@ class OrderRound(models.Model):
 class Order(models.Model):
     products = models.ManyToManyField("Product", through="OrderProduct")
     order_round = models.ForeignKey("OrderRound")
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="orders")
+
+    # This might have to change to 'paid' or something
+    finalized = models.BooleanField(default=False)
 
     def __unicode__(self):
         return "Order %d" % self.id
