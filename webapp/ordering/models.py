@@ -37,12 +37,23 @@ class Order(models.Model):
     def __unicode__(self):
         return "Order %d" % self.id
 
+    @property
+    def total_price(self):
+        return sum([p.total_price for p in self.orderproduct_set.all()])
+
 
 class OrderProduct(models.Model):
     order = models.ForeignKey("Order")
     product = models.ForeignKey("Product")
     amount = models.IntegerField()
     # created at etc
+
+    def __unicode__(self):
+        return "%d x %s" % (self.amount, self.product)
+
+    @property
+    def total_price(self):
+        return self.amount * self.product.retail_price
 
 
 class Product(models.Model):

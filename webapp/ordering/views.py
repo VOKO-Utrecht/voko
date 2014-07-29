@@ -2,7 +2,7 @@ from django.views.generic import ListView, DetailView, FormView, View
 from django.views.generic.detail import SingleObjectMixin
 from ordering.core import get_current_order_round, get_or_create_order
 from ordering.forms import OrderForm
-from ordering.models import Product, OrderProduct
+from ordering.models import Product, OrderProduct, Order
 
 
 class ProductsView(ListView):
@@ -50,4 +50,7 @@ class ProductOrder(SingleObjectMixin, FormView):
             order_product.save()
         return self.form_valid(form)
 
+
+class OrderDisplay(DetailView):
+    model = Order
 

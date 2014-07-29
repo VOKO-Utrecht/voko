@@ -1,0 +1,18 @@
+{%  extends 'base.html' %}
+
+{% block content %}
+
+{{ object }}<br/>
+{% for order_product in object.orderproduct_set.all %}
+    {{ order_product.product.name }} - {{ order_product.amount }} : {{ order_product.total_price }}<br/>
+{% endfor %}
+
+{{ object.total_price }} Euro
+<form action="" method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Bestellen" />
+</form>
+
+
+
+{% endblock %}
