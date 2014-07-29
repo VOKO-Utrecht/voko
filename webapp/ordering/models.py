@@ -39,7 +39,8 @@ class Order(models.Model):
 
     @property
     def total_price(self):
-        return sum([p.total_price for p in self.orderproduct_set.all()])
+        product_sum = sum([p.total_price for p in self.orderproduct_set.all()])
+        return product_sum + self.order_round.transaction_costs
 
 
 class OrderProduct(models.Model):

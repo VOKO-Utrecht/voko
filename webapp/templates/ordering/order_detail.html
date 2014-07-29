@@ -6,6 +6,7 @@
 {% for order_product in object.orderproduct_set.all %}
     {{ order_product.product.name }} - {{ order_product.amount }} : {{ order_product.total_price }}<br/>
 {% endfor %}
+Transactie: {{ object.order_round.transaction_costs }} <br/>
 
 {{ object.total_price }} Euro
 <form action="" method="post">{% csrf_token %}

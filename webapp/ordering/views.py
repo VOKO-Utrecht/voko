@@ -1,7 +1,8 @@
-from django.views.generic import ListView, DetailView, FormView, View
+from django.forms import modelformset_factory, formset_factory
+from django.views.generic import ListView, DetailView, FormView, View, UpdateView
 from django.views.generic.detail import SingleObjectMixin
 from ordering.core import get_current_order_round, get_or_create_order
-from ordering.forms import OrderForm
+from ordering.forms import OrderProductForm, OrderForm
 from ordering.models import Product, OrderProduct, Order
 
 
@@ -29,13 +30,13 @@ class ProductDisplay(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductDisplay, self).get_context_data(**kwargs)
-        context['form'] = OrderForm(initial=self._get_initial())
+        context['form'] = OrderProductForm(initial=self._get_initial())
         return context
 
 
 class ProductOrder(SingleObjectMixin, FormView):
     model = OrderProduct
-    form_class = OrderForm
+    form_class = OrderProductForm
     success_url = "/hoera"
 
     def post(self, request, *args, **kwargs):
@@ -51,6 +52,18 @@ class ProductOrder(SingleObjectMixin, FormView):
         return self.form_valid(form)
 
 
-class OrderDisplay(DetailView):
+class OrderDisplay(UpdateView):
     model = Order
+    form_class = OrderProductForm
+
+    def get_context_data(self, **kwargs):
+        context = super(OrderDisplay, self).get_context_data(**kwargs)
+        FormSet = formset_factory(self.form_class, extra=0)
+        order_products = self.get_object().orderproduct_set.all()
+        initial = [{'product': op.product, 'amount': op.amount} for op in order_products]
+        fs = FormSet(initial=initial)
+        print fs
+        context['form'] = fs
+        return context
+
 
