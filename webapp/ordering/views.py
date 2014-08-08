@@ -86,5 +86,13 @@ class OrderDisplay(UpdateView):
         return self.render_to_response(self.get_context_data(form=self.get_form(self.form_class)))
 
 
-class FinishOrder(DetailView):
+class FinishOrder(UpdateView):
+    template_name = "ordering/order_finish.html"
     model = Order
+
+    def post(self, request, *args, **kwargs):
+        # For now, we just finish the order.
+        order = self.get_object()
+        order.finalized = True
+        order.save()
+        print "HOERA"

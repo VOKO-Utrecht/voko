@@ -40,7 +40,14 @@ class Order(models.Model):
     @property
     def total_price(self):
         product_sum = sum([p.total_price for p in self.orderproduct_set.all()])
-        return product_sum + self.order_round.transaction_costs
+        return product_sum + self.order_round.transaction_costs + self.member_fee
+
+    @property
+    def member_fee(self):
+        # Add contribution if this is users' first order (unfinished orders not included)
+        if len(self.user.orders.filter(finalized=True)) == 0:
+            return Decimal(settings.MEMBER_FEE)
+        return Decimal(0)
 
 
 class OrderProduct(models.Model):

@@ -20,3 +20,5 @@ def get_order_product(product, order):
     existing_ops = OrderProduct.objects.filter(product=product, order=order)
     if existing_ops:
         return existing_ops[0]
+
+
