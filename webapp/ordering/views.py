@@ -98,3 +98,11 @@ class FinishOrder(UpdateView):
         order.finalized = True
         order.save()
         print "HOERA"
+
+
+class OrdersDisplay(ListView):
+    """
+    Overview of multiple orders
+    """
+    def get_queryset(self):
+        return self.request.user.orders.all().order_by("-pk")

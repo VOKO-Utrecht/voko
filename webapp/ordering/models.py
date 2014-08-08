@@ -45,7 +45,12 @@ class Order(models.Model):
     @property
     def member_fee(self):
         # Add contribution if this is users' first order (unfinished orders not included)
-        if len(self.user.orders.filter(finalized=True)) == 0:
+        non_finalized_orders = self.user.orders.filter(finalized=True)
+        total = len(non_finalized_orders)
+        if self.pk:
+            if self in non_finalized_orders:
+                total -= 1
+        if total == 0:
             return Decimal(settings.MEMBER_FEE)
         return Decimal(0)
 

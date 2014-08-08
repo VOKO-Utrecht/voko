@@ -1,0 +1,19 @@
+{%  extends 'base.html' %}
+
+{% block content %}
+
+{% for order in object_list %}
+    <hr>
+    Order ID: {{ order.pk }}<br/>
+    {% for order_product in order.orderproduct_set.all %}
+        <li>{{ order_product.amount }} x {{ order_product.product.name }}</li>
+    {% endfor %}
+        {% if order.member_fee %}
+            <li>Member fee: {{ order.member_fee }}</li>
+        {% endif %}
+        Totaal: {{ order.total_price }}
+
+{% endfor %}
+
+
+{% endblock %}
