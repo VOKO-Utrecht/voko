@@ -67,8 +67,6 @@ class OrderDisplay(UpdateView):
     success_url = "/hoera"
 
     def get_context_data(self, **kwargs):
-        print self
-        print "kwargs:", kwargs
         context = super(OrderDisplay, self).get_context_data(**kwargs)
         FormSet = inlineformset_factory(self.model, OrderProduct, extra=0, form=self.form_class)
         fs = FormSet(instance=self.get_object())
@@ -76,7 +74,7 @@ class OrderDisplay(UpdateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        self.object = None
+        self.object = self.get_object()
         FormSet = inlineformset_factory(self.model, OrderProduct, extra=0, form=self.form_class)
         fs = FormSet(instance=self.get_object(), data=request.POST)
         if fs.is_valid():
