@@ -1,10 +1,9 @@
-from django.core.urlresolvers import reverse, reverse_lazy
-from django.forms import modelformset_factory, formset_factory, inlineformset_factory
-from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
+from django.forms import inlineformset_factory
 from django.views.generic import ListView, DetailView, FormView, View, UpdateView
 from django.views.generic.detail import SingleObjectMixin
 from ordering.core import get_current_order_round, get_or_create_order, get_order_product
-from ordering.forms import OrderProductForm, OrderForm
+from ordering.forms import OrderProductForm
 from ordering.models import Product, OrderProduct, Order
 
 
