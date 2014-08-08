@@ -58,6 +58,8 @@ class OrderDisplay(UpdateView):
     success_url = "/hoera"
 
     def get_context_data(self, **kwargs):
+        print self
+        print "kwargs:", kwargs
         context = super(OrderDisplay, self).get_context_data(**kwargs)
         FormSet = inlineformset_factory(self.model, OrderProduct, extra=0, form=self.form_class)
         fs = FormSet(instance=self.get_object())
@@ -65,16 +67,14 @@ class OrderDisplay(UpdateView):
         return context
 
     def post(self, request, *args, **kwargs):
+        self.object = None
         FormSet = inlineformset_factory(self.model, OrderProduct, extra=0, form=self.form_class)
         fs = FormSet(instance=self.get_object(), data=request.POST)
         if fs.is_valid():
             fs.save()
             ## TODO: add 'succeeded' message
 
-        else:
-            ## TODO: add errors to form
-            pass
-
-        return HttpResponseRedirect(reverse("view_order", kwargs={"pk": self.get_object().pk}))
+        # Errors are saved in formset.errors: TODO: show them in template.
+        return self.render_to_response(self.get_context_data(form=self.get_form(self.form_class)))
 
 
