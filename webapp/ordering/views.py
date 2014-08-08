@@ -3,7 +3,7 @@ from django.forms import modelformset_factory, formset_factory, inlineformset_fa
 from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView, FormView, View, UpdateView
 from django.views.generic.detail import SingleObjectMixin
-from ordering.core import get_current_order_round, get_or_create_order
+from ordering.core import get_current_order_round, get_or_create_order, get_order_product
 from ordering.forms import OrderProductForm, OrderForm
 from ordering.models import Product, OrderProduct, Order
 
@@ -32,19 +32,24 @@ class ProductDisplay(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductDisplay, self).get_context_data(**kwargs)
-        context['form'] = OrderProductForm(initial=self._get_initial())
+
+        existing_op = get_order_product(product=self.get_object(),
+                                        order=get_or_create_order(self.request.user))
+        context['form'] = OrderProductForm(initial=self._get_initial(), instance=existing_op)
         return context
 
 
 class ProductOrder(SingleObjectMixin, FormView):
-    model = OrderProduct
+    model = Product
     form_class = OrderProductForm
     success_url = "/hoera"
 
     def post(self, request, *args, **kwargs):
         form_class = self.get_form_class()
-        form = form_class(request.POST)
-        print request.POST
+        form = form_class(request.POST, instance=get_order_product(product=self.get_object(),
+                                                                   order=get_or_create_order(
+                                                                       user=self.request.user
+                                                                   )))
         if form.is_valid():
             # TODO: restrict orders of 0 amount!
             order_product = form.save(commit=False)
