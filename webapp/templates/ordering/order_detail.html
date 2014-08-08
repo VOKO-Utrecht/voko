@@ -1,5 +1,7 @@
 {%  extends 'base.html' %}
 
+{# THIS TEMPLATE IS NOT BEING USED #}
+
 {% block content %}
 
 {{ object }}<br/>
@@ -13,4 +15,6 @@ Transactie: {{ object.order_round.transaction_costs }} <br/>
     {{ form.as_p }}
     <input type="submit" value="Bestellen" />
 </form>
+
+{% endblock %}
 
