@@ -1,4 +1,6 @@
-from django.forms import modelformset_factory, formset_factory
+from django.core.urlresolvers import reverse
+from django.forms import modelformset_factory, formset_factory, inlineformset_factory
+from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView, FormView, View, UpdateView
 from django.views.generic.detail import SingleObjectMixin
 from ordering.core import get_current_order_round, get_or_create_order
@@ -42,8 +44,6 @@ class ProductOrder(SingleObjectMixin, FormView):
     def post(self, request, *args, **kwargs):
         form_class = self.get_form_class()
         form = form_class(request.POST)
-        print form
-        print form.is_valid()
         if form.is_valid():
             # TODO: restrict orders of 0 amount!
             order_product = form.save(commit=False)
@@ -55,15 +55,26 @@ class ProductOrder(SingleObjectMixin, FormView):
 class OrderDisplay(UpdateView):
     model = Order
     form_class = OrderProductForm
+    success_url = "/hoera"
 
     def get_context_data(self, **kwargs):
         context = super(OrderDisplay, self).get_context_data(**kwargs)
-        FormSet = formset_factory(self.form_class, extra=0)
-        order_products = self.get_object().orderproduct_set.all()
-        initial = [{'product': op.product, 'amount': op.amount} for op in order_products]
-        fs = FormSet(initial=initial)
-        print fs
-        context['form'] = fs
+        FormSet = inlineformset_factory(self.model, OrderProduct, extra=0, form=self.form_class)
+        fs = FormSet(instance=self.get_object())
+        context['formset'] = fs
         return context
+
+    def post(self, request, *args, **kwargs):
+        FormSet = inlineformset_factory(self.model, OrderProduct, extra=0, form=self.form_class)
+        fs = FormSet(instance=self.get_object(), data=request.POST)
+        if fs.is_valid():
+            fs.save()
+            ## TODO: add 'succeeded' message
+
+        else:
+            ## TODO: add errors to form
+            pass
+
+        return HttpResponseRedirect(reverse("view_order", kwargs={"pk": self.get_object().pk}))
 
 

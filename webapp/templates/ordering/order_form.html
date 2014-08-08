@@ -1,4 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
-{{  form }}
+
+
+<form action="" method="post">{% csrf_token %}
+{{ formset.management_form }}
+{% for form in formset %}
+    Form:<br/>
+    {{ form.instance.product }}
+    {{ form }}
+    <br/>
+{% endfor %}
+
+
+    <input type="submit" value="Bijwerken" />
+</form>
+
+
+
+
 {% endblock %}
+

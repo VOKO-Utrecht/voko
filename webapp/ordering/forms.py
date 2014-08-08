@@ -5,8 +5,7 @@ from .models import OrderProduct, Order
 class OrderProductForm(forms.ModelForm):
     class Meta:
         model = OrderProduct
-        fields = ['product', 'amount']
-        widgets = {'product': forms.HiddenInput()}
+        fields = ['amount']
 
 
 class OrderForm(forms.ModelForm):
