@@ -44,11 +44,13 @@ class ProductOrder(SingleObjectMixin, FormView):
     def post(self, request, *args, **kwargs):
         form_class = self.get_form_class()
         form = form_class(request.POST)
+        print request.POST
         if form.is_valid():
             # TODO: restrict orders of 0 amount!
             order_product = form.save(commit=False)
             order_product.order = get_or_create_order(request.user)
             order_product.save()
+            print order_product.pk
         return self.form_valid(form)
 
 
@@ -71,6 +73,7 @@ class OrderDisplay(UpdateView):
         FormSet = inlineformset_factory(self.model, OrderProduct, extra=0, form=self.form_class)
         fs = FormSet(instance=self.get_object(), data=request.POST)
         if fs.is_valid():
+            # TODO: validate if form may be modified still (isn't it finished?)
             fs.save()
             ## TODO: add 'succeeded' message
 
