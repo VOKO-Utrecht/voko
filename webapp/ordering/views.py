@@ -1,4 +1,4 @@
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.forms import modelformset_factory, formset_factory, inlineformset_factory
 from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView, FormView, View, UpdateView
@@ -42,7 +42,9 @@ class ProductDisplay(DetailView):
 class ProductOrder(SingleObjectMixin, FormView):
     model = Product
     form_class = OrderProductForm
-    success_url = "/hoera"
+
+    def get_success_url(self):
+        return reverse("view_order", kwargs={'pk': get_or_create_order(self.request.user).pk})
 
     def post(self, request, *args, **kwargs):
         form_class = self.get_form_class()
@@ -60,6 +62,7 @@ class ProductOrder(SingleObjectMixin, FormView):
 
 
 class OrderDisplay(UpdateView):
+    # TODO: restrict to user only
     model = Order
     form_class = OrderProductForm
     success_url = "/hoera"
