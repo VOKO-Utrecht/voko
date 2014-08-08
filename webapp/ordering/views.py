@@ -86,3 +86,5 @@ class OrderDisplay(UpdateView):
         return self.render_to_response(self.get_context_data(form=self.get_form(self.form_class)))
 
 
+class FinishOrder(DetailView):
+    model = Order

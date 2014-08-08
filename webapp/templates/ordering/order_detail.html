@@ -1,20 +1,14 @@
 {%  extends 'base.html' %}
 
-{# THIS TEMPLATE IS NOT BEING USED #}
-
 {% block content %}
 
 {{ object }}<br/>
 {% for order_product in object.orderproduct_set.all %}
-    {{ order_product.product.name }} - {{ order_product.amount }} : {{ order_product.total_price }}<br/>
+    {{ order_product.product.name }} - {{ order_product.product.retail_price }} x {{ order_product.amount }} : {{ order_product.total_price }}<br/>
 {% endfor %}
 Transactie: {{ object.order_round.transaction_costs }} <br/>
 
-{{ object.total_price }} Euro
-<form action="" method="post">{% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Bestellen" />
-</form>
+Totaalbedrag: {{ object.total_price }} Euro
 
 {% endblock %}
 
