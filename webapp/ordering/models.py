@@ -2,9 +2,11 @@ from decimal import Decimal, ROUND_UP
 from django.db import models
 from accounts.models import Address
 from vokou import settings
+import ordering.core
 
 # TODO use TimeStampedModel for all models
 # TODO: use slugs in relevant models (product, supplier, etc)
+
 
 class Supplier(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -44,10 +46,10 @@ class Order(models.Model):
     collected = models.BooleanField(default=False)
     # TODO: add payment transaction idea or something like that
 
-    debit = models.OneToOneField("Balance", null=True)
+    debit = models.OneToOneField("Balance", null=True, blank=True)
 
     def __unicode__(self):
-        return "Order %d" % self.id
+        return "Order %d; value: E%s; user: %s" % (self.id, self.total_price, self.user)
 
     @property
     def total_price(self):
@@ -104,6 +106,7 @@ class OrderProductCorrection(models.Model):
 
 
 class Balance(models.Model):
+    # TODO: add sanity check; amount may never be negative.
     TYPES = (
         ("CR", "Credit"),
         ("DR", "Debit"),
@@ -111,7 +114,7 @@ class Balance(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="balance")
     type = models.CharField(max_length=2, choices=TYPES)
     amount = models.DecimalField(max_digits=6, decimal_places=2)
-    notes = models.TextField(blank=True)
+    notes = models.TextField()
 
     def __unicode__(self):
         return "[%s] %s: %s" % (self.user, self.type, self.amount)
