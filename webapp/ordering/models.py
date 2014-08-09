@@ -2,7 +2,6 @@ from decimal import Decimal, ROUND_UP
 from django.db import models
 from accounts.models import Address
 from vokou import settings
-import ordering.core
 
 # TODO use TimeStampedModel for all models
 # TODO: use slugs in relevant models (product, supplier, etc)
@@ -27,6 +26,8 @@ class OrderRound(models.Model):
     def __unicode__(self):
         return "Order round %d" % self.id
 
+
+# TODO: Payment class?
 
 class Order(models.Model):
     """ Order order: ;)
@@ -105,6 +106,21 @@ class OrderProductCorrection(models.Model):
         return (before_correction - new_price) - self.credit_used
 
 
+class BalanceManager(models.Manager):
+    use_for_related_fields = True
+
+    def credit(self):
+        credit_objs = super(BalanceManager, self).get_queryset().filter(type="CR")
+        debit_objs = super(BalanceManager, self).get_queryset().filter(type="DR")
+        credit_sum = sum([b.amount for b in credit_objs])
+        debit_sum = sum([b.amount for b in debit_objs])
+
+        return credit_sum - debit_sum
+
+    def debit(self):
+        return -self.credit()
+
+
 class Balance(models.Model):
     # TODO: add sanity check; amount may never be negative.
     TYPES = (
@@ -118,6 +134,8 @@ class Balance(models.Model):
 
     def __unicode__(self):
         return "[%s] %s: %s" % (self.user, self.type, self.amount)
+
+    objects = BalanceManager()
 
 
 class Product(models.Model):

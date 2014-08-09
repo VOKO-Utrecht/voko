@@ -15,6 +15,11 @@ Transactie: {{ object.order_round.transaction_costs }} <br/>
     {{ object.member_fee }}
 {% endif %}
 
+<br/>
+    {% if user.balance.credit > 0 %}
+        Credit: {{ user.balance.credit }}
+    {% endif %}
+
 
 <br/>
 Totaalbedrag: {{ object.total_price }} Euro
