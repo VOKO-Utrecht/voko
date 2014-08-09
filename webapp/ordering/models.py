@@ -45,7 +45,7 @@ class Order(models.Model):
     finalized = models.BooleanField(default=False)
     # Whether the order has been retrieved by the user
     collected = models.BooleanField(default=False)
-    # TODO: add payment transaction idea or something like that
+    # TODO: add payment transaction id or something like that
 
     debit = models.OneToOneField("Balance", null=True, blank=True)
 
