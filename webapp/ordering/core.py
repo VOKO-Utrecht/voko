@@ -27,3 +27,7 @@ def get_credit(user):
     debit = sum([b.amount for b in user.balance.filter(type="DR")])
 
     return credit - debit
+
+
+def get_debit(user):
+    return -get_credit(user)
