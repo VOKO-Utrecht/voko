@@ -27,6 +27,13 @@ class OrderRound(models.Model):
 
 
 class Order(models.Model):
+    """ Order order: ;)
+    1. create order (this is implicit even)
+    2. place/confirm order (make it definitive for payment)
+    3. pay/finalize order
+    4. collect order
+    """
+
     products = models.ManyToManyField("Product", through="OrderProduct")
     order_round = models.ForeignKey("OrderRound")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="orders")
@@ -37,7 +44,7 @@ class Order(models.Model):
     collected = models.BooleanField(default=False)
     # TODO: add payment transaction idea or something like that
 
-    debit = models.OneToOneField("Balance")
+    debit = models.OneToOneField("Balance", null=True)
 
     def __unicode__(self):
         return "Order %d" % self.id
@@ -58,6 +65,13 @@ class Order(models.Model):
         if total == 0:
             return Decimal(settings.MEMBER_FEE)
         return Decimal(0)
+
+    def place_order_and_debit(self):
+        debit = Balance.objects.create(user=self.user,
+                                       type="DR",
+                                       amount=self.total_price,
+                                       notes="Debit of %s for Order %d" % (self.total_price, self.pk))
+        self.debit = debit
 
 
 class OrderProduct(models.Model):

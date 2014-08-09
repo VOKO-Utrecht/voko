@@ -93,7 +93,8 @@ class FinishOrder(UpdateView):
     def post(self, request, *args, **kwargs):
         # For now, we just finish the order.
         order = self.get_object()
-        order.finalized = True
+        order.place_order_and_debit()
+        # order.finalized = True
         order.save()
         print "HOERA"
 
