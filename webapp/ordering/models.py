@@ -33,6 +33,11 @@ class Order(models.Model):
 
     # This might have to change to 'paid' or something
     finalized = models.BooleanField(default=False)
+    # Whether the order has been retrieved by the user
+    collected = models.BooleanField(default=False)
+    # TODO: add payment transaction idea or something like that
+
+    debit = models.OneToOneField("Balance")
 
     def __unicode__(self):
         return "Order %d" % self.id
@@ -67,6 +72,35 @@ class OrderProduct(models.Model):
     @property
     def total_price(self):
         return self.amount * self.product.retail_price
+
+
+class OrderProductCorrection(models.Model):
+    order_product = models.OneToOneField("OrderProduct")
+    supplied_amount = models.DecimalField(max_digits=6, decimal_places=1)
+    notes = models.TextField(blank=True)
+    credit = models.OneToOneField("Balance")
+
+    def __unicode__(self):
+        return "Correction on OrderProduct: %s" % self.order_product
+
+    def calculate_refund(self):
+        before_correction = self.order_product.total_price
+        new_price = self.supplied_amount * self.order_product.product.retail_price
+        return (before_correction - new_price) - self.credit_used
+
+
+class Balance(models.Model):
+    TYPES = (
+        ("CR", "Credit"),
+        ("DR", "Debit"),
+    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="balance")
+    type = models.CharField(max_length=2, choices=TYPES)
+    amount = models.DecimalField(max_digits=6, decimal_places=2)
+    notes = models.TextField(blank=True)
+
+    def __unicode__(self):
+        return "[%s] %s: %s" % (self.user, self.type, self.amount)
 
 
 class Product(models.Model):

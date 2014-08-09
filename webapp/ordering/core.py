@@ -1,4 +1,5 @@
-from .models import OrderRound, Order, OrderProduct
+from django.db import transaction
+from .models import OrderRound, Order, OrderProduct, OrderProductCorrection
 
 
 def get_current_order_round():
@@ -22,3 +23,8 @@ def get_order_product(product, order):
         return existing_ops[0]
 
 
+def get_credit(user):
+    credit = sum([b.amount for b in user.balance.filter(type="CR")])
+    debit = sum([b.amount for b in user.balance.filter(type="DR")])
+
+    return credit - debit
