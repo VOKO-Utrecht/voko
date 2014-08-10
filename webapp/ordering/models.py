@@ -27,7 +27,19 @@ class OrderRound(models.Model):
         return "Order round %d" % self.id
 
 
-# TODO: Payment class?
+class Payment(models.Model):
+    amount = models.DecimalField(max_digits=6, decimal_places=2)
+
+    # TODO: add more fields
+
+    # TODO: succeeded payment creates credit.
+
+    def is_paid(self):  # Placeholder
+        return True
+
+    def __unicode__(self):
+        return "Payment of E%s" % self.amount
+
 
 class Order(models.Model):
     """ Order order: ;)
@@ -42,10 +54,10 @@ class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="orders")
 
     # This might have to change to 'paid' or something
-    finalized = models.BooleanField(default=False)
+    finalized = models.BooleanField(default=False)  # TODO remove?
+    payment = models.OneToOneField("Payment", blank=True, null=True)
     # Whether the order has been retrieved by the user
     collected = models.BooleanField(default=False)
-    # TODO: add payment transaction id or something like that
 
     debit = models.OneToOneField("Balance", null=True, blank=True)
 
@@ -75,6 +87,12 @@ class Order(models.Model):
                                        amount=self.total_price,
                                        notes="Debit of %s for Order %d" % (self.total_price, self.pk))
         self.debit = debit
+
+    def create_and_add_payment(self):
+        to_pay = self.user.balance.debit()
+        # Sanity check.  TODO: Allow orders without payment when credits exceed total order price.
+        assert(to_pay > 0, "Debit is negative.")
+        self.payment = Payment.objects.create(amount=to_pay)
 
 
 class OrderProduct(models.Model):

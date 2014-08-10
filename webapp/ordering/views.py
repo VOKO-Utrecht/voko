@@ -94,6 +94,7 @@ class FinishOrder(UpdateView):
         # For now, we just finish the order.
         order = self.get_object()
         order.place_order_and_debit()
+        order.create_and_add_payment()
         # order.finalized = True
         order.save()
         print "HOERA"
