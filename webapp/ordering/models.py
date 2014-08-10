@@ -1,6 +1,7 @@
 from decimal import Decimal, ROUND_UP
 from django.db import models
 from accounts.models import Address
+from finance.models import Payment, Balance
 from vokou import settings
 
 # TODO use TimeStampedModel for all models
@@ -27,20 +28,6 @@ class OrderRound(models.Model):
         return "Order round %d" % self.id
 
 
-class Payment(models.Model):
-    amount = models.DecimalField(max_digits=6, decimal_places=2)
-
-    # TODO: add more fields
-
-    # TODO: succeeded payment creates credit.
-
-    def is_paid(self):  # Placeholder
-        return True
-
-    def __unicode__(self):
-        return "Payment of E%s" % self.amount
-
-
 class Order(models.Model):
     """ Order order: ;)
     1. create order (this is implicit even)
@@ -55,11 +42,11 @@ class Order(models.Model):
 
     # This might have to change to 'paid' or something
     finalized = models.BooleanField(default=False)  # TODO remove?
-    payment = models.OneToOneField("Payment", blank=True, null=True)
+    payment = models.OneToOneField(Payment, blank=True, null=True)
     # Whether the order has been retrieved by the user
     collected = models.BooleanField(default=False)
 
-    debit = models.OneToOneField("Balance", null=True, blank=True)
+    debit = models.OneToOneField(Balance, null=True, blank=True)
 
     def __unicode__(self):
         return "Order %d; value: E%s; user: %s" % (self.id, self.total_price, self.user)
@@ -113,7 +100,7 @@ class OrderProductCorrection(models.Model):
     order_product = models.OneToOneField("OrderProduct")
     supplied_amount = models.DecimalField(max_digits=6, decimal_places=1)
     notes = models.TextField(blank=True)
-    credit = models.OneToOneField("Balance")
+    credit = models.OneToOneField(Balance)
 
     def __unicode__(self):
         return "Correction on OrderProduct: %s" % self.order_product
@@ -122,38 +109,6 @@ class OrderProductCorrection(models.Model):
         before_correction = self.order_product.total_price
         new_price = self.supplied_amount * self.order_product.product.retail_price
         return (before_correction - new_price) - self.credit_used
-
-
-class BalanceManager(models.Manager):
-    use_for_related_fields = True
-
-    def credit(self):
-        credit_objs = super(BalanceManager, self).get_queryset().filter(type="CR")
-        debit_objs = super(BalanceManager, self).get_queryset().filter(type="DR")
-        credit_sum = sum([b.amount for b in credit_objs])
-        debit_sum = sum([b.amount for b in debit_objs])
-
-        return credit_sum - debit_sum
-
-    def debit(self):
-        return -self.credit()
-
-
-class Balance(models.Model):
-    # TODO: add sanity check; amount may never be negative.
-    TYPES = (
-        ("CR", "Credit"),
-        ("DR", "Debit"),
-    )
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="balance")
-    type = models.CharField(max_length=2, choices=TYPES)
-    amount = models.DecimalField(max_digits=6, decimal_places=2)
-    notes = models.TextField()
-
-    def __unicode__(self):
-        return "[%s] %s: %s" % (self.user, self.type, self.amount)
-
-    objects = BalanceManager()
 
 
 class Product(models.Model):
