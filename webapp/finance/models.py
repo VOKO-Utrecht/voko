@@ -4,6 +4,8 @@ from vokou import settings
 
 class Payment(models.Model):
     amount = models.DecimalField(max_digits=6, decimal_places=2)
+    # Might be reduntant / non-normalized?
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="user")
 
     # TODO: add more fields
 

@@ -79,7 +79,8 @@ class Order(models.Model):
         to_pay = self.user.balance.debit()
         # Sanity check.  TODO: Allow orders without payment when credits exceed total order price.
         assert(to_pay > 0, "Debit is negative.")
-        self.payment = Payment.objects.create(amount=to_pay)
+        self.payment = Payment.objects.create(amount=to_pay,
+                                              user=self.user)
 
 
 class OrderProduct(models.Model):
