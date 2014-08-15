@@ -99,3 +99,5 @@ STATIC_URL = '/static/'
 AUTH_USER_MODEL = "accounts.VokoUser"
 
 MEMBER_FEE = 15.0
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

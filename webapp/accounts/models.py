@@ -1,3 +1,4 @@
+from uuid import uuid4
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.db import models
 from vokou import settings
@@ -66,3 +67,28 @@ class VokoUser(AbstractBaseUser, PermissionsMixin):
 
     def __unicode__(self):
         return self.get_full_name()
+
+    def save(self, *args, **kwargs):
+        if self.is_active and not self.email_confirmation.is_confirmed:
+            raise RuntimeError("Email address is not confirmed!")
+
+        super(VokoUser, self).save(*args, **kwargs)
+
+
+class EmailConfirmation(models.Model):
+    token = models.CharField(max_length=100, primary_key=True)
+    # OneToOneField might be inpractical when user changes his e-mail address. (TODO?)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="email_confirmation")
+    is_confirmed = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = str(uuid4())
+        super(EmailConfirmation, self).save(*args, **kwargs)
+
+    def confirm(self):
+        self.is_confirmed = True
+        self.save()
+
+    def __unicode__(self):
+        return "Confirmed: %s | user: %s | email: %s" % (self.is_confirmed, self.user, self.user.email)
