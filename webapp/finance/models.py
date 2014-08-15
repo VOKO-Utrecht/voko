@@ -21,7 +21,7 @@ class Payment(models.Model):
 class BalanceManager(models.Manager):
     use_for_related_fields = True
 
-    def credit(self):
+    def _credit(self):
         credit_objs = super(BalanceManager, self).get_queryset().filter(type="CR")
         debit_objs = super(BalanceManager, self).get_queryset().filter(type="DR")
         credit_sum = sum([b.amount for b in credit_objs])
@@ -29,8 +29,16 @@ class BalanceManager(models.Manager):
 
         return credit_sum - debit_sum
 
+    def _debit(self):
+        return -self._credit()
+
+    def credit(self):
+        _credit = self._credit()
+        return _credit if _credit > 0 else 0
+
     def debit(self):
-        return -self.credit()
+        _debit = self._debit()
+        return _debit if _debit > 0 else 0
 
 
 class Balance(models.Model):
