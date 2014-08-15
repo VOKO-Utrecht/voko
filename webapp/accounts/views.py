@@ -22,7 +22,8 @@ class RegisterView(FormView):
     def form_valid(self, form):
         # This method is called when valid form data has been POSTed.
         # It should return an HttpResponse.
-        form.save()
+        user = form.save()
+        user.email_confirmation.send_confirmation_mail()
         return super(RegisterView, self).form_valid(form)
 
 

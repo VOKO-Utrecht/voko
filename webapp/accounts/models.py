@@ -1,7 +1,10 @@
 from uuid import uuid4
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail
+from django.core.urlresolvers import reverse
 from django.db import models
+from accounts.mails import email_confirm_mail
 from vokou import settings
 from django.utils.translation import ugettext_lazy as _
 
@@ -95,6 +98,11 @@ class EmailConfirmation(models.Model):
     def confirm(self):
         self.is_confirmed = True
         self.save()
+
+    def send_confirmation_mail(self):
+        body = email_confirm_mail % {'URL': reverse('confirm_email', args=(self.pk,))}
+        send_mail('[VOKO Utrecht] Emailadres bevestigen', body, 'info@vokoutrecht.nl',
+                  [self.user.email], fail_silently=False)
 
     def __unicode__(self):
         return "Confirmed: %s | user: %s | email: %s" % (self.is_confirmed, self.user, self.user.email)
