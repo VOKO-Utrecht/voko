@@ -16,6 +16,10 @@
 
 Transactiekosten: {{ object.order_round.transaction_costs }} <br/>
 
+{% if object.member_fee > 0 %}
+    Ledenbijdrage bij eerste bestelling: {{ object.member_fee }} <br/>
+{% endif %}
+
 TOTAAL: {{ object.total_price }} Euro
 
 <br/>
