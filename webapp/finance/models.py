@@ -14,6 +14,16 @@ class Payment(models.Model):
     def is_paid(self):  # Placeholder
         return True
 
+    def _create_credit(self):
+        Balance.objects.create(user=self.user,
+                               type="CR",
+                               amount=self.amount,
+                               notes="Credit from Payment #%d" % self.pk)
+
+    def save(self, *args, **kwargs):
+        super(Payment, self).save(*args, **kwargs)
+        self._create_credit()
+
     def __unicode__(self):
         return "Payment of E%s" % self.amount
 
