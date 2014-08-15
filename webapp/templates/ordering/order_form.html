@@ -18,7 +18,8 @@ Transactiekosten: {{ object.order_round.transaction_costs }} <br/>
 
 TOTAAL: {{ object.total_price }} Euro
 
-
+<br/>
+<a href="{% url 'finish_order' object.pk %}">Order afronden</a>
 
 {% endblock %}
 

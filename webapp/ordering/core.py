@@ -7,6 +7,7 @@ def get_current_order_round():
     try:
         return list(models.OrderRound.objects.all())[-1]
     except IndexError:
+        print "INDEX FAIL"
         return
 
 

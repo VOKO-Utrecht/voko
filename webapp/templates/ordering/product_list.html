@@ -2,7 +2,7 @@
 {% block content %}
 <h1>Producten</h1>
 {% for product in object_list %}
-    <li>{{ product.name }} - {{ product.retail_price }}</li>
+    <li><a href="{% url 'view_product' product.pk %}">{{ product.name }} - {{ product.retail_price }}</a></li>
 {% empty %}
     <li>No products yet.</li>
 {% endfor %}
