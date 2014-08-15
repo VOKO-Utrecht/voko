@@ -37,6 +37,7 @@ class VokoUserManager(BaseUserManager):
 
     def create_superuser(self, email, first_name, last_name, password):
         user = self.create_user(email, first_name, last_name, password=password)
+        user.is_active = True
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
@@ -73,8 +74,9 @@ class VokoUser(AbstractBaseUser, PermissionsMixin):
         return self.get_full_name()
 
     def save(self, *args, **kwargs):
-        if self.is_active and not self.email_confirmation.is_confirmed:
-            raise RuntimeError("Email address is not confirmed!")
+        # Disabled because this breaks admin login (TODO)
+        # if self.is_active and not self.email_confirmation.is_confirmed:
+        #     raise RuntimeError("Email address is not confirmed!")
 
         super(VokoUser, self).save(*args, **kwargs)
 

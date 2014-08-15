@@ -1,13 +1,19 @@
+from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
+from django.shortcuts import redirect
 from django.views.generic import FormView, DetailView
 from accounts.forms import VokoUserCreationForm
 from accounts.models import EmailConfirmation
+from vokou import settings
 
 
 class LoginView(FormView):
     template_name = "accounts/login.html"
     form_class = AuthenticationForm
-    success_url = "/welcome/"
+
+    def form_valid(self, form):
+        login(self.request, form.get_user())
+        return redirect(settings.LOGIN_REDIRECT_URL)
 
 
 class RegisterView(FormView):
