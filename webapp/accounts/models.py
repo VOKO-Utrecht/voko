@@ -5,9 +5,9 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class Address(models.Model):
-    street_and_number = models.CharField(max_length=100)
+    street_and_number = models.CharField(max_length=100, blank=True)
     zip_code = models.CharField(max_length=7)
-    city = models.CharField(max_length=100)
+    city = models.CharField(max_length=100, blank=True)
 
     def __unicode__(self):
         return "%s - %s, %s" % (self.street_and_number, self.zip_code, self.city)
