@@ -1,5 +1,6 @@
 from uuid import uuid4
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from vokou import settings
 from django.utils.translation import ugettext_lazy as _
@@ -74,10 +75,15 @@ class VokoUser(AbstractBaseUser, PermissionsMixin):
 
         super(VokoUser, self).save(*args, **kwargs)
 
+        try:
+            _ = self.email_confirmation
+        except ObjectDoesNotExist:
+            EmailConfirmation.objects.create(user=self)
+
 
 class EmailConfirmation(models.Model):
     token = models.CharField(max_length=100, primary_key=True)
-    # OneToOneField might be inpractical when user changes his e-mail address. (TODO?)
+    # OneToOneField might be impractical when user changes his e-mail address. (TODO?)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="email_confirmation")
     is_confirmed = models.BooleanField(default=False)
 
