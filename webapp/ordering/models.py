@@ -2,6 +2,7 @@ from decimal import Decimal, ROUND_UP
 from django.db import models
 from accounts.models import Address
 from finance.models import Payment, Balance
+from ordering.core import get_or_create_order
 from vokou import settings
 
 # TODO use TimeStampedModel for all models
@@ -32,7 +33,10 @@ class OrderManager(models.Manager):
     use_for_related_fields = True
 
     def get_current_order(self):
-        return super(OrderManager, self).get_queryset().order_by('-pk')[0]
+        try:
+            return super(OrderManager, self).get_queryset().filter(finalized=False).order_by('-pk')[0]
+        except IndexError:
+            return get_or_create_order(user=self.instance)
 
 
 class Order(models.Model):

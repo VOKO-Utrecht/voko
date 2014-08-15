@@ -13,8 +13,8 @@ def get_current_order_round():
 
 def get_or_create_order(user):
     return models.Order.objects.get_or_create(finalized=False,
-                                       defaults={'order_round': models.OrderRound.objects.order_by('-pk')[0],
-                                                 'user': user})[0]
+                                              defaults={'order_round': models.OrderRound.objects.order_by('-pk')[0],
+                                                        'user': user})[0]
 
 
 def get_order_product(product, order):
