@@ -28,6 +28,13 @@ class OrderRound(models.Model):
         return "Order round %d" % self.id
 
 
+class OrderManager(models.Manager):
+    use_for_related_fields = True
+
+    def get_current_order(self):
+        return super(OrderManager, self).get_queryset().order_by('-pk')[0]
+
+
 class Order(models.Model):
     """ Order order: ;)
     1. create order (this is implicit even)
@@ -35,6 +42,8 @@ class Order(models.Model):
     3. pay/finalize order
     4. collect order
     """
+
+    objects = OrderManager()
 
     products = models.ManyToManyField("Product", through="OrderProduct")
     order_round = models.ForeignKey("OrderRound")
