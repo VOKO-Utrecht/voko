@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from django.db import transaction
 from .models import VokoUser, Address, UserProfile
 
 # Custom user forms based on examples from Two Scoops of Django.
@@ -30,18 +31,19 @@ class VokoUserCreationForm(forms.ModelForm):
     # TODO: clean_zip_code
 
     def save(self, commit=True):
-        # Save zip code in address
-        address = Address.objects.create(zip_code=self.cleaned_data['zip_code'])
+        with transaction.atomic():
+            # Save zip code in address
+            address = Address.objects.create(zip_code=self.cleaned_data['zip_code'])
 
-        # Create user
-        user = super(VokoUserCreationForm, self).save(commit=False)
-        user.set_password(self.cleaned_data["password1"])
+            # Create user
+            user = super(VokoUserCreationForm, self).save(commit=False)
+            user.set_password(self.cleaned_data["password1"])
 
-        if commit:
-            user.save()
+            if commit:
+                user.save()
 
-        # Lastly, link the two
-        UserProfile.objects.create(user=user, address=address)
+            # Lastly, link the two
+            UserProfile.objects.create(user=user, address=address)
 
         return user
 
