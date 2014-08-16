@@ -1,1 +1,3 @@
-__author__ = 'rik'
+from .base import *
+
+SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
