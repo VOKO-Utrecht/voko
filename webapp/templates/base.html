@@ -7,7 +7,10 @@
 <body>
 <h1>VOKO</h1>
 Welkom {{ user }} | <a href="{% url 'view_products' %}">Producten</a> | Credit: {{ user.balance.credit }} | Debit: {{ user.balance.debit }}
-| Order totaal: <a href="{% url 'view_order' user.orders.get_current_order.pk %}">{{ user.orders.get_current_order.total_price }}</a>
+|
+{% if user.orders %}
+Order totaal: <a href="{% url 'view_order' user.orders.get_current_order.pk %}">{{ user.orders.get_current_order.total_price }}</a>
+{% endif %}
 <hr>
 {% block content %}{% endblock %}
 </body>
