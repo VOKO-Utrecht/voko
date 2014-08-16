@@ -1,5 +1,5 @@
 from django.db import models
-from vokou import settings
+from django.conf import settings
 
 
 class Payment(models.Model):

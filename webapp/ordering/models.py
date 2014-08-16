@@ -3,7 +3,7 @@ from django.db import models
 from accounts.models import Address
 from finance.models import Payment, Balance
 from ordering.core import get_or_create_order
-from vokou import settings
+from django.conf import settings
 
 # TODO use TimeStampedModel for all models
 # TODO: use slugs in relevant models (product, supplier, etc)

@@ -5,7 +5,7 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.db import models
 from accounts.mails import email_confirm_mail
-from vokou import settings
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 
