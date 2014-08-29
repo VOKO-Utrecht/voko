@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 from django.views.generic import FormView, DetailView
 from accounts.forms import VokoUserCreationForm
 from accounts.models import EmailConfirmation
-from vokou import settings
+from django.conf import settings
 
 
 class LoginView(FormView):
