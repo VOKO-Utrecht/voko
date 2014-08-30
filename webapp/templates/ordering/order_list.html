@@ -1,5 +1,4 @@
-{%  extends 'base.html' %}
-
+{% extends 'base.html' %}
 {% block content %}
 
 {% for order in object_list %}
@@ -14,6 +13,4 @@
         Totaal: {{ order.total_price }}
 
 {% endfor %}
-
-
 {% endblock %}
