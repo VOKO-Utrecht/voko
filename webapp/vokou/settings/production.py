@@ -11,3 +11,8 @@ DATABASES = {
         'HOST': 'localhost',                      # Empty for localhost through domain sockets or           '127.0.0.1' for localhost through TCP.
         }
     }
+
+DEFAULT_FROM_EMAIL = "info@vokoutrecht.nl"
+SERVER_EMAIL = "info@vokoutrecht.nl"
+
+ADMINS = (("Voko Utrecht", "info@vokoutrecht.nl"))
