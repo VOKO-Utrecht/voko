@@ -1,3 +1,4 @@
+from django.db import OperationalError
 import models
 
 
@@ -9,6 +10,9 @@ def get_current_order_round():
     except IndexError:
         print "INDEX FAIL"
         return
+    except OperationalError:
+        print "OPERATIONAL ERROR"
+        pass
 
 
 def get_or_create_order(user):

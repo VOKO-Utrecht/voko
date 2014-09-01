@@ -47,7 +47,7 @@ class VokoUserManager(BaseUserManager):
         return user
 
 
-class VokoUser(AbstractBaseUser, PermissionsMixin):
+class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(
         verbose_name="E-mail adres",
         max_length=255,

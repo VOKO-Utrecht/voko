@@ -78,30 +78,3 @@ class VokoUserChangeForm(forms.ModelForm):
         # to the initial value
         return self.initial["password"]
 
-
-class VokoUserAdmin(UserAdmin):
-    # Set the add/modify forms
-    add_form = VokoUserCreationForm
-    form = VokoUserChangeForm
-    # The fields to be used in displaying the User model.
-    # These override the definitions on the base UserAdmin
-    # that reference specific fields on auth.User.
-    list_display = ("email", "is_staff", "can_activate", "is_active", "first_name", "last_name")
-    list_filter = ("is_staff", "is_superuser", "is_active", "groups")
-    search_fields = ("email",)
-    ordering = ("email",)
-    filter_horizontal = ("groups", "user_permissions",)
-    fieldsets = (
-        (None, {"fields": ("email", "password")}),
-        ("Permissions", {"fields": ("can_activate", "is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
-        ("Important dates", {"fields": ("last_login",)}),
-    )
-
-    add_fieldsets = (
-        (None, {
-        "classes": ("wide",),
-        "fields": ("email",
-        "password1", "password2")}
-        ),
-    )
-
