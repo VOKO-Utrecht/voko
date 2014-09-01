@@ -4,12 +4,13 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.db import models
+from django_extensions.db.models import TimeStampedModel
 from accounts.mails import email_confirm_mail
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 
-class Address(models.Model):
+class Address(TimeStampedModel):
     street_and_number = models.CharField(max_length=100, blank=True)
     zip_code = models.CharField(max_length=7)
     city = models.CharField(max_length=100, blank=True)
@@ -18,7 +19,7 @@ class Address(models.Model):
         return "%s - %s, %s" % (self.street_and_number, self.zip_code, self.city)
 
 
-class UserProfile(models.Model):
+class UserProfile(TimeStampedModel):
     user = models.OneToOneField(settings.AUTH_USER_MODEL)
     address = models.ForeignKey(Address)
     notes = models.TextField()
@@ -88,7 +89,7 @@ class VokoUser(AbstractBaseUser, PermissionsMixin):
             EmailConfirmation.objects.create(user=self)
 
 
-class EmailConfirmation(models.Model):
+class EmailConfirmation(TimeStampedModel):
     token = models.CharField(max_length=100, primary_key=True)
     # OneToOneField might be impractical when user changes his e-mail address. (TODO?)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="email_confirmation")

@@ -1,15 +1,15 @@
 from decimal import Decimal, ROUND_UP
 from django.db import models
+from django_extensions.db.models import TimeStampedModel
 from accounts.models import Address
 from finance.models import Payment, Balance
 from ordering.core import get_or_create_order
 from django.conf import settings
 
-# TODO use TimeStampedModel for all models
 # TODO: use slugs in relevant models (product, supplier, etc)
 
 
-class Supplier(models.Model):
+class Supplier(TimeStampedModel):
     name = models.CharField(max_length=50, unique=True)
     address = models.ForeignKey(Address)
 
@@ -17,7 +17,7 @@ class Supplier(models.Model):
         return self.name
 
 
-class OrderRound(models.Model):
+class OrderRound(TimeStampedModel):
     open_for_orders = models.DateField()
     closed_for_orders = models.DateField()
     collect_date = models.DateField()
@@ -39,7 +39,7 @@ class OrderManager(models.Manager):
             return get_or_create_order(user=self.instance)
 
 
-class Order(models.Model):
+class Order(TimeStampedModel):
     """ Order order: ;)
     1. create order (this is implicit even)
     2. place/confirm order (make it definitive for payment)
@@ -96,7 +96,7 @@ class Order(models.Model):
                                               user=self.user)
 
 
-class OrderProduct(models.Model):
+class OrderProduct(TimeStampedModel):
     order = models.ForeignKey("Order")
     product = models.ForeignKey("Product")
     amount = models.IntegerField()
@@ -110,7 +110,7 @@ class OrderProduct(models.Model):
         return self.amount * self.product.retail_price
 
 
-class OrderProductCorrection(models.Model):
+class OrderProductCorrection(TimeStampedModel):
     order_product = models.OneToOneField("OrderProduct")
     supplied_amount = models.DecimalField(max_digits=6, decimal_places=1)
     notes = models.TextField(blank=True)
@@ -125,7 +125,7 @@ class OrderProductCorrection(models.Model):
         return (before_correction - new_price) - self.credit_used
 
 
-class Product(models.Model):
+class Product(TimeStampedModel):
     UNITS = (
         ('St', 'Stuk'),
         ('G',  'Gram'),
@@ -154,12 +154,12 @@ class Product(models.Model):
         return rounded
 
 
-class SupplierOrderProduct(models.Model):
+class SupplierOrderProduct(TimeStampedModel):
     order = models.ForeignKey("SupplierOrder")
     product = models.ForeignKey("Product")
     amount = models.IntegerField()
 
 
-class SupplierOrder(models.Model):
+class SupplierOrder(TimeStampedModel):
     products = models.ManyToManyField("Product", through="SupplierOrderProduct")
     order_round = models.ForeignKey("OrderRound")  # <-- maybe not required
