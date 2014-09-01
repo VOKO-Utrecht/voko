@@ -16,3 +16,4 @@ DEFAULT_FROM_EMAIL = "info@vokoutrecht.nl"
 SERVER_EMAIL = "info@vokoutrecht.nl"
 
 ADMINS = (("Voko Utrecht", "info@vokoutrecht.nl"))
+ALLOWED_HOSTS = ("leden.vokoutrecht.nl",)
