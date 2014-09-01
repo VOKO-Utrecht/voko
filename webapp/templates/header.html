@@ -1,0 +1,11 @@
+<div class="page-header">
+    <h1>Welkom!</h1>
+</div>
+<p>
+Welkom {{ user }} | <a href="{% url 'view_products' %}">Producten</a> | Credit: {{ user.balance.credit }} | Debit: {{ user.balance.debit }}
+|
+{% if user.orders %}
+Order totaal: <a href="{% url 'view_order' user.orders.get_current_order.pk %}">{{ user.orders.get_current_order.total_price }}</a>
+{% endif %}
+<hr>
+</p>

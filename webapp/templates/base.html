@@ -35,7 +35,7 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li><a href="/">Home</a></li>
-            <li><a href="{% url 'view_products' %}">Producten</a></li>
+            {# <li><a href="{% url 'view_products' %}">Producten</a></li> #}
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -43,18 +43,9 @@
     <!-- end of navbar -->
 
     <div class="container" role="main">
-
-      <div class="page-header">
-        <h1>Welkom!</h1>
-      </div>
-<p>
-Welkom {{ user }} | <a href="{% url 'view_products' %}">Producten</a> | Credit: {{ user.balance.credit }} | Debit: {{ user.balance.debit }}
-|
-{% if user.orders %}
-Order totaal: <a href="{% url 'view_order' user.orders.get_current_order.pk %}">{{ user.orders.get_current_order.total_price }}</a>
-{% endif %}
-<hr>
-</p>
+{#    {% if request.user.is_authenticated %}#}
+{#    {% include 'header.html' %}#}
+{#    {% endif %}#}
 {% block content %}{% endblock %}
     </div>
 
