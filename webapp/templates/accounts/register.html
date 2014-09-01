@@ -1,6 +1,17 @@
+{% extends 'base.html' %}
 {% block content %}
+<h1>Lid worden?</h1>
+<p>
+    We nodigen iedereen die interesse heeft uit om lid te worden van VOKO Utrecht.
+    Wel vragen we geïnteresseerden om eerst een informatiebijeenkomst bij te wonen, waarin we uitleggen
+    wat VOKO Utrecht precies is en wat het betekent om lid te worden, alvorens de inschrijving definitief wordt.
+</p><p>
+    Om lid te worden van VOKO Utrecht vragen we daarom hieronder je naam en e-mailadres in te voeren.
+    We zullen dan binnenkort contact met je opnemen over de eerstvolgende informatiebijeenkomst.
+</p>
+
 <form action="" method="post">{% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Register" />
+    <input type="submit" value="Lidmaatschap aanvragen" />
 </form>
 {% endblock %}

@@ -1,11 +1,19 @@
 email_confirm_mail = \
 """
-Hoi,
+Beste %(first_name)s,
 
-Je moet je e-mail adres nog bevestigen. Klik hier om dat te doen:
+Leuk dat je lid wilt worden van VOKO Utrecht!
+
+
+Klik op onderstaande link om je aanmelding te bevestigen:
 
 %(URL)s
 
-Groeten,
-VOKO Utrecht
+
+Wanneer je de aanmelding hebt bevestigd zullen wij binnenkort contact met je opnemen over de eerstvolgende informatiebijeenkomst.
+
+
+Groene groetjes,
+
+VOKO Utrecht.
 """

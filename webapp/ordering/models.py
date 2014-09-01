@@ -22,7 +22,7 @@ class OrderRound(models.Model):
     closed_for_orders = models.DateField()
     collect_date = models.DateField()
     # TODO: Set default values to the values of previous object
-    markup_percentage = models.DecimalField(decimal_places=2, max_digits=5, default=5.0)
+    markup_percentage = models.DecimalField(decimal_places=2, max_digits=5, default=7.0)
     transaction_costs = models.DecimalField(decimal_places=2, max_digits=5, default=0.35)
 
     def __unicode__(self):

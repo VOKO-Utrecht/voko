@@ -21,6 +21,7 @@ class Address(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL)
     address = models.ForeignKey(Address)
+    notes = models.TextField()
 
 
 class VokoUserManager(BaseUserManager):
@@ -47,18 +48,19 @@ class VokoUserManager(BaseUserManager):
 
 class VokoUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(
-        verbose_name="email address",
+        verbose_name="E-mail adres",
         max_length=255,
         unique=True,
         db_index=True,
     )
 
-    first_name = models.CharField(_('first name'), max_length=30)
-    last_name = models.CharField(_('last name'), max_length=30)
+    first_name = models.CharField(_('Voornaam'), max_length=30)
+    last_name = models.CharField(_('Achternaam'), max_length=30)
 
     USERNAME_FIELD = "email"
 
     REQUIRED_FIELDS = ["first_name", "last_name"]
+    can_activate = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
@@ -102,8 +104,9 @@ class EmailConfirmation(models.Model):
         self.save()
 
     def send_confirmation_mail(self):
-        body = email_confirm_mail % {'URL': reverse('confirm_email', args=(self.pk,))}
-        send_mail('[VOKO Utrecht] Emailadres bevestigen', body, 'info@vokoutrecht.nl',
+        body = email_confirm_mail % {'URL': "http://leden.vokoutrecht.nl%s" % reverse('confirm_email', args=(self.pk,)),
+                                     'first_name': self.user.first_name}
+        send_mail('[VOKO Utrecht] Email-adres bevestigen', body, 'info@vokoutrecht.nl',
                   [self.user.email], fail_silently=False)
 
     def __unicode__(self):
