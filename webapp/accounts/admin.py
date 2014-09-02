@@ -35,7 +35,7 @@ enable_user.short_description = "Gebruikersactivatie na bezoek info-avond"
 class VokoUserAdmin(UserAdmin):
     # Set the add/modify forms
     add_form = VokoUserCreationForm
-    form = VokoUserChangeForm
+    # form = VokoUserChangeForm
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
@@ -54,7 +54,7 @@ class VokoUserAdmin(UserAdmin):
         (None, {
         "classes": ("wide",),
         "fields": ("email",
-        "password1", "password2")}
+        "first_name", "last_name")}
         ),
     )
 
