@@ -30,7 +30,7 @@ class VokoUserFinishForm(forms.ModelForm):
     password1 = forms.CharField(label="Wachtwoord", widget=forms.PasswordInput)
     password2 = forms.CharField(label="Wachtwoord (bevestiging)", widget=forms.PasswordInput)
 
-    notes = forms.CharField(label="Voorkeur", widget=forms.Textarea)
+    notes = forms.CharField(label="Antwoorden op bovenstaande vragen", widget=forms.Textarea)
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -59,7 +59,7 @@ class VokoUserFinishForm(forms.ModelForm):
                 user.save()
 
             # Lastly, link the two
-            UserProfile.objects.create(user=user, address=address)
+            UserProfile.objects.create(user=user, address=address, notes=self.cleaned_data['notes'])
 
         return user
 
