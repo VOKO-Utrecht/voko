@@ -11,6 +11,10 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class Address(TimeStampedModel):
+    class Meta:
+        verbose_name = "adres"
+        verbose_name_plural = "adressen"
+
     street_and_number = models.CharField(max_length=100, blank=True)
     zip_code = models.CharField(max_length=7)
     city = models.CharField(max_length=100, blank=True)
@@ -20,6 +24,10 @@ class Address(TimeStampedModel):
 
 
 class UserProfile(TimeStampedModel):
+    class Meta:
+        verbose_name = "ledenprofiel"
+        verbose_name_plural = "ledenprofielen"
+
     user = models.OneToOneField(settings.AUTH_USER_MODEL)
     address = models.ForeignKey(Address)
     notes = models.TextField()
@@ -48,6 +56,10 @@ class VokoUserManager(BaseUserManager):
 
 
 class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
+    class Meta:
+        verbose_name = "lid"
+        verbose_name_plural = "leden"
+
     email = models.EmailField(
         verbose_name="E-mail adres",
         max_length=255,
@@ -90,6 +102,10 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
 
 
 class EmailConfirmation(TimeStampedModel):
+    class Meta:
+        verbose_name = "emailbevestiging"
+        verbose_name_plural = "emailbevestigingen"
+
     token = models.CharField(max_length=100, primary_key=True)
     # OneToOneField might be impractical when user changes his e-mail address. (TODO?)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="email_confirmation")
