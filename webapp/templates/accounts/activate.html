@@ -1,29 +1,33 @@
 {% extends 'base.html' %}
+{% load bootstrap3 %}
 {% block content %}
 <h1>Welkom terug {{ object.first_name }}!</h1>
-<p>
-    Geef in onderstaand tekstveld antwoord op de volgende drie vragen:
-</p>
+    <p>Voer a.u.b. de onderstaande gegevens in om je lidmaatschap te activeren.</p>
 
-<p>
-<ol>
-<li>Geef in een top drie aan in welke werkgroepen je voorkeur hebben (1=leukst):</li>
-<ol type="a">
-<li>Administratie</li>
-<li>Contact Boeren</li>
-<li>Techniek (IT)</li>
-<li>PR en ledenwerving</li>
-<li>Ophalen bestellingen (woensdag overdag)</li>
-<li>Distributie bestellingen (woensdag avond)</li>
-</ol>
-<li>Op welke dagdelen ben je beschikbaar voor VOKO activiteiten?</li>
-<li>Beschik je over een auto(bus), bakfiets of ander voertuig waarmee producten kunnen worden opgehaald?</li>
-</ol>
+ <p>
+    Geef in het tekstveld antwoord op de volgende drie vragen:
+    <ol>
+        <li>Geef in een top drie aan in welke werkgroepen je voorkeur hebben (1=leukst):</li>
+        <ol type="a">
+            <li>Administratie</li>
+            <li>Contact Boeren</li>
+            <li>Techniek (IT)</li>
+            <li>PR en ledenwerving</li>
+            <li>Ophalen bestellingen (woensdag overdag)</li>
+            <li>Distributie bestellingen (woensdag avond)</li>
+        </ol>
+        <li>Op welke dagdelen ben je beschikbaar voor VOKO activiteiten?</li>
+        <li>Beschik je over een auto(bus), bakfiets of ander voertuig waarmee producten kunnen worden opgehaald?</li>
+    </ol>
 </p>
 
 
 <form action="" method="post">{% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Account activeren" />
+    {% bootstrap_form form %}
+    {% buttons %}
+    <button type="submit" class="btn btn-primary">
+      {% bootstrap_icon "star" %} Account activeren
+    </button>
+    {% endbuttons %}
 </form>
 {% endblock %}

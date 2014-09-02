@@ -38,7 +38,7 @@ class VokoUserFinishForm(forms.ModelForm):
         password2 = self.cleaned_data.get("password2")
 
         if password1 and password2 and password1 != password2:
-            msg = "Passwords don't match"
+            msg = "Wachtwoorden zijn niet identiek!"
             raise forms.ValidationError(msg)
 
         return password2
