@@ -32,6 +32,14 @@ def enable_user(modeladmin, request, queryset):
 enable_user.short_description = "Gebruikersactivatie na bezoek info-avond"
 
 
+def force_confirm_email(modeladmin, request, queryset):
+    for user in queryset:
+        user.email_confirmation.is_confirmed = True
+        user.email_confirmation.save()
+
+force_confirm_email.short_description = "Forceer e-mailadres bevestiging"
+
+
 class VokoUserAdmin(UserAdmin):
     # Set the add/modify forms
     add_form = VokoUserCreationForm
@@ -58,7 +66,7 @@ class VokoUserAdmin(UserAdmin):
         ),
     )
 
-    actions = (enable_user,)
+    actions = (enable_user, force_confirm_email)
 
     def email_confirmed(self, obj):
         if obj.email_confirmation:
