@@ -17,10 +17,10 @@ class VokoUserAdmin(UserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ("created", "email", "is_staff", "can_activate", "is_active", "first_name", "last_name")
+    list_display = ("created", "email", "email_confirmed", "can_activate", "is_active", "is_staff", "first_name", "last_name")
     list_filter = ("is_staff", "is_superuser", "is_active", "groups")
     search_fields = ("email",)
-    ordering = ("created",)
+    ordering = ("created", )
     filter_horizontal = ("groups", "user_permissions",)
     fieldsets = (
         (None, {"fields": ("email", "password")}),
@@ -35,5 +35,11 @@ class VokoUserAdmin(UserAdmin):
         "password1", "password2")}
         ),
     )
+
+    def email_confirmed(self, obj):
+        if obj.email_confirmation:
+            return obj.email_confirmation.is_confirmed
+        return False
+    email_confirmed.boolean = True
 
 admin.site.register(VokoUser, VokoUserAdmin)
