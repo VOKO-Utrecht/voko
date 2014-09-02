@@ -7,7 +7,7 @@ from ordering.core import get_or_create_order
 from django.conf import settings
 
 # TODO: use slugs in relevant models (product, supplier, etc)
-
+# TODO: override delete methods (also in finance app)
 
 class Supplier(TimeStampedModel):
     name = models.CharField(max_length=50, unique=True)
