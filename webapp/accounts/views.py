@@ -38,6 +38,10 @@ class RegisterThanksView(TemplateView):
     template_name = "accounts/register_thanks.html"
 
 
+class WelcomeView(TemplateView):
+    template_name = "accounts/welcome.html"
+
+
 class FinishRegistration(UpdateView):
     template_name = "accounts/activate.html"
     success_url = "/accounts/welcome"

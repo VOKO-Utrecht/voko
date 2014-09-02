@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, url
-from .views import LoginView, RegisterView, PasswordResetView, EmailConfirmView, FinishRegistration, RegisterThanksView
+from .views import LoginView, RegisterView, PasswordResetView, EmailConfirmView, FinishRegistration, RegisterThanksView, \
+    WelcomeView
 
 urlpatterns = patterns('',
     url(r'^login/$', LoginView.as_view(), name="login"),
@@ -8,4 +9,5 @@ urlpatterns = patterns('',
     url(r'^register/confirm/(?P<pk>[0-9a-zA-Z\-]+)$', EmailConfirmView.as_view(), name="confirm_email"),
     url(r'^register/finish/(?P<pk>[0-9a-zA-Z\-]+)$', FinishRegistration.as_view(), name="finish_registration"),
     url(r'^passwordreset/$', PasswordResetView.as_view()),
+    url(r'^welcome/$', WelcomeView.as_view()),
 )
