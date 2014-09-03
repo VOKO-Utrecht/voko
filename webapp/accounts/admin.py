@@ -43,7 +43,7 @@ force_confirm_email.short_description = "Forceer e-mailadres bevestiging"
 class VokoUserAdmin(UserAdmin):
     # Set the add/modify forms
     add_form = VokoUserCreationForm
-    # form = VokoUserChangeForm
+    form = VokoUserChangeForm
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
