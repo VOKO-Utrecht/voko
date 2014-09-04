@@ -31,6 +31,9 @@ class UserProfile(TimeStampedModel):
     user = models.OneToOneField(settings.AUTH_USER_MODEL)
     address = models.ForeignKey(Address)
     notes = models.TextField()
+    
+    def __unicode__(self):
+        return "Profile for user: %s" % self.user
 
 
 class VokoUserManager(BaseUserManager):
