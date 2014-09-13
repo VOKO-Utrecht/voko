@@ -102,12 +102,12 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
     template_name = "ordering/order_finish.html"
     model = Order
 
+    def get_queryset(self):
+        qs = super(FinishOrder, self).get_queryset()
+        return qs.filter(finalized=False)
+
     def post(self, request, *args, **kwargs):
         order = self.get_object()
-        # You cannot finalize a finalized order
-        if order.finalized:
-            return HttpResponseBadRequest()
-
         # For now, we just finish the order.
         order.place_order_and_debit()
         order.create_and_add_payment()
