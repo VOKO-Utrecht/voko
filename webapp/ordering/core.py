@@ -6,7 +6,7 @@ def get_current_order_round():
     ## TODO: Get current order round based on current date
     ## If non existing, get_or_create?
     try:
-        return list(models.OrderRound.objects.all())[-1]
+        return models.OrderRound.objects.all().order_by("-pk")[0]
     except IndexError:
         print "INDEX FAIL"
         return

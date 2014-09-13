@@ -57,6 +57,7 @@ class ProductOrder(LoginRequiredMixin, SingleObjectMixin, FormView):
             # TODO: restrict orders of 0 amount!
             order_product = form.save(commit=False)
             order_product.order = get_or_create_order(request.user)
+            assert order_product.product.order_round == get_current_order_round()  # TODO: nicer error, or just disable ordering.
             order_product.save()
             print order_product.pk
         return self.form_valid(form)
