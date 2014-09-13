@@ -1,6 +1,7 @@
 from braces.views import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.forms import inlineformset_factory
+from django.http import HttpResponseForbidden
 from django.views.generic import ListView, DetailView, FormView, View, UpdateView
 from django.views.generic.detail import SingleObjectMixin
 from ordering.core import get_current_order_round, get_or_create_order, get_order_product
@@ -85,8 +86,11 @@ class OrderDisplay(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
         self.object = self.get_object()
         FormSet = inlineformset_factory(self.model, OrderProduct, extra=0, form=self.form_class)
         fs = FormSet(instance=self.get_object(), data=request.POST)
+
+        if self.object.finalized:
+            return HttpResponseForbidden()
+
         if fs.is_valid():
-            # TODO: validate if form may be modified still (isn't it finished?)
             fs.save()
             ## TODO: add 'succeeded' message
 
