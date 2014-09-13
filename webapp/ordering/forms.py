@@ -8,6 +8,13 @@ class OrderProductForm(forms.ModelForm):
         fields = ['amount', 'product']
         widgets = {'product': forms.HiddenInput()}
 
+    def clean_amount(self):
+        amount = int(self.cleaned_data['amount'])
+        if amount < 1:
+            raise forms.ValidationError("Geen valide getal.")
+
+        return amount
+
 
 class OrderForm(forms.ModelForm):
     class Meta:
