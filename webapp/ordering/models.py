@@ -34,7 +34,7 @@ class OrderManager(models.Manager):
 
     def get_current_order(self):
         try:
-            return super(OrderManager, self).get_queryset().filter(finalized=False).order_by('-pk')[0]
+            return super(OrderManager, self).get_queryset().filter(finalized=False, user=self.instance).order_by('-pk')[0]
         except IndexError:
             return get_or_create_order(user=self.instance)
 

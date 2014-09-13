@@ -1,11 +1,6 @@
-<div class="page-header">
-    <h1>Welkom!</h1>
-</div>
-<p>
-Welkom {{ user }} | <a href="{% url 'view_products' %}">Producten</a> | Credit: {{ user.balance.credit }} | Debit: {{ user.balance.debit }}
-|
+<ul class="nav navbar-nav navbar-right">
 {% if user.orders %}
-Order totaal: <a href="{% url 'view_order' user.orders.get_current_order.pk %}">{{ user.orders.get_current_order.total_price }}</a>
+<li><a href="{% url 'view_order' user.orders.get_current_order.pk %}">Bestelling (&euro; {{ user.orders.get_current_order.total_price }})</a></li>
 {% endif %}
-<hr>
-</p>
+<li><a href="#">{{ user.get_full_name }}</a></li>
+</ul>
