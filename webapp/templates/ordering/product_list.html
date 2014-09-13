@@ -1,9 +1,34 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>Producten</h1>
-{% for product in object_list %}
-    <li><a href="{% url 'view_product' product.pk %}">{{ product.name }} - {{ product.retail_price }}</a></li>
-{% empty %}
-    <li>No products yet.</li>
-{% endfor %}
+<div class="panel panel-default">
+      <!-- Default panel contents -->
+      <div class="panel-heading">Producten voor deze bestelronde</div>
+      <div class="panel-body">
+        <p>Dit zijn de producten die deze ronde te bestellen zijn.<br/>
+        Klik op een product voor meer informatie en om te bestellen.</p>
+      </div>
+
+      <!-- Table -->
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Leverancier</th>
+            <th>Omschrijving</th>
+            <th>Prijs</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in object_list %}
+          <tr>
+            <td><a href="{% url 'view_product' product.pk %}">{{ product.name }}</a></td>
+            <td>{{ product.supplier }}</td>
+            <td>{{ product.description }}</td>
+            <td>&euro; {{ product.retail_price }} per {{ product.unit_of_measurement }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 {% endblock %}
