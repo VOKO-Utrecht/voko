@@ -2,5 +2,11 @@
 {% if user.orders %}
 <li><a href="{% url 'view_order' user.orders.get_current_order.pk %}">Bestelling (&euro; {{ user.orders.get_current_order.total_price }})</a></li>
 {% endif %}
-<li><a href="#">{{ user.get_full_name }}</a></li>
+
+<li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ user.get_full_name }}<span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="#">Uitloggen</a></li>
+          </ul>
+</li>
 </ul>
