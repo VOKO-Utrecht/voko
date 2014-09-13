@@ -25,17 +25,17 @@
             <th>Aantal</th>
             <th>Stukprijs</th>
             <th>Totaal</th>
-            <th>Verwijderen?</th>
+            <th><span class="glyphicon glyphicon-trash"></span></th>
           </tr>
         </thead>
         <tbody>
           {% for form in formset %}
           <tr>
-            <td>{{ form.id }} {{ form.order }} {{ form.product }}{{ form.instance.product }}</td>
+            <td><a href="{% url 'view_product' form.instance.product.pk %}">{{ form.instance.product }}</a></td>
             <td>{{ form.amount }}</td>
             <td>&euro; {{ form.instance.product.retail_price }}</td>
             <td>&euro; {{ form.instance.total_price }}</td>
-            <td>{{ form.DELETE }}</td>
+            <td>{{ form.DELETE }}{{ form.id }}{{ form.order }}{{ form.product }}</td>
           </tr>
           {% endfor %}
           <tr>
