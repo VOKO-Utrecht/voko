@@ -143,7 +143,7 @@ class Product(TimeStampedModel):
     minimum_total_order = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
-        return '"%s" van "%s"' % (self.name, self.supplier)
+        return '%s van %s' % (self.name, self.supplier)
 
     @property
     def retail_price(self):

@@ -1,29 +1,81 @@
 {% extends 'base.html' %}
+{% load bootstrap3 %}
 {% block content %}
 
 <form action="" method="post">{% csrf_token %}
-{{ formset.management_form }}
-{% for form in formset %}
-    Form:<br/>
-    {{ form.instance.product }}
-    {{ form }}
-    <br/>
-{% endfor %}
+    {{ formset.management_form }}
+
+    <div class="panel panel-default">
+      <!-- Default panel contents -->
+      <div class="panel-heading">Je bestelling</div>
+      <div class="panel-body">
+        <p>Dit is je bestelling zoals 'ie er nu uitziet.</p>
+        {% if object.member_fee > 0 %}
+        <div class="alert alert-warning" role="alert">
+            <strong>Let op!</strong> Omdat dit je eerste bestelling is, is de ledenbijdrage van &euro; {{ object.member_fee }} automatisch
+        aan je bestelling toegevoegd.
+        </div>
+        {% endif %}
+      </div>
+      <!-- Table -->
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Aantal</th>
+            <th>Stukprijs</th>
+            <th>Totaal</th>
+            <th>Verwijderen?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for form in formset %}
+          <tr>
+            <td>{{ form.id }} {{ form.order }} {{ form.product }}{{ form.instance.product }}</td>
+            <td>{{ form.amount }}</td>
+            <td>&euro; {{ form.instance.product.retail_price }}</td>
+            <td>&euro; {{ form.instance.total_price }}</td>
+            <td>{{ form.DELETE }}</td>
+          </tr>
+          {% endfor %}
+          <tr>
+            <td>Transactiekosten</td>
+            <td>-</td>
+            <td>-</td>
+            <td>&euro; {{ object.order_round.transaction_costs }}</td>
+            <td>-</td>
+          </tr>
+        {% if object.member_fee > 0 %}
+          <tr>
+            <td>Ledenbijdrage bij eerste bestelling</td>
+            <td>-</td>
+            <td>-</td>
+            <td>&euro; {{ object.member_fee }}</td>
+            <td>-</td>
+         </tr>
+        {% endif %}
+          <tr class="panel-footer">
+           <td><strong>Subtotaal</strong></td>
+           <td></td>
+           <td></td>
+           <td><strong>&euro; {{ object.total_price }}</strong></td>
+           <td></td>
+            </tr>
+        </tbody>
+      </table>
+        </div>
+
+    {% buttons %}
+    <button type="submit" class="btn btn-primary">
+      {% bootstrap_icon "pencil" %} Bestelling bijwerken
+    </button>
+    <a class="btn btn-success" href="{% url 'finish_order' object.pk %}" role="button">
+        <span class="glyphicon glyphicon-ok"></span> Bestelling afronden</a>
+    {% endbuttons %}
 
 
-    <input type="submit" value="Bijwerken" />
 </form>
 
-Transactiekosten: {{ object.order_round.transaction_costs }} <br/>
-
-{% if object.member_fee > 0 %}
-    Ledenbijdrage bij eerste bestelling: {{ object.member_fee }} <br/>
-{% endif %}
-
-TOTAAL: {{ object.total_price }} Euro
-
-<br/>
-<a href="{% url 'finish_order' object.pk %}">Order afronden</a>
 
 {% endblock %}
 
