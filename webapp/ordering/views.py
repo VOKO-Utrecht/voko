@@ -1,7 +1,7 @@
 from braces.views import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.forms import inlineformset_factory
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponseBadRequest
 from django.views.generic import ListView, DetailView, FormView, View, UpdateView
 from django.views.generic.detail import SingleObjectMixin
 from ordering.core import get_current_order_round, get_or_create_order, get_order_product
@@ -88,7 +88,7 @@ class OrderDisplay(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
         fs = FormSet(instance=self.get_object(), data=request.POST)
 
         if self.object.finalized:
-            return HttpResponseForbidden()
+            return HttpResponseBadRequest()
 
         if fs.is_valid():
             fs.save()
@@ -103,8 +103,12 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
     model = Order
 
     def post(self, request, *args, **kwargs):
-        # For now, we just finish the order.
         order = self.get_object()
+        # You cannot finalize a finalized order
+        if order.finalized:
+            return HttpResponseBadRequest()
+
+        # For now, we just finish the order.
         order.place_order_and_debit()
         order.create_and_add_payment()
         order.finalized = True

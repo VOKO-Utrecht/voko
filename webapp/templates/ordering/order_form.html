@@ -15,11 +15,11 @@
             <strong>Let op!</strong> Omdat dit je eerste bestelling is, is de ledenbijdrage van &euro; {{ object.member_fee }} automatisch
         aan je bestelling toegevoegd.
         </div>
+        {% endif %}
         {% if object.finalized %}
             <div class="alert alert-danger" role="alert">
             <strong>Let op!</strong> Deze bestelling is al afgerond en kan niet meer worden gewijzigd.
         </div>
-        {% endif %}
         {% endif %}
       </div>
       <!-- Table -->
