@@ -1,3 +1,4 @@
+from braces.views import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.forms import inlineformset_factory
 from django.views.generic import ListView, DetailView, FormView, View, UpdateView
@@ -7,11 +8,11 @@ from ordering.forms import OrderProductForm
 from ordering.models import Product, OrderProduct, Order
 
 
-class ProductsView(ListView):
+class ProductsView(LoginRequiredMixin, ListView):
     queryset = Product.objects.filter(order_round=get_current_order_round())
 
 
-class ProductDetail(View):
+class ProductDetail(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         view = ProductDisplay.as_view()
         return view(request, *args, **kwargs)
@@ -21,7 +22,7 @@ class ProductDetail(View):
         return view(request, *args, **kwargs)
 
 
-class ProductDisplay(DetailView):
+class ProductDisplay(LoginRequiredMixin, DetailView):
     model = Product
 
     def _get_initial(self):
@@ -38,7 +39,7 @@ class ProductDisplay(DetailView):
         return context
 
 
-class ProductOrder(SingleObjectMixin, FormView):
+class ProductOrder(LoginRequiredMixin, SingleObjectMixin, FormView):
     model = Product
     form_class = OrderProductForm
 
@@ -60,7 +61,7 @@ class ProductOrder(SingleObjectMixin, FormView):
         return self.form_valid(form)
 
 
-class OrderDisplay(UpdateView):
+class OrderDisplay(LoginRequiredMixin, UpdateView):
     # TODO: restrict to user only
     model = Order
     form_class = OrderProductForm
@@ -86,7 +87,7 @@ class OrderDisplay(UpdateView):
         return self.render_to_response(self.get_context_data(form=self.get_form(self.form_class)))
 
 
-class FinishOrder(UpdateView):
+class FinishOrder(LoginRequiredMixin, UpdateView):
     template_name = "ordering/order_finish.html"
     model = Order
 
@@ -100,7 +101,7 @@ class FinishOrder(UpdateView):
         print "HOERA"
 
 
-class OrdersDisplay(ListView):
+class OrdersDisplay(LoginRequiredMixin, ListView):
     """
     Overview of multiple orders
     """
