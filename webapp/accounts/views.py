@@ -1,14 +1,15 @@
+from braces.views import AnonymousRequiredMixin
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
 from django.http import Http404
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect
 from django.views.generic import FormView, DetailView, UpdateView, TemplateView
 from accounts.forms import VokoUserCreationForm, VokoUserFinishForm
-from accounts.models import EmailConfirmation, VokoUser
+from accounts.models import EmailConfirmation
 from django.conf import settings
 
 
-class LoginView(FormView):
+class LoginView(AnonymousRequiredMixin, FormView):
     template_name = "accounts/login.html"
     form_class = AuthenticationForm
 
@@ -17,7 +18,7 @@ class LoginView(FormView):
         return redirect(settings.LOGIN_REDIRECT_URL)
 
 
-class RegisterView(FormView):
+class RegisterView(AnonymousRequiredMixin, FormView):
     template_name = "accounts/register.html"
     form_class = VokoUserCreationForm
     success_url = "/accounts/register/thanks"  # TODO: Reverse url
@@ -34,7 +35,7 @@ class RegisterView(FormView):
         return super(RegisterView, self).form_valid(form)
 
 
-class RegisterThanksView(TemplateView):
+class RegisterThanksView(AnonymousRequiredMixin, TemplateView):
     template_name = "accounts/register_thanks.html"
 
 
@@ -42,7 +43,7 @@ class WelcomeView(TemplateView):
     template_name = "accounts/welcome.html"
 
 
-class FinishRegistration(UpdateView):
+class FinishRegistration(AnonymousRequiredMixin, UpdateView):
     template_name = "accounts/activate.html"
     success_url = "/accounts/welcome"
     form_class = VokoUserFinishForm
@@ -59,13 +60,13 @@ class FinishRegistration(UpdateView):
             raise Http404
 
 
-class PasswordResetView(FormView):
+class PasswordResetView(AnonymousRequiredMixin, FormView):
     template_name = "accounts/passwordreset.html"
     form_class = PasswordResetForm
     success_url = "/todo"
 
 
-class EmailConfirmView(DetailView):
+class EmailConfirmView(AnonymousRequiredMixin, DetailView):
     model = EmailConfirmation
 
     def get_queryset(self):
