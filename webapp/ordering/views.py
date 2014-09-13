@@ -5,6 +5,7 @@ from django.views.generic import ListView, DetailView, FormView, View, UpdateVie
 from django.views.generic.detail import SingleObjectMixin
 from ordering.core import get_current_order_round, get_or_create_order, get_order_product
 from ordering.forms import OrderProductForm
+from ordering.mixins import UserOwnsObjectMixin
 from ordering.models import Product, OrderProduct, Order
 
 
@@ -61,7 +62,7 @@ class ProductOrder(LoginRequiredMixin, SingleObjectMixin, FormView):
         return self.form_valid(form)
 
 
-class OrderDisplay(LoginRequiredMixin, UpdateView):
+class OrderDisplay(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
     # TODO: restrict to user only
     model = Order
     form_class = OrderProductForm
@@ -87,7 +88,7 @@ class OrderDisplay(LoginRequiredMixin, UpdateView):
         return self.render_to_response(self.get_context_data(form=self.get_form(self.form_class)))
 
 
-class FinishOrder(LoginRequiredMixin, UpdateView):
+class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
     template_name = "ordering/order_finish.html"
     model = Order
 
@@ -101,7 +102,7 @@ class FinishOrder(LoginRequiredMixin, UpdateView):
         print "HOERA"
 
 
-class OrdersDisplay(LoginRequiredMixin, ListView):
+class OrdersDisplay(LoginRequiredMixin, UserOwnsObjectMixin, ListView):
     """
     Overview of multiple orders
     """
