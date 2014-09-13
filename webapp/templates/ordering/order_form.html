@@ -15,6 +15,11 @@
             <strong>Let op!</strong> Omdat dit je eerste bestelling is, is de ledenbijdrage van &euro; {{ object.member_fee }} automatisch
         aan je bestelling toegevoegd.
         </div>
+        {% if object.finalized %}
+            <div class="alert alert-danger" role="alert">
+            <strong>Let op!</strong> Deze bestelling is al afgerond en kan niet meer worden gewijzigd.
+        </div>
+        {% endif %}
         {% endif %}
       </div>
       <!-- Table -->
@@ -66,10 +71,10 @@
         </div>
 
     {% buttons %}
-    <button type="submit" class="btn btn-primary">
+    <button type="submit" class="btn btn-primary {% if object.finalized %}disabled{% endif %}">
       {% bootstrap_icon "pencil" %} Bestelling bijwerken
     </button>
-    <a class="btn btn-success" href="{% url 'finish_order' object.pk %}" role="button">
+    <a class="btn btn-success {% if object.finalized %}disabled{% endif %}" href="{% url 'finish_order' object.pk %}" role="button">
         <span class="glyphicon glyphicon-ok"></span> Bestelling afronden</a>
     {% endbuttons %}
 
