@@ -22,7 +22,7 @@ def get_or_create_order(user):
                                                   defaults={'order_round': models.OrderRound.objects.order_by('-pk')[0],
                                                             'user': user})[0]
     except IndexError:
-        raise RuntimeError("No orderrounds yet!")
+        raise RuntimeError("Nog geen bestelronde aangemaakt!")
 
 
 def get_order_product(product, order):

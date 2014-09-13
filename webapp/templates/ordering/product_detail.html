@@ -1,11 +1,43 @@
 {% extends 'base.html' %}
+{% load bootstrap3 %}
 {% block content %}
+<h1>{{ object.name }} van {{ object.supplier }}</h1>
+<div class="panel panel-default">
+  <table class="table">
+    <tbody>
+      <tr>
+        <td><strong>Product</strong></td>
+        <td>{{ object.name }}</td>
+      </tr>
+      <tr>
+        <td><strong>Omschrijving</strong></td>
+        <td>{{ object.description }}</td>
+      </tr>
+      <tr>
+        <td><strong>Besteleenheid</strong></td>
+        <td>{{ object.unit_of_measurement }}</td>
+      </tr>
+      <tr>
+        <td><strong>Prijs per eenheid</strong></td>
+        <td>&euro; {{ object.retail_price }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-{{  object }}
-
-<form action="" method="post">{% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Bestellen" />
-</form>
-
+<div class="panel panel-info">
+  <div class="panel-heading">
+    <h3 class="panel-title">Bestellen?</h3>
+  </div>
+  <div class="panel-body">
+    <form action="" method="post">{% csrf_token %}
+        {% bootstrap_form form %}
+        {% buttons %}
+        <button type="submit" class="btn btn-primary">
+        {% bootstrap_icon "shopping-cart" %} Bestelling bijwerken
+        </button>
+        {% endbuttons %}
+    </form>
+  </div>
+</div>
 {% endblock %}

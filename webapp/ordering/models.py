@@ -99,7 +99,7 @@ class Order(TimeStampedModel):
 class OrderProduct(TimeStampedModel):
     order = models.ForeignKey("Order")
     product = models.ForeignKey("Product")
-    amount = models.IntegerField()
+    amount = models.IntegerField(verbose_name="Aantal")
 
     def __unicode__(self):
         return "%d x %s" % (self.amount, self.product)
