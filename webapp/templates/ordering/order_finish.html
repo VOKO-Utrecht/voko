@@ -1,29 +1,71 @@
 {% extends 'base.html' %}
 {% block content %}
-
-{{ object }}<br/>
-{% for order_product in object.orderproduct_set.all %}
-    {{ order_product.product.name }} - {{ order_product.product.retail_price }} x {{ order_product.amount }} : {{ order_product.total_price }}<br/>
-{% endfor %}
-Transactie: {{ object.order_round.transaction_costs }} <br/>
-
-
-<br/>
-{% if object.member_fee %}
-    Contributie:
-    {{ object.member_fee }}
-{% endif %}
-
-<br/>
+<h1>Bestelling afronden</h1>
+<div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-body">
+    <p>Klik onderaan op de knop om je bestelling af te ronden en te betalen.</p>
+  </div>
+  <!-- Table -->
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Aantal</th>
+        <th>Stukprijs</th>
+        <th>Subtotaal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order_product in object.orderproduct_set.all %}
+      <tr>
+        <td>{{ order_product.product.name }}</td>
+        <td>{{ order_product.amount }}</td>
+        <td>&euro; {{ order_product.product.retail_price }}</td>
+        <td>&euro; {{ order_product.total_price }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <td>Transactiekosten</td>
+        <td>-</td>
+        <td>-</td>
+        <td>&euro; {{ object.order_round.transaction_costs }}</td>
+      </tr>
+    {% if object.member_fee %}
+      <tr>
+        <td>Ledenbijdrage bij eerste bestelling</td>
+        <td>-</td>
+        <td>-</td>
+        <td>&euro; {{ object.member_fee }}</td>
+     </tr>
+    {% endif %}
     {% if user.balance.credit > 0 %}
-        Credit: {{ user.balance.credit }}
+      <tr>
+        <td>Credit</td>
+        <td>-</td>
+        <td>-</td>
+        <td>&euro; {{ user.balance.credit }}</td>
+     </tr>
+    {% endif %}
+    {% if user.balance.debit > 0 %}
+      <tr>
+        <td>Debet</td>
+        <td>-</td>
+        <td>-</td>
+        <td>&euro; {{ user.balance.debit }}</td>
+     </tr>
     {% endif %}
 
+      <tr class="panel-footer">
+       <td><strong>Te betalen</strong></td>
+       <td></td>
+       <td></td>
+       <td><strong>&euro; {{ object.total_price_to_pay_with_balances_taken_into_account }}</strong></td>
+        </tr>
+    </tbody>
+  </table>
+</div>
 
-<br/>
-Totaalbedrag: {{ object.total_price }} Euro
-
-<br/>
 
 <form action="" method="post">{% csrf_token %}
     <input type="submit" value="Betalen" />

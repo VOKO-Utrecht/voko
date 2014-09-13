@@ -70,6 +70,20 @@ class Order(TimeStampedModel):
         return product_sum + self.order_round.transaction_costs + self.member_fee
 
     @property
+    def total_price_to_pay_with_balances_taken_into_account(self):
+        if self.user.balance.credit() > 0:
+            print "c1"
+            total_price = self.total_price - self.user.balance.credit()
+            return total_price if total_price > 0 else 0
+
+        if self.user.balance.debit() > 0:
+            print "c2"
+            return self.total_price + self.user.balance.debit()
+
+        print "c3"
+        return self.total_price
+
+    @property
     def member_fee(self):
         # Add contribution if this is users' first order (unfinished orders not included)
         non_finalized_orders = self.user.orders.filter(finalized=True)
