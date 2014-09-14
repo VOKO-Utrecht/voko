@@ -4,4 +4,4 @@ from django.views.generic import View
 
 class HomeView(View):
     def get(self, *args, **kwargs):
-        return redirect('view_products')
+        return redirect('overview')

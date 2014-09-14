@@ -77,3 +77,10 @@ class EmailConfirmView(AnonymousRequiredMixin, DetailView):
         self.get_object().confirm()
         return super(EmailConfirmView, self).get_context_data(**kwargs)
 
+
+class OverView(TemplateView):
+    template_name = "accounts/overview.html"
+
+    # def get_context_data(self, **kwargs):
+    #     context = super(OverView, self).get_context_data(**kwargs)
+

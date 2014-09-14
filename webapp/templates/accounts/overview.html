@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% block content %}
+<h1>Accountoverzicht</h1>
+<h2>Bestellingen</h2>
+<div class="panel panel-default">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>UID</th>
+        <th>Bedrag</th>
+        <th>Bevestigd</th>
+        <th>Opgehaald</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in user.orders.all %}
+      <tr>
+        <td><a href="{% if order.finalized %}{% url 'order_summary' order.pk %}{% else %}{% url 'view_order' order.pk  %}{% endif %}">Bestelling {{ order.pk }}</a></td>
+        <td>&euro; {{ order.total_price }}</td>
+        <td>{{ order.finalized }}</td>
+        <td>{{ order.collected }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2>Financiën</h2>
+    <div>
+    <p>
+    Credit: &euro; {{ user.balance.credit }}<br/>
+    Debet: &euro; {{ user.balance.debit }}
+    </p>
+    </div>
+
+<div class="panel panel-default">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Credit/debet</th>
+        <th>Bedrag</th>
+        <th>Opmerkingen</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in user.balance.all %}
+      <tr>
+        <td>{{ b.type }}</td>
+        <td>&euro; {{ b.amount }}</td>
+        <td>{{ b.notes }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+{% endblock %}
+
+
+
+
