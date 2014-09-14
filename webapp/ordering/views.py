@@ -2,6 +2,7 @@ from braces.views import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.forms import inlineformset_factory
 from django.http import HttpResponseForbidden, HttpResponseBadRequest
+from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, FormView, View, UpdateView
 from django.views.generic.detail import SingleObjectMixin
 from ordering.core import get_current_order_round, get_or_create_order, get_order_product
@@ -110,10 +111,10 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
         order = self.get_object()
         # For now, we just finish the order.
         order.place_order_and_debit()
-        order.create_and_add_payment()
+        # order.create_and_add_payment()
         order.finalized = True
         order.save()
-        print "HOERA"
+        return redirect('pay_order', order.pk)
 
 
 class OrdersDisplay(LoginRequiredMixin, UserOwnsObjectMixin, ListView):
@@ -122,3 +123,23 @@ class OrdersDisplay(LoginRequiredMixin, UserOwnsObjectMixin, ListView):
     """
     def get_queryset(self):
         return self.request.user.orders.all().order_by("-pk")
+
+
+class PayOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
+    template_name = "ordering/order_pay.html"
+    model = Order
+
+    def get_queryset(self):
+        qs = super(PayOrder, self).get_queryset()
+        return qs.filter(finalized=True)
+
+    # TODO mail confirmation
+
+
+class OrderSummary(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
+    template_name = "ordering/order_summary.html"
+    model = Order
+
+    def get_queryset(self):
+        qs = super(OrderSummary, self).get_queryset()
+        return qs.filter(finalized=True)

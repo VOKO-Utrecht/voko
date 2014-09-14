@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% block content %}
+<h1>Bestellingsoverzicht</h1>
+<div class="panel panel-default">
+  <!-- Default panel contents -->
+{#  <div class="panel-body">#}
+{#    <p></p>#}
+{#  </div>#}
+  <!-- Table -->
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Aantal</th>
+        <th>Stukprijs</th>
+        <th>Subtotaal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order_product in object.orderproduct_set.all %}
+      <tr>
+        <td>{{ order_product.product.name }} ({{ order_product.product.supplier }})</td>
+        <td>{{ order_product.amount }}</td>
+        <td>&euro; {{ order_product.product.retail_price }}</td>
+        <td>&euro; {{ order_product.total_price }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <td>Transactiekosten</td>
+        <td>-</td>
+        <td>-</td>
+        <td>&euro; {{ object.order_round.transaction_costs }}</td>
+      </tr>
+    {% if object.member_fee %}
+      <tr>
+        <td>Ledenbijdrage bij eerste bestelling</td>
+        <td>-</td>
+        <td>-</td>
+        <td>&euro; {{ object.member_fee }}</td>
+     </tr>
+    {% endif %}
+      <tr class="panel-footer">
+       <td><strong>Totaalbedrag</strong></td>
+       <td></td>
+       <td></td>
+       <td><strong>&euro; {{ object.total_price }}</strong></td>
+        </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>Belangrijke informatie</h2>
+<div class="panel panel-default">
+  <table class="table">
+    <tbody>
+      <tr>
+        <td>Huidige bestelronde sluit:</td>
+        <td>{{ object.order_round.closed_for_orders }}</td>
+      </tr>
+      <tr>
+        <td>Ophaaldag huidige bestelronde:</td>
+        <td>{{ object.order_round.collect_date }}</td>
+      </tr>
+      <tr>
+        <td>Tijden van uitgifte:</td>
+        <td>17.30 - 20.30</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+{% endblock %}
+
