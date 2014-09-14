@@ -9,6 +9,7 @@ from django.conf import settings
 # TODO: use slugs in relevant models (product, supplier, etc)
 # TODO: override delete methods (also in finance app)
 
+
 class Supplier(TimeStampedModel):
     name = models.CharField(max_length=50, unique=True)
     address = models.ForeignKey(Address)
@@ -64,6 +65,10 @@ class Order(TimeStampedModel):
 
     def __unicode__(self):
         return "Order %d; value: E%s; user: %s" % (self.id, self.total_price, self.user)
+
+    @property
+    def has_products(self):
+        return len(self.orderproduct_set.all()) > 0
 
     @property
     def total_price(self):

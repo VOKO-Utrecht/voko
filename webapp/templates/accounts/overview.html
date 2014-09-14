@@ -15,12 +15,14 @@
     </thead>
     <tbody>
       {% for order in user.orders.all %}
-      <tr>
-        <td><a href="{% if order.finalized %}{% url 'order_summary' order.pk %}{% else %}{% url 'view_order' order.pk  %}{% endif %}">Bestelling {{ order.pk }}</a></td>
-        <td>&euro; {{ order.total_price }}</td>
-        <td>{% if order.finalized %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}</td>
-        <td>{% if order.collected %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}</td>
-      </tr>
+          {% if order.has_products %}
+          <tr>
+            <td><a href="{% if order.finalized %}{% url 'order_summary' order.pk %}{% else %}{% url 'view_order' order.pk  %}{% endif %}">Bestelling {{ order.pk }}</a></td>
+            <td>&euro; {{ order.total_price }}</td>
+            <td>{% if order.finalized %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}</td>
+            <td>{% if order.collected %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}</td>
+          </tr>
+          {% endif %}
       {% endfor %}
     </tbody>
   </table>
