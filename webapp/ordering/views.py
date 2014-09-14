@@ -1,4 +1,5 @@
 from braces.views import LoginRequiredMixin
+from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.forms import inlineformset_factory
 from django.http import HttpResponseForbidden, HttpResponseBadRequest
@@ -7,6 +8,7 @@ from django.views.generic import ListView, DetailView, FormView, View, UpdateVie
 from django.views.generic.detail import SingleObjectMixin
 from ordering.core import get_current_order_round, get_or_create_order, get_order_product
 from ordering.forms import OrderProductForm
+from ordering.mails import order_confirmation_mail
 from ordering.mixins import UserOwnsObjectMixin
 from ordering.models import Product, OrderProduct, Order
 
@@ -133,7 +135,17 @@ class PayOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
         qs = super(PayOrder, self).get_queryset()
         return qs.filter(finalized=True)
 
-    # TODO mail confirmation
+    # TODO when payment works via ideal, mail after payment.
+    def get(self, request, *args, **kwargs):
+        product_list_text = "\n".join(["%d x %s (%s)" % (op.amount, op.product, op.product.supplier) for op in self.get_object().orderproduct_set.all()])
+
+        mail_body = order_confirmation_mail % {'first_name': request.user.first_name,
+                                               'collect_date': self.get_object().order_round.collect_date,
+                                               'product_list': product_list_text}
+        send_mail('[VOKO Utrecht] Bestelbevestiging', mail_body, 'info@vokoutrecht.nl',
+                  [request.user.email], fail_silently=False)
+
+        return super(PayOrder, self).get(request, *args, **kwargs)
 
 
 class OrderSummary(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
