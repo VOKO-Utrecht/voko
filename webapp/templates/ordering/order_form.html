@@ -10,6 +10,10 @@
       <div class="panel-heading">Je bestelling</div>
       <div class="panel-body">
         <p>Dit is je bestelling zoals 'ie er nu uitziet.</p>
+        <p>Om een product uit je bestelling te verwijderen, vink het vakje naast het product aan
+        en klik op 'Bestelling bijwerken'. Om een productaantal te wijzigen, pas de inhoud van het 'Aantal'-veld aan
+        en klik op dezelfde knop.</p>
+        <p>Om de bestelling definitief te maken, klik op "Bestelling afronden".</p>
         {% if object.member_fee > 0 %}
         <div class="alert alert-warning" role="alert">
             <strong>Let op!</strong> Omdat dit je eerste bestelling is, is de ledenbijdrage van &euro; {{ object.member_fee }} automatisch
