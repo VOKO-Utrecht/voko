@@ -28,7 +28,7 @@ class UserProfile(TimeStampedModel):
         verbose_name = "ledenprofiel"
         verbose_name_plural = "ledenprofielen"
 
-    user = models.OneToOneField(settings.AUTH_USER_MODEL)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="userprofile")
     address = models.ForeignKey(Address)
     notes = models.TextField()
     
