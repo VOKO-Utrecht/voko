@@ -18,7 +18,11 @@
         <td>{{ object.unit_of_measurement }}</td>
       </tr>
       <tr>
-        <td><strong>Prijs per eenheid</strong></td>
+        <td><strong>Inkoopprijs per eenheid</strong></td>
+        <td>&euro; {{ object.base_price }}</td>
+      </tr>
+      <tr>
+        <td><strong>Verkoopprijs per eenheid</strong></td>
         <td>&euro; {{ object.retail_price }}</td>
       </tr>
     </tbody>
