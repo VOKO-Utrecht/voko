@@ -1,4 +1,4 @@
-from braces.views import AnonymousRequiredMixin
+from braces.views import AnonymousRequiredMixin, LoginRequiredMixin
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
 from django.http import Http404
@@ -78,7 +78,7 @@ class EmailConfirmView(AnonymousRequiredMixin, DetailView):
         return super(EmailConfirmView, self).get_context_data(**kwargs)
 
 
-class OverView(TemplateView):
+class OverView(LoginRequiredMixin, TemplateView):
     template_name = "accounts/overview.html"
 
     # def get_context_data(self, **kwargs):
