@@ -26,7 +26,8 @@ class OrderRound(TimeStampedModel):
     transaction_costs = models.DecimalField(decimal_places=2, max_digits=5, default=0.35)
 
     def __unicode__(self):
-        return "Order round %d" % self.id
+        return "[%d] Open: %s | Closed: %s | Collect: %s" %\
+               (self.id, self.open_for_orders, self.closed_for_orders, self.collect_date)
 
 
 class OrderManager(models.Manager):
