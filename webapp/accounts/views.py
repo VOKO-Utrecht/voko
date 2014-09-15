@@ -1,11 +1,11 @@
 from braces.views import AnonymousRequiredMixin, LoginRequiredMixin
 from django.contrib.auth import login
-from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.http import Http404
 from django.shortcuts import redirect
 from django.views.generic import FormView, DetailView, UpdateView, TemplateView
-from accounts.forms import VokoUserCreationForm, VokoUserFinishForm
-from accounts.models import EmailConfirmation
+from accounts.forms import VokoUserCreationForm, VokoUserFinishForm, RequestPasswordResetForm, PasswordResetForm
+from accounts.models import EmailConfirmation, VokoUser, PasswordResetRequest
 from django.conf import settings
 
 
@@ -60,12 +60,6 @@ class FinishRegistration(AnonymousRequiredMixin, UpdateView):
             raise Http404
 
 
-class PasswordResetView(AnonymousRequiredMixin, FormView):
-    template_name = "accounts/passwordreset.html"
-    form_class = PasswordResetForm
-    success_url = "/todo"
-
-
 class EmailConfirmView(AnonymousRequiredMixin, DetailView):
     model = EmailConfirmation
 
@@ -84,3 +78,64 @@ class OverView(LoginRequiredMixin, TemplateView):
     # def get_context_data(self, **kwargs):
     #     context = super(OverView, self).get_context_data(**kwargs)
 
+
+class RequestPasswordResetView(AnonymousRequiredMixin, FormView):
+    # TODO: Rate limit
+
+    template_name = "accounts/passwordreset.html"
+    form_class = RequestPasswordResetForm
+    success_url = "done"
+
+    def form_valid(self, form):
+        try:
+            user = VokoUser.objects.get(email=form.cleaned_data['email'])
+            request = PasswordResetRequest(user=user)
+            request.save()
+            request.send_email()
+
+        except VokoUser.DoesNotExist:
+            # Do not notify user
+            pass
+
+        return super(RequestPasswordResetView, self).form_valid(form)
+
+
+class PasswordResetRequestDoneView(AnonymousRequiredMixin, TemplateView):
+    template_name = "accounts/passwordreset_requested.html"
+
+
+class PasswordResetView(AnonymousRequiredMixin, FormView, DetailView):
+    model = PasswordResetRequest
+    template_name = "accounts/passwordreset_reset.html"
+    form_class = PasswordResetForm
+    success_url = "../finished"
+
+    def get_queryset(self):
+        qs = super(PasswordResetView, self).get_queryset()
+        return qs.filter(is_used=False)
+
+    def get_context_data(self, **kwargs):
+        if not self.get_object().is_usable:
+            return Http404
+
+        context = super(PasswordResetView, self).get_context_data(**kwargs)
+        context['form'] = self.form_class()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.form_class(request.POST)
+
+        if form.is_valid():
+            self.object.is_used = True
+            self.object.save()
+            self.object.user.set_password(form.cleaned_data['password1'])
+            self.object.user.save()
+            return self.form_valid(form)
+
+        else:
+            return self.form_invalid(form)
+
+
+class PasswordResetFinishedView(AnonymousRequiredMixin, TemplateView):
+    template_name = "accounts/passwordreset_finished.html"

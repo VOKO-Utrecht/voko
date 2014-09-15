@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from uuid import uuid4
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.core.exceptions import ObjectDoesNotExist
@@ -5,7 +6,8 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
-from accounts.mails import email_confirm_mail
+import pytz
+from accounts.mails import email_confirm_mail, password_reset_mail
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
@@ -131,3 +133,36 @@ class EmailConfirmation(TimeStampedModel):
 
     def __unicode__(self):
         return "Confirmed: %s | user: %s | email: %s" % (self.is_confirmed, self.user, self.user.email)
+
+
+class PasswordResetRequest(TimeStampedModel):
+    class Meta:
+        verbose_name = "wachtwoordreset-aanvraag"
+        verbose_name_plural = "wachtwoordreset-aanvragen"
+
+    token = models.CharField(max_length=100, primary_key=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="password_reset_requests")
+    is_used = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = str(uuid4())
+        super(PasswordResetRequest, self).save(*args, **kwargs)
+
+    def send_email(self):
+        body = password_reset_mail % {'URL': "http://leden.vokoutrecht.nl%s" % reverse('reset_pass', args=(self.pk,)),
+                                     'first_name': self.user.first_name}
+        send_mail('[VOKO Utrecht] Wachtwoord reset', body, 'info@vokoutrecht.nl',
+                  [self.user.email], fail_silently=False)
+    @property
+    def is_usable(self):
+        if self.is_used:
+            return False
+
+        # Time window of 1 hour to reset
+        if (datetime.now(pytz.utc) - self.created) > timedelta(hours=1):
+            return False
+        return True
+
+    def __unicode__(self):
+        return "User: %s | Used: %s | Usable: %s" % (self.user, self.is_used, self.is_usable)

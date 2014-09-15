@@ -77,3 +77,22 @@ class VokoUserChangeForm(forms.ModelForm):
         # to the initial value
         return self.initial["password"]
 
+
+class RequestPasswordResetForm(forms.Form):
+    email = forms.EmailField(label="Email-adres", widget=forms.TextInput)
+
+
+class PasswordResetForm(forms.Form):
+    password1 = forms.CharField(label="Wachtwoord", widget=forms.PasswordInput)
+    password2 = forms.CharField(label="Wachtwoord (bevestiging)", widget=forms.PasswordInput)
+
+    def clean_password2(self):
+        # Check that the two password entries match
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+
+        if password1 and password2 and password1 != password2:
+            msg = "Wachtwoorden zijn niet identiek!"
+            raise forms.ValidationError(msg)
+
+        return password2

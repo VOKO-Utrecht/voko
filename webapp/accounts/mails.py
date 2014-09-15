@@ -38,3 +38,24 @@ Groene groetjes,
 
 VOKO Utrecht.
 """
+
+
+password_reset_mail = \
+"""
+Beste %(first_name)s,
+
+Er is een aanvraag voor een wachtwoordreset gedaan.
+
+Klik op onderstaande link om een nieuw wachtwoord in te stellen:
+
+
+%(URL)s
+
+
+Als je geen wachtwoordreset hebt aangevraagd kun je deze mail negeren.
+
+
+Groene groetjes,
+
+VOKO Utrecht.
+"""
