@@ -155,7 +155,7 @@ class Product(TimeStampedModel):
 
     name = models.CharField(max_length=50)
     description = models.TextField(blank=True)
-    unit_of_measurement = models.CharField(max_length=2, choices=UNITS)
+    unit_of_measurement = models.CharField(max_length=10, choices=UNITS)
     base_price = models.DecimalField(max_digits=6, decimal_places=2)
     supplier = models.ForeignKey("Supplier")
     order_round = models.ForeignKey("OrderRound", related_name="products")
