@@ -10,6 +10,8 @@
             <button type="submit" class="btn btn-primary">
               {% bootstrap_icon "user" %} Inloggen
             </button>
+            <a class="btn btn-warning" href="{% url 'password_reset' %}" role="button">
+            <span class="glyphicon glyphicon-question-sign"></span> Wachtwoord vergeten?</a>
             {% endbuttons %}
         </form>
     </div>
