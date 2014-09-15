@@ -158,6 +158,7 @@ class Product(TimeStampedModel):
     order_round = models.ForeignKey("OrderRound", related_name="products")
 
     minimum_total_order = models.IntegerField(null=True, blank=True)
+    maximum_total_order = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
         return '%s van %s' % (self.name, self.supplier)
