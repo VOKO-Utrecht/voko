@@ -4,7 +4,8 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.db.models.loading import get_models, get_app
 from accounts.forms import VokoUserCreationForm, VokoUserChangeForm
-from accounts.mails import user_enable_mail
+from accounts.mails import user_enable_mail, eerste_bestelronde_mail_plain, \
+    eerste_bestelronde_mail_html
 from accounts.models import VokoUser, UserProfile
 
 for model in get_models(get_app('accounts')):
@@ -38,6 +39,17 @@ def force_confirm_email(modeladmin, request, queryset):
         user.email_confirmation.save()
 
 force_confirm_email.short_description = "Forceer e-mailadres bevestiging"
+
+
+def send_first_order_mail(modeladmin, request, queryset):
+    for user in queryset:
+        plain_body = eerste_bestelronde_mail_plain % {'first_name': user.first_name}
+        html_body = eerste_bestelronde_mail_html % {'first_name': user.first_name}
+
+        send_mail('[VOKO Utrecht] Eerste bestelronde', message=plain_body, html_message=html_body,
+                  from_email='info@vokoutrecht.nl', recipient_list=[user.email], fail_silently=False)
+send_first_order_mail.short_description = "EERSTE BESTELRONDE MAIL"
+
 
 
 class UserProfileInline(admin.StackedInline):
@@ -74,7 +86,7 @@ class VokoUserAdmin(UserAdmin):
         UserProfileInline,
     ]
 
-    actions = (enable_user, force_confirm_email)
+    actions = (enable_user, force_confirm_email, send_first_order_mail)
 
     def email_confirmed(self, obj):
         if obj.email_confirmation:
