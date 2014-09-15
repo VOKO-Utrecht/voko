@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from django.core.mail import mail_admins
 from django.db import transaction
 from .models import VokoUser, Address, UserProfile
 
@@ -45,6 +46,15 @@ class VokoUserFinishForm(forms.ModelForm):
 
     # TODO: clean_zip_code
 
+    def _notify_admins_about_activated_user(self, user):
+        # This is most likely temporary
+        message = """Hoi!
+
+Gebruiker %s heeft zojuist zijn/haar registratie afgerond..
+""" % user
+
+        mail_admins("Gebruiker %s is geactiveerd" % user, message, fail_silently=True)
+
     def save(self, commit=True):
         with transaction.atomic():
             # Save zip code in address
@@ -60,6 +70,8 @@ class VokoUserFinishForm(forms.ModelForm):
 
             # Lastly, link the two
             UserProfile.objects.create(user=user, address=address, notes=self.cleaned_data['notes'])
+
+            self._notify_admins_about_activated_user(user)
 
         return user
 
