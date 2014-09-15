@@ -143,11 +143,14 @@ class OrderProductCorrection(TimeStampedModel):
 
 class Product(TimeStampedModel):
     UNITS = (
-        ('St', 'Stuk'),
-        ('G',  'Gram'),
-        ('KG', 'Kilogram'),
-        ('P',  'Pond'),
-        ('L',  'Liter'),
+        ('Stuk', 'Stuk'),
+        ('Gram',  'Gram'),
+        ('Decagram', 'Decagram (10g)'),
+        ('Hectogram', 'Hectogram (100g)'),
+        ('Pond',  'Pond (500g)'),
+        ('Kilogram', 'Kilogram'),
+        ('Deciliter', 'Deciliter (100ml)'),
+        ('Liter',  'Liter'),
     )
 
     name = models.CharField(max_length=50)
