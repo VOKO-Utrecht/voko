@@ -110,7 +110,8 @@ Bestelling:
 """ % (self.user,
        "\n".join(["%d x %s (%s)" % (op.amount, op.product, op.product.supplier) for op in self.orderproduct_set.all()]))
 
-        mail_admins("Bestelling geplaatst (#%d)" % self.pk, message, fail_silently=True)
+        mail_admins("Bestelling bevestigd (#%d) van %s" % (self.pk, self.user), message,
+                    fail_silently=True)
 
     def place_order_and_debit(self):
         debit = Balance.objects.create(user=self.user,
