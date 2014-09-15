@@ -10,7 +10,7 @@ import django_extensions.db.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0006_auto_20140915_0934'),
+        ('accounts', '0002_auto_20140915_0934'),
         ('finance', '__first__'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
