@@ -32,8 +32,8 @@ class BalanceManager(models.Manager):
     use_for_related_fields = True
 
     def _credit(self):
-        credit_objs = super(BalanceManager, self).get_queryset().filter(type="CR")
-        debit_objs = super(BalanceManager, self).get_queryset().filter(type="DR")
+        credit_objs = self.get_queryset().filter(type="CR")
+        debit_objs = self.get_queryset().filter(type="DR")
         credit_sum = sum([b.amount for b in credit_objs])
         debit_sum = sum([b.amount for b in debit_objs])
 
