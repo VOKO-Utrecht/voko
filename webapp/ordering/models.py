@@ -1,4 +1,5 @@
 from decimal import Decimal, ROUND_UP
+from django.core.mail import mail_admins
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 from accounts.models import Address
@@ -98,12 +99,26 @@ class Order(TimeStampedModel):
             return Decimal(settings.MEMBER_FEE)
         return Decimal(0)
 
+    def _notify_admins_about_new_order(self):
+        # This is most likely temporary
+        message = """Hoi!
+
+Er is een nieuwe bestelling van gebruiker %s.
+
+Bestelling:
+%s
+""" % (self.user,
+       "\n".join(["%d x %s (%s)" % (op.amount, op.product, op.product.supplier) for op in self.orderproduct_set.all()]))
+
+        mail_admins("Bestelling geplaatst (#%d)" % self.pk, message, fail_silently=True)
+
     def place_order_and_debit(self):
         debit = Balance.objects.create(user=self.user,
                                        type="DR",
                                        amount=self.total_price,
                                        notes="Debit of %s for Order %d" % (self.total_price, self.pk))
         self.debit = debit
+
 
     def create_and_add_payment(self):
         to_pay = self.user.balance.debit()

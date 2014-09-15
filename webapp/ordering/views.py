@@ -136,6 +136,7 @@ class PayOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
         return qs.filter(finalized=True)
 
     # TODO when payment works via ideal, mail after payment.
+    # TODO: restrict mailing to once, even on F5
     def get(self, request, *args, **kwargs):
         product_list_text = "\n".join(["%d x %s (%s)" % (op.amount, op.product, op.product.supplier) for op in self.get_object().orderproduct_set.all()])
 
@@ -144,6 +145,8 @@ class PayOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
                                                'product_list': product_list_text}
         send_mail('[VOKO Utrecht] Bestelbevestiging', mail_body, 'info@vokoutrecht.nl',
                   [request.user.email], fail_silently=False)
+
+        self.get_object()._notify_admins_about_new_order()
 
         return super(PayOrder, self).get(request, *args, **kwargs)
 

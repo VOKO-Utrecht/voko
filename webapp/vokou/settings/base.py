@@ -61,3 +61,5 @@ STATIC_URL = '/static/'
 AUTH_USER_MODEL = "accounts.VokoUser"
 MEMBER_FEE = 20.0
 LOGIN_REDIRECT_URL = "/"
+
+EMAIL_SUBJECT_PREFIX = "[Voko Admin]"
