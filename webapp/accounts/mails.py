@@ -65,8 +65,8 @@ eerste_bestelronde_mail_html = \
 """
 Beste %(first_name)s,<br/><br/>
 
-Zoals jullie weten gaan we nu echt van start met VOKO Utrecht! In dit bericht informeren we
-jullie over de laatste ontwikkelingen en de eerste bestelronde:<br/><br/>
+Zoals je weet gaan we nu echt van start met VOKO Utrecht! In dit bericht informeren we
+je over de laatste ontwikkelingen en de eerste bestelronde:<br/><br/>
 
 <strong>Indeling werkzaamheden</strong><br/>
 We zijn na de eerste bijeenkomst druk geweest met het bestelsysteem, juridische zaken en natuurlijk
@@ -97,6 +97,7 @@ Volg van daaruit de aanwijzingen!<br/><br/>
 <li>bestelronde open: maandag 15 september</li>
 <li>bestelronde sluit: vrijdag 19 september, om 18.00 uur</li>
 <li>ophaalmoment: woensdag 24 september, tussen 17.30 en 20.30 in cafe Averechts</li>
+</ul>
 
 <br/><br/>
 <strong>Lidmaatschap nog niet bevestigd?</strong><br/>
@@ -116,8 +117,8 @@ eerste_bestelronde_mail_plain = \
 """
 Beste %(first_name)s,
 
-Zoals jullie weten gaan we nu echt van start met VOKO Utrecht! In dit bericht informeren we
-jullie over de laatste ontwikkelingen en de eerste bestelronde:
+Zoals je weet gaan we nu echt van start met VOKO Utrecht! In dit bericht informeren we
+je over de laatste ontwikkelingen en de eerste bestelronde:
 
 ## Indeling werkzaamheden ##
 We zijn na de eerste bijeenkomst druk geweest met het bestelsysteem, juridische zaken en natuurlijk
