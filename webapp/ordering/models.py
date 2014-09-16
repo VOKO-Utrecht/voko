@@ -1,7 +1,9 @@
+from datetime import datetime
 from decimal import Decimal, ROUND_UP
 from django.core.mail import mail_admins
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
+import pytz
 from accounts.models import Address
 from finance.models import Payment, Balance
 from ordering.core import get_or_create_order
@@ -26,6 +28,13 @@ class OrderRound(TimeStampedModel):
     # TODO: Set default values to the values of previous object
     markup_percentage = models.DecimalField(decimal_places=2, max_digits=5, default=7.0)
     transaction_costs = models.DecimalField(decimal_places=2, max_digits=5, default=0.35)
+
+    @property
+    def is_open(self):
+        current_datetime = datetime.now(pytz.utc)  # Yes, UTC. see Django's timezone docs
+        if current_datetime >= self.open_for_orders and current_datetime < self.closed_for_orders:
+           return True
+        return False
 
     def __unicode__(self):
         return "[%d] Open: %s | Closed: %s | Collect: %s" %\
