@@ -7,6 +7,7 @@ from django.views.generic import FormView, DetailView, UpdateView, TemplateView
 from accounts.forms import VokoUserCreationForm, VokoUserFinishForm, RequestPasswordResetForm, PasswordResetForm
 from accounts.models import EmailConfirmation, VokoUser, PasswordResetRequest
 from django.conf import settings
+from ordering.core import get_current_order_round
 
 
 class LoginView(AnonymousRequiredMixin, FormView):
@@ -75,8 +76,10 @@ class EmailConfirmView(AnonymousRequiredMixin, DetailView):
 class OverView(LoginRequiredMixin, TemplateView):
     template_name = "accounts/overview.html"
 
-    # def get_context_data(self, **kwargs):
-    #     context = super(OverView, self).get_context_data(**kwargs)
+    def get_context_data(self, **kwargs):
+        context = super(OverView, self).get_context_data(**kwargs)
+        context['current_order_round'] = get_current_order_round()
+        return context
 
 
 class RequestPasswordResetView(AnonymousRequiredMixin, FormView):

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>Producten</h1>
-{% if user.orders.get_current_order.order_round.is_open %}
+{% if current_order_round.is_open %}
 <div class="panel panel-default">
   <!-- Default panel contents -->
   <div class="panel-heading">Producten voor deze bestelronde</div>
