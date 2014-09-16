@@ -20,16 +20,16 @@ class Supplier(TimeStampedModel):
 
 
 class OrderRound(TimeStampedModel):
-    open_for_orders = models.DateField()
-    closed_for_orders = models.DateField()
-    collect_date = models.DateField()
+    open_for_orders = models.DateTimeField()
+    closed_for_orders = models.DateTimeField()
+    collect_datetime = models.DateTimeField()
     # TODO: Set default values to the values of previous object
     markup_percentage = models.DecimalField(decimal_places=2, max_digits=5, default=7.0)
     transaction_costs = models.DecimalField(decimal_places=2, max_digits=5, default=0.35)
 
     def __unicode__(self):
         return "[%d] Open: %s | Closed: %s | Collect: %s" %\
-               (self.id, self.open_for_orders, self.closed_for_orders, self.collect_date)
+               (self.id, self.open_for_orders, self.closed_for_orders, self.collect_datetime)
 
 
 class OrderManager(models.Manager):
