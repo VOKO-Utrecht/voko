@@ -2,6 +2,30 @@
 {% load bootstrap3 %}
 {% block content %}
 <h1>Accountoverzicht</h1>
+<h2>Bestelronde</h2>
+<div class="panel panel-default">
+  <table class="table">
+    <tbody>
+          <tr>
+            <td>Bestelronde</td>
+            <td>{% if user.orders.get_current_order.order_round.is_open %}Open{% else %}Gesloten{% endif %}</td>
+          </tr>
+          <tr>
+            <td>Bestelronde open vanaf</td>
+            <td>{{ user.orders.get_current_order.order_round.open_for_orders }}</td>
+          </tr>
+          <tr>
+            <td>Bestelronde open tot</td>
+            <td>{{ user.orders.get_current_order.order_round.closed_for_orders }}</td>
+          </tr>
+          <tr>
+            <td>Ophaalmoment</td>
+            <td>{{ user.orders.get_current_order.order_round.collect_datetime }}</td>
+          </tr>
+    </tbody>
+  </table>
+</div>
+
 <h2>Bestellingen</h2>
 <div class="panel panel-default">
   <table class="table">

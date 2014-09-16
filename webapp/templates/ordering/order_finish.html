@@ -2,6 +2,7 @@
 {% load bootstrap3 %}
 {% block content %}
 <h1>Bestelling afronden</h1>
+{% if object.order_round.is_open %}
 <div class="panel panel-default">
   <!-- Default panel contents -->
   <div class="panel-body">
@@ -72,5 +73,10 @@
       {% bootstrap_icon "euro" %} Bestelling bevestigen en betalen
     </button>
 </form>
+{% else %}
+<div class="alert alert-danger" role="alert">
+    <strong>Helaas!</strong> De bestelronde is gesloten. Kom binnenkort terug!
+</div>
+{% endif %}
 {% endblock %}
 
