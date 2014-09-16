@@ -10,7 +10,7 @@ BESTELLING
 
 DATUMS EN TIJDEN
 ================
-Ophaaldag: %(collect_date)s
+Ophaaldag: %(collect_datetime)s
 Ophaaltijden: 17.30 - 20.30
 
 

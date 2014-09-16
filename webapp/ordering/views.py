@@ -67,7 +67,7 @@ class ProductOrder(LoginRequiredMixin, SingleObjectMixin, FormView):
             order_product.order = get_or_create_order(request.user)
             assert order_product.product.order_round == get_current_order_round()  # TODO: nicer error, or just disable ordering.
 
-            # Remove order when amount is zero
+            # Remove product from order when amount is zero
             if order_product.amount < 1:
                 if order_product.id is not None:
                     order_product.delete()
@@ -146,7 +146,7 @@ class PayOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
         product_list_text = "\n".join(["%d x %s (%s)" % (op.amount, op.product, op.product.supplier) for op in self.get_object().orderproduct_set.all()])
 
         mail_body = order_confirmation_mail % {'first_name': request.user.first_name,
-                                               'collect_date': self.get_object().order_round.collect_date,
+                                               'collect_datetime': self.get_object().order_round.collect_datetime,
                                                'product_list': product_list_text}
         send_mail('[VOKO Utrecht] Bestelbevestiging', mail_body, 'info@vokoutrecht.nl',
                   [request.user.email], fail_silently=False)
