@@ -6,6 +6,7 @@ from django.http import HttpResponseForbidden, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, FormView, View, UpdateView
 from django.views.generic.detail import SingleObjectMixin
+import pytz
 from ordering.core import get_current_order_round, get_or_create_order, get_order_product
 from ordering.forms import OrderProductForm
 from ordering.mails import order_confirmation_mail
@@ -145,8 +146,9 @@ class PayOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
     def get(self, request, *args, **kwargs):
         product_list_text = "\n".join(["%d x %s (%s)" % (op.amount, op.product, op.product.supplier) for op in self.get_object().orderproduct_set.all()])
 
+        amsterdam = pytz.timezone('Europe/Amsterdam')
         mail_body = order_confirmation_mail % {'first_name': request.user.first_name,
-                                               'collect_datetime': self.get_object().order_round.collect_datetime,
+                                               'collect_datetime': self.get_object().order_round.collect_datetime.astimezone(amsterdam).strftime("%c"),
                                                'product_list': product_list_text}
         send_mail('[VOKO Utrecht] Bestelbevestiging', mail_body, 'info@vokoutrecht.nl',
                   [request.user.email], fail_silently=False)
