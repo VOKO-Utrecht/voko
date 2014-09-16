@@ -19,3 +19,4 @@ class OrderProductForm(forms.ModelForm):
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
+        exclude = []

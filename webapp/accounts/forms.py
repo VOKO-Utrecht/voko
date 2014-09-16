@@ -81,6 +81,7 @@ class VokoUserChangeForm(forms.ModelForm):
 
     class Meta:
         model = VokoUser
+        exclude = []
 
     def clean_password(self):
         # Regardless of what the user provides, return the
