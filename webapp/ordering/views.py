@@ -1,4 +1,4 @@
-from braces.views import LoginRequiredMixin
+from braces.views import LoginRequiredMixin, StaffuserRequiredMixin
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.forms import inlineformset_factory
@@ -11,7 +11,7 @@ from ordering.core import get_current_order_round, get_or_create_order, get_orde
 from ordering.forms import OrderProductForm
 from ordering.mails import order_confirmation_mail
 from ordering.mixins import UserOwnsObjectMixin
-from ordering.models import Product, OrderProduct, Order
+from ordering.models import Product, OrderProduct, Order, OrderRound, Supplier
 
 
 class ProductsView(LoginRequiredMixin, ListView):
@@ -165,3 +165,30 @@ class OrderSummary(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
     def get_queryset(self):
         qs = super(OrderSummary, self).get_queryset()
         return qs.filter(finalized=True)
+
+
+### ADMIN VIEWS ###
+
+class OrderRoundsAdminView(StaffuserRequiredMixin, ListView):
+    model = OrderRound
+    template_name = "ordering/admin/orderrounds.html"
+
+
+class OrderRoundAdminView(StaffuserRequiredMixin, DetailView):
+    model = OrderRound
+    template_name = "ordering/admin/orderround.html"
+
+    def _get_orders_per_supplier(self):
+        data = {}
+        order_round = self.get_object()
+        for supplier in Supplier.objects.all():
+            data[supplier] = OrderProduct.objects.filter(order__order_round=order_round,
+                                                         product__supplier=supplier,
+                                                         order__finalized=True)
+
+        return data
+
+    def get_context_data(self, **kwargs):
+        context = super(OrderRoundAdminView, self).get_context_data(**kwargs)
+        context['orders_per_supplier'] = self._get_orders_per_supplier()
+        return context

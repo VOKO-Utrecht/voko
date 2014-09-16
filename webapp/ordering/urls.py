@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, url
-from .views import ProductsView, ProductDetail, OrderDisplay, FinishOrder, OrdersDisplay, PayOrder, OrderSummary
+from .views import ProductsView, ProductDetail, OrderDisplay, FinishOrder, OrdersDisplay, PayOrder, OrderSummary, \
+    OrderRoundsAdminView, OrderRoundAdminView
 
 urlpatterns = patterns('',
     url(r'^products/$', ProductsView.as_view(), name="view_products"),
@@ -9,4 +10,6 @@ urlpatterns = patterns('',
     url(r'^order/(?P<pk>[0-9]+)/pay/$', PayOrder.as_view(), name="pay_order"),
     url(r'^order/(?P<pk>[0-9]+)/summary/$', OrderSummary.as_view(), name="order_summary"),
     url(r'^orders/$', OrdersDisplay.as_view(), name="view_orders"),
+    url(r'^admin/$', OrderRoundsAdminView.as_view(), name="orderrounds_admin"),
+    url(r'^admin/(?P<pk>[0-9]+)/$', OrderRoundAdminView.as_view(), name="orderround_admin"),
 )

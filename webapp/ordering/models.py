@@ -62,7 +62,7 @@ class Order(TimeStampedModel):
     objects = OrderManager()
 
     products = models.ManyToManyField("Product", through="OrderProduct")
-    order_round = models.ForeignKey("OrderRound")
+    order_round = models.ForeignKey("OrderRound", related_name="orders")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="orders")
 
     # This might have to change to 'paid' or something

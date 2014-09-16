@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Bestelronde #{{ object.pk }}</h1>
+
+{% for supplier, orderproducts in orders_per_supplier.items %}
+<h2>{{ supplier }}</h2>
+<div class="panel panel-default">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Aantal</th>
+        <th>Product</th>
+        <th>Omschrijving</th>
+        <th>Inkoopprijs</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for op in orderproducts %}
+          <tr>
+            <td>{{ op.amount }}</td>
+            <td>{{ op.product.name }}</td>
+            <td>{{ op.product.description }}</td>
+            <td>{{ op.product.base_price }}</td>
+          </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endfor %}
+
+
+{% endblock %}
+
+
+
+

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Bestelronden</h1>
+
+<div class="panel panel-default">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Open?</th>
+        <th>Datum open</th>
+        <th>Datum gesloten</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for orderround in object_list %}
+          <tr>
+            <td><a href="{% url 'orderround_admin' orderround.pk %}">{{ orderround.pk }}</a></td>
+            <td>{% if orderround.is_open %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}</td>
+            <td>{{ orderround.open_for_orders }}</td>
+            <td>{{ orderround.closed_for_orders }}</td>
+          </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+
+
+

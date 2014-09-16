@@ -3,11 +3,12 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import Http404
 from django.shortcuts import redirect
-from django.views.generic import FormView, DetailView, UpdateView, TemplateView
+from django.views.generic import FormView, DetailView, UpdateView, TemplateView, ListView
 from accounts.forms import VokoUserCreationForm, VokoUserFinishForm, RequestPasswordResetForm, PasswordResetForm
 from accounts.models import EmailConfirmation, VokoUser, PasswordResetRequest
 from django.conf import settings
 from ordering.core import get_current_order_round
+from ordering.models import OrderRound
 
 
 class LoginView(AnonymousRequiredMixin, FormView):
@@ -142,3 +143,4 @@ class PasswordResetView(AnonymousRequiredMixin, FormView, DetailView):
 
 class PasswordResetFinishedView(AnonymousRequiredMixin, TemplateView):
     template_name = "accounts/passwordreset_finished.html"
+
