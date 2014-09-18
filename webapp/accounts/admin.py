@@ -51,6 +51,14 @@ def send_first_order_mail(modeladmin, request, queryset):
 send_first_order_mail.short_description = "EERSTE BESTELRONDE MAIL"
 
 
+def send_first_order_reminder_mail(modeladmin, request, queryset):
+    for user in queryset:
+        plain_body = order_reminder_mail % {'first_name': user.first_name}
+
+        send_mail('VOKO Utrecht - Herinnering: bestellen mogelijk tot 19/9/14, 18.00 uur', message=plain_body,
+                  from_email='info@vokoutrecht.nl', recipient_list=[user.email], fail_silently=False)
+send_first_order_reminder_mail.short_description = "EERSTE BESTELRONDE MAIL REMINDER"
+
 
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
@@ -86,7 +94,7 @@ class VokoUserAdmin(UserAdmin):
         UserProfileInline,
     ]
 
-    actions = (enable_user, force_confirm_email, send_first_order_mail)
+    actions = (enable_user, force_confirm_email, send_first_order_mail, send_first_order_reminder_mail)
 
     def email_confirmed(self, obj):
         if obj.email_confirmation:
