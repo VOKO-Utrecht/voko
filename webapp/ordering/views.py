@@ -188,6 +188,8 @@ class OrderRoundAdminView(StaffuserRequiredMixin, DetailView):
             for product in suppliers_products_this_round:
                 order_products = product.orderproducts.filter(order__finalized=True)
                 product_sum = sum([op.amount for op in order_products])
+                if product_sum == 0:
+                    continue
 
                 data[supplier].append({'product': product,
                                        'sum': product_sum})
