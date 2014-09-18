@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.db.models.loading import get_models, get_app
 from accounts.forms import VokoUserCreationForm, VokoUserChangeForm
 from accounts.mails import user_enable_mail, eerste_bestelronde_mail_plain, \
-    eerste_bestelronde_mail_html
+    eerste_bestelronde_mail_html, order_reminder_mail
 from accounts.models import VokoUser, UserProfile
 
 for model in get_models(get_app('accounts')):
