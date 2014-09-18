@@ -140,7 +140,7 @@ Bestelling:
 
 class OrderProduct(TimeStampedModel):
     order = models.ForeignKey("Order")
-    product = models.ForeignKey("Product")
+    product = models.ForeignKey("Product", related_name="orderproducts")
     amount = models.IntegerField(verbose_name="Aantal")
 
     def __unicode__(self):
@@ -182,7 +182,7 @@ class Product(TimeStampedModel):
     description = models.TextField(blank=True)
     unit_of_measurement = models.CharField(max_length=10, choices=UNITS)
     base_price = models.DecimalField(max_digits=6, decimal_places=2)
-    supplier = models.ForeignKey("Supplier")
+    supplier = models.ForeignKey("Supplier", related_name="products")
     order_round = models.ForeignKey("OrderRound", related_name="products")
 
     minimum_total_order = models.IntegerField(null=True, blank=True)

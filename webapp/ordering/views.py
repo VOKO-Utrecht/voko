@@ -182,9 +182,16 @@ class OrderRoundAdminView(StaffuserRequiredMixin, DetailView):
         data = {}
         order_round = self.get_object()
         for supplier in Supplier.objects.all():
-            data[supplier] = OrderProduct.objects.filter(order__order_round=order_round,
-                                                         product__supplier=supplier,
-                                                         order__finalized=True)
+            suppliers_products_this_round = supplier.products.filter(order_round=order_round)
+            data[supplier] = []
+
+            for product in suppliers_products_this_round:
+                order_products = product.orderproducts.filter(order__finalized=True)
+                product_sum = sum([op.amount for op in order_products])
+
+                data[supplier].append({'product': product,
+                                       'sum': product_sum})
+
 
         return data
 
