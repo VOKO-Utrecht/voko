@@ -194,10 +194,14 @@ class OrderRoundAdminView(StaffuserRequiredMixin, DetailView):
                 data[supplier].append({'product': product,
                                        'sum': product_sum})
 
-
         return data
 
     def get_context_data(self, **kwargs):
         context = super(OrderRoundAdminView, self).get_context_data(**kwargs)
         context['orders_per_supplier'] = self._get_orders_per_supplier()
         return context
+
+
+class ProductOrdersAdminView(StaffuserRequiredMixin, DetailView):
+    model = Product
+    template_name = "ordering/admin/productorder.html"

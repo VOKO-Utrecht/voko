@@ -139,7 +139,7 @@ Bestelling:
 
 
 class OrderProduct(TimeStampedModel):
-    order = models.ForeignKey("Order")
+    order = models.ForeignKey("Order", related_name="orderproducts")
     product = models.ForeignKey("Product", related_name="orderproducts")
     amount = models.IntegerField(verbose_name="Aantal")
 

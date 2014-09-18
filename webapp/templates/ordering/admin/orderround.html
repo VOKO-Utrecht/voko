@@ -18,7 +18,7 @@
     <tbody>
       {% for i in items %}
           <tr>
-            <td>{{ i.sum }}</td>
+            <td><a href="{% url 'productorders_admin' i.product.pk %}">{{ i.sum }}</a></td>
             <td>{{ i.product.unit_of_measurement }}</td>
             <td>{{ i.product.name }}</td>
             <td>{{ i.product.description }}</td>

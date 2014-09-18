@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ object }}</h1>
+
+{% for op in object.orderproducts.all %}
+<h2>Order (#{{ op.order.pk }}) van {{ op.order.user }}</h2>
+<div class="panel panel-default">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Aantal</th>
+        <th>Eenheid</th>
+        <th>Product</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for o in op.order.orderproducts.all %}
+          <tr>
+            <td>{{ o.amount }}</td>
+            <td>{{ o.product.unit_of_measurement }}</td>
+            <td>{{ o.product.name }}</td>
+          </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endfor %}
+{% endblock %}
+
+
+
+
