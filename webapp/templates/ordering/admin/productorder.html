@@ -15,7 +15,7 @@
     </thead>
     <tbody>
       {% for o in op.order.orderproducts.all %}
-          <tr>
+          <tr {% if o.product == object %}class="success"{% endif %}>
             <td>{{ o.amount }}</td>
             <td>{{ o.product.unit_of_measurement }}</td>
             <td>{{ o.product.name }}</td>
