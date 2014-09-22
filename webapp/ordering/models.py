@@ -78,11 +78,11 @@ class Order(TimeStampedModel):
 
     @property
     def has_products(self):
-        return len(self.orderproduct_set.all()) > 0
+        return len(self.orderproducts.all()) > 0
 
     @property
     def total_price(self):
-        product_sum = sum([p.total_price for p in self.orderproduct_set.all()])
+        product_sum = sum([p.total_price for p in self.orderproducts.all()])
         return product_sum + self.order_round.transaction_costs + self.member_fee
 
     @property
@@ -117,7 +117,7 @@ Er is een nieuwe bestelling van gebruiker %s.
 Bestelling:
 %s
 """ % (self.user,
-       "\n".join(["%d x %s (%s)" % (op.amount, op.product, op.product.supplier) for op in self.orderproduct_set.all()]))
+       "\n".join(["%d x %s (%s)" % (op.amount, op.product, op.product.supplier) for op in self.orderproducts.all()]))
 
         mail_admins("Bestelling bevestigd (#%d) van %s" % (self.pk, self.user), message,
                     fail_silently=True)

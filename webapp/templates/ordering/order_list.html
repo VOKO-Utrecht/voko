@@ -4,7 +4,7 @@
 {% for order in object_list %}
     <hr>
     Order ID: {{ order.pk }}<br/>
-    {% for order_product in order.orderproduct_set.all %}
+    {% for order_product in order.orderproducts.all %}
         <li>{{ order_product.amount }} x {{ order_product.product.name }}</li>
     {% endfor %}
         {% if order.member_fee %}

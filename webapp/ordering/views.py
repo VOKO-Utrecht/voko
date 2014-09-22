@@ -144,7 +144,7 @@ class PayOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
     # TODO when payment works via ideal, mail after payment.
     # TODO: restrict mailing to once, even on F5
     def get(self, request, *args, **kwargs):
-        product_list_text = "\n".join(["%d x %s (%s)" % (op.amount, op.product, op.product.supplier) for op in self.get_object().orderproduct_set.all()])
+        product_list_text = "\n".join(["%d x %s (%s)" % (op.amount, op.product, op.product.supplier) for op in self.get_object().orderproducts.all()])
 
         amsterdam = pytz.timezone('Europe/Amsterdam')
         mail_body = order_confirmation_mail % {'first_name': request.user.first_name,

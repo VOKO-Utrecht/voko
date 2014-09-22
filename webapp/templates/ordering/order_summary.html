@@ -18,7 +18,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for order_product in object.orderproduct_set.all %}
+      {% for order_product in object.orderproducts.all %}
       <tr>
         <td>{{ order_product.product.name }} ({{ order_product.product.supplier }})</td>
         <td>{{ order_product.amount }}</td>
