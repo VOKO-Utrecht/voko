@@ -8,14 +8,16 @@
     </style>
 
 {% for order in object_list %}
-<h2>#{{ forloop.counter }}: Bestelling van {{ order.user }}</h2>
 <div class="panel panel-default">
 <div class="panel-heading">
+<h4>#{{ forloop.counter }}: Bestelling van {{ order.user }}</h4>
+</div>
+  <div class="panel-body">
     ID: {{ order.pk }}
     | Afgerond: {% if order.finalized %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}
     | Laatst gewijzigd: {{ order.modified }}
     | {{ order.user.email }}
-</div>
+  </div>
   <table class="table table-condensed">
     <thead>
       <tr>
