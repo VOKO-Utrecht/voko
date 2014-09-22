@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+    <style>
+    .panel {
+   page-break-after: always;
+   page-break-inside: avoid;
+}
+    </style>
+
+{% for order in object_list %}
+<h2>Bestelling van {{ order.user }}</h2>
+<div class="panel panel-default">
+<div class="panel-heading">
+    ID: {{ order.pk }}
+    | Afgerond: {% if order.finalized %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}
+    | Laatst gewijzigd: {{ order.modified }}
+</div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Aantal</th>
+        <th>Eenheid</th>
+        <th>Product</th>
+        <th>Omschrijving</th>
+        <th>Inkoop</th>
+        <th>Verkoop</th>
+        <th>Totaal</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      {% for o in order.orderproducts.all %}
+          <tr {% if o.product == object %}class="success"{% endif %}>
+            <td>{{ o.amount }}</td>
+            <td>{{ o.product.unit_of_measurement }}</td>
+            <td>{{ o.product.name }}</td>
+            <td>{{ o.product.description }}</td>
+            <td>&euro; {{ o.product.base_price }}</td>
+            <td>&euro; {{ o.product.retail_price }}</td>
+            <td>&euro; {{ o.total_price }}</td>
+          </tr>
+      {% endfor %}
+
+    {% if order.member_fee %}
+      <tr>
+        <td>Ledenbijdrage bij eerste bestelling</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>&euro; {{ order.member_fee }}</td>
+     </tr>
+    {% endif %}
+
+    <tr class="panel-footer">
+       <td><strong>Totaalbedrag</strong></td>
+       <td></td>
+       <td></td>
+       <td></td>
+       <td></td>
+       <td></td>
+       <td><strong>&euro; {{ order.total_price }}</strong></td>
+        </tr>
+    </tbody>
+  </table>
+</div>
+
+{% endfor %}
+{% endblock %}

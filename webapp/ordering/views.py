@@ -205,3 +205,11 @@ class OrderRoundAdminView(StaffuserRequiredMixin, DetailView):
 class ProductOrdersAdminView(StaffuserRequiredMixin, DetailView):
     model = Product
     template_name = "ordering/admin/productorder.html"
+
+
+class UserOrdersPerOrderRoundView(StaffuserRequiredMixin, ListView):
+    template_name = "ordering/admin/user_orders_per_round.html"
+
+    def get_queryset(self):
+        order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
+        return Order.objects.filter(order_round=order_round, finalized=True)
