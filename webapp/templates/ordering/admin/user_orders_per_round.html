@@ -22,6 +22,7 @@
         <th>Aantal</th>
         <th>Eenheid</th>
         <th>Product</th>
+        <th>Leverancier</th>
         <th>Omschrijving</th>
         <th>Per stuk</th>
         <th>Totaal</th>
@@ -34,6 +35,7 @@
             <td>{{ o.amount }}</td>
             <td>{{ o.product.unit_of_measurement }}</td>
             <td>{{ o.product.name }}</td>
+            <td>{{ o.product.supplier }}</td>
             <td>{{ o.product.description|truncatechars:50 }}</td>
             <td>&euro; {{ o.product.retail_price }}</td>
             <td>&euro; {{ o.total_price }}</td>
@@ -45,6 +47,7 @@
         <td>-</td>
         <td>-</td>
         <td>-</td>
+        <td>-</td>
         <td>Ledenbijdrage bij eerste bestelling</td>
         <td>-</td>
         <td>&euro; {{ order.member_fee }}</td>
@@ -53,6 +56,7 @@
 
     <tr class="panel-footer">
        <td><strong>Totaalbedrag</strong></td>
+       <td></td>
        <td></td>
        <td></td>
        <td></td>
