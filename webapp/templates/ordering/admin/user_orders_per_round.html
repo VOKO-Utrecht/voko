@@ -14,6 +14,7 @@
     ID: {{ order.pk }}
     | Afgerond: {% if order.finalized %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}
     | Laatst gewijzigd: {{ order.modified }}
+    | {{ order.user.email }}
 </div>
   <table class="table table-condensed">
     <thead>
