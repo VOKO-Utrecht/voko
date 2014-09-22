@@ -8,7 +8,7 @@
     </style>
 
 {% for order in object_list %}
-<h2>Bestelling van {{ order.user }}</h2>
+<h2>#{{ forloop.counter }}: Bestelling van {{ order.user }}</h2>
 <div class="panel panel-default">
 <div class="panel-heading">
     ID: {{ order.pk }}
