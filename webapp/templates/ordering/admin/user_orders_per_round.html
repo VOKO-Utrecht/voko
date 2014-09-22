@@ -22,8 +22,7 @@
         <th>Eenheid</th>
         <th>Product</th>
         <th>Omschrijving</th>
-        <th>Inkoop</th>
-        <th>Verkoop</th>
+        <th>Per stuk</th>
         <th>Totaal</th>
       </tr>
     </thead>
@@ -35,7 +34,6 @@
             <td>{{ o.product.unit_of_measurement }}</td>
             <td>{{ o.product.name }}</td>
             <td>{{ o.product.description }}</td>
-            <td>&euro; {{ o.product.base_price }}</td>
             <td>&euro; {{ o.product.retail_price }}</td>
             <td>&euro; {{ o.total_price }}</td>
           </tr>
@@ -43,11 +41,10 @@
 
     {% if order.member_fee %}
       <tr>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
         <td>Ledenbijdrage bij eerste bestelling</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
         <td>-</td>
         <td>&euro; {{ order.member_fee }}</td>
      </tr>
