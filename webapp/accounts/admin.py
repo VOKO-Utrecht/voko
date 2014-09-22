@@ -71,13 +71,13 @@ class VokoUserAdmin(UserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ("created", "email", "email_confirmed", "can_activate", "is_active", "is_staff", "first_name", "last_name")
+    list_display = ("first_name", "last_name", "email", "email_confirmed", "can_activate", "is_active", "is_staff", "created",)
     list_filter = ("is_staff", "is_superuser", "is_active", "groups")
-    search_fields = ("email",)
-    ordering = ("created", )
+    search_fields = ("email", 'first_name', 'last_name')
+    ordering = ("-created", )
     filter_horizontal = ("groups", "user_permissions",)
     fieldsets = (
-        (None, {"fields": ("email", "password")}),
+        (None, {"fields": ("email", "password", "first_name", "last_name")}),
         ("Permissions", {"fields": ("can_activate", "is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
         ("Important dates", {"fields": ("last_login",)}),
     )
