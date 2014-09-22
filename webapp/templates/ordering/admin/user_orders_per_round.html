@@ -15,7 +15,7 @@
     | Afgerond: {% if order.finalized %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}
     | Laatst gewijzigd: {{ order.modified }}
 </div>
-  <table class="table">
+  <table class="table table-condensed">
     <thead>
       <tr>
         <th>Aantal</th>
@@ -33,7 +33,7 @@
             <td>{{ o.amount }}</td>
             <td>{{ o.product.unit_of_measurement }}</td>
             <td>{{ o.product.name }}</td>
-            <td>{{ o.product.description }}</td>
+            <td>{{ o.product.description|truncatechars:50 }}</td>
             <td>&euro; {{ o.product.retail_price }}</td>
             <td>&euro; {{ o.total_price }}</td>
           </tr>
