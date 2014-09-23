@@ -13,6 +13,7 @@
         <th>Product</th>
         <th>Omschrijving</th>
         <th>Inkoopprijs</th>
+        <th>Subtotaal</th>
       </tr>
     </thead>
     <tbody>
@@ -22,7 +23,8 @@
             <td>{{ i.product.unit_of_measurement }}</td>
             <td>{{ i.product.name }}</td>
             <td>{{ i.product.description }}</td>
-            <td>{{ i.product.base_price }}</td>
+            <td>&euro; {{ i.product.base_price }}</td>
+            <td>&euro; {{ i.total_price }}</td>
           </tr>
       {% endfor %}
     </tbody>
