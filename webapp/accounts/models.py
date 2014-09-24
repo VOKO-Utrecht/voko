@@ -100,7 +100,7 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
         #     raise RuntimeError("Email address is not confirmed!")
         if self.pk is None:
             message = """Hoi! We hebben een nieuwe gebruiker (poti-lid) :  %s""" % self
-            mail_admins("Nieuwe gebruiker: %s" % user, message, fail_silently=True)
+            mail_admins("Nieuwe gebruiker: %s" % self, message, fail_silently=True)
 
         super(VokoUser, self).save(*args, **kwargs)
 
