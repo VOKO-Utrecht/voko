@@ -97,6 +97,9 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
         # Disabled because this breaks admin login (TODO)
         # if self.is_active and not self.email_confirmation.is_confirmed:
         #     raise RuntimeError("Email address is not confirmed!")
+        if self.pk is None:
+            message = """Hoi! We hebben een nieuwe gebruiker (poti-lid) :  %s""" % self
+            mail_admins("Nieuwe gebruiker: %s" % user, message, fail_silently=True)
 
         super(VokoUser, self).save(*args, **kwargs)
 
