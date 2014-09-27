@@ -12,7 +12,7 @@ DATABASES = {
         }
     }
 
-DEFAULT_FROM_EMAIL = "info@vokoutrecht.nl"
+DEFAULT_FROM_EMAIL = "VOKO Utrecht <info@vokoutrecht.nl>"
 SERVER_EMAIL = "info@vokoutrecht.nl"
 
 ADMINS = (
