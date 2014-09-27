@@ -150,7 +150,7 @@ class PayOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
         mail_body = order_confirmation_mail % {'first_name': request.user.first_name,
                                                'collect_datetime': self.get_object().order_round.collect_datetime.astimezone(amsterdam).strftime("%c"),
                                                'product_list': product_list_text}
-        send_mail('[VOKO Utrecht] Bestelbevestiging', mail_body, 'info@vokoutrecht.nl',
+        send_mail('[VOKO Utrecht] Bestelbevestiging', mail_body, 'VOKO Utrecht <info@vokoutrecht.nl>',
                   [request.user.email], fail_silently=False)
 
         self.get_object()._notify_admins_about_new_order()

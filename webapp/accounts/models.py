@@ -132,7 +132,7 @@ class EmailConfirmation(TimeStampedModel):
     def send_confirmation_mail(self):
         body = email_confirm_mail % {'URL': "http://leden.vokoutrecht.nl%s" % reverse('confirm_email', args=(self.pk,)),
                                      'first_name': self.user.first_name}
-        send_mail('[VOKO Utrecht] Email-adres bevestigen', body, 'info@vokoutrecht.nl',
+        send_mail('[VOKO Utrecht] Email-adres bevestigen', body, 'VOKO Utrecht <info@vokoutrecht.nl>',
                   [self.user.email], fail_silently=False)
 
     def __unicode__(self):
@@ -156,7 +156,7 @@ class PasswordResetRequest(TimeStampedModel):
     def send_email(self):
         body = password_reset_mail % {'URL': "http://leden.vokoutrecht.nl%s" % reverse('reset_pass', args=(self.pk,)),
                                      'first_name': self.user.first_name}
-        send_mail('[VOKO Utrecht] Wachtwoord reset', body, 'info@vokoutrecht.nl',
+        send_mail('[VOKO Utrecht] Wachtwoord reset', body, 'VOKO Utrecht <info@vokoutrecht.nl>',
                   [self.user.email], fail_silently=False)
     @property
     def is_usable(self):

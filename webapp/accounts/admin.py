@@ -47,7 +47,7 @@ def send_first_order_mail(modeladmin, request, queryset):
         html_body = eerste_bestelronde_mail_html % {'first_name': user.first_name}
 
         send_mail('[VOKO Utrecht] Eerste bestelronde', message=plain_body, html_message=html_body,
-                  from_email='info@vokoutrecht.nl', recipient_list=[user.email], fail_silently=False)
+                  from_email='VOKO Utrecht <info@vokoutrecht.nl>', recipient_list=[user.email], fail_silently=False)
 send_first_order_mail.short_description = "EERSTE BESTELRONDE MAIL"
 
 
@@ -56,7 +56,7 @@ def send_first_order_reminder_mail(modeladmin, request, queryset):
         plain_body = order_reminder_mail % {'first_name': user.first_name}
 
         send_mail('VOKO Utrecht - Herinnering: bestellen mogelijk tot 19/9/14, 18.00 uur', message=plain_body,
-                  from_email='info@vokoutrecht.nl', recipient_list=[user.email], fail_silently=False)
+                  from_email='VOKO Utrecht <info@vokoutrecht.nl>', recipient_list=[user.email], fail_silently=False)
 send_first_order_reminder_mail.short_description = "EERSTE BESTELRONDE MAIL REMINDER"
 
 
