@@ -70,7 +70,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for b in user.balance.all %}
+      {% for b in user.balance.all reversed %}
       <tr>
         <td>{{ b.type }}</td>
         <td>&euro; {{ b.amount }}</td>
