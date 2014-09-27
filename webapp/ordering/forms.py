@@ -1,5 +1,5 @@
 from django import forms
-from .models import OrderProduct, Order
+from .models import OrderProduct, Order, Product
 
 
 class OrderProductForm(forms.ModelForm):
@@ -8,12 +8,20 @@ class OrderProductForm(forms.ModelForm):
         fields = ['amount', 'product']
         widgets = {'product': forms.HiddenInput()}
 
-    def clean_amount(self):
-        amount = int(self.cleaned_data['amount'])
+    def clean(self):
+        cleaned_data = super(OrderProductForm, self).clean()
+        amount = cleaned_data.get('amount')
+
         if amount < 1:
             raise forms.ValidationError("Geen valide getal.")
 
-        return amount
+        # When called from product detail view, check for max amount
+        if 'product' in self.cleaned_data:
+            product = cleaned_data.get('product')
+            if amount > product.amount_available:
+                raise forms.ValidationError("Dit aantal is niet beschikbaar.")
+
+        return cleaned_data
 
 
 class OrderForm(forms.ModelForm):

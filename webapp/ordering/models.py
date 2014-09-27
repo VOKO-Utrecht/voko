@@ -196,6 +196,27 @@ class Product(TimeStampedModel):
         rounded = new_price.quantize(Decimal('.01'), rounding=ROUND_UP)
         return rounded
 
+    @property
+    def amount_available(self):
+        if self.maximum_total_order is None:
+            return
+        maximum = self.maximum_total_order
+        orderproducts = self.orderproducts.filter(order__finalized=True)
+        total = sum(op.amount for op in orderproducts)
+        return maximum - total
+
+    @property
+    def percentage_available_of_max(self):
+        if self.maximum_total_order is None:
+            return 100
+        return int((float(self.amount_available) / float(self.maximum_total_order)) * 100)
+
+    @property
+    def is_available(self):
+        if self.maximum_total_order is None:
+            return True
+        return self.amount_available > 0
+
 
 class SupplierOrderProduct(TimeStampedModel):
     order = models.ForeignKey("SupplierOrder")

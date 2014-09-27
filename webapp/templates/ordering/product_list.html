@@ -18,6 +18,7 @@
         <th>Leverancier</th>
         <th>Omschrijving</th>
         <th>Prijs</th>
+        <th>Beschikbaarheid</th>
       </tr>
     </thead>
     <tbody>
@@ -27,6 +28,13 @@
         <td>{{ product.supplier }}</td>
         <td>{{ product.description }}</td>
         <td>&euro; {{ product.retail_price }} per {{ product.unit_of_measurement }}</td>
+        <td><div class="progress">
+            <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"
+                 aria-valuenow="{{ product.percentage_available_of_max }}" aria-valuemin="0" aria-valuemax="100"
+                 style="width: {{ product.percentage_available_of_max }}%">
+                <span class="sr-only">{{ product.percentage_available_of_max }}% Complete</span></div>
+            </div>
+            </td>
       </tr>
       {% endfor %}
     </tbody>

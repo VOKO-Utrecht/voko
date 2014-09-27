@@ -18,6 +18,14 @@
         <td>{{ object.unit_of_measurement }}</td>
       </tr>
       <tr>
+        <td><strong>Maximaal beschikbaar</strong></td>
+        <td>{% if object.maximum_total_order %}{{ object.maximum_total_order }}{% endif %}</td>
+      </tr>
+      <tr>
+        <td><strong>Nog te bestellen</strong></td>
+        <td>{% if object.maximum_total_order %}{{ object.amount_available }} ({{ object.percentage_available_of_max }}%){% endif %}</td>
+      </tr>
+      <tr>
         <td><strong>Inkoopprijs per eenheid</strong></td>
         <td>&euro; {{ object.base_price }}</td>
       </tr>
@@ -34,14 +42,19 @@
     <h3 class="panel-title">Bestellen?</h3>
   </div>
   <div class="panel-body">
+    {% if object.is_available %}
     <form action="" method="post">{% csrf_token %}
-        {% bootstrap_form form %}
-        {% buttons %}
-        <button type="submit" class="btn btn-primary">
-        {% bootstrap_icon "shopping-cart" %} Bestelling bijwerken
-        </button>
-        {% endbuttons %}
+            {% bootstrap_form form %}
+            {% buttons %}
+            <button type="submit" class="btn btn-primary">
+            {% bootstrap_icon "shopping-cart" %} Bestelling bijwerken
+            </button>
+            {% endbuttons %}
     </form>
+    {% else %}
+        Helaas! Dit product is uitverkocht.
+    {% endif %}
+
   </div>
 </div>
 {% endblock %}

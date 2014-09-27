@@ -115,6 +115,22 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
         qs = super(FinishOrder, self).get_queryset()
         return qs.filter(finalized=False)
 
+    def get_context_data(self, **kwargs):
+        self._update_totals_for_products_with_max_order_amounts(self.get_object())
+        context = super(UpdateView, self).get_context_data(**kwargs)
+        return context
+
+    def _update_totals_for_products_with_max_order_amounts(self, order):
+        ### TODO: Add messages about deleted / changed orderproducts
+        for orderproduct in order.orderproducts.all():
+            if orderproduct.amount > orderproduct.product.amount_available:
+                if orderproduct.product.amount_available > 0:
+                    orderproduct.amount = orderproduct.product.amount_available
+                    orderproduct.save()
+
+                else:
+                    orderproduct.delete()
+
     def post(self, request, *args, **kwargs):
         order = self.get_object()
         # For now, we just finish the order.
