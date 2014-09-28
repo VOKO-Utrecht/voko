@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.db.models.loading import get_models, get_app
 from accounts.forms import VokoUserCreationForm, VokoUserChangeForm
 from accounts.mails import user_enable_mail, eerste_bestelronde_mail_plain, \
-    eerste_bestelronde_mail_html, order_reminder_mail
+    eerste_bestelronde_mail_html, order_reminder_mail, tweede_bestelronde_mail_plain
 from accounts.models import VokoUser, UserProfile
 
 for model in get_models(get_app('accounts')):
@@ -41,14 +41,13 @@ def force_confirm_email(modeladmin, request, queryset):
 force_confirm_email.short_description = "Forceer e-mailadres bevestiging"
 
 
-def send_first_order_mail(modeladmin, request, queryset):
+def send_second_orderround_mail(modeladmin, request, queryset):
     for user in queryset:
-        plain_body = eerste_bestelronde_mail_plain % {'first_name': user.first_name}
-        html_body = eerste_bestelronde_mail_html % {'first_name': user.first_name}
+        plain_body = tweede_bestelronde_mail_plain % {'first_name': user.first_name}
 
-        send_mail('[VOKO Utrecht] Eerste bestelronde', message=plain_body, html_message=html_body,
+        send_mail('VOKO Utrecht - Tweede bestelronde', message=plain_body,
                   from_email='VOKO Utrecht <info@vokoutrecht.nl>', recipient_list=[user.email], fail_silently=False)
-send_first_order_mail.short_description = "EERSTE BESTELRONDE MAIL"
+send_second_orderround_mail.short_description = "TWEEDE BESTELRONDE MAIL"
 
 
 def send_first_order_reminder_mail(modeladmin, request, queryset):
@@ -94,7 +93,7 @@ class VokoUserAdmin(UserAdmin):
         UserProfileInline,
     ]
 
-    actions = (enable_user, force_confirm_email, send_first_order_mail, send_first_order_reminder_mail)
+    actions = (enable_user, force_confirm_email, send_second_orderround_mail, send_first_order_reminder_mail)
 
     def email_confirmed(self, obj):
         if obj.email_confirmation:

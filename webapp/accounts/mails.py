@@ -176,3 +176,42 @@ dat zal plaatsvinden op woensdag 24 september, van 17.30 - 20.30 uur.
 Groeten,
 VOKO Utrecht
 """
+
+tweede_bestelronde_mail_plain = \
+"""
+Beste %(first_name)s,
+
+
+De tweede bestellijst staat nu online!
+
+## ! Let op ! ##
+Ten eerste: Vanwege vertraging in de procedure bij de notaris hebben we helaas nog geen bankrekening kunnen
+openen, hierdoor is het nog niet mogelijk de bestelling online te betalen. We vragen iedereen
+daarom om ook tijdens de tweede bestelronde contant af te rekenen bij het ophalen, dit zal de kosten van je
+bestelling en eventueel (wanneer je voor het eerst bestelt) van het lidmaatschap (20 euro) bedragen.
+Neem alsjeblieft het geld zo contant mogelijk mee.
+
+Ten tweede: In verband met een andere activiteit in Cafe Averechts zal de uitdeelavond eenmalig tot 19:30 duren (in plaats van tot 20.30).
+
+## Hoe werkt het: ##
+Je kunt inloggen op http://leden.vokoutrecht.nl/ . Van daaruit klik je op "Producten".
+Volg van daaruit de aanwijzingen!
+Voor de zekerheid: vergeet niet je bestelling te bevestigen! Je bestelling is pas definitief wanneer je een bevestiging per e-mail hebt ontvangen.
+
+## Belangrijke data: ##
+* bestelronde open: maandag 29 september
+* bestelronde sluit: vrijdag 3 oktober, om 19.00 uur
+* ophaalmoment: woensdag 8 oktober, tussen 17.30 en **19.30** in cafe Averechts
+
+## Lidmaatschap nog niet bevestigd? ##
+Om te kunnen bestellen dien je je lidmaatschap te hebben bevestigd; doe dit dus als je het nog niet gedaan hebt.
+Wanneer je hierover geen bericht van ons hebt ontvangen kan het zijn dat het in je spambox terecht is gekomen,
+check die dus eerst. Indien je niets hebt ontvangen mail ons dan.
+
+Als je vragen hebt, mail ons dan gerust! Dit kan via info@vokoutrecht.nl.
+
+Veel plezier met bestellen en tot volgende week woensdag!
+
+Groene groetjes,
+VOKO Utrecht.
+"""
