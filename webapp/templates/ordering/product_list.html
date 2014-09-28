@@ -2,6 +2,13 @@
 {% block content %}
 <h1>Producten</h1>
 {% if current_order_round.is_open or user.is_staff %}
+
+    {% if user.is_staff %}
+    <div class="alert alert-warning" role="alert">
+        <strong>Let op!</strong> Je kunt de producten zien omdat je "staff user" bent. De bestelronde is nog niet open!
+    </div>
+    {% endif %}
+
 <div class="panel panel-default">
   <!-- Default panel contents -->
   <div class="panel-heading">Producten voor deze bestelronde</div>
