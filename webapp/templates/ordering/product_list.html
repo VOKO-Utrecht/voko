@@ -35,13 +35,18 @@
         <td>{{ product.supplier }}</td>
         <td>{{ product.description }}</td>
         <td>&euro; {{ product.retail_price }} per {{ product.unit_of_measurement }}</td>
-        <td><div class="progress">
-            <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"
-                 aria-valuenow="{{ product.percentage_available_of_max }}" aria-valuemin="0" aria-valuemax="100"
-                 style="width: {{ product.percentage_available_of_max }}%">
-                <span class="sr-only">{{ product.percentage_available_of_max }}% Complete</span></div>
+        <td>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" aria-valuenow="{{ product.percentage_available_of_max }}"
+                     aria-valuemin="0" aria-valuemax="100" style="width: {{ product.percentage_available_of_max }}%;">
+                    {% if product.maximum_total_order %}
+                        {{ product.amount_available }} van {{ product.maximum_total_order }}
+                    {% else %}
+                        onbeperkt
+                    {% endif %}
+                </div>
             </div>
-            </td>
+        </td>
       </tr>
       {% endfor %}
     </tbody>
