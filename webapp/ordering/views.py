@@ -15,7 +15,7 @@ from ordering.models import Product, OrderProduct, Order, OrderRound, Supplier
 
 
 class ProductsView(LoginRequiredMixin, ListView):
-    queryset = Product.objects.filter(order_round=get_current_order_round())
+    queryset = Product.objects.filter(order_round=get_current_order_round()).order_by('name')
 
     def get_context_data(self, **kwargs):
         context = super(ProductsView, self).get_context_data(**kwargs)
