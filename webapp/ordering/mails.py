@@ -10,8 +10,7 @@ BESTELLING
 
 DATUMS EN TIJDEN
 ================
-Ophaaldag: %(collect_datetime)s
-Ophaaltijden: 17.30 - 20.30
+Ophaalmoment: %(collect_datetime)s
 
 
 Groene groetjes,
