@@ -7,7 +7,7 @@ for model in get_models(get_app('ordering')):
         continue
     admin.site.register(model)
     
-class OrderProductInline(admin.TabularInline):
+class OrderProductInline(admin.StackedInline):
     model = OrderProduct
     
 class OrderAdmin(admin.ModelAdmin):
