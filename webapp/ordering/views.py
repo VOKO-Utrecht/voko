@@ -116,13 +116,13 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
         return qs.filter(finalized=False)
 
     def get_context_data(self, **kwargs):
-        # self._update_totals_for_products_with_max_order_amounts(self.get_object())
+        self._update_totals_for_products_with_max_order_amounts(self.get_object())
         context = super(UpdateView, self).get_context_data(**kwargs)
         return context
 
     def _update_totals_for_products_with_max_order_amounts(self, order):
         ### TODO: Add messages about deleted / changed orderproducts
-        for orderproduct in order.orderproducts.all():
+        for orderproduct in order.orderproducts.all().exclude(product__maximum_total_order__exact=None):
             if orderproduct.amount > orderproduct.product.amount_available:
                 if orderproduct.product.amount_available > 0:
                     orderproduct.amount = orderproduct.product.amount_available
