@@ -7,7 +7,8 @@ from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, FormView, View, UpdateView
 from django.views.generic.detail import SingleObjectMixin
 import pytz
-from ordering.core import get_current_order_round, get_or_create_order, get_order_product
+from ordering.core import get_current_order_round, get_or_create_order, get_order_product, \
+    update_totals_for_products_with_max_order_amounts
 from ordering.forms import OrderProductForm
 from ordering.mails import order_confirmation_mail
 from ordering.mixins import UserOwnsObjectMixin
@@ -79,13 +80,13 @@ class ProductOrder(LoginRequiredMixin, SingleObjectMixin, FormView):
 
 
 class OrderDisplay(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
-    # TODO: restrict to user only
     model = Order
     form_class = OrderProductForm
     success_url = "/hoera"
 
     def get_context_data(self, **kwargs):
         context = super(OrderDisplay, self).get_context_data(**kwargs)
+        update_totals_for_products_with_max_order_amounts(self.get_object())
         FormSet = inlineformset_factory(self.model, OrderProduct, extra=0, form=self.form_class)
         fs = FormSet(instance=self.get_object())
         context['formset'] = fs
@@ -116,20 +117,9 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
         return qs.filter(finalized=False)
 
     def get_context_data(self, **kwargs):
-        self._update_totals_for_products_with_max_order_amounts(self.get_object())
+        update_totals_for_products_with_max_order_amounts(self.get_object())
         context = super(UpdateView, self).get_context_data(**kwargs)
         return context
-
-    def _update_totals_for_products_with_max_order_amounts(self, order):
-        ### TODO: Add messages about deleted / changed orderproducts
-        for orderproduct in order.orderproducts.all().exclude(product__maximum_total_order__exact=None):
-            if orderproduct.amount > orderproduct.product.amount_available:
-                if orderproduct.product.amount_available > 0:
-                    orderproduct.amount = orderproduct.product.amount_available
-                    orderproduct.save()
-
-                else:
-                    orderproduct.delete()
 
     def post(self, request, *args, **kwargs):
         order = self.get_object()

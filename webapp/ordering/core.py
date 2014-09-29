@@ -41,3 +41,15 @@ def get_credit(user):
 
 def get_debit(user):
     return -get_credit(user)
+
+
+def update_totals_for_products_with_max_order_amounts(order):
+    ### TODO: Add messages about deleted / changed orderproducts
+    for orderproduct in order.orderproducts.all().exclude(product__maximum_total_order__exact=None):
+        if orderproduct.amount > orderproduct.product.amount_available:
+            if orderproduct.product.amount_available > 0:
+                orderproduct.amount = orderproduct.product.amount_available
+                orderproduct.save()
+
+            else:
+                orderproduct.delete()
