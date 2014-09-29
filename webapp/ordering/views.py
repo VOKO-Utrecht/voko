@@ -116,7 +116,7 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
         return qs.filter(finalized=False)
 
     def get_context_data(self, **kwargs):
-        self._update_totals_for_products_with_max_order_amounts(self.get_object())
+        # self._update_totals_for_products_with_max_order_amounts(self.get_object())
         context = super(UpdateView, self).get_context_data(**kwargs)
         return context
 
