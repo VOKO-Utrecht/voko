@@ -201,9 +201,14 @@ class Product(TimeStampedModel):
         if self.maximum_total_order is None:
             return
         maximum = self.maximum_total_order
+        total = self.amount_ordered
+        return maximum - total
+
+    @property
+    def amount_ordered(self):
         orderproducts = self.orderproducts.filter(order__finalized=True)
         total = sum(op.amount for op in orderproducts)
-        return maximum - total
+        return total
 
     @property
     def percentage_available_of_max(self):

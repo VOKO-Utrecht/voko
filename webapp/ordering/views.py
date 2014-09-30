@@ -218,8 +218,9 @@ class OrderRoundAdminView(StaffuserRequiredMixin, DetailView):
         return context
 
 
-class ProductOrdersAdminView(StaffuserRequiredMixin, DetailView):
-    model = Product
+class ProductOrdersAdminView(StaffuserRequiredMixin, ListView):
+    def get_queryset(self):
+        return OrderProduct.objects.filter(product__pk=self.kwargs.get('pk')).order_by("order__user")
     template_name = "ordering/admin/productorder.html"
 
 
