@@ -6,12 +6,16 @@ for model in get_models(get_app('ordering')):
     if model == Order:
         continue
     admin.site.register(model)
-    
+
+
 class OrderProductInline(admin.TabularInline):
     model = OrderProduct
-    
+
+
 class OrderAdmin(admin.ModelAdmin):
     list_display = ["id", "order_round", "user", "finalized", "collected", "total_price"]
+    ordering = ("-id", )
+
     inlines = [
         OrderProductInline,
     ]
