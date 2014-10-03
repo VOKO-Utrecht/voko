@@ -92,7 +92,7 @@ class RequestPasswordResetView(AnonymousRequiredMixin, FormView):
 
     def form_valid(self, form):
         try:
-            user = VokoUser.objects.get(email=form.cleaned_data['email'])
+            user = VokoUser.objects.get(email=form.cleaned_data['email'].lower())
             request = PasswordResetRequest(user=user)
             request.save()
             request.send_email()
