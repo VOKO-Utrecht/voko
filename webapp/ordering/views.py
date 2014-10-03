@@ -217,7 +217,7 @@ class OrderAdminOrderLists(StaffuserRequiredMixin, DetailView):
         return context
 
 
-class OrderAdminUserOrderListPerSupplier(StaffuserRequiredMixin, ListView):
+class OrderAdminSupplierOrderCSV(StaffuserRequiredMixin, ListView):
     template_name = "ordering/admin/orderlist_per_supplier.html"
 
     def get_queryset(self):

@@ -3,7 +3,7 @@
 <h1>Bestelronde #{{ object.pk }}</h1>
 
 {% for supplier, items in orders_per_supplier.items %}
-<h2>{{ supplier }}</h2>
+<h2><a href="{% url 'orderadmin_supplier_order_csv' object.pk supplier.pk %}">{{ supplier }}</a></h2>
 <div class="panel panel-default">
   <table class="table">
     <thead>
