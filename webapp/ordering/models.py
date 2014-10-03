@@ -100,7 +100,11 @@ class Order(TimeStampedModel):
     @property
     def member_fee(self):
         # Return contribution fee if this is users' first order (unfinished orders not included)
-        amount_of_finalized_orders = self.user.orders.filter(finalized=True).exclude(pk=self.pk).count()
+        amount_of_finalized_orders = self.user.orders.\
+            filter(finalized=True).\
+            exclude(pk=self.pk).\
+            exclude(pk__gt=self.pk).\
+            count()
 
         if amount_of_finalized_orders == 0:
             return Decimal(settings.MEMBER_FEE)
