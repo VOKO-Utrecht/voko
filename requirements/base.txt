@@ -4,3 +4,4 @@ Unipath==1.0
 django-bootstrap3==4.11.0
 django-braces==1.4.0
 pytz==2014.7
+django-cron==0.3.4
