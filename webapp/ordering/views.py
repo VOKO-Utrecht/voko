@@ -189,7 +189,8 @@ class OrderRoundAdminView(StaffuserRequiredMixin, DetailView):
         order_round = self.get_object()
         for supplier in Supplier.objects.all():
             suppliers_products_this_round = supplier.products.filter(order_round=order_round)
-            data[supplier] = []
+            data[supplier] = {'orderproducts': [],
+                              'sum': self._get_total_prices_per_supplier(supplier, order_round)}
 
             for product in suppliers_products_this_round:
                 order_products = product.orderproducts.filter(order__finalized=True)
@@ -197,19 +198,17 @@ class OrderRoundAdminView(StaffuserRequiredMixin, DetailView):
                 if product_sum == 0:
                     continue
 
-                data[supplier].append({'product': product,
-                                       'sum': product_sum,
-                                       'total_price': product_sum * product.base_price})
+                data[supplier]['orderproducts'].append({'product': product,
+                                                        'amount': product_sum,
+                                                        'sub_total': product_sum * product.base_price})
 
         return data
 
-    # def _get_total_prices_per_supplier(self):
-    #     data = {}
-    #     ops = self._get_orders_per_supplier()
-    #     for supplier in ops:
-    #         data[supplier] = sum([x.get('total_price') for x in ops[supplier]])
-    #
-    #     return data
+    def _get_total_prices_per_supplier(self, supplier, order_round):
+        ops = OrderProduct.objects.filter(product__supplier=supplier,
+                                          order__order_round=order_round,
+                                          order__finalized=True)
+        return sum([op.amount * op.product.base_price for op in ops])
 
     def get_context_data(self, **kwargs):
         context = super(OrderRoundAdminView, self).get_context_data(**kwargs)

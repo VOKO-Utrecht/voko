@@ -17,16 +17,25 @@
       </tr>
     </thead>
     <tbody>
-      {% for i in items %}
+      {% for i in items.orderproducts %}
           <tr>
-            <td><a href="{% url 'productorders_admin' i.product.pk %}">{{ i.sum }}</a></td>
+            <td><a href="{% url 'productorders_admin' i.product.pk %}">{{ i.amount }}</a></td>
             <td>{{ i.product.unit_of_measurement }}</td>
             <td>{{ i.product.name }}</td>
             <td>{{ i.product.description }}</td>
             <td>&euro; {{ i.product.base_price }}</td>
-            <td>&euro; {{ i.total_price }}</td>
+            <td>&euro; {{ i.sub_total }}</td>
           </tr>
       {% endfor %}
+      <tr class="panel-footer">
+        <td>-</td>
+        <td>-</td>
+        <td>TOTAAL</td>
+        <td>-</td>
+        <td>-</td>
+        <td>&euro; {{ items.sum }}</td>
+      </tr>
+
     </tbody>
   </table>
 </div>
