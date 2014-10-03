@@ -21,8 +21,8 @@
             <td>{% if orderround.is_open %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}</td>
             <td>{{ orderround.open_for_orders }}</td>
             <td>{{ orderround.closed_for_orders }}</td>
-            <td><a href="{% url 'orderround_admin' orderround.pk %}">Bestellijsten</a></td>
-            <td><a href="{% url 'userorders_admin' orderround.pk %}">Overzichten</a></td>
+            <td><a href="{% url 'orderadmin_orderlists' orderround.pk %}">Bestellijsten</a></td>
+            <td><a href="{% url 'orderadmin_userorders' orderround.pk %}">Overzichten</a></td>
           </tr>
       {% endfor %}
     </tbody>

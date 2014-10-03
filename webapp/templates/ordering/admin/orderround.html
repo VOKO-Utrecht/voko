@@ -19,7 +19,7 @@
     <tbody>
       {% for i in items.orderproducts %}
           <tr>
-            <td><a href="{% url 'orderadmin_user_orders_per_product' i.product.pk %}">{{ i.amount }}</a></td>
+            <td><a href="{% url 'productorders_admin' i.product.pk %}">{{ i.amount }}</a></td>
             <td>{{ i.product.unit_of_measurement }}</td>
             <td>{{ i.product.name }}</td>
             <td>{{ i.product.description }}</td>

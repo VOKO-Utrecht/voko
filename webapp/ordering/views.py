@@ -1,6 +1,7 @@
 from braces.views import LoginRequiredMixin, StaffuserRequiredMixin
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
+from django.db.models.aggregates import Sum
 from django.forms import inlineformset_factory
 from django.http import HttpResponseForbidden, HttpResponseBadRequest
 from django.shortcuts import redirect
@@ -213,8 +214,22 @@ class OrderAdminOrderLists(StaffuserRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(OrderAdminOrderLists, self).get_context_data(**kwargs)
         context['orders_per_supplier'] = self._get_orders_per_supplier()
-        # context['total_prices_per_supplier'] = self._get_total_prices_per_supplier()
         return context
+
+
+class OrderAdminUserOrderListPerSupplier(StaffuserRequiredMixin, ListView):
+    template_name = "ordering/admin/orderlist_per_supplier.html"
+
+    def get_queryset(self):
+        supplier = Supplier.objects.get(pk=self.kwargs.get('supplier_pk'))
+
+        return supplier.products.\
+            exclude(orderproducts=None).\
+            exclude(orderproducts__order__finalized=False).\
+            filter(order_round__pk=1).\
+            annotate(amount_sum=Sum('orderproducts__amount'))
+
+    content_type = "text/csv"
 
 
 class OrderAdminUserOrdersPerProduct(StaffuserRequiredMixin, ListView):
