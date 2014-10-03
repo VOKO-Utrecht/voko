@@ -108,7 +108,8 @@ class VokoUserAdmin(UserAdmin):
 
     def finished_orders_curr_OR(self, obj):
         orders = Order.objects.filter(order_round=self.current_order_round,
-                                      user=obj).count()
+                                      user=obj,
+                                      finalized=True).count()
         return orders
         # if orders:
         #     return True
