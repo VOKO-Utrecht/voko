@@ -222,11 +222,12 @@ class OrderAdminUserOrderListPerSupplier(StaffuserRequiredMixin, ListView):
 
     def get_queryset(self):
         supplier = Supplier.objects.get(pk=self.kwargs.get('supplier_pk'))
+        order_round = get_current_order_round()
 
         return supplier.products.\
             exclude(orderproducts=None).\
             exclude(orderproducts__order__finalized=False).\
-            filter(order_round__pk=1).\
+            filter(order_round=order_round).\
             annotate(amount_sum=Sum('orderproducts__amount'))
 
     content_type = "text/csv"
