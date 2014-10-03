@@ -30,6 +30,8 @@ INSTALLED_APPS = (
     'accounts',
     'finance',
     'ordering',
+
+    "django_cron",
 )
 
 MIDDLEWARE_CLASSES = (
