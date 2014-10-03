@@ -45,6 +45,10 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.BrokenLinkEmailsMiddleware',
 )
 
+CRON_CLASSES = [
+    "ordering.cron.MailOrderLists",
+]
+
 ROOT_URLCONF = 'vokou.urls'
 WSGI_APPLICATION = 'vokou.wsgi.application'
 
