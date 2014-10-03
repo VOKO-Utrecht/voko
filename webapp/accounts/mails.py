@@ -167,11 +167,11 @@ order_reminder_mail = \
 """
 Beste %(first_name)s,
 
-Hierbij willen we je er even aan herinneren dat de bestelronde van VOKO Utrecht morgen sluit om 18.00 uur, 
+Hierbij willen we je er even aan herinneren dat de bestelronde van VOKO Utrecht vanavond sluit om 18.00 uur,
 je hebt dus tot dan om je bestelling af te ronden en te bevestigen.
 
 We vragen je om de betaling voor deze eerste bestelronde contant te voldoen tijdens het ophaalmoment, 
-dat zal plaatsvinden op woensdag 24 september, van 17.30 - 20.30 uur.
+dat zal plaatsvinden op woensdag 8 oktober, van 17.30 - 19.30 uur.
 
 Groeten,
 VOKO Utrecht

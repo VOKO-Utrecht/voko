@@ -52,13 +52,13 @@ def send_second_orderround_mail(modeladmin, request, queryset):
 send_second_orderround_mail.short_description = "TWEEDE BESTELRONDE MAIL"
 
 
-def send_first_order_reminder_mail(modeladmin, request, queryset):
+def send_order_reminder_mail(modeladmin, request, queryset):
     for user in queryset:
         plain_body = order_reminder_mail % {'first_name': user.first_name}
 
-        send_mail('VOKO Utrecht - Herinnering: bestellen mogelijk tot 19/9/14, 18.00 uur', message=plain_body,
+        send_mail('VOKO Utrecht - Herinnering: bestellen mogelijk tot 3/10/14, 18.00 uur', message=plain_body,
                   from_email='VOKO Utrecht <info@vokoutrecht.nl>', recipient_list=[user.email], fail_silently=False)
-send_first_order_reminder_mail.short_description = "EERSTE BESTELRONDE MAIL REMINDER"
+send_order_reminder_mail.short_description = "TWEEDE BESTELRONDE MAIL REMINDER"
 
 
 class UserProfileInline(admin.StackedInline):
@@ -96,7 +96,7 @@ class VokoUserAdmin(UserAdmin):
         UserProfileInline,
     ]
 
-    actions = (enable_user, force_confirm_email, send_second_orderround_mail, send_first_order_reminder_mail)
+    actions = (enable_user, force_confirm_email, send_second_orderround_mail, send_order_reminder_mail)
 
     def email_confirmed(self, obj):
         if obj.email_confirmation:
