@@ -1,2 +1,3 @@
 Aantal,Eenheid,Product,Omschrijving,Inkoopprijs Euro
-{%  for product in object_list %}{{ product.amount_sum }},{{ product.unit_of_measurement }},{{ product.name }},{{ product.description }},"{{ product.base_price }}",{% endfor %}
+{%  for product in object_list %}{{ product.amount_sum }},{{ product.unit_of_measurement }},{{ product.name }},{{ product.description }},"{{ product.base_price }}"
+{% endfor %}
