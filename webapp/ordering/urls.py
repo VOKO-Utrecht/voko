@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 from .views import ProductsView, ProductDetail, OrderDisplay, FinishOrder, OrdersDisplay, PayOrder, OrderSummary, \
-    OrderRoundsAdminView, OrderRoundAdminView, ProductOrdersAdminView, UserOrdersPerOrderRoundView
+    OrderAdminMain, OrderAdminOrderLists, OrderAdminUserOrdersPerProduct, OrderAdminUserOrders
 
 urlpatterns = patterns('',
     url(r'^products/$', ProductsView.as_view(), name="view_products"),
@@ -10,8 +10,8 @@ urlpatterns = patterns('',
     url(r'^order/(?P<pk>[0-9]+)/pay/$', PayOrder.as_view(), name="pay_order"),
     url(r'^order/(?P<pk>[0-9]+)/summary/$', OrderSummary.as_view(), name="order_summary"),
     url(r'^orders/$', OrdersDisplay.as_view(), name="view_orders"),
-    url(r'^admin/$', OrderRoundsAdminView.as_view(), name="orderrounds_admin"),
-    url(r'^admin/round/(?P<pk>[0-9]+)/$', OrderRoundAdminView.as_view(), name="orderround_admin"),
-    url(r'^admin/round/(?P<pk>[0-9]+)/orders/$', UserOrdersPerOrderRoundView.as_view(), name="userorders_admin"),
-    url(r'^admin/product/(?P<pk>[0-9]+)/$', ProductOrdersAdminView.as_view(), name="productorders_admin"),
+    url(r'^admin/$', OrderAdminMain.as_view(), name="orderadmin_main"),
+    url(r'^admin/round/(?P<pk>[0-9]+)/order_lists/$', OrderAdminOrderLists.as_view(), name="orderadmin_orderlists"),
+    url(r'^admin/round/(?P<pk>[0-9]+)/user_orders/$', OrderAdminUserOrders.as_view(), name="orderadmin_userorders"),
+    url(r'^admin/product/(?P<pk>[0-9]+)/$', OrderAdminUserOrdersPerProduct.as_view(), name="productorders_admin"),
 )

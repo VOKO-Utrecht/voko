@@ -175,12 +175,12 @@ class OrderSummary(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
 
 ### ADMIN VIEWS ###
 
-class OrderRoundsAdminView(StaffuserRequiredMixin, ListView):
+class OrderAdminMain(StaffuserRequiredMixin, ListView):
     model = OrderRound
     template_name = "ordering/admin/orderrounds.html"
 
 
-class OrderRoundAdminView(StaffuserRequiredMixin, DetailView):
+class OrderAdminOrderLists(StaffuserRequiredMixin, DetailView):
     model = OrderRound
     template_name = "ordering/admin/orderround.html"
 
@@ -211,19 +211,19 @@ class OrderRoundAdminView(StaffuserRequiredMixin, DetailView):
         return sum([op.amount * op.product.base_price for op in ops])
 
     def get_context_data(self, **kwargs):
-        context = super(OrderRoundAdminView, self).get_context_data(**kwargs)
+        context = super(OrderAdminOrderLists, self).get_context_data(**kwargs)
         context['orders_per_supplier'] = self._get_orders_per_supplier()
         # context['total_prices_per_supplier'] = self._get_total_prices_per_supplier()
         return context
 
 
-class ProductOrdersAdminView(StaffuserRequiredMixin, ListView):
+class OrderAdminUserOrdersPerProduct(StaffuserRequiredMixin, ListView):
     def get_queryset(self):
         return OrderProduct.objects.filter(product__pk=self.kwargs.get('pk')).order_by("order__user")
     template_name = "ordering/admin/productorder.html"
 
 
-class UserOrdersPerOrderRoundView(StaffuserRequiredMixin, ListView):
+class OrderAdminUserOrders(StaffuserRequiredMixin, ListView):
     template_name = "ordering/admin/user_orders_per_round.html"
 
     def get_queryset(self):
