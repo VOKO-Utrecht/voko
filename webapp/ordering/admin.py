@@ -11,6 +11,7 @@ class OrderProductInline(admin.TabularInline):
     model = OrderProduct
     
 class OrderAdmin(admin.ModelAdmin):
+    list_display = ["order_round", "user", "finalized", "total_price"]
     inlines = [
         OrderProductInline,
     ]

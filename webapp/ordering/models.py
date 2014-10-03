@@ -37,8 +37,9 @@ class OrderRound(TimeStampedModel):
         return False
 
     def __unicode__(self):
-        return "[%d] Open: %s | Closed: %s | Collect: %s" %\
-               (self.id, self.open_for_orders, self.closed_for_orders, self.collect_datetime)
+        # return "[%d] Open: %s | Closed: %s | Collect: %s" %\
+        #        (self.id, self.open_for_orders, self.closed_for_orders, self.collect_datetime)
+        return "Order round ID %s" % self.pk
 
 
 class OrderManager(models.Manager):
