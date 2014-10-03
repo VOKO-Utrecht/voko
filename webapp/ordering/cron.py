@@ -35,7 +35,7 @@ class MailOrderLists(CronJobBase):
             csv = template.render(c)
 
             # Generate mail
-            subject = 'VOKO Utrecht - bestellijst voor %s' % order_round.collect_datetime.strftime("%d %B %Y")
+            subject = 'VOKO Utrecht - Bestellijst voor %s' % order_round.collect_datetime.strftime("%d %B %Y")
             from_email = 'VOKO Utrecht <info@vokoutrecht.nl>'
             to = '%s <%s>' % (supplier.name, "info@vokoutrecht.nl")  # FOR NOW, EMAIL US
                                       # '%s <%s>' % (supplier.name, supplier.email)
@@ -56,6 +56,7 @@ Vriendelijke groeten,
 VOKO Utrecht
 """ % (supplier, order_round.pk,  order_round.collect_datetime.strftime("%d %B %Y"))
 
-            msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+            msg = EmailMultiAlternatives(subject, text_content, from_email,
+                                         [to], cc=["VOKO Utrecht <info@vokoutrecht.nl>"])
             msg.attach('bestellijst_bestelronde_%d.csv' % order_round.pk, csv, 'text/csv')
             msg.send()
