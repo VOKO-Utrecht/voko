@@ -7,6 +7,8 @@ from accounts.forms import VokoUserCreationForm, VokoUserChangeForm
 from accounts.mails import user_enable_mail, eerste_bestelronde_mail_plain, \
     eerste_bestelronde_mail_html, order_reminder_mail, tweede_bestelronde_mail_plain
 from accounts.models import VokoUser, UserProfile
+from ordering.core import get_current_order_round
+from ordering.models import Order
 
 for model in get_models(get_app('accounts')):
     if model == VokoUser:
@@ -70,7 +72,8 @@ class VokoUserAdmin(UserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ("first_name", "last_name", "email", "email_confirmed", "can_activate", "is_active", "is_staff", "created",)
+    list_display = ("first_name", "last_name", "email", "email_confirmed", "can_activate", "is_active", "is_staff",
+                    "created", 'finished_orders_curr_OR')
     list_filter = ("is_staff", "is_superuser", "is_active", "groups")
     search_fields = ("email", 'first_name', 'last_name')
     ordering = ("-created", )
@@ -100,6 +103,18 @@ class VokoUserAdmin(UserAdmin):
             return obj.email_confirmation.is_confirmed
         return False
     email_confirmed.boolean = True
+
+    current_order_round = get_current_order_round()
+
+    def finished_orders_curr_OR(self, obj):
+        orders = Order.objects.filter(order_round=self.current_order_round,
+                                      user=obj).count()
+        return orders
+        # if orders:
+        #     return True
+        # return False
+    # finished_orders_curr_OR.boolean = True
+
 
 admin.site.register(VokoUser, VokoUserAdmin)
 
