@@ -18,6 +18,9 @@ class MailOrderLists(CronJobBase):
         if order_round.is_open:
             return
 
+        if order_round.order_placed:
+            return
+
         # To prevent mail loops
         order_round.order_placed = True
         order_round.save()
