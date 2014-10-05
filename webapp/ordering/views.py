@@ -235,7 +235,8 @@ class OrderAdminSupplierOrderCSV(StaffuserRequiredMixin, ListView):
 
 class OrderAdminUserOrdersPerProduct(StaffuserRequiredMixin, ListView):
     def get_queryset(self):
-        return OrderProduct.objects.filter(product__pk=self.kwargs.get('pk')).order_by("order__user")
+        return OrderProduct.objects.filter(product__pk=self.kwargs.get('pk'),
+                                           order__finalized=True).order_by("order__user")
     template_name = "ordering/admin/productorder.html"
 
 

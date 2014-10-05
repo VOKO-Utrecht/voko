@@ -3,29 +3,27 @@
 <h1>{{ object_list.0.product }}; Bestelronde #{{ object_list.0.order.order_round.pk }}</h1>
 <h4>Totaal besteld: {{ object_list.0.product.amount_ordered }} {{ object_list.0.product.unit_of_measurement }}</h4>
 <h6>Gegenereerd op {% now "DATETIME_FORMAT" %}</h6>
-
-<h2>Order (id {{ op.order.pk }}) van {{ op.order.user }}</h2>
-<div class="panel panel-default">
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Aantal</th>
-        <th>Eenheid</th>
-        <th>Product</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for op in object_list %}
+{% for op in object_list %}
+    <h2>Order (id {{ op.order.pk }}) van {{ op.order.user }}</h2>
+    <div class="panel panel-default">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Aantal</th>
+            <th>Eenheid</th>
+            <th>Product</th>
+          </tr>
+        </thead>
+        <tbody>
           <tr>
             <td>{{ op.amount }}</td>
             <td>{{ op.product.unit_of_measurement }}</td>
             <td>{{ op.product.name }}</td>
           </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-
+        </tbody>
+      </table>
+    </div>
+{% endfor %}
 
 {% endblock %}
 
