@@ -4,24 +4,26 @@
 <h4>Totaal besteld: {{ object_list.0.product.amount_ordered }} {{ object_list.0.product.unit_of_measurement }}</h4>
 <h6>Gegenereerd op {% now "DATETIME_FORMAT" %}</h6>
 {% for op in object_list %}
-    <h2>Order (id {{ op.order.pk }}) van {{ op.order.user }}</h2>
     <div class="panel panel-default">
+      <div class="panel-heading">
+          Bestelling (id {{ op.order.pk }}) van {{ op.order.user }}
+      </div>
+
       <table class="table">
         <thead>
           <tr>
             <th>Aantal</th>
             <th>Eenheid</th>
-            <th>Product</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>{{ op.amount }}</td>
             <td>{{ op.product.unit_of_measurement }}</td>
-            <td>{{ op.product.name }}</td>
           </tr>
         </tbody>
       </table>
+
     </div>
 {% endfor %}
 
