@@ -8,7 +8,6 @@
 }
 </style>
 
-
 <h1>Bestellingen per product van bestelronde #{{ object_list.0.order.order_round.pk }}</h1>
 <h6>Gegenereerd op {% now "DATETIME_FORMAT" %}</h6>
 
@@ -17,7 +16,7 @@
     {%  for product, orderproducts in products.items %}
         <div class="panel panel-default">
         <div class="panel-heading">
-        <h4>{{ product }}</h4>
+        <h4>{{ product }} (Totaal besteld: {{ product.amount_ordered }})</h4>
         </div>
         <div class="panel-body">
         {{ product.description }}
