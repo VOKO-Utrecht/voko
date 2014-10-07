@@ -246,3 +246,31 @@ class OrderAdminUserOrders(StaffuserRequiredMixin, ListView):
     def get_queryset(self):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
         return Order.objects.filter(order_round=order_round, finalized=True).order_by("modified")
+
+
+class OrderAdminUserOrderProductsPerOrderRound(StaffuserRequiredMixin, ListView):
+    def get_queryset(self):
+        return OrderProduct.objects.select_related().filter(order__order_round_id=self.kwargs.get('pk'), order__finalized=True).\
+            order_by('product__supplier').\
+            order_by('product')
+
+    def get_context_data(self, **kwargs):
+        context = super(OrderAdminUserOrderProductsPerOrderRound, self).get_context_data(**kwargs)
+
+        suppliers = {s: None for s in Supplier.objects.all()}
+        orderproducts = self.get_queryset()
+
+        for s in suppliers:
+            suppliers[s] = {op.product: [] for op in orderproducts.filter(product__supplier=s)}
+            for product in suppliers[s]:
+                for op in orderproducts.filter(product=product):
+                    suppliers[s][product].append(op)
+
+        context['data'] = suppliers
+        print suppliers
+
+
+        return context
+
+
+    template_name = "ordering/admin/productsorders.html"

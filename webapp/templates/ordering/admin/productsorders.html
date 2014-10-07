@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Bestellingen per product van bestelronde #{{ object_list.0.order.order_round.pk }}</h1>
+<h6>Gegenereerd op {% now "DATETIME_FORMAT" %}</h6>
+
+    {{ data.items }}
+
+
+{% for supplier, products in data.items %}
+    <h3>{{ supplier }}</h3>
+    {%  for product, orderproducts in products.items %}
+        <h4>{{ product }}</h4>
+        {%  for op in orderproducts %}
+    <hr>
+    {{ op }}
+            {{ op.order }}
+    {{ op.order.user.pk }} <br>
+    {{ op.order.user }} <br>
+    {{ op.order.pk }} <br>
+    {{ op.amount }} <br>
+    {{ op.product }} <br>
+
+        {% endfor %}
+        {% endfor %}
+{% endfor %}
+
+{% for op in object_list %}
+{% endfor %}
+{% endblock %}
