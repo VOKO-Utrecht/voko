@@ -26,20 +26,20 @@
   <table class="table table-condensed">
     <thead>
       <tr>
-        <th>Lid ID</th>
-        <th>Lid naam</th>
         <th>Aantal</th>
         <th>Eenheid</th>
+        <th>Lid</th>
+        <th>Lid ID</th>
         <th>Bestelling ID</th>
       </tr>
     </thead>
     <tbody>
         {%  for op in orderproducts %}
           <tr>
-            <td>{{ op.order.user.pk }}</td>
-            <td>{{ op.order.user }}</td>
             <td>{{ op.amount }}</td>
             <td>{{ op.product.unit_of_measurement }}</td>
+            <td>{{ op.order.user }}</td>
+            <td>ID #{{ op.order.user.pk }}</td>
             <td>ID #{{ op.order.pk }}</td>
           </tr>
         {% endfor %}
