@@ -267,8 +267,6 @@ class OrderAdminUserOrderProductsPerOrderRound(StaffuserRequiredMixin, ListView)
                     suppliers[s][product].append(op)
 
         context['data'] = suppliers
-        print suppliers
-
 
         return context
 
