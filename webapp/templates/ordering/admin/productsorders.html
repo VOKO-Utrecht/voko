@@ -16,7 +16,7 @@
     {%  for product, orderproducts in products.items %}
         <div class="panel panel-default">
         <div class="panel-heading">
-        <h4>{{ product }} (Totaal besteld: {{ product.amount_ordered }})</h4>
+        <h4>{{ product }} (Totaal besteld: {{ product.amount_ordered }} {{ product.unit_of_measurement }})</h4>
         </div>
         <div class="panel-body">
         {{ product.description }}
