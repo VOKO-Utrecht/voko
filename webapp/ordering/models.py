@@ -126,6 +126,10 @@ class Order(TimeStampedModel):
 
         return Decimal(0)
 
+    @property
+    def user_order_id(self):
+        return self.user.orders.exclude(orderproducts=None).count()
+
     def _notify_admins_about_new_order(self):
         # This is most likely temporary
         message = """Hoi!
