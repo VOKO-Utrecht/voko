@@ -15,7 +15,10 @@ class MailOrderLists(CronJobBase):
 
     def do(self):
         order_round = get_current_order_round()
-        if order_round.is_open:
+        if order_round.is_open():
+            return
+
+        if order_round.is_not_open_yet():
             return
 
         if order_round.order_placed:

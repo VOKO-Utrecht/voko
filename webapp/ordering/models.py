@@ -38,12 +38,14 @@ class OrderRound(TimeStampedModel):
     transaction_costs = models.DecimalField(decimal_places=2, max_digits=5, default=0.35)
     order_placed = models.BooleanField(default=False)
 
+    def is_not_open_yet(self):
+        current_datetime = datetime.now(pytz.utc)  # Yes, UTC. see Django's timezone docs
+        return current_datetime < self.open_for_orders
+
     @property
     def is_open(self):
         current_datetime = datetime.now(pytz.utc)  # Yes, UTC. see Django's timezone docs
-        if current_datetime >= self.open_for_orders and current_datetime < self.closed_for_orders:
-           return True
-        return False
+        return current_datetime >= self.open_for_orders and current_datetime < self.closed_for_orders
 
     def __unicode__(self):
         # return "[%d] Open: %s | Closed: %s | Collect: %s" %\
