@@ -15,9 +15,7 @@ class OrderProductInline(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ["id", "order_round", "user", "finalized", "collected", "total_price"]
     ordering = ("-id", )
+    inlines = [OrderProductInline]
+    list_filter = ("finalized", "collected")
 
-    inlines = [
-        OrderProductInline,
-    ]
-    
 admin.site.register(Order, OrderAdmin)

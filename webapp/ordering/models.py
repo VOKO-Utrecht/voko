@@ -14,6 +14,9 @@ from django.conf import settings
 
 
 class Supplier(TimeStampedModel):
+    class Meta:
+        verbose_name = "Leverancier"
+
     name = models.CharField(max_length=50, unique=True)
     address = models.ForeignKey(Address)
     email = models.EmailField()
@@ -23,6 +26,10 @@ class Supplier(TimeStampedModel):
 
 
 class OrderRound(TimeStampedModel):
+    class Meta:
+        verbose_name = "Bestelronde"
+        verbose_name_plural = "Bestelronden"
+
     open_for_orders = models.DateTimeField()
     closed_for_orders = models.DateTimeField()
     collect_datetime = models.DateTimeField()
@@ -41,7 +48,7 @@ class OrderRound(TimeStampedModel):
     def __unicode__(self):
         # return "[%d] Open: %s | Closed: %s | Collect: %s" %\
         #        (self.id, self.open_for_orders, self.closed_for_orders, self.collect_datetime)
-        return "Order round ID %s" % self.pk
+        return "Bestelronde #%s" % self.pk
 
 
 class OrderManager(models.Manager):
@@ -61,6 +68,10 @@ class Order(TimeStampedModel):
     3. pay/finalize order
     4. collect order
     """
+
+    class Meta:
+        verbose_name = "Bestelling"
+        verbose_name_plural = "Bestellingen"
 
     objects = OrderManager()
 
@@ -134,7 +145,6 @@ Bestelling:
                                        notes="Debit of %s for Order %d" % (self.total_price, self.pk))
         self.debit = debit
 
-
     def create_and_add_payment(self):
         to_pay = self.user.balance.debit()
         # Sanity check.  TODO: Allow orders without payment when credits exceed total order price.
@@ -144,6 +154,10 @@ Bestelling:
 
 
 class OrderProduct(TimeStampedModel):
+    class Meta:
+        verbose_name = "Productbestelling"
+        verbose_name_plural = "Productbestellingen"
+
     order = models.ForeignKey("Order", related_name="orderproducts")
     product = models.ForeignKey("Product", related_name="orderproducts")
     amount = models.IntegerField(verbose_name="Aantal")
@@ -157,6 +171,10 @@ class OrderProduct(TimeStampedModel):
 
 
 class OrderProductCorrection(TimeStampedModel):
+    class Meta:
+        verbose_name = "Productbestelling-correctie"
+        verbose_name_plural = "Productbestelling-correcties"
+
     order_product = models.OneToOneField("OrderProduct")
     supplied_amount = models.DecimalField(max_digits=6, decimal_places=1)
     notes = models.TextField(blank=True)
@@ -172,6 +190,10 @@ class OrderProductCorrection(TimeStampedModel):
 
 
 class Product(TimeStampedModel):
+    class Meta:
+        verbose_name = "Product"
+        verbose_name_plural = "Producten"
+
     UNITS = (
         ('Stuk', 'Stuk'),
         ('Gram',  'Gram'),
@@ -194,7 +216,7 @@ class Product(TimeStampedModel):
     maximum_total_order = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
-        return '%s van %s' % (self.name, self.supplier)
+        return '%s (%s)' % (self.name, self.supplier)
 
     @property
     def retail_price(self):
