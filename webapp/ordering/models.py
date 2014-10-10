@@ -128,7 +128,10 @@ class Order(TimeStampedModel):
 
     @property
     def user_order_id(self):
-        return self.user.orders.exclude(orderproducts=None).count()
+        user_orders = self.user.orders.exclude(orderproducts=None).order_by("pk")
+        for index, uo in enumerate(user_orders):
+            if uo == self:
+                return index + 1
 
     def _notify_admins_about_new_order(self):
         # This is most likely temporary
