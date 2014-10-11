@@ -18,6 +18,7 @@ def _render_template(template, user, order_round):
     rendered_html_body = body_tpl.render(context)
 
     h2t = html2text.HTML2Text()
+    h2t.body_width = 0
     rendered_plain_body = h2t.handle(rendered_html_body)
 
     return rendered_subject, rendered_html_body, rendered_plain_body
