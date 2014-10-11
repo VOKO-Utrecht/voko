@@ -3,6 +3,8 @@ from django.contrib.auth.admin import UserAdmin
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.db.models.loading import get_models, get_app
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 from accounts.forms import VokoUserCreationForm, VokoUserChangeForm
 from accounts.mails import user_enable_mail, eerste_bestelronde_mail_plain, \
     eerste_bestelronde_mail_html, order_reminder_mail, tweede_bestelronde_mail_plain
@@ -61,6 +63,15 @@ def send_order_reminder_mail(modeladmin, request, queryset):
 send_order_reminder_mail.short_description = "TWEEDE BESTELRONDE MAIL REMINDER"
 
 
+def send_email_to_selected_users(modeladmin, request, queryset):
+    user_ids = [user.pk for user in queryset]
+    request.session['mailing_user_ids'] = user_ids
+    return redirect("admin_choose_mail_template")
+
+
+send_email_to_selected_users.short_description = "Verstuur E-mail"
+
+
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
 
@@ -96,7 +107,8 @@ class VokoUserAdmin(UserAdmin):
         UserProfileInline,
     ]
 
-    actions = (enable_user, force_confirm_email, send_second_orderround_mail, send_order_reminder_mail)
+    actions = (enable_user, force_confirm_email, send_second_orderround_mail, send_order_reminder_mail,
+               send_email_to_selected_users)
 
     def email_confirmed(self, obj):
         if obj.email_confirmation:

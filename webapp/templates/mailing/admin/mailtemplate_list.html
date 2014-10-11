@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Kies een template:</h1>
+    <ul class="list-group">
+    {% for template in object_list %}
+        <li class="list-group-item"><a href="{% url 'admin_preview_mail' template.pk %}">{{ template }}</a> </li>
+    {% endfor %}
+    </ul>
+{% endblock %}

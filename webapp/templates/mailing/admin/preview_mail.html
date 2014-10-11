@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Ontvangers:</h1>
+    <ul class="list-group">
+    {% for user in mailing_users %}
+        <li class="list-group-item">{{ user }}</li>
+    {% endfor %}
+    </ul>
+
+    <h1>Template:</h1>
+    <ul class="list-group">
+        <li class="list-group-item">{{ template }}</li>
+    </ul>
+
+    <h1>Versturen:</h1>
+    <a href="{% url 'admin_send_mail' template.pk %}" class="btn btn-danger" role="button">GO</a>
+
+    <h1>HTML Voorbeeld:</h1>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">{{ example.0 }}</h3>
+      </div>
+      <div class="panel-body">
+        {{ example.1 }}
+      </div>
+    </div>
+
+    <h1>Plaintext Voorbeeld:</h1>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">{{ example.0 }}</h3>
+      </div>
+      <div class="panel-body">
+        {{ example.2|linebreaksbr }}
+      </div>
+    </div>
+
+
+{% endblock %}
