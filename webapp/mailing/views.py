@@ -41,7 +41,7 @@ class PreviewMailView(StaffuserRequiredMixin, TemplateView):
         template = MailTemplate.objects.get(pk=self.kwargs.get('pk'))
         context['template'] = template
 
-        context['example'] = _render_template(template, users[0], get_current_order_round())
+        context['example'] = _render_template(template, self.request.user, get_current_order_round())
 
         return context
 
