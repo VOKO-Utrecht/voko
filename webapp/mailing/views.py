@@ -71,7 +71,7 @@ class SendMailView(StaffuserRequiredMixin, View):
                       recipient_list=[user.email],
                       html_message=html_message)
 
-            EventLog.objects.create(actor=self.request.user,
+            EventLog.objects.create(operator=self.request.user,
                                     user=user,
                                     event="Mail verstuurd met onderwerp '%s'" % subject,
                                     extra=html_message)
