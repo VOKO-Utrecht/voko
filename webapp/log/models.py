@@ -8,3 +8,6 @@ class EventLog(TimeStampedModel):
     user = models.ForeignKey(VokoUser, null=True, blank=True, related_name="user_logs")
     event = models.CharField(max_length=255)
     extra = models.TextField(blank=True, null=True)
+
+    def __unicode__(self):
+        return self.event
