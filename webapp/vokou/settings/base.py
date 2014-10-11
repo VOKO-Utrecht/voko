@@ -27,6 +27,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'bootstrap3',
     'braces',
+    'tinymce',
     'accounts',
     'finance',
     'ordering',
