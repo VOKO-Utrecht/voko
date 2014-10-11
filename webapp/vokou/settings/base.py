@@ -28,6 +28,7 @@ INSTALLED_APPS = (
     'bootstrap3',
     'braces',
     'tinymce',
+    'log',
     'accounts',
     'finance',
     'ordering',
