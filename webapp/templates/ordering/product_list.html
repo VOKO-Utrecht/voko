@@ -32,7 +32,7 @@
       {% for product in object_list %}
       <tr>
         <td><a href="{% url 'view_product' product.pk %}">{{ product.name|title }}</a></td>
-        <td>{{ product.supplier }}</td>
+        <td><a href="{% url 'view_supplier' product.supplier.pk %}">{{ product.supplier }}</a></td>
         <td>{{ product.description }}</td>
         <td>&euro; {{ product.retail_price }} per {{ product.unit_of_measurement }}</td>
         <td>

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>{{ object.name }}</h1>
+
+    <div class="panel panel-default">
+     <div class="panel-body">
+    {{ object.biography|linebreaks }}
+  </div>
+    <div class="panel-footer">
+        {% if object.website %}
+        Website: {{ object.website|urlize }}<br/>
+        {% endif %}
+
+        {% if object.facebook_url %}
+        Facebook: {{ object.facebook_url|urlize }}<br/>
+        {% endif %}
+
+
+    </div>
+</div>
+
+{% endblock %}

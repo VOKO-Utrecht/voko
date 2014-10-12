@@ -174,6 +174,10 @@ class OrderSummary(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
         return qs.filter(finalized=True)
 
 
+class SupplierView(LoginRequiredMixin, DetailView):
+    model = Supplier
+
+
 ### ADMIN VIEWS ###
 
 class OrderAdminMain(StaffuserRequiredMixin, ListView):
