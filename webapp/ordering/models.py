@@ -20,6 +20,8 @@ class Supplier(TimeStampedModel):
     name = models.CharField(max_length=50, unique=True)
     address = models.ForeignKey(Address)
     email = models.EmailField()
+    biography = models.TextField(blank=True, null=True)
+    website = models.URLField(blank=True, null=True)
 
     def __unicode__(self):
         return self.name
