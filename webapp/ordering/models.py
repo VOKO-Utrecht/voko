@@ -22,6 +22,7 @@ class Supplier(TimeStampedModel):
     email = models.EmailField()
     biography = models.TextField(blank=True, null=True)
     website = models.URLField(blank=True, null=True)
+    facebook_url = models.URLField(blank=True, null=True)
 
     def __unicode__(self):
         return self.name
