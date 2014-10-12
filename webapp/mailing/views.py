@@ -68,7 +68,7 @@ class SendMailView(StaffuserRequiredMixin, View):
             send_mail(subject=subject,
                       message=plain_message,
                       from_email="VOKO Utrecht <info@vokoutrecht.nl>",
-                      recipient_list=[user.email],
+                      recipient_list=["%s <%s>" % (user.get_full_name(), user.email)],
                       html_message=html_message)
 
             EventLog.objects.create(operator=self.request.user,
