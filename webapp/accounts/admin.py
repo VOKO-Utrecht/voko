@@ -91,7 +91,7 @@ class VokoUserAdmin(UserAdmin):
     filter_horizontal = ("groups", "user_permissions",)
     fieldsets = (
         (None, {"fields": ("email", "password", "first_name", "last_name")}),
-        ("Permissions", {"fields": ("can_activate", "is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
+        ("Permissions", {"fields": ("is_staff", "is_superuser", "groups", "user_permissions")}),
         ("Important dates", {"fields": ("last_login",)}),
     )
 
