@@ -53,8 +53,6 @@ voor ons uitlevermoment op %s.
 
 De bestelling is in CSV-formaat, dit is te openen in bijvoorbeeld Excel.
 
-Zou je willen bevestigen als je de bestelling in goede orde hebt ontvangen?
-
 Dit is een geautomatiseerd bericht. Reageren is gewoon mogelijk!
 
 Vriendelijke groeten,
