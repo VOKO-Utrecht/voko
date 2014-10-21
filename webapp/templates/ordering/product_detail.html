@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load bootstrap3 %}
+{% block title %}{{ object.name}} van {{ object.supplier }}{% endblock %}
 {% block content %}
 <h1>{{ object.name }} van <a href="{% url 'view_supplier' object.supplier.pk %}">{{ object.supplier }}</a></h1>
 <div class="panel panel-default">
