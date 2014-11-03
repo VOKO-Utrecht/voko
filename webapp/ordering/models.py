@@ -228,7 +228,7 @@ class Product(TimeStampedModel):
     maximum_total_order = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
-        return '%s (%s)' % (self.name, self.supplier)
+        return '[ronde %s] %s (%s)' % (self.order_round.pk, self.name, self.supplier)
 
     @property
     def retail_price(self):
