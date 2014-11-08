@@ -25,6 +25,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_nose',
     'bootstrap3',
     'braces',
     'tinymce',
@@ -72,3 +73,5 @@ MEMBER_FEE = 20.0
 LOGIN_REDIRECT_URL = "/"
 
 EMAIL_SUBJECT_PREFIX = "[Voko Admin] "
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

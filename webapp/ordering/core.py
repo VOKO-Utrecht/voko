@@ -1,18 +1,39 @@
-from django.db import OperationalError
+from pytz import UTC
 import models
+from datetime import datetime
 
 
 def get_current_order_round():
-    ## TODO: Get current order round based on current date
-    ## If non existing, get_or_create?
-    try:
-        return models.OrderRound.objects.all().order_by("-pk")[0]
-    except IndexError:
-        print "INDEX FAIL"
+    """
+    Return the current order round.
+    If there's no current order round, return the next one.
+    If there's not current or next order round, return the previous one.
+    If there's no order round at all, return None.
+
+    :return: OrderRound object || None
+    """
+    now = datetime.now(UTC)
+    order_rounds = models.OrderRound.objects.all()
+
+    # No rounds at all (empty DB)
+    if order_rounds.count() == 0:
         return
-    except OperationalError:
-        print "OPERATIONAL ERROR"
-        pass
+
+    # Exact match to open round
+    filtered = order_rounds.filter(open_for_orders__lte=now,
+                                   collect_datetime__gt=now)
+    if filtered.count() == 1:
+        return filtered.get()
+
+    # Future round(s)
+    filtered = order_rounds.filter(open_for_orders__gte=now)
+    if filtered.count() > 0:
+        return filtered.order_by("open_for_orders")[0]
+
+    # Previous round(s)
+    filtered = order_rounds.filter(collect_datetime__lt=now)
+    if filtered.count() > 0:
+        return filtered.order_by("-open_for_orders")[0]
 
 
 def get_or_create_order(user):
