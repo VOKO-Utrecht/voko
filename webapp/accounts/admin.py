@@ -44,6 +44,10 @@ def force_confirm_email(modeladmin, request, queryset):
         user.email_confirmation.is_confirmed = True
         user.email_confirmation.save()
 
+        log_event(operator=request.user,
+                  event="User's e-mail forcefully confirmet: %s" % user,
+                  user=user)
+
 force_confirm_email.short_description = "Forceer e-mailadres bevestiging"
 
 
