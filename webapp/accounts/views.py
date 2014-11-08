@@ -8,7 +8,6 @@ from accounts.forms import VokoUserCreationForm, VokoUserFinishForm, RequestPass
 from accounts.models import EmailConfirmation, VokoUser, PasswordResetRequest
 from django.conf import settings
 from ordering.core import get_current_order_round
-from ordering.models import OrderRound
 
 
 class LoginView(AnonymousRequiredMixin, FormView):
