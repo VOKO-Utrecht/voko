@@ -1,3 +1,4 @@
+import pytz
 from datetime import datetime, timedelta
 from uuid import uuid4
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
@@ -6,11 +7,14 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
-import pytz
-from accounts.mails import email_confirm_mail, password_reset_mail
+from accounts.mails import password_reset_mail
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.mail import mail_admins
+from log import log_event
+from mailing.views import get_template_by_id, render_mail_template
+
+CONFIRM_MAILTEMPLATE_ID = 2
 
 
 class Address(TimeStampedModel):
@@ -130,10 +134,16 @@ class EmailConfirmation(TimeStampedModel):
         self.save()
 
     def send_confirmation_mail(self):
-        body = email_confirm_mail % {'URL': "http://leden.vokoutrecht.nl%s" % reverse('confirm_email', args=(self.pk,)),
-                                     'first_name': self.user.first_name}
-        send_mail('[VOKO Utrecht] Email-adres bevestigen', body, 'VOKO Utrecht <info@vokoutrecht.nl>',
-                  [self.user.email], fail_silently=False)
+        mail_template = get_template_by_id(CONFIRM_MAILTEMPLATE_ID)
+
+        subject, html_message, plain_message = render_mail_template(mail_template, user=self.user)
+        send_mail(subject=subject,
+                  message=plain_message,
+                  from_email="VOKO Utrecht <info@vokoutrecht.nl>",
+                  recipient_list=["%s <%s>" % (self.user.name, self.user.email)],
+                  html_message=html_message)
+
+        log_event(user=self.user, event="Email confirmation mail sent", extra=html_message)
 
     def __unicode__(self):
         return "Confirmed: %s | user: %s | email: %s" % (self.is_confirmed, self.user, self.user.email)
