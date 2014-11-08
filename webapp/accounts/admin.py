@@ -3,11 +3,9 @@ from django.contrib.auth.admin import UserAdmin
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.db.models.loading import get_models, get_app
-from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from accounts.forms import VokoUserCreationForm, VokoUserChangeForm
-from accounts.mails import user_enable_mail, eerste_bestelronde_mail_plain, \
-    eerste_bestelronde_mail_html, order_reminder_mail, tweede_bestelronde_mail_plain
+from accounts.mails import user_enable_mail
 from accounts.models import VokoUser, UserProfile
 from ordering.core import get_current_order_round
 from ordering.models import Order
@@ -43,24 +41,6 @@ def force_confirm_email(modeladmin, request, queryset):
         user.email_confirmation.save()
 
 force_confirm_email.short_description = "Forceer e-mailadres bevestiging"
-
-
-def send_second_orderround_mail(modeladmin, request, queryset):
-    for user in queryset:
-        plain_body = tweede_bestelronde_mail_plain % {'first_name': user.first_name}
-
-        send_mail('VOKO Utrecht - Tweede bestelronde', message=plain_body,
-                  from_email='VOKO Utrecht <info@vokoutrecht.nl>', recipient_list=[user.email], fail_silently=False)
-send_second_orderround_mail.short_description = "TWEEDE BESTELRONDE MAIL"
-
-
-def send_order_reminder_mail(modeladmin, request, queryset):
-    for user in queryset:
-        plain_body = order_reminder_mail % {'first_name': user.first_name}
-
-        send_mail('VOKO Utrecht - Herinnering: bestellen mogelijk tot 3/10/14, 18.00 uur', message=plain_body,
-                  from_email='VOKO Utrecht <info@vokoutrecht.nl>', recipient_list=[user.email], fail_silently=False)
-send_order_reminder_mail.short_description = "TWEEDE BESTELRONDE MAIL REMINDER"
 
 
 def send_email_to_selected_users(modeladmin, request, queryset):
@@ -107,8 +87,7 @@ class VokoUserAdmin(UserAdmin):
         UserProfileInline,
     ]
 
-    actions = (enable_user, force_confirm_email, send_second_orderround_mail, send_order_reminder_mail,
-               send_email_to_selected_users)
+    actions = (enable_user, force_confirm_email, send_email_to_selected_users)
 
     def email_confirmed(self, obj):
         if obj.email_confirmation:
