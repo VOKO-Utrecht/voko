@@ -7,6 +7,7 @@ from django.shortcuts import redirect
 from accounts.forms import VokoUserCreationForm, VokoUserChangeForm
 from accounts.mails import user_enable_mail
 from accounts.models import VokoUser, UserProfile
+from log import log_event
 from ordering.core import get_current_order_round
 from ordering.models import Order
 
@@ -24,13 +25,15 @@ def enable_user(modeladmin, request, queryset):
     queryset.update(can_activate=True)
 
     for user in queryset:
-            ## send mail
-            body = user_enable_mail % {'URL': "http://leden.vokoutrecht.nl%s"
-                                              % reverse('finish_registration', args=(user.email_confirmation.token,)),
-                                       'first_name': user.first_name}
-            send_mail('[VOKO Utrecht] Account activeren', body,
-                      'info@vokoutrecht.nl', [user.email], fail_silently=False)
+        ## send mail
+        body = user_enable_mail % {'URL': "http://leden.vokoutrecht.nl%s"
+                                          % reverse('finish_registration', args=(user.email_confirmation.token,)),
+                                   'first_name': user.first_name}
+        send_mail('[VOKO Utrecht] Account activeren', body,
+                  'info@vokoutrecht.nl', [user.email], fail_silently=False)
 
+        log_event(operator=request.user,
+                  event="User set to 'can_activate': %s" % user)
 
 enable_user.short_description = "Gebruikersactivatie na bezoek info-avond"
 
