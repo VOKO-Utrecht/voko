@@ -1,6 +1,6 @@
 from braces.views import StaffuserRequiredMixin
 from django.core.mail import send_mail
-from django.http import HttpResponse, StreamingHttpResponse
+from django.http import HttpResponse
 from django.template import Template, Context
 from django.views.generic import TemplateView, ListView, View
 from accounts.models import VokoUser
@@ -10,10 +10,10 @@ from ordering.core import get_current_order_round
 import html2text
 
 
-def _render_template(template, user, order_round):
+def render_mail_template(template, **kwargs):
     body_tpl = Template(template.html_body)
     subject_tpl = Template(template.subject)
-    context = Context({'user': user, 'order_round': order_round})
+    context = Context(**kwargs)
 
     rendered_subject = subject_tpl.render(context)
     rendered_html_body = body_tpl.render(context)
@@ -42,7 +42,9 @@ class PreviewMailView(StaffuserRequiredMixin, TemplateView):
         template = MailTemplate.objects.get(pk=self.kwargs.get('pk'))
         context['template'] = template
 
-        context['example'] = _render_template(template, self.request.user, get_current_order_round())
+        context['example'] = render_mail_template(template,
+                                                  user=self.request.user,
+                                                  order_round=get_current_order_round())
 
         return context
 
@@ -63,7 +65,9 @@ class SendMailView(StaffuserRequiredMixin, View):
 
     def _send_mails(self):
         for user in self.users:
-            subject, html_message, plain_message = _render_template(self.template, user, self.current_order_round)
+            subject, html_message, plain_message = render_mail_template(self.template,
+                                                                        user=user,
+                                                                        order_round=self.current_order_round)
 
             send_mail(subject=subject,
                       message=plain_message,
