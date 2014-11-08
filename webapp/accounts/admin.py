@@ -33,7 +33,8 @@ def enable_user(modeladmin, request, queryset):
                   'info@vokoutrecht.nl', [user.email], fail_silently=False)
 
         log_event(operator=request.user,
-                  event="User set to 'can_activate': %s" % user)
+                  event="User set to 'can_activate': %s" % user,
+                  user=user)
 
 enable_user.short_description = "Gebruikersactivatie na bezoek info-avond"
 
