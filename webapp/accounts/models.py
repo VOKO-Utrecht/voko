@@ -7,7 +7,6 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
-from accounts.mails import password_reset_mail
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.mail import mail_admins
@@ -15,6 +14,7 @@ import log
 from mailing.helpers import get_template_by_id, render_mail_template
 
 CONFIRM_MAILTEMPLATE_ID = 2
+PASSWORD_RESET_MAILTEMPLATE_ID = 9
 
 
 class Address(TimeStampedModel):
@@ -162,10 +162,17 @@ class PasswordResetRequest(TimeStampedModel):
         super(PasswordResetRequest, self).save(*args, **kwargs)
 
     def send_email(self):
-        body = password_reset_mail % {'URL': "http://leden.vokoutrecht.nl%s" % reverse('reset_pass', args=(self.pk,)),
-                                     'first_name': self.user.first_name}
-        send_mail('[VOKO Utrecht] Wachtwoord reset', body, 'VOKO Utrecht <info@vokoutrecht.nl>',
-                  [self.user.email], fail_silently=False)
+        mail_template = get_template_by_id(PASSWORD_RESET_MAILTEMPLATE_ID)
+        subject, html_message, plain_message = render_mail_template(mail_template, user=self.user,
+                                                                    url="http://leden.vokoutrecht.nl%s" %
+                                                                        reverse('reset_pass', args=(self.pk,)))
+        send_mail(subject=subject,
+                  message=plain_message,
+                  from_email="VOKO Utrecht <info@vokoutrecht.nl>",
+                  recipient_list=["%s <%s>" % (self.user.get_full_name(), self.user.email)],
+                  html_message=html_message)
+        log.log_event(user=self.user, event="Password reset mail sent", extra=html_message)
+
     @property
     def is_usable(self):
         if self.is_used:
