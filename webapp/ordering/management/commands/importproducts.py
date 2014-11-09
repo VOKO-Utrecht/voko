@@ -30,6 +30,12 @@ class Command(BaseCommand):
                 try:
                     name, description, unit, price, maximum, minimum = row
 
+                    if maximum.lower() == 'onbeperkt':
+                        maximum = None
+
+                    if minimum.lower() == 'onbeperkt':
+                        minimum = None
+
                     maximum = int(maximum) if maximum else None
                     minimum = int(minimum) if minimum else None
 
