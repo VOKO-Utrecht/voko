@@ -5,7 +5,7 @@ from django.template import Context
 from django.template.loader import get_template
 from django_cron import CronJobBase, Schedule
 from .core import get_current_order_round
-from log import log_event
+from log.models import EventLog
 from mailing.models import MailTemplate
 from mailing.views import render_mail_template
 from ordering.models import Supplier
@@ -53,7 +53,8 @@ class SendReminderMailToSuppliersCron(CronJobBase):
                       recipient_list=["%s <%s>" % (supplier.name, supplier.email)],
                       html_message=html_message)
 
-            log_event(event="Herinneringsmail naar %s" % supplier.name, extra=html_message)
+            EventLog.objects.create(event="Herinneringsmail naar %s" % supplier.name,
+                                    extra=html_message)
 
 
 class MailOrderLists(CronJobBase):

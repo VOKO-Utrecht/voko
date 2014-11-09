@@ -10,11 +10,6 @@ from ordering.core import get_current_order_round
 import html2text
 
 
-# TODO: Views is not the appropiate module
-def get_template_by_id(template_id):
-    return MailTemplate.objects.get(id=template_id)
-
-
 def render_mail_template(template, **kwargs):
     body_tpl = Template(template.html_body)
     subject_tpl = Template(template.subject)
