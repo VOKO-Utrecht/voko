@@ -6,8 +6,8 @@ from django.template.loader import get_template
 from django_cron import CronJobBase, Schedule
 from .core import get_current_order_round
 from log import log_event
+from mailing.helpers import render_mail_template
 from mailing.models import MailTemplate
-from mailing.views import render_mail_template
 from ordering.models import Supplier
 
 
