@@ -1,15 +1,17 @@
+import log
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.core.mail import send_mail
-from django.core.urlresolvers import reverse
 from django.db.models.loading import get_models, get_app
 from django.shortcuts import redirect
 from accounts.forms import VokoUserCreationForm, VokoUserChangeForm
-from accounts.mails import user_enable_mail
 from accounts.models import VokoUser, UserProfile
-from log import log_event
+from mailing.helpers import get_template_by_id, render_mail_template
 from ordering.core import get_current_order_round
 from ordering.models import Order
+
+
+ACTIVATE_ACCOUNT_MAILTEMPLATE_ID = 1
 
 for model in get_models(get_app('accounts')):
     if model == VokoUser:
@@ -26,15 +28,14 @@ def enable_user(modeladmin, request, queryset):
 
     for user in queryset:
         ## send mail
-        body = user_enable_mail % {'URL': "http://leden.vokoutrecht.nl%s"
-                                          % reverse('finish_registration', args=(user.email_confirmation.token,)),
-                                   'first_name': user.first_name}
-        send_mail('[VOKO Utrecht] Account activeren', body,
-                  'info@vokoutrecht.nl', [user.email], fail_silently=False)
-
-        log_event(operator=request.user,
-                  event="User set to 'can_activate': %s" % user,
-                  user=user)
+        mail_template = get_template_by_id(ACTIVATE_ACCOUNT_MAILTEMPLATE_ID)
+        subject, html_message, plain_message = render_mail_template(mail_template, user=user)
+        send_mail(subject=subject,
+                  message=plain_message,
+                  from_email="VOKO Utrecht <info@vokoutrecht.nl>",
+                  recipient_list=["%s <%s>" % (user.get_full_name(), user.email)],
+                  html_message=html_message)
+        log.log_event(user=user, event="User set to 'can_activate=True' and activation mail sent", extra=html_message)
 
 enable_user.short_description = "Gebruikersactivatie na bezoek info-avond"
 
@@ -44,9 +45,9 @@ def force_confirm_email(modeladmin, request, queryset):
         user.email_confirmation.is_confirmed = True
         user.email_confirmation.save()
 
-        log_event(operator=request.user,
-                  event="User's e-mail forcefully confirmet: %s" % user,
-                  user=user)
+        log.log_event(operator=request.user,
+                      event="User's e-mail forcefully confirmet: %s" % user,
+                      user=user)
 
 force_confirm_email.short_description = "Forceer e-mailadres bevestiging"
 
