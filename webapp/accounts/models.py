@@ -139,7 +139,7 @@ class EmailConfirmation(TimeStampedModel):
         send_mail(subject=subject,
                   message=plain_message,
                   from_email="VOKO Utrecht <info@vokoutrecht.nl>",
-                  recipient_list=["%s <%s>" % (self.user.name, self.user.email)],
+                  recipient_list=["%s <%s>" % (self.user.get_full_name(), self.user.email)],
                   html_message=html_message)
         log.log_event(user=self.user, event="Email confirmation mail sent", extra=html_message)
 
