@@ -1,4 +1,4 @@
-from .models import EventLog
+from models import EventLog
 
 
 def log_event(operator=None,

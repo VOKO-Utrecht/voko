@@ -1,5 +1,6 @@
 from django.template import Template, Context
 import html2text
+from mailing.models import MailTemplate
 
 
 def render_mail_template(template, **kwargs):
@@ -15,3 +16,7 @@ def render_mail_template(template, **kwargs):
     rendered_plain_body = h2t.handle(rendered_html_body)
 
     return rendered_subject, rendered_html_body, rendered_plain_body
+
+
+def get_template_by_id(template_id):
+    return MailTemplate.objects.get(id=template_id)
