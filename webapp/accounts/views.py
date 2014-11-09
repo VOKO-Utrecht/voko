@@ -7,6 +7,7 @@ from django.views.generic import FormView, DetailView, UpdateView, TemplateView,
 from accounts.forms import VokoUserCreationForm, VokoUserFinishForm, RequestPasswordResetForm, PasswordResetForm
 from accounts.models import EmailConfirmation, VokoUser, PasswordResetRequest
 from django.conf import settings
+import log
 from ordering.core import get_current_order_round
 
 
@@ -98,7 +99,7 @@ class RequestPasswordResetView(AnonymousRequiredMixin, FormView):
 
         except VokoUser.DoesNotExist:
             # Do not notify user
-            pass
+            log.log_event(event="Password reset requested for unknown email address: %s" % form.cleaned_data['email'])
 
         return super(RequestPasswordResetView, self).form_valid(form)
 
