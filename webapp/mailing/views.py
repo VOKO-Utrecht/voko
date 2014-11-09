@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.template import Template, Context
 from django.views.generic import TemplateView, ListView, View
 from accounts.models import VokoUser
-from log.models import EventLog
+from log import log_event
 from mailing.models import MailTemplate
 from ordering.core import get_current_order_round
 import html2text
@@ -75,8 +75,8 @@ class SendMailView(StaffuserRequiredMixin, View):
                       recipient_list=["%s <%s>" % (user.get_full_name(), user.email)],
                       html_message=html_message)
 
-            EventLog.objects.create(operator=self.request.user,
-                                    user=user,
-                                    event="Mail verstuurd met onderwerp '%s'" % subject,
-                                    extra=html_message)
+            log_event(operator=self.request.user,
+                      user=user,
+                      event="Mail verstuurd met onderwerp '%s'" % subject,
+                      extra=html_message)
 
