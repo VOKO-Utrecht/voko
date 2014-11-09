@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.mail import mail_admins
 from django.db import transaction
+import log
 from .models import VokoUser, Address, UserProfile
 
 # Custom user forms based on examples from Two Scoops of Django.
@@ -72,6 +73,7 @@ Gebruiker %s heeft zojuist zijn/haar registratie afgerond..
             UserProfile.objects.create(user=user, address=address, notes=self.cleaned_data['notes'])
 
             self._notify_admins_about_activated_user(user)
+            log.log_event(user=user, event="User finished registration")
 
         return user
 
