@@ -1,5 +1,4 @@
 import pytz
-import log
 from datetime import datetime, timedelta
 from uuid import uuid4
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
@@ -12,6 +11,7 @@ from accounts.mails import password_reset_mail
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.mail import mail_admins
+from log import log_event
 from mailing.views import get_template_by_id, render_mail_template
 
 CONFIRM_MAILTEMPLATE_ID = 2
@@ -143,7 +143,7 @@ class EmailConfirmation(TimeStampedModel):
                   recipient_list=["%s <%s>" % (self.user.name, self.user.email)],
                   html_message=html_message)
 
-        log.log_event(user=self.user, event="Email confirmation mail sent", extra=html_message)
+        log_event(user=self.user, event="Email confirmation mail sent", extra=html_message)
 
     def __unicode__(self):
         return "Confirmed: %s | user: %s | email: %s" % (self.is_confirmed, self.user, self.user.email)
