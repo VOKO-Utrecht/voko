@@ -5,15 +5,22 @@ from ordering.models import Product, Supplier
 
 
 class Command(BaseCommand):
+    args = '<Supplier name> <Path to CSV>'
     help = 'Create product objects from CSV'
 
     def add_arguments(self, parser):
         parser.add_argument('--csvfile', type=str)
 
     def handle(self, *args, **options):
-        csvfile = "/home/rik/VOKO/bestellijsten_ronde1/nieuwslagmaat.csv"
+        supplier = Supplier.objects.get(name=args[0])
+        csvfile = args[1]
+
+        print "============="
+        print "Supplier: %s" % supplier
+        print "CSV file: %s" % csvfile
+        print "============="
+
         data = []
-        supplier = Supplier.objects.get(name="De Kas")
         order_round = get_current_order_round()
 
         with open(csvfile, "rb") as csvfile:
@@ -27,7 +34,6 @@ class Command(BaseCommand):
                     minimum = int(minimum) if minimum else None
 
                     # Strip off euro sign
-                    old_price = price
                     if not price.isdigit():
                         price = price[3:]
                     price = float(price)
@@ -61,8 +67,8 @@ class Command(BaseCommand):
                 for field in ("name", "description", "base_price", "minimum_total_order",
                               "maximum_total_order", "unit_of_measurement"):
                     print "%s: %s" % (field, getattr(d[1], field))
-                do_save = raw_input("Save? (y/n) > ")
-                if do_save == "y":
+                do_save = raw_input("Save? [Y/n] > ")
+                if do_save == "y" or do_save == "":
                     print "Saving"
                     d[1].save()
                 else:
