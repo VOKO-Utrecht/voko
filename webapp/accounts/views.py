@@ -79,7 +79,7 @@ class OverView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(OverView, self).get_context_data(**kwargs)
-        context['current_order_round'] = get_current_order_round()
+        context['current_order_round'] = self.request.current_order_round
         return context
 
 

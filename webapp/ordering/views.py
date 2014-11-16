@@ -17,11 +17,12 @@ from ordering.models import Product, OrderProduct, Order, OrderRound, Supplier
 
 
 class ProductsView(LoginRequiredMixin, ListView):
-    queryset = Product.objects.filter(order_round=get_current_order_round()).order_by('name')
+    def get_queryset(self):
+        return Product.objects.filter(order_round=self.request.current_order_round).order_by('name')
 
     def get_context_data(self, **kwargs):
         context = super(ProductsView, self).get_context_data(**kwargs)
-        context['current_order_round'] = get_current_order_round()
+        context['current_order_round'] = self.request.current_order_round
         return context
 
 
@@ -68,7 +69,7 @@ class ProductOrder(LoginRequiredMixin, SingleObjectMixin, FormView):
         if form.is_valid():
             order_product = form.save(commit=False)
             order_product.order = get_or_create_order(request.user)
-            assert order_product.product.order_round == get_current_order_round()  # TODO: nicer error, or just disable ordering.
+            assert order_product.product.order_round == self.request.current_order_round  # TODO: nicer error, or just disable ordering.
 
             # Remove product from order when amount is zero
             if order_product.amount < 1:

@@ -28,7 +28,7 @@ class PreviewMailView(StaffuserRequiredMixin, TemplateView):
 
         context['example'] = render_mail_template(template,
                                                   user=self.request.user,
-                                                  order_round=get_current_order_round())
+                                                  order_round=self.request.current_order_round)
 
         return context
 
@@ -37,7 +37,7 @@ class SendMailView(StaffuserRequiredMixin, View):
     def dispatch(self, request, *args, **kwargs):
         self.users = [VokoUser.objects.get(pk=uid) for uid in self.request.session.get('mailing_user_ids')]
         self.template = MailTemplate.objects.get(pk=self.kwargs.get('pk'))
-        self.current_order_round = get_current_order_round()
+        self.current_order_round = self.request.current_order_round
 
         # TODO: Clear users from session. Below code doesn't work
         # request.session['mailing_user_ids'] = []
