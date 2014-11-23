@@ -19,3 +19,7 @@ ADMINS = (
     ("Voko Utrecht", "info@vokoutrecht.nl"),
 )
 ALLOWED_HOSTS = ("leden.vokoutrecht.nl",)
+
+QANTANI_MERCHANT_ID = os.environ["QANTANI_MERCHANT_ID"]
+QANTANI_MERCHANT_KEY = os.environ["QANTANI_MERCHANT_KEY"]
+QANTANI_MERCHANT_SECRET = os.environ["QANTANI_MERCHANT_SECRET"]
