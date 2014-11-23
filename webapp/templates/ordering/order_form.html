@@ -40,7 +40,7 @@
         <tbody>
           {% for form in formset %}
           <tr>
-            <td><a href="{% url 'view_product' form.instance.product.pk %}">{{ form.instance.product }}</a></td>
+            <td><a href="{% url 'view_product' form.instance.product.pk %}">{{ form.instance.product.name }}</a></td>
             <td>{{ form.amount }}</td>
             <td>&euro; {{ form.instance.product.retail_price }}</td>
             <td>&euro; {{ form.instance.total_price }}</td>
