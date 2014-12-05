@@ -5,6 +5,7 @@ from django.db import models
 from django_extensions.db.models import TimeStampedModel
 import pytz
 from accounts.models import Address
+from finance.models import Balance
 from ordering.core import get_or_create_order
 from django.conf import settings
 
@@ -89,7 +90,7 @@ class Order(TimeStampedModel):
     # Whether the order has been retrieved by the user
     collected = models.BooleanField(default=False)
 
-    debit = models.OneToOneField("finance.Balance", null=True, blank=True)
+    debit = models.OneToOneField(Balance, null=True, blank=True)
 
     def __unicode__(self):
         return "Order %d; value: E%s; user: %s" % (self.id, self.total_price, self.user)
@@ -182,7 +183,7 @@ class OrderProductCorrection(TimeStampedModel):
     order_product = models.OneToOneField("OrderProduct")
     supplied_amount = models.DecimalField(max_digits=6, decimal_places=1)
     notes = models.TextField(blank=True)
-    credit = models.OneToOneField("finance.Balance")
+    credit = models.OneToOneField(Balance)
 
     def __unicode__(self):
         return "Correction on OrderProduct: %s" % self.order_product

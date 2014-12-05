@@ -1,13 +1,12 @@
 from django.db import models
 from django.conf import settings
-from ordering.models import Order
 
 
 class Payment(models.Model):
     amount = models.DecimalField(max_digits=6, decimal_places=2)
     # Might be redundant / non-normalized?
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="user")
-    order = models.ForeignKey(Order)
+    order = models.ForeignKey("ordering.Order", null=True)
 
     transaction_id = models.IntegerField()
     transaction_code = models.CharField(max_length=255)
