@@ -28,6 +28,10 @@ class Supplier(TimeStampedModel):
     def __unicode__(self):
         return self.name
 
+    def has_orders_in_current_order_round(self):
+        return OrderProduct.objects.filter(product__supplier=self,
+                                           order__order_round=get_current_order_round()).exists()
+
 
 class OrderRound(TimeStampedModel):
     class Meta:
@@ -223,6 +227,7 @@ class Product(TimeStampedModel):
         ('Gram',  'Gram'),
         ('Decagram', 'Decagram (10g)'),
         ('Hectogram', 'Hectogram (100g)'),
+        ('Half pond', 'Halve pond (250g)'),
         ('Pond',  'Pond (500g)'),
         ('Kilogram', 'Kilogram'),
         ('Deciliter', 'Deciliter (100ml)'),

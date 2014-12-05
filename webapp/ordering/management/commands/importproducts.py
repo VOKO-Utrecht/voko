@@ -51,8 +51,8 @@ class Command(BaseCommand):
                             unit = u
 
                     product = Product(
-                        name=name,
-                        description=description,
+                        name=unicode(name, 'utf-8'),
+                        description=unicode(description, 'utf-8'),
                         base_price=price,
                         supplier=supplier,
                         order_round=order_round,
