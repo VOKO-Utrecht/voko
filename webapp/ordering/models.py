@@ -6,7 +6,7 @@ from django_extensions.db.models import TimeStampedModel
 import pytz
 from accounts.models import Address
 from finance.models import Payment, Balance
-from ordering.core import get_or_create_order
+from ordering.core import get_or_create_order, get_current_order_round
 from django.conf import settings
 
 # TODO: use slugs in relevant models (product, supplier, etc)
@@ -26,6 +26,10 @@ class Supplier(TimeStampedModel):
 
     def __unicode__(self):
         return self.name
+
+    def has_orders_in_current_order_round(self):
+        return OrderProduct.objects.filter(product__supplier=self,
+                                           order__order_round=get_current_order_round()).exists()
 
 
 class OrderRound(TimeStampedModel):

@@ -78,7 +78,10 @@ class MailOrderLists(CronJobBase):
         order_round.order_placed = True
         order_round.save()
 
-        for supplier in Supplier.objects.all():  # TODO: Only take suppliers with actual orders
+        for supplier in Supplier.objects.all():
+            if not supplier.has_orders_in_current_order_round():
+                continue
+
             # Generate CSV
             template = get_template("ordering/admin/orderlist_per_supplier.html")
             object_list = supplier.products.\
