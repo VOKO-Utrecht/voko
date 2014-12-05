@@ -87,7 +87,6 @@ class Order(TimeStampedModel):
 
     # This might have to change to 'paid' or something
     finalized = models.BooleanField(default=False)  # TODO remove?
-    payment = models.OneToOneField(Payment, blank=True, null=True)
     # Whether the order has been retrieved by the user
     collected = models.BooleanField(default=False)
 
