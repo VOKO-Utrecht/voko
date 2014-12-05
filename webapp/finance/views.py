@@ -2,7 +2,6 @@ from braces.views import LoginRequiredMixin
 from django import forms
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.views.generic import TemplateView, FormView
 from qantani import QantaniAPI
@@ -25,10 +24,12 @@ class QantaniMixin(object):
                                       settings.QANTANI_MERCHANT_SECRET)
 
     def _create_transaction(self, bank_id, amount, description):
+        # BASE_URL = "http://leden.vokoutrecht.nl"
+        BASE_URL = "http://localhost:8000"
         return self.qantani_api.create_ideal_transaction(amount=amount,
                                                          bank_id=bank_id,
                                                          description=description,
-                                                         return_url=reverse('finance.confirmtransaction'))
+                                                         return_url=BASE_URL + reverse('finance.confirmtransaction'))
 
     def _validate_transaction(self, transaction_code, transaction_checksum, transaction_id,
                               transaction_status, transaction_salt):
@@ -73,7 +74,7 @@ class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
             redirect(reverse('finance.choosebank'))
 
         user_debit = self.request.user.balance.debit()
-        #assert user_debit > 0
+        assert user_debit > 0
         bank_id = f.cleaned_data['bank']
         results = self._create_transaction(bank_id=bank_id,
                                            amount=user_debit,
@@ -82,6 +83,7 @@ class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
 
         Payment.objects.create(amount=user_debit,
                                user=self.request.user,
+                               order=self.request.user.orders.get_current_order(),
                                transaction_id=results.get("TransactionID"),
                                transaction_code=results.get("Code"))
 
@@ -114,9 +116,13 @@ class ConfirmTransactionView(LoginRequiredMixin, QantaniMixin, TemplateView):
 
         if success:
             payment.succeeded = True
-            # payment.save()
+            payment.save()
+            payment.order.finalized = True
+            payment.order.save()
+            payment.create_credit()
 
-            # Set order to finalized ?
+            payment.order.mail_confirmation()
+            payment.order._notify_admins_about_new_order()
 
         context['payment_succeeded'] = success
 

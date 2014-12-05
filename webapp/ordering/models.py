@@ -1,6 +1,6 @@
 from datetime import datetime
 from decimal import Decimal, ROUND_UP
-from django.core.mail import mail_admins
+from django.core.mail import mail_admins, send_mail
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 import pytz
@@ -11,6 +11,7 @@ from django.conf import settings
 
 # TODO: use slugs in relevant models (product, supplier, etc)
 # TODO: override delete methods (also in finance app)
+from ordering.mails import order_confirmation_mail
 
 
 class Supplier(TimeStampedModel):
@@ -154,8 +155,19 @@ Bestelling:
         debit = Balance.objects.create(user=self.user,
                                        type="DR",
                                        amount=self.total_price,
-                                       notes="Debit of %s for Order %d" % (self.total_price, self.pk))
+                                       notes="Debit van %s voor bestelling #%d" % (self.total_price, self.pk))
         self.debit = debit
+
+    def mail_confirmation(self):
+        product_list_text = "\n".join(["%d x %s (%s)" % (op.amount, op.product, op.product.supplier)
+                                       for op in self.orderproducts.all()])
+
+        amsterdam = pytz.timezone('Europe/Amsterdam')
+        mail_body = order_confirmation_mail % {'first_name': self.user.first_name,
+                                               'collect_datetime': self.order_round.collect_datetime.astimezone(amsterdam).strftime("%c"),
+                                               'product_list': product_list_text}
+        send_mail('[VOKO Utrecht] Bestelbevestiging', mail_body, 'VOKO Utrecht <info@vokoutrecht.nl>',
+                  [self.user.email], fail_silently=False)
 
 
 class OrderProduct(TimeStampedModel):

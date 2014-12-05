@@ -4,30 +4,26 @@ from django.conf import settings
 
 class Payment(models.Model):
     amount = models.DecimalField(max_digits=6, decimal_places=2)
-    # Might be redundant / non-normalized?
+    # Might be redundant / non-normalized?  TODO: remove, is the same as order.user
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="user")
-    order = models.ForeignKey("ordering.Order", null=True)
+    order = models.ForeignKey("ordering.Order", null=True, related_name="payments")
 
     transaction_id = models.IntegerField()
     transaction_code = models.CharField(max_length=255)
     succeeded = models.BooleanField(default=False)
 
-
     # TODO: add more fields
     # TODO: succeeded payment creates credit.
 
-    def _create_credit(self):
+    def create_credit(self):
         Balance.objects.create(user=self.user,
                                type="CR",
                                amount=self.amount,
-                               notes="Credit from Payment #%d" % self.pk)
-
-    def save(self, *args, **kwargs):
-        super(Payment, self).save(*args, **kwargs)
-        self._create_credit()
+                               notes="iDeal betaling voor bestelling #%d" % self.order.pk)
 
     def __unicode__(self):
-        return "Payment of E%s" % self.amount
+        status = "Succeeded" if self.succeeded else "Failed"
+        return "%s payment of E%s by %s" % (status, self.amount, self.user)
 
 
 class BalanceManager(models.Manager):

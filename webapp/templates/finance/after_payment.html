@@ -5,10 +5,11 @@
     {% if payment_succeeded  %}
         <h1>Betaling geslaagd</h1>
         <p>
-        Klik hier om
+        <a href="{% url 'order_summary' user.orders.get_current_order.pk %}">Er is een bevestiging naar je toe gemaild. Klik hier om je bestelling te bekijken.</a>
         </p>
     {% else %}
             <h1>Betaling mislukt</h1>
+            <p><a href="{% url 'finance.choosebank' %}">Klik hier om het nogmaals te proberen.</a></p>
     {% endif %}
 
 {% endblock %}

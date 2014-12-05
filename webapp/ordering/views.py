@@ -125,12 +125,9 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
 
     def post(self, request, *args, **kwargs):
         order = self.get_object()
-        # For now, we just finish the order.
         order.place_order_and_debit()
-        # order.create_and_add_payment()
-        order.finalized = True
         order.save()
-        return redirect('pay_order', order.pk)
+        return redirect('finance.choosebank')
 
 
 class OrdersDisplay(LoginRequiredMixin, UserOwnsObjectMixin, ListView):
@@ -139,31 +136,6 @@ class OrdersDisplay(LoginRequiredMixin, UserOwnsObjectMixin, ListView):
     """
     def get_queryset(self):
         return self.request.user.orders.all().order_by("-pk")
-
-
-class PayOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
-    template_name = "ordering/order_pay.html"
-    model = Order
-
-    def get_queryset(self):
-        qs = super(PayOrder, self).get_queryset()
-        return qs.filter(finalized=True)
-
-    # TODO when payment works via ideal, mail after payment.
-    # TODO: restrict mailing to once, even on F5
-    def get(self, request, *args, **kwargs):
-        product_list_text = "\n".join(["%d x %s (%s)" % (op.amount, op.product, op.product.supplier) for op in self.get_object().orderproducts.all()])
-
-        amsterdam = pytz.timezone('Europe/Amsterdam')
-        mail_body = order_confirmation_mail % {'first_name': request.user.first_name,
-                                               'collect_datetime': self.get_object().order_round.collect_datetime.astimezone(amsterdam).strftime("%c"),
-                                               'product_list': product_list_text}
-        send_mail('[VOKO Utrecht] Bestelbevestiging', mail_body, 'VOKO Utrecht <info@vokoutrecht.nl>',
-                  [request.user.email], fail_silently=False)
-
-        self.get_object()._notify_admins_about_new_order()
-
-        return super(PayOrder, self).get(request, *args, **kwargs)
 
 
 class OrderSummary(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
