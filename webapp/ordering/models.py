@@ -6,7 +6,7 @@ from django_extensions.db.models import TimeStampedModel
 import pytz
 from accounts.models import Address
 from finance.models import Balance
-from ordering.core import get_or_create_order
+from ordering.core import get_or_create_order, get_current_order_round
 from django.conf import settings
 
 # TODO: use slugs in relevant models (product, supplier, etc)
@@ -63,9 +63,16 @@ class OrderManager(models.Manager):
 
     def get_current_order(self):
         try:
-            return super(OrderManager, self).get_queryset().filter(finalized=False, user=self.instance).order_by('-pk')[0]
+            return super(OrderManager, self).get_queryset().filter(finalized=False,
+                                                                   user=self.instance,
+                                                                   order_round=get_current_order_round()).order_by('-pk')[0]
         except IndexError:
             return get_or_create_order(user=self.instance)
+
+    def get_last_finalized_order(self):
+        return super(OrderManager, self).get_queryset().filter(finalized=True,
+                                                               user=self.instance,
+                                                               order_round=get_current_order_round()).order_by('-pk')[0]
 
 
 class Order(TimeStampedModel):
