@@ -40,9 +40,7 @@ def get_or_create_order(user):
     try:
         return models.Order.objects.get_or_create(finalized=False,
                                                   user=user,
-                                                  order_round=get_current_order_round(),
-                                                  defaults={'order_round': models.OrderRound.objects.order_by('-pk')[0],
-                                                            'user': user})[0]
+                                                  order_round=get_current_order_round())[0]
     except IndexError:
         raise RuntimeError("Nog geen bestelronde aangemaakt!")
 
