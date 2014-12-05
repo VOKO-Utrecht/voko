@@ -1,15 +1,18 @@
 from django.db import models
 from django.conf import settings
+from ordering.models import Order
 
 
 class Payment(models.Model):
     amount = models.DecimalField(max_digits=6, decimal_places=2)
-    # Might be reduntant / non-normalized?
+    # Might be redundant / non-normalized?
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="user")
+    order = models.ForeignKey(Order)
 
     transaction_id = models.IntegerField()
     transaction_code = models.CharField(max_length=255)
     succeeded = models.BooleanField(default=False)
+
 
     # TODO: add more fields
     # TODO: succeeded payment creates credit.
