@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% block title %}Betalen{% endblock %}
+{% block content %}
+<h1>Betalen via iDeal</h1>
+    <p>
+    Bedrag huidige bestelling: &euro; {{ user.orders.get_current_order.total_price }}<br/>
+    Totaal openstaande debet: &euro; {{ user.balance.debit }}
+    <br/><br/>
+    <strong>Te betalen: &euro; {{ user.balance.debit }}</strong>
+    </p>
+
+    <div class="row">
+    <div class="col-md-4">
+        <form action="{% url 'finance.createtransaction' %}" method="post">{% csrf_token %}
+            {% bootstrap_form form %}
+            {% buttons %}
+            <button type="submit" class="btn btn-primary">
+              {% bootstrap_icon "star" %} Betalen
+            </button>
+            {% endbuttons %}
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}

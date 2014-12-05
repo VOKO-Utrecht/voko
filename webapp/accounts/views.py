@@ -3,12 +3,11 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import Http404
 from django.shortcuts import redirect
-from django.views.generic import FormView, DetailView, UpdateView, TemplateView, ListView
+from django.views.generic import FormView, DetailView, UpdateView, TemplateView
 from accounts.forms import VokoUserCreationForm, VokoUserFinishForm, RequestPasswordResetForm, PasswordResetForm
 from accounts.models import EmailConfirmation, VokoUser, PasswordResetRequest
 from django.conf import settings
 import log
-from ordering.core import get_current_order_round
 
 
 class LoginView(AnonymousRequiredMixin, FormView):

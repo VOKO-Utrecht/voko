@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% block title %}Betalen{% endblock %}
+{% block content %}
+    {% if payment_succeeded  %}
+        <h1>Betaling geslaagd</h1>
+        <p>
+        Klik hier om
+        </p>
+    {% else %}
+            <h1>Betaling mislukt</h1>
+    {% endif %}
+
+{% endblock %}

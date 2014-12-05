@@ -30,3 +30,8 @@ INSTALLED_APPS += ("debug_toolbar.apps.DebugToolbarConfig",)
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = '/tmp/app-messages'
+
+try:
+    from local import *
+except ImportError:
+    pass
