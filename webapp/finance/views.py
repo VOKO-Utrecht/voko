@@ -24,8 +24,7 @@ class QantaniMixin(object):
                                       settings.QANTANI_MERCHANT_SECRET)
 
     def _create_transaction(self, bank_id, amount, description):
-        # BASE_URL = "http://leden.vokoutrecht.nl"
-        BASE_URL = "http://localhost:8000"
+        BASE_URL = "http://leden.vokoutrecht.nl"
         return self.qantani_api.create_ideal_transaction(amount=amount,
                                                          bank_id=bank_id,
                                                          description=description,
