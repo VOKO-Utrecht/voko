@@ -1,9 +1,9 @@
 from braces.views import AnonymousRequiredMixin, LoginRequiredMixin
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import Http404
 from django.shortcuts import redirect
-from django.views.generic import FormView, DetailView, UpdateView, TemplateView
+from django.views.generic import FormView, DetailView, UpdateView, TemplateView, View
 from accounts.forms import VokoUserCreationForm, VokoUserFinishForm, RequestPasswordResetForm, PasswordResetForm
 from accounts.models import EmailConfirmation, VokoUser, PasswordResetRequest
 from django.conf import settings
@@ -42,6 +42,12 @@ class RegisterThanksView(AnonymousRequiredMixin, TemplateView):
 
 class WelcomeView(TemplateView):
     template_name = "accounts/welcome.html"
+
+
+class LogoutView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return redirect('login')
 
 
 class FinishRegistration(AnonymousRequiredMixin, UpdateView):

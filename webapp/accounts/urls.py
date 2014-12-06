@@ -1,9 +1,10 @@
 from django.conf.urls import patterns, url
 from .views import LoginView, RegisterView, RequestPasswordResetView, EmailConfirmView, FinishRegistration, RegisterThanksView, \
-    WelcomeView, OverView, PasswordResetRequestDoneView, PasswordResetView, PasswordResetFinishedView
+    WelcomeView, OverView, PasswordResetRequestDoneView, PasswordResetView, PasswordResetFinishedView, LogoutView
 
 urlpatterns = patterns('',
     url(r'^login/$', LoginView.as_view(), name="login"),
+    url(r'^logout/$', LogoutView.as_view(), name="logout"),
     url(r'^register/$', RegisterView.as_view(), name="register"),
     url(r'^register/thanks/$', RegisterThanksView.as_view(), name="register_thanks"),
     url(r'^register/confirm/(?P<pk>[0-9a-zA-Z\-]+)$', EmailConfirmView.as_view(), name="confirm_email"),
