@@ -164,7 +164,7 @@ class PasswordResetRequest(TimeStampedModel):
     def send_email(self):
         mail_template = get_template_by_id(PASSWORD_RESET_MAILTEMPLATE_ID)
         subject, html_message, plain_message = render_mail_template(mail_template, user=self.user,
-                                                                    url="http://leden.vokoutrecht.nl%s" %
+                                                                    url=settings.BASE_URL %
                                                                         reverse('reset_pass', args=(self.pk,)))
         send_mail(subject=subject,
                   message=plain_message,

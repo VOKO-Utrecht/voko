@@ -27,11 +27,10 @@ class QantaniMixin(object):
                                       settings.QANTANI_MERCHANT_SECRET)
 
     def _create_transaction(self, bank_id, amount, description):
-        BASE_URL = "http://leden.vokoutrecht.nl"
         return self.qantani_api.create_ideal_transaction(amount=amount,
                                                          bank_id=bank_id,
                                                          description=description,
-                                                         return_url=BASE_URL + reverse('finance.confirmtransaction'))
+                                                         return_url=settings.BASE_URL + reverse('finance.confirmtransaction'))
 
     def _validate_transaction(self, transaction_code, transaction_checksum, transaction_id,
                               transaction_status, transaction_salt):

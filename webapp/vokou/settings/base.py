@@ -80,3 +80,5 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 QANTANI_MERCHANT_ID = 0
 QANTANI_MERCHANT_KEY = ""
 QANTANI_MERCHANT_SECRET = ""
+
+BASE_URL = "http://leden.vokoutrecht.nl"
