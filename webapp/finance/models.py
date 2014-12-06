@@ -4,16 +4,11 @@ from django.conf import settings
 
 class Payment(models.Model):
     amount = models.DecimalField(max_digits=6, decimal_places=2)
-    # Might be redundant / non-normalized?  TODO: remove, is the same as order.user
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="user")
     order = models.ForeignKey("ordering.Order", null=True, related_name="payments")
 
     transaction_id = models.IntegerField()
     transaction_code = models.CharField(max_length=255)
     succeeded = models.BooleanField(default=False)
-
-    # TODO: add more fields
-    # TODO: succeeded payment creates credit.
 
     def create_credit(self):
         Balance.objects.create(user=self.user,
