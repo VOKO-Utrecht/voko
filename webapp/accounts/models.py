@@ -120,7 +120,6 @@ class EmailConfirmation(TimeStampedModel):
         verbose_name_plural = "emailbevestigingen"
 
     token = models.CharField(max_length=100, primary_key=True)
-    # OneToOneField might be impractical when user changes his e-mail address. (TODO?)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="email_confirmation")
     is_confirmed = models.BooleanField(default=False)
 
