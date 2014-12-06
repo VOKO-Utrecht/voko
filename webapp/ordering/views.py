@@ -154,7 +154,8 @@ class SupplierView(LoginRequiredMixin, DetailView):
 ### ADMIN VIEWS ###
 
 class OrderAdminMain(StaffuserRequiredMixin, ListView):
-    model = OrderRound
+    def get_queryset(self):
+        return OrderRound.objects.all().order_by('id')
     template_name = "ordering/admin/orderrounds.html"
 
 

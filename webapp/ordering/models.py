@@ -56,6 +56,9 @@ class OrderRound(TimeStampedModel):
         current_datetime = datetime.now(pytz.utc)  # Yes, UTC. see Django's timezone docs
         return current_datetime >= self.open_for_orders and current_datetime < self.closed_for_orders
 
+    def is_current(self):
+        return self == get_current_order_round()
+
     def __unicode__(self):
         # return "[%d] Open: %s | Closed: %s | Collect: %s" %\
         #        (self.id, self.open_for_orders, self.closed_for_orders, self.collect_datetime)
