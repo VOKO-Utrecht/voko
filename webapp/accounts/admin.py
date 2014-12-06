@@ -1,4 +1,3 @@
-from django.db import OperationalError
 import log
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
@@ -105,21 +104,12 @@ class VokoUserAdmin(UserAdmin):
         return False
     email_confirmed.boolean = True
 
-    try:
-        current_order_round = get_current_order_round()
-    except OperationalError:
-        pass  # So syncdb can be used. TODO: Nicer fix
-
     def finished_orders_curr_OR(self, obj):
-        orders = Order.objects.filter(order_round=self.current_order_round,
+        current_order_round = get_current_order_round()
+        orders = Order.objects.filter(order_round=current_order_round,
                                       user=obj,
                                       finalized=True).count()
         return orders
-        # if orders:
-        #     return True
-        # return False
-    # finished_orders_curr_OR.boolean = True
-
 
     def debit(self, obj):
         return obj.balance.debit()
