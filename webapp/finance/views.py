@@ -8,7 +8,7 @@ from qantani import QantaniAPI
 from finance.models import Payment
 
 
-IDEAL_ENABLED = False
+IDEAL_ENABLED = True
 
 
 def choosebankform_factory(banks):
