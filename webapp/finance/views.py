@@ -113,7 +113,6 @@ class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
                                                        self.request.user.orders.get_current_order().id)
 
         Payment.objects.create(amount=user_debit,
-                               user=self.request.user,
                                order=self.request.user.orders.get_current_order(),
                                transaction_id=results.get("TransactionID"),
                                transaction_code=results.get("Code"))
