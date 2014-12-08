@@ -230,7 +230,7 @@ class Product(TimeStampedModel):
         ('Gram',  'Gram'),
         ('Decagram', 'Decagram (10g)'),
         ('Hectogram', 'Hectogram (100g)'),
-        ('Half pond', 'Halve pond (250g)'),
+        ('Half pond', 'Half pond (250g)'),
         ('Pond',  'Pond (500g)'),
         ('Kilogram', 'Kilogram'),
         ('Deciliter', 'Deciliter (100ml)'),
