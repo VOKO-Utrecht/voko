@@ -18,7 +18,7 @@ class Payment(models.Model):
 
     def __unicode__(self):
         status = "Succeeded" if self.succeeded else "Failed"
-        return "%s payment of E%s by %s" % (status, self.amount, self.user)
+        return "%s payment of E%s by %s" % (status, self.amount, self.order.user)
 
 
 class BalanceManager(models.Manager):
