@@ -11,7 +11,7 @@ class Payment(models.Model):
     succeeded = models.BooleanField(default=False)
 
     def create_credit(self):
-        Balance.objects.create(user=self.user,
+        Balance.objects.create(user=self.order.user,
                                type="CR",
                                amount=self.amount,
                                notes="iDeal betaling voor bestelling #%d" % self.order.pk)
