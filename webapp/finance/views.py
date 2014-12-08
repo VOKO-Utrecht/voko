@@ -2,7 +2,7 @@ from braces.views import LoginRequiredMixin
 from django import forms
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import TemplateView, FormView, View
 from qantani import QantaniAPI
 from finance.models import Payment
@@ -138,7 +138,7 @@ class ConfirmTransactionView(LoginRequiredMixin, QantaniMixin, TemplateView):
         transaction_salt = self.request.GET['salt']
         transaction_checksum = self.request.GET['checksum']
 
-        payment = Payment.objects.get(transaction_id=transaction_id, succeeded=False)
+        payment = get_object_or_404(Payment, transaction_id=transaction_id, succeeded=False)
         transaction_code = payment.transaction_code
 
         success = self._validate_transaction(transaction_code, transaction_checksum,
