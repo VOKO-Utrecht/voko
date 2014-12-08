@@ -237,7 +237,7 @@ class Product(TimeStampedModel):
         ('Liter',  'Liter'),
     )
 
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     unit_of_measurement = models.CharField(max_length=10, choices=UNITS)
     base_price = models.DecimalField(max_digits=6, decimal_places=2)
