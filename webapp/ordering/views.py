@@ -125,7 +125,10 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
 
     def post(self, request, *args, **kwargs):
         order = self.get_object()
-        order.place_order_and_debit()
+        if order.debit:
+            order.update_debit()
+        else:
+            order.create_and_link_debit()
         order.save()
         return redirect('finance.choosebank')
 

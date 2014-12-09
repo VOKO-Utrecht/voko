@@ -100,8 +100,8 @@ class Order(TimeStampedModel):
     order_round = models.ForeignKey("OrderRound", related_name="orders")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="orders")
 
-    # This might have to change to 'paid' or something
-    finalized = models.BooleanField(default=False)  # TODO remove?
+    # If order has been paid
+    finalized = models.BooleanField(default=False)
     # Whether the order has been retrieved by the user
     collected = models.BooleanField(default=False)
 
@@ -165,12 +165,23 @@ Bestelling:
         mail_admins("Bestelling bevestigd (#%d) van %s" % (self.pk, self.user), message,
                     fail_silently=True)
 
-    def place_order_and_debit(self):
+    def create_and_link_debit(self):
+        """
+        Create debit and save as self.debit one-to-one
+        """
         debit = Balance.objects.create(user=self.user,
                                        type="DR",
                                        amount=self.total_price,
                                        notes="Debit van %s voor bestelling #%d" % (self.total_price, self.pk))
         self.debit = debit
+
+    def update_debit(self):
+        """
+        Update debit amount and note to current order total.
+        """
+        self.debit.amount = self.total_price
+        self.debit.notes = "Debit van %s voor bestelling #%d" % (self.total_price, self.pk)
+        self.debit.save()
 
     def mail_confirmation(self):
         product_list_text = "\n".join(["%d x %s (%s)" % (op.amount, op.product, op.product.supplier)
