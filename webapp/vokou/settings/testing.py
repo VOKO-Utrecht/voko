@@ -13,3 +13,4 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
     }
 }
+

@@ -228,7 +228,17 @@ class OrderProductCorrection(TimeStampedModel):
     def calculate_refund(self):
         before_correction = self.order_product.total_price
         new_price = self.supplied_amount * self.order_product.product.retail_price
-        return (before_correction - new_price) - self.credit_used
+        return before_correction - new_price
+
+    def _create_credit(self):
+        return Balance.objects.create(user=self.order_product.order.user,
+                                      type="CR",
+                                      amount=self.calculate_refund())
+
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            self.credit = self._create_credit()
+        super(OrderProductCorrection, self).save(*args, **kwargs)
 
 
 class Product(TimeStampedModel):
