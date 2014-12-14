@@ -293,14 +293,3 @@ class Product(TimeStampedModel):
         if self.maximum_total_order is None:
             return True
         return self.amount_available > 0
-
-
-class SupplierOrderProduct(TimeStampedModel):
-    order = models.ForeignKey("SupplierOrder")
-    product = models.ForeignKey("Product")
-    amount = models.IntegerField()
-
-
-class SupplierOrder(TimeStampedModel):
-    products = models.ManyToManyField("Product", through="SupplierOrderProduct")
-    order_round = models.ForeignKey("OrderRound")  # <-- maybe not required
