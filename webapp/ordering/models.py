@@ -1,5 +1,5 @@
 from datetime import datetime
-from decimal import Decimal, ROUND_UP
+from decimal import Decimal, ROUND_UP, ROUND_DOWN
 from django.core.mail import mail_admins, send_mail
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
@@ -228,7 +228,7 @@ class OrderProductCorrection(TimeStampedModel):
     def calculate_refund(self):
         before_correction = self.order_product.total_price
         new_price = self.supplied_amount * self.order_product.product.retail_price
-        return before_correction - new_price
+        return Decimal(before_correction - new_price).quantize(Decimal('.01'), rounding=ROUND_DOWN)
 
     def _create_credit(self):
         return Balance.objects.create(user=self.order_product.order.user,

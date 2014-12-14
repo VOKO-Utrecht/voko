@@ -58,3 +58,32 @@ class TestOrderProductCorrections(VokoTestCase):
 
         opc = OrderProductCorrection.objects.all().get()
         self.assertEqual(opc.credit.amount, Decimal(10 * 1.07).quantize(Decimal('.01')))
+
+    def test_that_creating_a_correction_creates_sufficient_credit_4(self):
+        order_product = OrderProductFactory.create(amount=1,
+                                                   product__base_price=Decimal(1),
+                                                   product__order_round__markup_percentage=Decimal(7))
+
+        opc = OrderProductCorrection.objects.create(order_product=order_product,
+                                                    supplied_amount=Decimal(0.5))
+
+        # Price is 1 Euro, markup is 7%, so total price is 1.07.
+        # Half of 1.07 is 0.535
+        # Rounding is ROUND_DOWN to 2 decimals, so 0.53.
+
+        self.assertEqual(opc.credit.amount, Decimal('0.53'))
+
+    def test_that_creating_a_correction_creates_sufficient_credit_5(self):
+        order_product = OrderProductFactory.create(amount=2,
+                                                   product__base_price=Decimal(1),
+                                                   product__order_round__markup_percentage=Decimal(7))
+
+        opc = OrderProductCorrection.objects.create(order_product=order_product,
+                                                    supplied_amount=Decimal(0.9))
+
+        # Price is 1 Euro, markup is 7%, amount is 2, so total price is 2.14.
+        # 0.9 supplied, so 1.1 was not supplied.
+        # 1.07 * 1.1 = 1.177
+        # Rounding is ROUND_DOWN to 2 decimals, so 1.17.
+
+        self.assertEqual(opc.credit.amount, Decimal('1.17'))
