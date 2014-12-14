@@ -1,16 +1,8 @@
-import mock
 from datetime import datetime
-from django.test import TestCase
 from pytz import UTC
 from ordering.core import get_current_order_round
 from ordering.models import OrderRound
-
-
-class VokoTestCase(TestCase):
-    def patch(self, to_patch):
-        patcher = mock.patch(to_patch)
-        self.addCleanup(patcher.stop)
-        return patcher.start()
+from vokou.testing import VokoTestCase
 
 
 class TestGetCurrentOrderRound(VokoTestCase):
