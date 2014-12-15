@@ -1,17 +1,16 @@
 import pytz
 from datetime import datetime
 from decimal import Decimal, ROUND_UP, ROUND_DOWN
-from django.core.mail import mail_admins, send_mail
+from django.core.mail import mail_admins
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 from accounts.models import Address
 from finance.models import Balance
+from mailing.helpers import mail_user, get_template_by_id, render_mail_template
 from ordering.core import get_or_create_order, get_current_order_round
 from django.conf import settings
 
-# TODO: use slugs in relevant models (product, supplier, etc)
-# TODO: override delete methods (also in finance app)
-from ordering.mails import order_confirmation_mail
+ORDER_CONFIRM_MAIL_ID = 12
 
 
 class Supplier(TimeStampedModel):
@@ -177,15 +176,9 @@ class Order(TimeStampedModel):
         self.debit.save()
 
     def mail_confirmation(self):
-        product_list_text = "\n".join(["%d x %s (%s)" % (op.amount, op.product, op.product.supplier)
-                                       for op in self.orderproducts.all()])
-
-        amsterdam = pytz.timezone('Europe/Amsterdam')
-        mail_body = order_confirmation_mail % {'first_name': self.user.first_name,
-                                               'collect_datetime': self.order_round.collect_datetime.astimezone(amsterdam).strftime("%c"),
-                                               'product_list': product_list_text}
-        send_mail('[VOKO Utrecht] Bestelbevestiging', mail_body, 'VOKO Utrecht <info@vokoutrecht.nl>',
-                  [self.user.email], fail_silently=False)
+        mail_template = get_template_by_id(ORDER_CONFIRM_MAIL_ID)
+        rendered_template_vars = render_mail_template(mail_template, user=self.user, order=self)
+        mail_user(self.user, *rendered_template_vars)
 
 
 class OrderProduct(TimeStampedModel):
