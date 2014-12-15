@@ -9,19 +9,19 @@
     <tbody>
           <tr>
             <td>Bestelronde</td>
-            <td>{% if current_order_round.is_open %}Open{% else %}Gesloten{% endif %}</td>
+            <td>{% if view.current_order_round.is_open %}Open{% else %}Gesloten{% endif %}</td>
           </tr>
           <tr>
             <td>Bestelronde open vanaf</td>
-            <td>{{ current_order_round.open_for_orders }}</td>
+            <td>{{ view.current_order_round.open_for_orders }}</td>
           </tr>
           <tr>
             <td>Bestelronde open tot</td>
-            <td>{{ current_order_round.closed_for_orders }}</td>
+            <td>{{ view.current_order_round.closed_for_orders }}</td>
           </tr>
           <tr>
             <td>Ophaalmoment</td>
-            <td>{{ current_order_round.collect_datetime }}</td>
+            <td>{{ view.current_order_round.collect_datetime }}</td>
           </tr>
     </tbody>
   </table>

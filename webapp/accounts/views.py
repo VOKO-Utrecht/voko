@@ -24,10 +24,6 @@ class RegisterView(AnonymousRequiredMixin, FormView):
     form_class = VokoUserCreationForm
     success_url = "/accounts/register/thanks"  # TODO: Reverse url
 
-    def get_context_data(self, **kwargs):
-        context = super(FormView, self).get_context_data(**kwargs)
-        return context
-
     def form_valid(self, form):
         # This method is called when valid form data has been POSTed.
         # It should return an HttpResponse.
@@ -82,10 +78,8 @@ class EmailConfirmView(AnonymousRequiredMixin, DetailView):
 class OverView(LoginRequiredMixin, TemplateView):
     template_name = "accounts/overview.html"
 
-    def get_context_data(self, **kwargs):
-        context = super(OverView, self).get_context_data(**kwargs)
-        context['current_order_round'] = self.request.current_order_round
-        return context
+    def current_order_round(self):
+        return self.request.current_order_round
 
 
 class RequestPasswordResetView(AnonymousRequiredMixin, FormView):
