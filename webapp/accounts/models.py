@@ -11,7 +11,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.mail import mail_admins
 import log
-from mailing.helpers import get_template_by_id, render_mail_template
+from mailing.helpers import get_template_by_id, render_mail_template, mail_user
 
 CONFIRM_MAILTEMPLATE_ID = 2
 PASSWORD_RESET_MAILTEMPLATE_ID = 9
@@ -134,13 +134,8 @@ class EmailConfirmation(TimeStampedModel):
 
     def send_confirmation_mail(self):
         mail_template = get_template_by_id(CONFIRM_MAILTEMPLATE_ID)
-        subject, html_message, plain_message = render_mail_template(mail_template, user=self.user)
-        send_mail(subject=subject,
-                  message=plain_message,
-                  from_email="VOKO Utrecht <info@vokoutrecht.nl>",
-                  recipient_list=["%s <%s>" % (self.user.get_full_name(), self.user.email)],
-                  html_message=html_message)
-        log.log_event(user=self.user, event="Email confirmation mail sent", extra=html_message)
+        rendered_template_vars = render_mail_template(mail_template, user=self.user)
+        mail_user(self.user, *rendered_template_vars)
 
     def __unicode__(self):
         return "Confirmed: %s | user: %s | email: %s" % (self.is_confirmed, self.user, self.user.email)
