@@ -6,7 +6,8 @@ from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, FormView, View, UpdateView
 from django.views.generic.detail import SingleObjectMixin
-from ordering.core import get_or_create_order, get_order_product, update_totals_for_products_with_max_order_amounts
+from ordering.core import get_or_create_order, get_order_product, \
+    update_totals_for_products_with_max_order_amounts
 from ordering.forms import OrderProductForm
 from ordering.mixins import UserOwnsObjectMixin
 from ordering.models import Product, OrderProduct, Order, OrderRound, Supplier
@@ -15,6 +16,11 @@ from ordering.models import Product, OrderProduct, Order, OrderRound, Supplier
 class ProductsView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Product.objects.filter(order_round=self.request.current_order_round).order_by('name')
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductsView, self).get_context_data(**kwargs)
+        context['current_order_round'] = self.request.current_order_round
+        return context
 
 
 class ProductDetail(LoginRequiredMixin, View):
