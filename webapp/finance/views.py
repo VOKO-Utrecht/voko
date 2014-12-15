@@ -3,12 +3,9 @@ from django import forms
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, get_object_or_404
-from django.views.generic import TemplateView, FormView, View
+from django.views.generic import TemplateView, FormView
 from qantani import QantaniAPI
 from finance.models import Payment
-
-
-IDEAL_ENABLED = True
 
 
 def choosebankform_factory(banks):
@@ -45,37 +42,7 @@ class QantaniMixin(object):
                                                               transaction_salt)
 
 
-class ChooseBankView(LoginRequiredMixin, View):
-    """
-    Temporary until ideal account is activated
-    """
-    def get(self, request, *args, **kwargs):
-        if IDEAL_ENABLED:
-            view = IdealEnabledView.as_view()
-        else:
-            view = IdealDisabledView.as_view()
-
-        return view(request, *args, **kwargs)
-
-
-class IdealDisabledView(LoginRequiredMixin, TemplateView):
-    template_name = "ordering/order_pay.html"
-
-    def get_context_data(self, **kwargs):
-        context = super(IdealDisabledView, self).get_context_data(**kwargs)
-        order = self.request.user.orders.get_current_order()
-        order.finalized = True
-        order.save()
-        order.mail_confirmation()
-        order._notify_admins_about_new_order()
-
-        context['object'] = order
-        return context
-
-        # return redirect(reverse("order_summary", args=(order.id,)))
-
-
-class IdealEnabledView(LoginRequiredMixin, QantaniMixin, FormView):
+class ChooseBankView(LoginRequiredMixin, QantaniMixin, FormView):
     """
     Lets user choose bank to pay.
     POSTs to CreateTransactionView.
