@@ -87,3 +87,13 @@ class TestOrderProductCorrections(VokoTestCase):
         # Rounding is ROUND_DOWN to 2 decimals, so 1.17.
 
         self.assertEqual(opc.credit.amount, Decimal('1.17'))
+
+    def test_that_credit_description_is_filled_in(self):
+        order_product = OrderProductFactory.create()
+        opc = OrderProductCorrection.objects.create(order_product=order_product,
+                                                    supplied_amount=0)
+        self.assertEqual(opc.credit.notes, "Correctie in ronde %d, product %s, geleverd: %s i.p.v. %s" %
+                         (opc.order_product.product.order_round.id,
+                          opc.order_product.product.name,
+                          opc.supplied_amount,
+                          opc.order_product.amount))

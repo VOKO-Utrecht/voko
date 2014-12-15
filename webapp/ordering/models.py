@@ -233,7 +233,12 @@ class OrderProductCorrection(TimeStampedModel):
     def _create_credit(self):
         return Balance.objects.create(user=self.order_product.order.user,
                                       type="CR",
-                                      amount=self.calculate_refund())
+                                      amount=self.calculate_refund(),
+                                      notes="Correctie in ronde %d, product %s, geleverd: %s i.p.v. %s" %
+                                            (self.order_product.product.order_round.id,
+                                             self.order_product.product.name,
+                                             self.supplied_amount,
+                                             self.order_product.amount))
 
     def save(self, *args, **kwargs):
         if self.pk is None:
