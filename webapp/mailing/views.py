@@ -6,7 +6,6 @@ from accounts.models import VokoUser
 from log import log_event
 from mailing.helpers import render_mail_template
 from mailing.models import MailTemplate
-from ordering.core import get_current_order_round
 
 
 class ChooseTemplateView(StaffuserRequiredMixin, ListView):
