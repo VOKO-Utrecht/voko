@@ -51,17 +51,6 @@ def get_order_product(product, order):
         return existing_ops[0]
 
 
-def get_credit(user):
-    credit = sum([b.amount for b in user.balance.filter(type="CR")])
-    debit = sum([b.amount for b in user.balance.filter(type="DR")])
-
-    return credit - debit
-
-
-def get_debit(user):
-    return -get_credit(user)
-
-
 def update_totals_for_products_with_max_order_amounts(order):
     ### TODO: Add messages about deleted / changed orderproducts
     for orderproduct in order.orderproducts.all().exclude(product__maximum_total_order__exact=None):
