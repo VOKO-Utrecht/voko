@@ -1,9 +1,9 @@
+import pytz
 from datetime import datetime
 from decimal import Decimal, ROUND_UP, ROUND_DOWN
 from django.core.mail import mail_admins, send_mail
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
-import pytz
 from accounts.models import Address
 from finance.models import Balance
 from ordering.core import get_or_create_order, get_current_order_round
@@ -60,8 +60,6 @@ class OrderRound(TimeStampedModel):
         return self == get_current_order_round()
 
     def __unicode__(self):
-        # return "[%d] Open: %s | Closed: %s | Collect: %s" %\
-        #        (self.id, self.open_for_orders, self.closed_for_orders, self.collect_datetime)
         return "Bestelronde #%s" % self.pk
 
 
@@ -153,14 +151,9 @@ class Order(TimeStampedModel):
 
     def _notify_admins_about_new_order(self):
         # This is most likely temporary
-        message = """Hoi!
-
-Er is een nieuwe bestelling van gebruiker %s.
-
-Bestelling:
-%s
-""" % (self.user,
-       "\n".join(["%d x %s (%s)" % (op.amount, op.product, op.product.supplier) for op in self.orderproducts.all()]))
+        message = "Hoi!\n\nEr is een nieuwe bestelling van gebruiker %s.\n\nBestelling\n\n%s" % \
+                  (self.user, "\n".join(["%d x %s (%s)" % (op.amount, op.product.name, op.product.supplier)
+                                         for op in self.orderproducts.all()]))
 
         mail_admins("Bestelling bevestigd (#%d) van %s" % (self.pk, self.user), message,
                     fail_silently=True)
