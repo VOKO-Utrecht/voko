@@ -35,13 +35,10 @@ class ProductDisplay(LoginRequiredMixin, DetailView):
         return {'product': self.get_object().pk,
                 'order': order.pk}
 
-    def get_context_data(self, **kwargs):
-        context = super(ProductDisplay, self).get_context_data(**kwargs)
-
+    def form(self):
         existing_op = get_order_product(product=self.get_object(),
                                         order=get_or_create_order(self.request.user))
-        context['form'] = OrderProductForm(initial=self._get_initial(), instance=existing_op)
-        return context
+        return OrderProductForm(initial=self._get_initial(), instance=existing_op)
 
 
 class ProductOrder(LoginRequiredMixin, SingleObjectMixin, FormView):
@@ -77,13 +74,10 @@ class OrderDisplay(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
     form_class = OrderProductForm
     success_url = "/hoera"
 
-    def get_context_data(self, **kwargs):
-        context = super(OrderDisplay, self).get_context_data(**kwargs)
+    def formset(self):
         update_totals_for_products_with_max_order_amounts(self.get_object())
         FormSet = inlineformset_factory(self.model, OrderProduct, extra=0, form=self.form_class)
-        fs = FormSet(instance=self.get_object())
-        context['formset'] = fs
-        return context
+        return FormSet(instance=self.get_object())
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -111,8 +105,7 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         update_totals_for_products_with_max_order_amounts(self.get_object())
-        context = super(UpdateView, self).get_context_data(**kwargs)
-        return context
+        return super(UpdateView, self).get_context_data(**kwargs)
 
     def post(self, request, *args, **kwargs):
         order = self.get_object()

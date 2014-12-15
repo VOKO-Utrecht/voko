@@ -3,7 +3,7 @@
 {% block title %}Bestelling{% endblock %}
 {% block content %}
 <form action="" method="post">{% csrf_token %}
-    {{ formset.management_form }}
+    {{ view.formset.management_form }}
 
     <div class="panel panel-default">
       <!-- Default panel contents -->
@@ -38,7 +38,7 @@
           </tr>
         </thead>
         <tbody>
-          {% for form in formset %}
+          {% for form in view.formset %}
           <tr>
             <td><a href="{% url 'view_product' form.instance.product.pk %}">{{ form.instance.product.name }}</a></td>
             <td>{{ form.amount }}</td>
