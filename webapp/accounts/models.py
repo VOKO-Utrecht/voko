@@ -3,14 +3,12 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.mail import mail_admins
-import log
 from mailing.helpers import get_template_by_id, render_mail_template, mail_user
 
 CONFIRM_MAILTEMPLATE_ID = 2
@@ -157,14 +155,9 @@ class PasswordResetRequest(TimeStampedModel):
 
     def send_email(self):
         mail_template = get_template_by_id(PASSWORD_RESET_MAILTEMPLATE_ID)
-        subject, html_message, plain_message = render_mail_template(mail_template, user=self.user,
-                                                                    url=settings.BASE_URL + reverse('reset_pass', args=(self.pk,)))
-        send_mail(subject=subject,
-                  message=plain_message,
-                  from_email="VOKO Utrecht <info@vokoutrecht.nl>",
-                  recipient_list=["%s <%s>" % (self.user.get_full_name(), self.user.email)],
-                  html_message=html_message)
-        log.log_event(user=self.user, event="Password reset mail sent", extra=html_message)
+        rendered_template_vars = render_mail_template(mail_template, user=self.user,
+                                                      url=settings.BASE_URL + reverse('reset_pass', args=(self.pk,)))
+        mail_user(self.user, *rendered_template_vars)
 
     @property
     def is_usable(self):
