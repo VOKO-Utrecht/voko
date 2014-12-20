@@ -9,6 +9,7 @@ class VokoUserFactory(factory.DjangoModelFactory):
     first_name = factory.Sequence(lambda n: 'John%s' % n)
     last_name = factory.Sequence(lambda n: 'Doe%s' % n)
     email = factory.LazyAttribute(lambda o: '%s@example.org' % o.last_name)
+    is_active = True
 
 
 class AddressFactory(factory.DjangoModelFactory):
