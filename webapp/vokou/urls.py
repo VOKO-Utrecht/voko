@@ -4,10 +4,12 @@ import accounts.urls
 import finance.urls
 import mailing.urls
 import ordering.urls
+import ordering.admin_urls
 from vokou.views import HomeView
 
 urlpatterns = patterns('',
     url(r'^admin/mailing/', include(mailing.urls)),
+    url(r'^admin/orderrounds/', include(ordering.admin_urls)),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/', include(accounts.urls)),
     url(r'^ordering/', include(ordering.urls)),

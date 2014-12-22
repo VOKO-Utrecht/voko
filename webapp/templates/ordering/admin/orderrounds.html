@@ -13,6 +13,7 @@
         <th>Bestellijsten voor leveranciers</th>
         <th>Overzicht bestellingen per lid</th>
         <th>Overzicht bestellingen per product</th>
+        <th>Correcties</th>
       </tr>
     </thead>
     <tbody>
@@ -25,6 +26,7 @@
             <td><a href="{% url 'orderadmin_orderlists' orderround.pk %}">Bestellijsten</a></td>
             <td><a href="{% url 'orderadmin_userorders' orderround.pk %}">Overzicht</a></td>
             <td><a href="{% url 'orderadmin_orders_per_product' orderround.pk %}">Overzicht</a></td>
+            <td><a href="{% url 'orderadmin_correction' orderround.pk %}">Correcties</a></td>
           </tr>
       {% endfor %}
     </tbody>
