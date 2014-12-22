@@ -1,2 +1,2 @@
 #!/bin/bash
-python manage.py test --settings=vokou.settings.testing
+python manage.py test --settings=vokou.settings.testing --nologcapture

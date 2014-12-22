@@ -53,6 +53,15 @@ class ChooseBankView(LoginRequiredMixin, QantaniMixin, FormView):
         banks = self.qantani_api.get_ideal_banks()
         return choosebankform_factory(banks)
 
+    def get(self, *args, **kwargs):
+        user_debit = self.request.user.balance.debit()
+        order = self.request.user.orders.get_current_order()
+        if user_debit == 0 and order.finalized is False:
+            order.finalized = True
+            order.save()
+            return redirect(reverse('order_summary', args=(order.pk,)))
+        return super(ChooseBankView, self).get(*args, **kwargs)
+
 
 class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
     """

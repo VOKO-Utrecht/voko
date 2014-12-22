@@ -10,8 +10,8 @@ class OrderRoundFactory(DjangoModelFactory):
     class Meta:
         model = "ordering.OrderRound"
 
-    open_for_orders = FuzzyDateTime(datetime.datetime(2014, 1, 1, tzinfo=UTC))
-    closed_for_orders = open_for_orders.start_dt + datetime.timedelta(days=4)
+    open_for_orders = datetime.datetime.now(tz=UTC)
+    closed_for_orders = open_for_orders + datetime.timedelta(days=4)
     collect_datetime = closed_for_orders + datetime.timedelta(days=5)
 
     transaction_costs = FuzzyDecimal(low=0, high=0.40)
