@@ -6,6 +6,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import TemplateView, FormView
 from qantani import QantaniAPI
 from finance.models import Payment
+from django.contrib import messages
 
 
 def choosebankform_factory(banks):
@@ -59,6 +60,10 @@ class ChooseBankView(LoginRequiredMixin, QantaniMixin, FormView):
         if user_debit == 0 and order.finalized is False:
             order.finalized = True
             order.save()
+
+            messages.add_message(self.request, messages.SUCCESS,
+                                 'Omdat je genoeg krediet had was betalen niet nodig. '
+                                 'Je bestelling is bevestigd.')
             return redirect(reverse('order_summary', args=(order.pk,)))
         return super(ChooseBankView, self).get(*args, **kwargs)
 

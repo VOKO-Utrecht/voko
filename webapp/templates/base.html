@@ -46,6 +46,12 @@
     <!-- end of navbar -->
 
     <div class="container" role="main">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-info" role="alert"><strong>Let op! </strong>{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+
     {% block content %}{% endblock %}
     </div>
 
