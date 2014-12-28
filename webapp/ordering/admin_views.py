@@ -1,6 +1,7 @@
 from braces.views import StaffuserRequiredMixin
 from django.db.models.aggregates import Sum
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, View
+from accounts.models import VokoUser
 from ordering.models import OrderProduct, Order, OrderRound, Supplier, OrderProductCorrection
 
 
@@ -106,5 +107,18 @@ class OrderAdminCorrection(StaffuserRequiredMixin, ListView):
     template_name = "ordering/admin/correction.html"
 
     def get_queryset(self):
+        self.order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
+        return OrderProductCorrection.objects.filter(order_product__product__order_round=self.order_round)
+
+
+class OrderAdminCorrectionJSON(StaffuserRequiredMixin, View):
+    """
+    JSON data for OrderAdminCorrection view
+    """
+
+    def get(self, *args, **kwargs):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
-        return OrderProductCorrection.objects.filter(order_product__product__order_round=order_round)
+        data = []
+
+        # for user in
+
