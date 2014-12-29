@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
     <h1>Correcties</h1>
-
-{#    {{ object_list }}#}
     <hr>
     <h2>Correctie maken</h2>
 
@@ -10,20 +8,20 @@
         {% csrf_token %}
         <div class="form-group">
             <label for="lid">Lid</label>
-            <select class="form-control" id="lid">
+            <select class="form-control" id="lid" name="member_id">
                 <option></option>
             </select>
         </div>
 
         <div class="form-group">
             <label for="order">Bestelling</label>
-            <select class="form-control" id="order">
+            <select class="form-control" id="order" name="order_id">
             </select>
         </div>
 
         <div class="form-group">
             <label for="product">Subbestelling / Product</label>
-            <select class="form-control" id="product" name="order_product">
+            <select class="form-control" id="product" name="order_product_id">
             </select>
         </div>
 
@@ -36,125 +34,80 @@
 
     </form>
 
+    <hr>
+    <h2>Correcties in deze bestelronde</h2>
+    {{ view.corrections }}
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script lang="javascript">
-    var data = [
-        {
-            "name": "John Doe",
-            "id": 12,
-            "orders": [
-                {
-                    "id": 2332,
-                    "total_price": 12.12,
-                    "order_products": [
-                        {
-                            "id": 121,
-                            "name": "Aardappelen",
-                            "amount": 12
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "Jane Doe",
-            "id": 13,
-            "orders": [
-                {
-                    "id": 321,
-                    "total_price": 14.14,
-                    "order_products": [
-                        {
-                            "id": 131,
-                            "name": "Aardperen",
-                            "amount": 33
-                        }
-                    ]
-                },
-                {
-                    "id": 322,
-                    "total_price": 15.15,
-                    "order_products": [
-                        {
-                            "id": 141,
-                            "name": "Aardbeien",
-                            "amount": 2
-                        },
-                        {
-                            "id": 142,
-                            "name": "Appelsap",
-                            "amount": 1
-                        }
-                    ]
-                }
-            ]
-        }
-    ];
+        var json_data = '{{ view.orders_json|safe }}';
+        var data = $.parseJSON(json_data);
 
-    function populate_members() {
-        var members_dropdown = $("#lid");
-        $.each(data, function () {
-            members_dropdown.append($('<option></option>').attr("value", this.id).text(this.name));
-        });
-    }
-
-    function populate_orders(member_id) {
-        var orders_dropdown = $("#order");
-        orders_dropdown.empty();
-
-        // look up user in our data structure
-        $.each(data, function() {
-           if (this.id === member_id) {
-               member_data = this;
-           }
-        });
-
-        $.each(member_data.orders, function() {
-            var txt = "Bestelling ID " + this.id + ", totale waarde: € " + this.total_price;
-            orders_dropdown.append($('<option></option>').attr("value", this.id).text(txt));
-        });
-
-        var order_id = parseInt(($("#order option:selected").val()));
-        populate_products(order_id);
-    }
-
-    function populate_products(order_id) {
-        var products_dropdown = $("#product");
-        products_dropdown.empty();
-
-        // look up order
-        $.each(data, function() {
-            $.each(this.orders, function() {
-                if (this.id === order_id) {
-                    order_data = this;
-                }
+        function populate_members() {
+            var members_dropdown = $("#lid");
+            $.each(data, function () {
+                members_dropdown.append($('<option></option>').attr("value", this.id).text(this.name));
             });
-        });
+        }
 
-        $.each(order_data.order_products, function() {
-            var txt = this.amount + " x " + this.name;
-            products_dropdown.append($('<option></option>').attr("value", this.id).text(txt));
-        })
+        function populate_orders(member_id) {
+            var orders_dropdown = $("#order");
+            orders_dropdown.empty();
 
-    }
+            // look up user in our data structure
+            $.each(data, function() {
+               if (this.id === member_id) {
+                   member_data = this;
+               }
+            });
 
-    populate_members();
+            $.each(member_data.orders, function() {
+                var txt = "Bestelling ID " + this.id + ", totale waarde: € " + this.total_price;
+                orders_dropdown.append($('<option></option>').attr("value", this.id).text(txt));
+            });
 
-    // Set up dropdown events
-    $(function() {
-        $("#lid").change(function(){
-            var member_id = parseInt(($("#lid option:selected").val()));
-            populate_orders(member_id);
-        });
-
-        $("#order").change(function(){
-           var order_id = parseInt(($("#order option:selected").val()));
+            var order_id = parseInt(($("#order option:selected").val()));
             populate_products(order_id);
-        });
+        }
 
-});
+        function populate_products(order_id) {
+            var products_dropdown = $("#product");
+            products_dropdown.empty();
+
+            // look up order
+            $.each(data, function() {
+                $.each(this.orders, function() {
+                    if (this.id === order_id) {
+                        order_data = this;
+                    }
+                });
+            });
+
+            $.each(order_data.order_products, function() {
+                var txt = this.amount + " x " + this.name;
+                products_dropdown.append($('<option></option>').attr("value", this.id).text(txt));
+            })
+
+        }
+
+        populate_members();
+
+        // Set up dropdown events
+        $(function() {
+            $("#lid").change(function(){
+                var member_id = parseInt(($("#lid option:selected").val()));
+                populate_orders(member_id);
+            });
+
+            $("#order").change(function(){
+               var order_id = parseInt(($("#order option:selected").val()));
+                populate_products(order_id);
+            });
+
+        });
 
     </script>
+
  {% endblock %}
 
 

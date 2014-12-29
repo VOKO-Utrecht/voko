@@ -1,3 +1,5 @@
+from decimal import Decimal
+import json
 from braces.views import StaffuserRequiredMixin
 from django.contrib import messages
 from django.core.urlresolvers import reverse
@@ -109,26 +111,59 @@ class OrderAdminUserOrderProductsPerOrderRound(StaffuserRequiredMixin, ListView)
 class OrderAdminCorrection(StaffuserRequiredMixin, TemplateView):
     template_name = "ordering/admin/correction.html"
 
-    # def get_queryset(self):
-    #     self.order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
-    #     return OrderProductCorrection.objects.filter(order_product__product__order_round=self.order_round)
-
     def post(self, request, *args, **kwargs):
-        print request.POST
+        user_id = int(request.POST['member_id'])
+        order_id = int(request.POST['order_id'])
+        order_product_id = int(request.POST['order_product_id'])
+        supplied_amount = Decimal(request.POST['supplied_amount'])
+
+        order_product = OrderProduct.objects.get(id=order_product_id,
+                                                 order_id=order_id,
+                                                 order__user_id=user_id)
+
+        assert supplied_amount < order_product.amount, "Supplied amount should be less than real amount"
+
+        OrderProductCorrection.objects.create(
+            order_product=order_product,
+            supplied_amount=supplied_amount
+        )
+
+        # TODO: Notes
 
         messages.add_message(request, messages.SUCCESS, "De correctie is succesvol aangemaakt.")
 
         return redirect(reverse('orderadmin_correction', args=args, kwargs=kwargs))
 
+    def corrections(self):
+        order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
+        return OrderProductCorrection.objects.filter(order_product__product__order_round=order_round)
 
-class OrderAdminCorrectionJSON(StaffuserRequiredMixin, View):
-    """
-    JSON data for OrderAdminCorrection view
-    """
-
-    def get(self, *args, **kwargs):
+    def orders_json(self):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
         data = []
+        users = set([o.user for o in order_round.orders.all()])
 
-        # for user in
+        for user in users:
+            orders = []
+            for order in user.orders.filter(order_round=order_round):
+                order_products = []
+                for order_product in order.orderproducts.all():
+                    order_products.append({
+                        "id": order_product.id,
+                        "name": order_product.product.name,
+                        "amount": order_product.amount
+                    })
 
+                orders.append({
+                    "id": order.id,
+                    "total_price": float(order.total_price),
+                    "order_products": order_products
+                })
+
+            data.append({
+                "name": user.get_full_name(),
+                "id": user.id,
+                "orders": orders
+            })
+
+        return json.dumps(data)
