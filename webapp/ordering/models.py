@@ -203,7 +203,7 @@ class OrderProductCorrection(TimeStampedModel):
         verbose_name = "Productbestelling-correctie"
         verbose_name_plural = "Productbestelling-correcties"
 
-    order_product = models.OneToOneField("OrderProduct")
+    order_product = models.OneToOneField("OrderProduct", related_name="correction")
     supplied_amount = models.DecimalField(max_digits=6, decimal_places=1)
     notes = models.TextField(blank=True)
     credit = models.OneToOneField(Balance)

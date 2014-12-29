@@ -116,6 +116,7 @@ class OrderAdminCorrection(StaffuserRequiredMixin, TemplateView):
         order_id = int(request.POST['order_id'])
         order_product_id = int(request.POST['order_product_id'])
         supplied_amount = Decimal(request.POST['supplied_amount'])
+        notes = str(request.POST['notes']) if request.POST['notes'] else None
 
         order_product = OrderProduct.objects.get(id=order_product_id,
                                                  order_id=order_id,
@@ -125,10 +126,9 @@ class OrderAdminCorrection(StaffuserRequiredMixin, TemplateView):
 
         OrderProductCorrection.objects.create(
             order_product=order_product,
-            supplied_amount=supplied_amount
+            supplied_amount=supplied_amount,
+            notes=notes
         )
-
-        # TODO: Notes
 
         messages.add_message(request, messages.SUCCESS, "De correctie is succesvol aangemaakt.")
 
@@ -136,7 +136,7 @@ class OrderAdminCorrection(StaffuserRequiredMixin, TemplateView):
 
     def corrections(self):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
-        return OrderProductCorrection.objects.filter(order_product__product__order_round=order_round)
+        return OrderProductCorrection.objects.filter(order_product__product__order_round=order_round).order_by("order_product__order__user")
 
     def orders_json(self):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
@@ -147,7 +147,7 @@ class OrderAdminCorrection(StaffuserRequiredMixin, TemplateView):
             orders = []
             for order in user.orders.filter(order_round=order_round):
                 order_products = []
-                for order_product in order.orderproducts.all():
+                for order_product in order.orderproducts.filter(correction__isnull=True):
                     order_products.append({
                         "id": order_product.id,
                         "name": order_product.product.name,
