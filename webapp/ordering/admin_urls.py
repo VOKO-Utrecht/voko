@@ -9,6 +9,6 @@ urlpatterns = patterns('',
     url(r'^round/(?P<pk>[0-9]+)/user_orders/$', OrderAdminUserOrders.as_view(), name="orderadmin_userorders"),
     url(r'^round/(?P<pk>[0-9]+)/product_orders/$', OrderAdminUserOrderProductsPerOrderRound.as_view(), name="orderadmin_orders_per_product"),
     url(r'^round/(?P<pk>[0-9]+)/correction/$', OrderAdminCorrection.as_view(), name="orderadmin_correction"),
-    url(r'^round/(?P<pk>[0-9]+)/correction/json$', OrderAdminCorrectionJSON.as_view(), name="orderadmin_correction"),
+    url(r'^round/(?P<pk>[0-9]+)/correction/json$', OrderAdminCorrectionJSON.as_view(), name="orderadmin_correction_json"),
     url(r'^product/(?P<pk>[0-9]+)/$', OrderAdminUserOrdersPerProduct.as_view(), name="productorders_admin"),
 )

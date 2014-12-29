@@ -6,28 +6,36 @@
     <hr>
     <h2>Correctie maken</h2>
 
-    <form role="form">
-  <div class="form-group">
-    <label for="lid">Lid</label>
-    <select class="form-control" id="lid">
-        <option></option>
-    </select>
-  </div>
+    <form role="form" action="." method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="lid">Lid</label>
+            <select class="form-control" id="lid">
+                <option></option>
+            </select>
+        </div>
 
-  <div class="form-group">
-    <label for="order">Bestelling</label>
-    <select class="form-control" id="order">
-    </select>
-  </div>
+        <div class="form-group">
+            <label for="order">Bestelling</label>
+            <select class="form-control" id="order">
+            </select>
+        </div>
 
-  <div class="form-group">
-    <label for="product">Subbestelling / Product</label>
-    <select class="form-control" id="product">
-    </select>
-  </div>
+        <div class="form-group">
+            <label for="product">Subbestelling / Product</label>
+            <select class="form-control" id="product" name="order_product">
+            </select>
+        </div>
 
-        <button type="submit" class="btn btn-default">Submit</button>
-</form>
+        <div class="form-group">
+            <label for="supplied">Geleverd aantal</label>
+            <input type="number" step="0.1" class="form-control" id="supplied" name="supplied_amount"/>
+        </div>
+
+        <button type="submit" class="btn btn-default">Correctie maken</button>
+
+    </form>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script lang="javascript">
     var data = [

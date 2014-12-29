@@ -1,6 +1,9 @@
 from braces.views import StaffuserRequiredMixin
+from django.contrib import messages
+from django.core.urlresolvers import reverse
 from django.db.models.aggregates import Sum
-from django.views.generic import ListView, DetailView, View
+from django.shortcuts import redirect
+from django.views.generic import ListView, DetailView, View, UpdateView, TemplateView
 from accounts.models import VokoUser
 from ordering.models import OrderProduct, Order, OrderRound, Supplier, OrderProductCorrection
 
@@ -103,12 +106,19 @@ class OrderAdminUserOrderProductsPerOrderRound(StaffuserRequiredMixin, ListView)
     template_name = "ordering/admin/productsorders.html"
 
 
-class OrderAdminCorrection(StaffuserRequiredMixin, ListView):
+class OrderAdminCorrection(StaffuserRequiredMixin, TemplateView):
     template_name = "ordering/admin/correction.html"
 
-    def get_queryset(self):
-        self.order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
-        return OrderProductCorrection.objects.filter(order_product__product__order_round=self.order_round)
+    # def get_queryset(self):
+    #     self.order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
+    #     return OrderProductCorrection.objects.filter(order_product__product__order_round=self.order_round)
+
+    def post(self, request, *args, **kwargs):
+        print request.POST
+
+        messages.add_message(request, messages.SUCCESS, "De correctie is succesvol aangemaakt.")
+
+        return redirect(reverse('orderadmin_correction', args=args, kwargs=kwargs))
 
 
 class OrderAdminCorrectionJSON(StaffuserRequiredMixin, View):
