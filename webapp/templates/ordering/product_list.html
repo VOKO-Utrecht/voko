@@ -6,7 +6,7 @@
 
     {% if user.is_staff and not current_order_round.is_open %}
     <div class="alert alert-warning" role="alert">
-        <strong>Let op!</strong> Je kunt de producten zien omdat je "staff user" bent. De bestelronde is nog niet open!
+        <strong>Let op!</strong> Je kunt de producten zien omdat je "staff user" bent. <strong>De bestelronde is niet open!</strong>
     </div>
     {% endif %}
 
