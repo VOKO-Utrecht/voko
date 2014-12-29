@@ -160,7 +160,7 @@ class OrderAdminCorrection(StaffuserRequiredMixin, TemplateView):
         order_id = int(request.POST['order_id'])
         order_product_id = int(request.POST['order_product_id'])
         supplied_amount = Decimal(request.POST['supplied_amount'])
-        notes = str(request.POST['notes']) if request.POST['notes'] else None
+        notes = str((request.POST['notes']).strip())
 
         order_product = OrderProduct.objects.get(id=order_product_id,
                                                  order_id=order_id,
