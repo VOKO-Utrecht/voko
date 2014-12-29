@@ -294,3 +294,11 @@ class Product(TimeStampedModel):
         if self.maximum_total_order is None:
             return True
         return self.amount_available > 0
+
+    def create_corrections(self):
+        for order_product in self.orderproducts.filter(correction__isnull=True):
+            OrderProductCorrection.objects.create(
+                order_product=order_product,
+                supplied_amount=0,
+                notes='Product niet geleverd: "%s" (%s) [%s]' % (self.name, self.supplier.name, self.id)
+            )

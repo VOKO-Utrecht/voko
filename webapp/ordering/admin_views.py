@@ -1,13 +1,12 @@
-from decimal import Decimal
 import json
+from decimal import Decimal
 from braces.views import StaffuserRequiredMixin
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.db.models.aggregates import Sum
 from django.shortcuts import redirect
-from django.views.generic import ListView, DetailView, View, UpdateView, TemplateView
-from accounts.models import VokoUser
-from ordering.models import OrderProduct, Order, OrderRound, Supplier, OrderProductCorrection
+from django.views.generic import ListView, DetailView, TemplateView, View
+from ordering.models import OrderProduct, Order, OrderRound, Supplier, OrderProductCorrection, Product
 
 
 class OrderAdminMain(StaffuserRequiredMixin, ListView):
@@ -138,6 +137,10 @@ class OrderAdminCorrection(StaffuserRequiredMixin, TemplateView):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
         return OrderProductCorrection.objects.filter(order_product__product__order_round=order_round).order_by("order_product__order__user")
 
+    def products(self):
+        order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
+        return order_round.products.all().order_by('name')
+
     def orders_json(self):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
         data = []
@@ -167,3 +170,16 @@ class OrderAdminCorrection(StaffuserRequiredMixin, TemplateView):
             })
 
         return json.dumps(data)
+
+
+class OrderAdminMassCorrection(StaffuserRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
+        product_id = request.POST['product_id']
+        product = Product.objects.get(order_round=order_round,
+                                      id=product_id)
+        product.create_corrections()
+
+        messages.add_message(request, messages.SUCCESS, "De correcties zijn succesvol aangemaakt.")
+
+        return redirect(reverse('orderadmin_correction', args=args, kwargs=kwargs))
