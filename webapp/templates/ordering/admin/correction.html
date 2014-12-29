@@ -110,17 +110,15 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script lang="javascript">
-        var json_data = '{{ view.orders_json|safe }}';
-        var data = $.parseJSON(json_data);
 
-        function populate_members() {
+        function populate_members(data) {
             var members_dropdown = $("#lid");
             $.each(data, function () {
                 members_dropdown.append($('<option></option>').attr("value", this.id).text(this.name));
             });
         }
 
-        function populate_orders(member_id) {
+        function populate_orders(data, member_id) {
             var orders_dropdown = $("#order");
             orders_dropdown.empty();
 
@@ -137,10 +135,10 @@
             });
 
             var order_id = parseInt(($("#order option:selected").val()));
-            populate_products(order_id);
+            populate_products(data, order_id);
         }
 
-        function populate_products(order_id) {
+        function populate_products(data, order_id) {
             var products_dropdown = $("#product");
             products_dropdown.empty();
 
@@ -160,21 +158,24 @@
 
         }
 
-        populate_members();
+        var json_url = 'json';
+        $.getJSON(json_url, function(data) {
+            populate_members(data);
 
-        // Set up dropdown events
-        $(function() {
-            $("#lid").change(function(){
-                var member_id = parseInt(($("#lid option:selected").val()));
-                populate_orders(member_id);
+            // Set up dropdown events
+            $(function() {
+                $("#lid").change(function(){
+                    var member_id = parseInt(($("#lid option:selected").val()));
+                    populate_orders(data, member_id);
+                });
+
+                $("#order").change(function(){
+                    var order_id = parseInt(($("#order option:selected").val()));
+                    populate_products(data, order_id);
+                });
             });
-
-            $("#order").change(function(){
-               var order_id = parseInt(($("#order option:selected").val()));
-                populate_products(order_id);
-            });
-
         });
+
 
     </script>
 

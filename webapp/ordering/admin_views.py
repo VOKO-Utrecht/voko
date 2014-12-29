@@ -4,6 +4,7 @@ from braces.views import StaffuserRequiredMixin
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.db.models.aggregates import Sum
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, TemplateView, View
 from ordering.models import OrderProduct, Order, OrderRound, Supplier, OrderProductCorrection, Product
@@ -107,6 +108,50 @@ class OrderAdminUserOrderProductsPerOrderRound(StaffuserRequiredMixin, ListView)
     template_name = "ordering/admin/productsorders.html"
 
 
+class OrderAdminCorrectionJson(StaffuserRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        return HttpResponse(
+            self.orders_json(),
+            content_type="application/json"
+        )
+
+    def orders_json(self):
+        order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
+        data = []
+        users = set([o.user for o in order_round.orders.all()])
+
+        for user in users:
+            orders = []
+            for order in user.orders.filter(order_round=order_round):
+                order_products = []
+                for order_product in order.orderproducts.filter(correction__isnull=True):
+                    order_products.append({
+                        "id": order_product.id,
+                        "name": order_product.product.name,
+                        "amount": order_product.amount
+                    })
+
+                if not order_products:
+                    continue
+
+                orders.append({
+                    "id": order.id,
+                    "total_price": float(order.total_price),
+                    "order_products": order_products
+                })
+
+            if not orders:
+                continue
+
+            data.append({
+                "name": user.get_full_name(),
+                "id": user.id,
+                "orders": orders
+            })
+
+        return json.dumps(data)
+
+
 class OrderAdminCorrection(StaffuserRequiredMixin, TemplateView):
     template_name = "ordering/admin/correction.html"
 
@@ -140,36 +185,6 @@ class OrderAdminCorrection(StaffuserRequiredMixin, TemplateView):
     def products(self):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
         return order_round.products.all().order_by('name')
-
-    def orders_json(self):
-        order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
-        data = []
-        users = set([o.user for o in order_round.orders.all()])
-
-        for user in users:
-            orders = []
-            for order in user.orders.filter(order_round=order_round):
-                order_products = []
-                for order_product in order.orderproducts.filter(correction__isnull=True):
-                    order_products.append({
-                        "id": order_product.id,
-                        "name": order_product.product.name,
-                        "amount": order_product.amount
-                    })
-
-                orders.append({
-                    "id": order.id,
-                    "total_price": float(order.total_price),
-                    "order_products": order_products
-                })
-
-            data.append({
-                "name": user.get_full_name(),
-                "id": user.id,
-                "orders": orders
-            })
-
-        return json.dumps(data)
 
 
 class OrderAdminMassCorrection(StaffuserRequiredMixin, View):
