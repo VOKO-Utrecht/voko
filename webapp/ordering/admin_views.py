@@ -159,14 +159,15 @@ class OrderAdminCorrection(StaffuserRequiredMixin, TemplateView):
         user_id = int(request.POST['member_id'])
         order_id = int(request.POST['order_id'])
         order_product_id = int(request.POST['order_product_id'])
-        supplied_amount = Decimal(request.POST['supplied_amount'])
+        supplied_percentage = int(request.POST['supplied_percentage'])
         notes = str((request.POST['notes']).strip())
 
         order_product = OrderProduct.objects.get(id=order_product_id,
                                                  order_id=order_id,
                                                  order__user_id=user_id)
 
-        assert supplied_amount < order_product.amount, "Supplied amount should be less than real amount"
+        # Convert percentage to amount
+        supplied_amount = Decimal((float(order_product.amount) / 100) * supplied_percentage)
 
         OrderProductCorrection.objects.create(
             order_product=order_product,
