@@ -166,12 +166,9 @@ class OrderAdminCorrection(StaffuserRequiredMixin, TemplateView):
                                                  order_id=order_id,
                                                  order__user_id=user_id)
 
-        # Convert percentage to amount
-        supplied_amount = Decimal((float(order_product.amount) / 100) * supplied_percentage)
-
         OrderProductCorrection.objects.create(
             order_product=order_product,
-            supplied_amount=supplied_amount,
+            supplied_percentage=supplied_percentage,
             notes=notes
         )
 

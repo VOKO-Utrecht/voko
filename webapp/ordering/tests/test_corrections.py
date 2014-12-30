@@ -11,7 +11,7 @@ class TestOrderProductCorrections(VokoTestCase):
     def test_creating_a_correction(self):
         order_product = OrderProductFactory.create()
         OrderProductCorrection.objects.create(order_product=order_product,
-                                              supplied_amount=0)
+                                              supplied_percentage=0)
 
     def test_that_creating_a_correction_creates_sufficient_credit_1(self):
         order_product = OrderProductFactory.create(amount=10,
@@ -19,7 +19,7 @@ class TestOrderProductCorrections(VokoTestCase):
                                                    product__order_round__markup_percentage=Decimal(7))
 
         opc = OrderProductCorrection.objects.create(order_product=order_product,
-                                                    supplied_amount=Decimal(5))
+                                                    supplied_percentage=50)
 
         self.assertEqual(opc.credit.amount, Decimal(5 * 1.07).quantize(Decimal('.01')))
 
@@ -29,7 +29,7 @@ class TestOrderProductCorrections(VokoTestCase):
                                                    product__order_round__markup_percentage=Decimal(7))
 
         opc = OrderProductCorrection.objects.create(order_product=order_product,
-                                                    supplied_amount=Decimal(7))
+                                                    supplied_percentage=70)
 
         self.assertEqual(opc.credit.amount, Decimal(3 * 1.07).quantize(Decimal('.01')))
 
@@ -39,7 +39,7 @@ class TestOrderProductCorrections(VokoTestCase):
                                                    product__order_round__markup_percentage=Decimal(7))
 
         opc = OrderProductCorrection.objects.create(order_product=order_product,
-                                                    supplied_amount=Decimal(0))
+                                                    supplied_percentage=0)
 
         self.assertEqual(opc.credit.amount, Decimal(10 * 1.07).quantize(Decimal('.01')))
 
@@ -49,11 +49,11 @@ class TestOrderProductCorrections(VokoTestCase):
                                                    product__order_round__markup_percentage=Decimal(7))
 
         opc = OrderProductCorrection.objects.create(order_product=order_product,
-                                                    supplied_amount=Decimal(0))
+                                                    supplied_percentage=0)
 
         self.assertEqual(opc.credit.amount, Decimal(10 * 1.07).quantize(Decimal('.01')))
 
-        opc.supplied_amount = 10
+        opc.supplied_percentage = 10
         opc.save()
 
         opc = OrderProductCorrection.objects.all().get()
@@ -65,7 +65,7 @@ class TestOrderProductCorrections(VokoTestCase):
                                                    product__order_round__markup_percentage=Decimal(7))
 
         opc = OrderProductCorrection.objects.create(order_product=order_product,
-                                                    supplied_amount=Decimal(0.5))
+                                                    supplied_percentage=50)
 
         # Price is 1 Euro, markup is 7%, so total price is 1.07.
         # Half of 1.07 is 0.535
@@ -79,7 +79,7 @@ class TestOrderProductCorrections(VokoTestCase):
                                                    product__order_round__markup_percentage=Decimal(7))
 
         opc = OrderProductCorrection.objects.create(order_product=order_product,
-                                                    supplied_amount=Decimal(0.9))
+                                                    supplied_percentage=45)
 
         # Price is 1 Euro, markup is 7%, amount is 2, so total price is 2.14.
         # 0.9 supplied, so 1.1 was not supplied.
@@ -91,9 +91,9 @@ class TestOrderProductCorrections(VokoTestCase):
     def test_that_credit_description_is_filled_in(self):
         order_product = OrderProductFactory.create()
         opc = OrderProductCorrection.objects.create(order_product=order_product,
-                                                    supplied_amount=0)
-        self.assertEqual(opc.credit.notes, "Correctie in ronde %d, product %s, geleverd: %s i.p.v. %s" %
+                                                    supplied_percentage=0)
+        self.assertEqual(opc.credit.notes, "Correctie in ronde %d, %dx %s, geleverd: %s%%" %
                          (opc.order_product.product.order_round.id,
+                          opc.order_product.amount,
                           opc.order_product.product.name,
-                          opc.supplied_amount,
-                          opc.order_product.amount))
+                          opc.supplied_percentage))

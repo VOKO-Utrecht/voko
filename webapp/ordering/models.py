@@ -204,7 +204,7 @@ class OrderProductCorrection(TimeStampedModel):
         verbose_name_plural = "Productbestelling-correcties"
 
     order_product = models.OneToOneField("OrderProduct", related_name="correction")
-    supplied_amount = models.DecimalField(max_digits=6, decimal_places=2)
+    supplied_percentage = models.IntegerField()
     notes = models.TextField(blank=True)
     credit = models.OneToOneField(Balance)
 
@@ -212,19 +212,18 @@ class OrderProductCorrection(TimeStampedModel):
         return "Correction on OrderProduct: %s" % self.order_product
 
     def calculate_refund(self):
-        before_correction = self.order_product.total_price
-        new_price = self.supplied_amount * self.order_product.product.retail_price
-        return Decimal(before_correction - new_price).quantize(Decimal('.01'), rounding=ROUND_DOWN)
+        return Decimal((self.order_product.total_price / 100) * (100 - self.supplied_percentage))\
+            .quantize(Decimal('.01'), rounding=ROUND_DOWN)
 
     def _create_credit(self):
         return Balance.objects.create(user=self.order_product.order.user,
                                       type="CR",
                                       amount=self.calculate_refund(),
-                                      notes="Correctie in ronde %d, product %s, geleverd: %s i.p.v. %s" %
+                                      notes="Correctie in ronde %d, %dx %s, geleverd: %s%%" %
                                             (self.order_product.product.order_round.id,
+                                             self.order_product.amount,
                                              self.order_product.product.name,
-                                             self.supplied_amount,
-                                             self.order_product.amount))
+                                             self.supplied_percentage))
 
     def save(self, *args, **kwargs):
         if self.pk is None:
@@ -299,6 +298,6 @@ class Product(TimeStampedModel):
         for order_product in self.orderproducts.filter(correction__isnull=True):
             OrderProductCorrection.objects.create(
                 order_product=order_product,
-                supplied_amount=0,
+                supplied_percentage=0,
                 notes='Product niet geleverd: "%s" (%s) [%s]' % (self.name, self.supplier.name, self.id)
             )

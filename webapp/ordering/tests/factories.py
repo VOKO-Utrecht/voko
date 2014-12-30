@@ -1,6 +1,6 @@
 import datetime
 from factory import DjangoModelFactory, SubFactory, LazyAttribute
-from factory.fuzzy import FuzzyDateTime, FuzzyText, FuzzyChoice, FuzzyDecimal
+from factory.fuzzy import FuzzyDateTime, FuzzyText, FuzzyChoice, FuzzyDecimal, FuzzyInteger
 from pytz import UTC
 from accounts.tests.factories import AddressFactory, VokoUserFactory
 from ordering.models import Product
@@ -53,4 +53,4 @@ class OrderProductFactory(DjangoModelFactory):
 
     product = SubFactory(ProductFactory)
     order = SubFactory(OrderFactory)
-    amount = FuzzyDecimal(low=1, high=10)
+    amount = FuzzyInteger(low=1, high=10)
