@@ -82,3 +82,14 @@ QANTANI_MERCHANT_KEY = ""
 QANTANI_MERCHANT_SECRET = ""
 
 BASE_URL = "http://leden.vokoutrecht.nl"
+
+TINYMCE_DEFAULT_CONFIG = {
+    'plugins': "table,xhtmlxtras,paste,searchreplace",
+    'theme': "advanced",
+    "theme_advanced_buttons3_add" : "cite,abbr",
+    'cleanup_on_startup': True,
+    'custom_undo_redo_levels': 10,
+    'forced_root_block': False,
+    "width": "75%",
+    "height": "500px",
+}
