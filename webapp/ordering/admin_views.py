@@ -122,7 +122,7 @@ class OrderAdminCorrectionJson(StaffuserRequiredMixin, View):
 
         for user in users:
             orders = []
-            for order in user.orders.filter(order_round=order_round, finalized=True):
+            for order in user.orders.filter(order_round=order_round, finalized=True).select_related():
                 order_products = []
                 for order_product in order.orderproducts.filter(correction__isnull=True):
                     order_products.append({
