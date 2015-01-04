@@ -26,18 +26,13 @@ class Command(BaseCommand):
         with open(csvfile, "rb") as csvfile:
             reader = csv.reader(csvfile, delimiter=',', quotechar='"')
             for row in reader:
-                # Productnaam | Omschrijving (optioneel) | Verkoopeenheid | Prijs per eenheid in Euro | Maximaal leverbaar | Minimale leverhoeveelheid
                 try:
-                    name, description, unit, price, maximum, minimum = row
+                    name, description, unit, price, maximum = row
 
                     if maximum.lower() == 'onbeperkt':
                         maximum = None
 
-                    if minimum.lower() == 'onbeperkt':
-                        minimum = None
-
                     maximum = int(maximum) if maximum else None
-                    minimum = int(minimum) if minimum else None
 
                     # Strip off euro sign
                     if not price.isdigit():
@@ -56,7 +51,6 @@ class Command(BaseCommand):
                         base_price=price,
                         supplier=supplier,
                         order_round=order_round,
-                        minimum_total_order=minimum,
                         maximum_total_order=maximum,
                         unit_of_measurement=unit,
                     )
@@ -70,7 +64,7 @@ class Command(BaseCommand):
             for d in data:
                 print "====="
                 print d[0]
-                for field in ("name", "description", "base_price", "minimum_total_order",
+                for field in ("name", "description", "base_price",
                               "maximum_total_order", "unit_of_measurement"):
                     print "%s: %s" % (field, getattr(d[1], field))
                 do_save = raw_input("Save? [Y/n] > ")
