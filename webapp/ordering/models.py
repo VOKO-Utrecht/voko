@@ -185,6 +185,7 @@ class OrderProduct(TimeStampedModel):
     class Meta:
         verbose_name = "Productbestelling"
         verbose_name_plural = "Productbestellingen"
+        unique_together = ('order', 'product')
 
     order = models.ForeignKey("Order", related_name="orderproducts")
     product = models.ForeignKey("Product", related_name="orderproducts")
