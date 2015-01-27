@@ -21,14 +21,19 @@ class ProductsView(LoginRequiredMixin, ListView):
         Handling complex forms using Django's forms framework is pretty nearly impossible without
          all kinds of trickery that don't necessarily make the code more readable. Hence: manual parsing of POST data.
         """
-        # TODO: assert product is still leverbaar etc
         order = get_or_create_order(self.request.user)
 
         for key, value in request.POST.iteritems():
             if key.startswith("order-product-") and (value.isdigit() or value == ""):
-                # TODO: catch casting / index error
-                prod_id = int(key.split("-")[-1])
-                value = value.strip()
+                try:
+                    prod_id = int(key.split("-")[-1])
+                    value = value.strip()
+                except (IndexError, ValueError):
+                    messages.add_message(self.request, messages.ERROR,
+                                         "Er ging iets fout bij het opslaan. "
+                                         "Probeer het opnieuw of neem contact met ons op.")
+                    return redirect('view_products')
+
 
                 product = Product.objects.get(id=prod_id)
                 order_products = OrderProduct.objects.filter(order=order, product=product)
@@ -36,10 +41,13 @@ class ProductsView(LoginRequiredMixin, ListView):
 
                 if value.isdigit() and product.maximum_total_order and int(value) > product.amount_available:
                     if product.is_available:
-                        messages.add_message(self.request, messages.ERROR, "Van het product %s van %s is nog %s x %s beschikbaar!"
-                                             % (product.name, product.supplier.name, product.amount_available, product.unit_of_measurement))
+                        messages.add_message(self.request, messages.ERROR,
+                                             "Van het product %s van %s is nog %s x %s beschikbaar!"
+                                             % (product.name, product.supplier.name, product.amount_available,
+                                                product.unit_of_measurement))
                     else:
-                        messages.add_message(self.request, messages.ERROR, "Het product %s van %s is uitverkocht!" % (product.name, product.supplier.name))
+                        messages.add_message(self.request, messages.ERROR, "Het product %s van %s is uitverkocht!"
+                                             % (product.name, product.supplier.name))
                     value = 0
 
                 # User deleted a product
