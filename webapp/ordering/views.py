@@ -1,4 +1,5 @@
 from braces.views import LoginRequiredMixin
+from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.forms import inlineformset_factory
 from django.http import HttpResponseBadRequest
@@ -15,10 +16,68 @@ class ProductsView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Product.objects.filter(order_round=self.request.current_order_round).order_by('name')
 
+    def post(self, request, *args, **kwargs):
+        """
+        Handling complex forms using Django's forms framework is pretty nearly impossible without
+         all kinds of trickery that don't necessarily make the code more readable. Hence: manual parsing of POST data.
+        """
+        # TODO: assert product is still leverbaar etc
+        order = get_or_create_order(self.request.user)
+
+        for key, value in request.POST.iteritems():
+            if key.startswith("order-product-") and (value.isdigit() or value == ""):
+                # TODO: catch casting / index error
+                prod_id = int(key.split("-")[-1])
+                value = value.strip()
+
+                product = Product.objects.get(id=prod_id)
+                order_products = OrderProduct.objects.filter(order=order, product=product)
+                assert len(order_products) <= 1
+
+                if value.isdigit() and product.maximum_total_order and int(value) > product.amount_available:
+                    if product.is_available:
+                        messages.add_message(self.request, messages.ERROR, "Van het product %s van %s is nog %s x %s beschikbaar!"
+                                             % (product.name, product.supplier.name, product.amount_available, product.unit_of_measurement))
+                    else:
+                        messages.add_message(self.request, messages.ERROR, "Het product %s van %s is uitverkocht!" % (product.name, product.supplier.name))
+                    value = 0
+
+                # User deleted a product
+                if not value:
+                    if order_products:
+                        order_products.delete()
+                    continue
+
+                # Update orderproduct
+                if order_products:
+                    if order_products.get().amount != int(value):
+                        order_products.get().amount = int(value)
+                        order_products.get().save()
+                    continue
+
+                # Create orderproduct
+                if value and int(value) > 0:
+                    OrderProduct.objects.create(order=order, product=product, amount=int(value))
+
+        return redirect('view_products')
+
     def get_context_data(self, **kwargs):
+        print self.request.POST
         context = super(ProductsView, self).get_context_data(**kwargs)
         context['current_order_round'] = self.request.current_order_round
         return context
+
+    def order_products(self):
+        order = get_or_create_order(self.request.user)
+        return order.orderproducts.all().select_related()
+
+    def products(self):
+        order = get_or_create_order(self.request.user)
+        qs = self.get_queryset()
+        for prod in qs:
+            if prod.orderproducts.filter(order=order):
+                prod.ordered_amount = prod.orderproducts.get(order=order).amount
+        return qs
 
 
 class ProductDetail(LoginRequiredMixin, View):
