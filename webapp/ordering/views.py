@@ -62,9 +62,9 @@ class ProductsView(LoginRequiredMixin, ListView):
         return redirect('view_products')
 
     def get_context_data(self, **kwargs):
-        print self.request.POST
         context = super(ProductsView, self).get_context_data(**kwargs)
         context['current_order_round'] = self.request.current_order_round
+        context['order'] = get_or_create_order(self.request.user)
         return context
 
     def order_products(self):
