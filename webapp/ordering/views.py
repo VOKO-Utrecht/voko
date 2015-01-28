@@ -34,10 +34,11 @@ class ProductsView(LoginRequiredMixin, ListView):
                                          "Probeer het opnieuw of neem contact met ons op.")
                     return redirect('view_products')
 
-
                 product = Product.objects.get(id=prod_id)
-                order_products = OrderProduct.objects.filter(order=order, product=product)
-                assert len(order_products) <= 1
+                try:
+                    order_product = OrderProduct.objects.get(order=order, product=product)
+                except OrderProduct.DoesNotExist:
+                    order_product = None
 
                 if value.isdigit() and product.maximum_total_order and int(value) > product.amount_available:
                     if product.is_available:
@@ -52,15 +53,16 @@ class ProductsView(LoginRequiredMixin, ListView):
 
                 # User deleted a product
                 if not value:
-                    if order_products:
-                        order_products.delete()
+                    if order_product:
+                        order_product.delete()
                     continue
 
                 # Update orderproduct
-                if order_products:
-                    if order_products.get().amount != int(value):
-                        order_products.get().amount = int(value)
-                        order_products.get().save()
+                if order_product:
+                    if order_product.amount != int(value):
+                        order_product.amount = int(value)
+                        order_product.save()
+
                     continue
 
                 # Create orderproduct
