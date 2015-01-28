@@ -96,6 +96,7 @@ class Order(TimeStampedModel):
     products = models.ManyToManyField("Product", through="OrderProduct")
     order_round = models.ForeignKey("OrderRound", related_name="orders")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="orders")
+    user_notes = models.TextField(null=True, blank=True)
 
     # If order has been paid
     finalized = models.BooleanField(default=False)
