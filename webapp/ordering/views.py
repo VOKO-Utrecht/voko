@@ -199,6 +199,9 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
             order.update_debit()
         else:
             order.create_and_link_debit()
+
+        order.user_notes = request.POST.get('notes')
+
         order.save()
         return redirect('finance.choosebank')
 
