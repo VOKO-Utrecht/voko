@@ -7,9 +7,13 @@
 <div class="panel panel-default">
   <!-- Default panel contents -->
   <div class="panel-body">
+      {% if not order.has_products %}
+          <strong>Je hebt nog geen producten in je bestelling!</strong>
+      {% else %}
       <strong>Hieronder zie je de producten in je "winkelmandje".</strong><br/>
       Door op de rode knop onderaan deze pagina te klikken wordt je bestelling <strong>geplaatst</strong> en
       ga je naar de betalingspagina.
+      {% endif %}
   </div>
   <!-- Table -->
   <table class="table">
@@ -74,7 +78,7 @@
 <form action="" method="post">{% csrf_token %}
     <a class="btn btn-primary" href="{% url 'view_products' %}" role="button"><span class="glyphicon glyphicon-arrow-left"></span> Bestelling wijzigen</a>
 
-    <button type="submit" class="btn btn-danger pull-right">
+    <button type="submit" class="btn btn-danger pull-right" {% if not order.has_products %}disabled{% endif %}>
       {% bootstrap_icon "euro" %} Bestelling plaatsen en betalen
     </button>
 </form>
