@@ -17,6 +17,7 @@
   <!-- Default panel contents -->
   <div class="panel-heading">
     <button type="submit" class="btn btn-success">Bestelling opslaan</button>
+    <a class="btn btn-warning pull-right" href="{% url 'finish_order' order.pk %}" role="button">Bestelling afronden</a>
   </div>
   <div class="panel-body">
   </div>
@@ -63,6 +64,7 @@
 
 <div class="panel-footer">
     <button type="submit" class="btn btn-success">Bestelling opslaan</button>
+    <a class="btn btn-warning pull-right" href="{% url 'finish_order' order.pk %}" role="button">Bestelling afronden</a>
 </div>
 
 </div>
