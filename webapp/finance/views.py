@@ -2,8 +2,9 @@ from braces.views import LoginRequiredMixin
 from django import forms
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
-from django.views.generic import TemplateView, FormView
+from django.views.generic import TemplateView, FormView, View
 from qantani import QantaniAPI
 from finance.models import Payment
 from django.contrib import messages
@@ -104,7 +105,7 @@ class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
 
 class ConfirmTransactionView(LoginRequiredMixin, QantaniMixin, TemplateView):
     """
-    Callback view, $bank redirects user back to this view after payment
+    $bank redirects user back to this view after payment
 
     Transaction details are sent in GET parameters.
 
@@ -138,3 +139,39 @@ class ConfirmTransactionView(LoginRequiredMixin, QantaniMixin, TemplateView):
         context['payment_succeeded'] = success
 
         return context
+
+
+class QantaniCallbackView(QantaniMixin, View):
+    """
+    For extra certainty. See http://www.easy-ideal.com/callback-url/
+    """
+
+    def get(self, request, *args, **kwargs):
+        transaction_id = request.GET.get('id')
+        transaction_status = request.GET.get('status')
+        transaction_salt = request.GET.get('salt')
+        transaction_checksum = request.GET.get('checksum1')
+
+        payment = get_object_or_404(Payment, transaction_id=transaction_id)
+        transaction_code = payment.transaction_code
+
+        success = self._validate_transaction(transaction_code, transaction_checksum,
+                                             transaction_id, transaction_status, transaction_salt)
+
+        if not success:
+            return HttpResponse("")  # Any other response than "+" means failure.
+
+        payment.succeeded = True
+        payment.save()
+
+        if payment.order.finalized is False:
+            # This means that the user paid, but closed the browser after confirming. The callback view enables
+            # us to finish the order anyway.
+            payment.order.finalized = True
+            payment.order.save()
+            payment.create_credit()
+
+            payment.order.mail_confirmation()
+            payment.order._notify_admins_about_new_order()
+
+        return HttpResponse("+")  # This is the official "success" response
