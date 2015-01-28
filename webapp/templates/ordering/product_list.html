@@ -16,10 +16,11 @@
 <div class="panel panel-default">
   <!-- Default panel contents -->
   <div class="panel-heading">
-    <button type="submit" class="btn btn-success">Bestelling opslaan</button>
-    <a class="btn btn-warning pull-right" href="{% url 'finish_order' order.pk %}" role="button">Bestelling afronden</a>
+    <a class="btn btn-warning" href="{% url 'finish_order' order.pk %}" role="button">Bestelling afronden</a>
+    <button type="submit" class="btn btn-success pull-right">Bestelling opslaan</button>
   </div>
   <div class="panel-body">
+      <strong>Onderstaande producten zijn leverbaar in bestelronde {{ current_order_round.id }}.</strong><br/>
   </div>
 
   <!-- Table -->
@@ -63,8 +64,8 @@
   </table>
 
 <div class="panel-footer">
-    <button type="submit" class="btn btn-success">Bestelling opslaan</button>
-    <a class="btn btn-warning pull-right" href="{% url 'finish_order' order.pk %}" role="button">Bestelling afronden</a>
+    <a class="btn btn-warning" href="{% url 'finish_order' order.pk %}" role="button">Bestelling afronden</a>
+    <button type="submit" class="btn btn-success pull-right">Bestelling opslaan</button>
 </div>
 
 </div>
