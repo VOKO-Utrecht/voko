@@ -143,6 +143,8 @@ class ProductOrder(LoginRequiredMixin, SingleObjectMixin, FormView):
 
 
 class OrderDisplay(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
+    ## TODO: Remove this view, as it has become redundant.
+    ## It is still used to link to from the user overview. We need a replacement for that.
     model = Order
     form_class = OrderProductForm
     success_url = "/hoera"
