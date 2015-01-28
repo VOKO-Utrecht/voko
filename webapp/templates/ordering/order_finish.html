@@ -4,8 +4,9 @@
 {% block content %}
 <h1>Bestelling plaatsen</h1>
 {% if object.order_round.is_open %}
-<div class="panel panel-default">
+<div class="panel panel-primary">
   <!-- Default panel contents -->
+  <div class="panel-heading">Je huidige bestelling</div>
   <div class="panel-body">
       {% if not order.has_products %}
           <strong>Je hebt nog geen producten in je bestelling!</strong>
@@ -76,6 +77,19 @@
 </div>
 
 <form action="" method="post">{% csrf_token %}
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-info">
+                <div class="panel-heading">Opmerkingen</div>
+                    <div class="panel-body">
+                    <p>We willen graag van je horen wat je van de vorige bestelronde vond. Je mag dit vak ook leeglaten.</p>
+                    <textarea class="form-control" rows="2" name="notes" placeholder="Opmerkingen"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <a class="btn btn-primary" href="{% url 'view_products' %}" role="button"><span class="glyphicon glyphicon-arrow-left"></span> Bestelling wijzigen</a>
 
     <button type="submit" class="btn btn-danger pull-right" {% if not order.has_products %}disabled{% endif %}>
