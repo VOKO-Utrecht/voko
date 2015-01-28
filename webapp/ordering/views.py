@@ -9,12 +9,18 @@ from django.views.generic.detail import SingleObjectMixin
 from ordering.core import get_or_create_order, get_order_product, update_totals_for_products_with_max_order_amounts
 from ordering.forms import OrderProductForm
 from ordering.mixins import UserOwnsObjectMixin
-from ordering.models import Product, OrderProduct, Order, Supplier
+from ordering.models import Product, OrderProduct, Order, Supplier, OrderRound
 
 
 class ProductsView(LoginRequiredMixin, ListView):
     def get_queryset(self):
-        return Product.objects.filter(order_round=self.request.current_order_round).order_by('name')
+        order_round = self.request.current_order_round
+
+        # Manual override to show product list of specific round
+        if 'round' in self.request.GET:
+            order_round = OrderRound.objects.get(id=int(self.request.GET.get('round')))
+
+        return Product.objects.filter(order_round=order_round).order_by('name')
 
     def post(self, request, *args, **kwargs):
         """
@@ -74,6 +80,11 @@ class ProductsView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(ProductsView, self).get_context_data(**kwargs)
         context['current_order_round'] = self.request.current_order_round
+
+        # Manual override to show product list of specific round
+        if 'round' in self.request.GET:
+            context['current_order_round'] = OrderRound.objects.get(id=int(self.request.GET.get('round')))
+
         context['order'] = get_or_create_order(self.request.user)
         return context
 
