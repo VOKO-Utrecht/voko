@@ -13,13 +13,6 @@ class OrderProductInline(admin.TabularInline):
     model = OrderProduct
 
 
-def set_order_collected(modeladmin, request, queryset):
-    for order in queryset:
-        order.collected = True
-        order.save()
-set_order_collected.short_description = "Bestelling opgehaald"
-
-
 def create_credit_for_order(modeladmin, request, queryset):
     for order in queryset:
         Balance.objects.create(user=order.user,
@@ -30,10 +23,10 @@ create_credit_for_order.short_description = "Contant betaald"
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ["id", "order_round", "user", "finalized", "collected", "total_price"]
+    list_display = ["id", "order_round", "user", "finalized", "total_price"]
     ordering = ("-id", )
     inlines = [OrderProductInline]
-    list_filter = ("finalized", "collected")
-    actions = (create_credit_for_order, set_order_collected)
+    list_filter = ("finalized", )
+    actions = (create_credit_for_order, )
 
 admin.site.register(Order, OrderAdmin)

@@ -99,8 +99,6 @@ class Order(TimeStampedModel):
 
     # If order has been paid
     finalized = models.BooleanField(default=False)
-    # Whether the order has been retrieved by the user
-    collected = models.BooleanField(default=False)
 
     debit = models.OneToOneField(Balance, null=True, blank=True)
 

@@ -35,7 +35,6 @@
         <th>UID</th>
         <th>Bedrag</th>
         <th>Bevestigd</th>
-        <th>Opgehaald</th>
       </tr>
     </thead>
     <tbody>
@@ -45,7 +44,6 @@
             <td><a href="{% if order.finalized %}{% url 'order_summary' order.pk %}{% else %}{% url 'view_order' order.pk  %}{% endif %}">Bestelling {{ order.user_order_id }}</a></td>
             <td>&euro; {{ order.total_price }}</td>
             <td>{% if order.finalized %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}</td>
-            <td>{% if order.collected %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}</td>
           </tr>
           {% endif %}
       {% endfor %}
