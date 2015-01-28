@@ -90,7 +90,7 @@ class MailOrderLists(CronJobBase):
                 filter(order_round=order_round).\
                 annotate(amount_sum=Sum('orderproducts__amount'))
 
-            c = Context({'object_list': object_list})
+            c = Context({'object_list': object_list}, use_l10n=True)
             csv = template.render(c)
 
             # Generate mail
