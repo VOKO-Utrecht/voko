@@ -149,12 +149,12 @@ class Order(TimeStampedModel):
 
     def _notify_admins_about_new_order(self):
         # This is most likely temporary
-        message = "Hoi!\n\nEr is een nieuwe bestelling van gebruiker %s.\n\nBestelling\n\n%s" % \
+        message = "Hoi!\n\nEr is een nieuwe bestelling van gebruiker %s.\n\nBestelling\n\n%s\n\nNotities\n\n%s" % \
                   (self.user, "\n".join(["%d x %s (%s)" % (op.amount, op.product.name, op.product.supplier)
-                                         for op in self.orderproducts.all()]))
+                                         for op in self.orderproducts.all()]), self.user_notes)
 
-        mail_admins("Bestelling bevestigd (#%d) van %s" % (self.pk, self.user), message,
-                    fail_silently=True)
+        mail_admins("Bestelling geplaatst: %s" % self.user, message,
+                    fail_silently=False)
 
     def create_and_link_debit(self):
         """
