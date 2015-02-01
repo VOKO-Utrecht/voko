@@ -154,7 +154,7 @@ class Order(TimeStampedModel):
                                          for op in self.orderproducts.all()]), self.user_notes)
 
         mail_admins("Bestelling geplaatst: %s" % self.user, message,
-                    fail_silently=False)
+                    fail_silently=True)
 
     def create_and_link_debit(self):
         """
