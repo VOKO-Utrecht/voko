@@ -49,9 +49,9 @@ class ProductsView(LoginRequiredMixin, ListView):
                 if value.isdigit() and product.maximum_total_order and int(value) > product.amount_available:
                     if product.is_available:
                         messages.add_message(self.request, messages.ERROR,
-                                             "Van het product %s van %s is nog %s x %s beschikbaar!"
+                                             "Van het product '%s' van %s is nog %s %s beschikbaar!"
                                              % (product.name, product.supplier.name, product.amount_available,
-                                                product.unit_of_measurement))
+                                                product.unit_of_measurement.lower()))
                     else:
                         messages.add_message(self.request, messages.ERROR, "Het product %s van %s is uitverkocht!"
                                              % (product.name, product.supplier.name))
@@ -75,7 +75,7 @@ class ProductsView(LoginRequiredMixin, ListView):
                 if value and int(value) > 0:
                     OrderProduct.objects.create(order=order, product=product, amount=int(value))
 
-        return redirect('view_products')
+        return redirect(reverse('finish_order', args=(order.pk,)))
 
     def get_context_data(self, **kwargs):
         context = super(ProductsView, self).get_context_data(**kwargs)

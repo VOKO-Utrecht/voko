@@ -10,14 +10,13 @@
     </div>
     {% endif %}
 
-<form method="post">
+<form method="post" id="order-form">
   {% csrf_token %}
 
 <div class="panel panel-default">
   <!-- Default panel contents -->
   <div class="panel-heading">
-    <a class="btn btn-warning" href="{% url 'finish_order' order.pk %}" role="button"><span class="glyphicon glyphicon-ok-sign"></span> Bestelling plaatsen</a>
-    <button type="submit" class="btn btn-success pull-right"><span class="glyphicon glyphicon-shopping-cart"></span> Bestelling opslaan</button>
+    <button type="submit" class="btn btn-success btn-save-order"><span class="glyphicon glyphicon-ok-sign"></span> Bestelling bevestigen</button>
   </div>
   <div class="panel-body">
       <strong>Onderstaande producten zijn leverbaar in bestelronde {{ current_order_round.id }}.</strong><br/>
@@ -64,8 +63,7 @@
   </table>
 
 <div class="panel-footer">
-    <a class="btn btn-warning" href="{% url 'finish_order' order.pk %}" role="button"><span class="glyphicon glyphicon-ok-sign"></span> Bestelling plaatsen</a>
-    <button type="submit" class="btn btn-success pull-right"><span class="glyphicon glyphicon-shopping-cart"></span> Bestelling opslaan</button>
+  <button type="submit" class="btn btn-success btn-save-order"><span class="glyphicon glyphicon-ok-sign"></span> Bestelling bevestigen</button>
 </div>
 
 </div>
@@ -75,4 +73,15 @@
     <strong>Helaas!</strong> De bestelronde is gesloten. Kom binnenkort terug!
 </div>
 {% endif %}
+{% endblock %}
+{% block javascript %}
+<script language="javascript">
+    $(".btn-finish-order").click(function(event) {
+        event.preventDefault();k
+        console.log("aaa");
+        $("#order-form").ajaxSubmit({type: 'post'});
+        console.log("bbb");
+        console.log($(".btn-finish-order").href);
+    });
+</script>
 {% endblock %}

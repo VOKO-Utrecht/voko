@@ -11,9 +11,15 @@
       {% if not order.has_products %}
           <strong>Je hebt nog geen producten in je bestelling!</strong>
       {% else %}
+      <p>
       <strong>Hieronder zie je de producten in je "winkelmandje".</strong><br/>
       Door op de rode knop onderaan deze pagina te klikken wordt je bestelling <strong>geplaatst</strong> en
-      ga je naar de betalingspagina.
+      ga je naar de betalingspagina.</p>
+      <p>
+          Als je een product niet hebt kunnen bestellen (zie eventuele melding bovenaan deze pagina) of als je
+          nog iets wilt wijzigen aan onderstaande bestelling,
+          <a href="{% url 'view_products' %}">klik dan hier om terug te gaan naar het productoverzicht</a>.
+      </p>
       {% endif %}
   </div>
   <!-- Table -->
