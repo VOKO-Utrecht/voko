@@ -9,6 +9,7 @@ from accounts.models import VokoUser, UserProfile
 from mailing.helpers import get_template_by_id, render_mail_template
 from ordering.core import get_current_order_round
 from ordering.models import Order
+from django.utils.safestring import mark_safe
 
 
 ACTIVATE_ACCOUNT_MAILTEMPLATE_ID = 1
@@ -65,6 +66,18 @@ class UserProfileInline(admin.StackedInline):
     model = UserProfile
 
 
+# https://djangosnippets.org/snippets/1650/
+def roles(self):
+    short_name = lambda x: unicode(x)[:3].upper()
+    p = sorted([u"<a title='%s'>%s</a>" % (x, short_name(x)) for x in self.groups.all()])
+    if self.user_permissions.count():
+        p += ['+']
+    value = ', '.join(p)
+    return mark_safe("<nobr>%s</nobr>" % value)
+roles.allow_tags = True
+roles.short_description = u'Groups'
+
+
 class VokoUserAdmin(UserAdmin):
     # Set the add/modify forms
     add_form = VokoUserCreationForm
@@ -73,7 +86,7 @@ class VokoUserAdmin(UserAdmin):
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
     list_display = ("first_name", "last_name", "email", "email_confirmed", "can_activate", "is_active", "is_staff",
-                    "created", 'finished_orders_curr_OR', 'debit', 'credit')
+                    "created", 'finished_orders_curr_OR', 'debit', 'credit', roles)
     list_filter = ("is_staff", "is_superuser", "is_active", "groups")
     search_fields = ("email", 'first_name', 'last_name')
     ordering = ("-created", )
