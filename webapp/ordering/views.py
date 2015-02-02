@@ -58,7 +58,7 @@ class ProductsView(LoginRequiredMixin, ListView):
                     value = 0
 
                 # User deleted a product
-                if not value.isdigit():
+                if type(value) == str and not value.isdigit():
                     value = 0
                 if not int(value):
                     if order_product:
