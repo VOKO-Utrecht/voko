@@ -6,6 +6,7 @@ from django.db import models
 from django_extensions.db.models import TimeStampedModel
 from accounts.models import Address
 from finance.models import Balance
+from log import log_event
 from mailing.helpers import mail_user, get_template_by_id, render_mail_template
 from ordering.core import get_or_create_order, get_current_order_round
 from django.conf import settings
@@ -146,6 +147,12 @@ class Order(TimeStampedModel):
         for index, uo in enumerate(user_orders):
             if uo == self:
                 return index + 1
+
+    def remove_debit_when_unfinalized(self):
+        if not self.finalized and self.debit:
+            log_event(event="Removing debit '%s' from order '%s' because it is not finalized" % (self.debit, self))
+            self.debit.delete()
+            self.save()  # might be unnecessary
 
     def _notify_admins_about_new_order(self):
         # This is most likely temporary

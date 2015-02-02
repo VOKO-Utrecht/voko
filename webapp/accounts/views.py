@@ -8,6 +8,7 @@ from accounts.forms import VokoUserCreationForm, VokoUserFinishForm, RequestPass
 from accounts.models import EmailConfirmation, VokoUser, PasswordResetRequest
 from django.conf import settings
 import log
+from ordering.core import get_or_create_order
 
 
 class LoginView(AnonymousRequiredMixin, FormView):
@@ -77,6 +78,11 @@ class EmailConfirmView(AnonymousRequiredMixin, DetailView):
 
 class OverView(LoginRequiredMixin, TemplateView):
     template_name = "accounts/overview.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        order = get_or_create_order(request.user)
+        order.remove_debit_when_unfinalized()
+        return super(OverView, self).dispatch(request, *args, **kwargs)
 
     def current_order_round(self):
         return self.request.current_order_round

@@ -136,6 +136,9 @@ class ConfirmTransactionView(LoginRequiredMixin, QantaniMixin, TemplateView):
             payment.order.mail_confirmation()
             payment.order._notify_admins_about_new_order()
 
+        else:
+            payment.order.remove_debit_when_unfinalized()
+
         context['payment_succeeded'] = success
 
         return context

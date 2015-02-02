@@ -193,6 +193,7 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         update_totals_for_products_with_max_order_amounts(self.get_object())
+        self.get_object().remove_debit_when_unfinalized()
         return super(UpdateView, self).get_context_data(**kwargs)
 
     def post(self, request, *args, **kwargs):
