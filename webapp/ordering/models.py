@@ -150,10 +150,15 @@ class Order(TimeStampedModel):
 
     def remove_debit_when_unfinalized(self):
         if not self.finalized and self.debit:
-            log_event(event="Removing debit '%s' from order '%s' because it is not finalized" % (self.debit, self))
-            self.debit.delete()
+            log_event(event="Removing debit '%s' from order '%s' because it is not finalized" % (self.debit, self),
+                      user=self.user)
+
+            # Unlink debit
+            _debit = self.debit
             self.debit = None
-            self.save()  # might be unnecessary
+            self.save()
+
+            _debit.delete()
 
     def _notify_admins_about_new_order(self):
         # This is most likely temporary
