@@ -53,12 +53,12 @@ class ProductsView(LoginRequiredMixin, ListView):
                                              % (product.name, product.supplier.name, product.amount_available,
                                                 product.unit_of_measurement.lower()))
                     else:
-                        messages.add_message(self.request, messages.ERROR, "Het product %s van %s is uitverkocht!"
+                        messages.add_message(self.request, messages.ERROR, "Het product '%s' van %s is uitverkocht!"
                                              % (product.name, product.supplier.name))
                     value = 0
 
                 # User deleted a product
-                if not value:
+                if not int(value):
                     if order_product:
                         order_product.delete()
                     continue
