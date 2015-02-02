@@ -79,10 +79,11 @@ class EmailConfirmView(AnonymousRequiredMixin, DetailView):
 class OverView(LoginRequiredMixin, TemplateView):
     template_name = "accounts/overview.html"
 
-    def dispatch(self, request, *args, **kwargs):
-        order = get_or_create_order(request.user)
-        order.remove_debit_when_unfinalized()
-        return super(OverView, self).dispatch(request, *args, **kwargs)
+    def get_context_data(self, **kwargs):
+        if self.request.user.id:
+            order = get_or_create_order(self.request.user)
+            order.remove_debit_when_unfinalized()
+            return super(OverView, self).get_context_data(**kwargs)
 
     def current_order_round(self):
         return self.request.current_order_round
