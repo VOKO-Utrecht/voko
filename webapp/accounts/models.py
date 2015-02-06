@@ -35,6 +35,7 @@ class UserProfile(TimeStampedModel):
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="userprofile")
     address = models.ForeignKey(Address)
+    phone_number = models.CharField(max_length=12, blank=True)
     notes = models.TextField()
     
     def __unicode__(self):
