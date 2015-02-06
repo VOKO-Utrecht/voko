@@ -66,8 +66,8 @@ class UserProfileInline(admin.StackedInline):
     model = UserProfile
 
 
-# https://djangosnippets.org/snippets/1650/
 def roles(self):
+    # https://djangosnippets.org/snippets/1650/
     short_name = lambda x: unicode(x)[:3].upper()
     p = sorted([u"<a title='%s'>%s</a>" % (x, short_name(x)) for x in self.groups.all()])
     if self.user_permissions.count():
@@ -78,6 +78,10 @@ roles.allow_tags = True
 roles.short_description = u'Groups'
 
 
+def phone(self):
+    return self.userprofile.phone_number
+
+
 class VokoUserAdmin(UserAdmin):
     # Set the add/modify forms
     add_form = VokoUserCreationForm
@@ -85,8 +89,8 @@ class VokoUserAdmin(UserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ("first_name", "last_name", "email", "email_confirmed", "can_activate", "is_active", "is_staff",
-                    "created", 'finished_orders_curr_OR', 'debit', 'credit', roles)
+    list_display = ("first_name", "last_name", "email", phone, "email_confirmed", "can_activate", "is_active", "is_staff",
+                    "created", 'orders_round', 'debit', 'credit', roles)
     list_filter = ("is_staff", "is_superuser", "is_active", "groups")
     search_fields = ("email", 'first_name', 'last_name')
     ordering = ("-created", )
@@ -117,7 +121,8 @@ class VokoUserAdmin(UserAdmin):
         return False
     email_confirmed.boolean = True
 
-    def finished_orders_curr_OR(self, obj):
+    def orders_round(self, obj):
+        ## Orders in this round
         current_order_round = get_current_order_round()
         orders = Order.objects.filter(order_round=current_order_round,
                                       user=obj,

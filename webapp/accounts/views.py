@@ -156,7 +156,7 @@ class PasswordResetFinishedView(AnonymousRequiredMixin, TemplateView):
 
 class EditProfileView(LoginRequiredMixin, UpdateView):
     form_class = ChangeProfileForm
-    success_url = "/"
+    success_url = "/accounts/profile"
     template_name = "accounts/profile.html"
 
     def get_object(self, queryset=None):
