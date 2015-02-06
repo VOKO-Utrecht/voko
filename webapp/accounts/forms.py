@@ -28,6 +28,7 @@ class VokoUserFinishForm(forms.ModelForm):
         fields = ()
 
     zip_code = forms.CharField(label="Postcode", widget=forms.TextInput)
+    phone_number = forms.CharField(label="Telefoonnummer (optioneel)", widget=forms.TextInput, required=False)
 
     password1 = forms.CharField(label="Wachtwoord", widget=forms.PasswordInput)
     password2 = forms.CharField(label="Wachtwoord (bevestiging)", widget=forms.PasswordInput)
@@ -45,7 +46,7 @@ class VokoUserFinishForm(forms.ModelForm):
 
         return password2
 
-    # TODO: clean_zip_code
+    # TODO: clean_zip_code and phone number
 
     def _notify_admins_about_activated_user(self, user):
         # This is most likely temporary
@@ -70,7 +71,9 @@ Gebruiker %s heeft zojuist zijn/haar registratie afgerond..
                 user.save()
 
             # Lastly, link the two
-            UserProfile.objects.create(user=user, address=address, notes=self.cleaned_data['notes'])
+            UserProfile.objects.create(user=user, address=address,
+                                       notes=self.cleaned_data['notes'],
+                                       phone_number=self.cleaned_data['phone_number'])
 
             self._notify_admins_about_activated_user(user)
             log.log_event(user=user, event="User finished registration")
