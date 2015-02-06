@@ -1,6 +1,7 @@
 from django.conf.urls import patterns, url
 from .views import LoginView, RegisterView, RequestPasswordResetView, EmailConfirmView, FinishRegistration, RegisterThanksView, \
-    WelcomeView, OverView, PasswordResetRequestDoneView, PasswordResetView, PasswordResetFinishedView, LogoutView
+    WelcomeView, OverView, PasswordResetRequestDoneView, PasswordResetView, PasswordResetFinishedView, LogoutView, \
+    EditProfileView
 
 urlpatterns = patterns('',
     url(r'^login/$', LoginView.as_view(), name="login"),
@@ -15,4 +16,5 @@ urlpatterns = patterns('',
     url(r'^passwordreset/reset/(?P<pk>[0-9a-zA-Z\-]+)$', PasswordResetView.as_view(), name="reset_pass"),
     url(r'^welcome/$', WelcomeView.as_view()),
     url(r'^overview/$', OverView.as_view(), name='overview'),
+    url(r'^profile/$', EditProfileView.as_view(), name='profile'),
 )

@@ -114,3 +114,60 @@ class PasswordResetForm(forms.Form):
             raise forms.ValidationError(msg)
 
         return password2
+
+
+class ChangeProfileForm(forms.ModelForm):
+    class Meta:
+        model = VokoUser
+        fields = ('first_name', 'last_name')
+
+    zip_code = forms.CharField(label="Postcode", widget=forms.TextInput)
+    phone_number = forms.CharField(label="Telefoonnummer (optioneel)", widget=forms.TextInput, required=False)
+
+    password1 = forms.CharField(label="Wachtwoord", widget=forms.PasswordInput, required=False)
+    password2 = forms.CharField(label="Wachtwoord (bevestiging)", widget=forms.PasswordInput, required=False)
+
+    # TODO: Notes and e-mail address cannot be changed atm.
+
+    def __init__(self, *args, **kwargs):
+        super(ChangeProfileForm, self).__init__(*args, **kwargs)
+        self.fields['zip_code'].initial = self.instance.userprofile.address.zip_code
+        self.fields['phone_number'].initial = self.instance.userprofile.phone_number
+
+    def clean_password2(self):
+        # Check that the two password entries match
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+
+        if password1 and password2 and password1 != password2:
+            msg = "Wachtwoorden zijn niet identiek!"
+            raise forms.ValidationError(msg)
+
+        return password2
+
+    # TODO: clean_zip_code and phone number
+
+    def save(self, commit=True):
+        with transaction.atomic():
+            # Update user
+            user = super(ChangeProfileForm, self).save()
+
+            if self.cleaned_data['password1']:
+                user.set_password(self.cleaned_data["password1"])
+
+            # Profile
+            userprofile = user.userprofile
+            userprofile.phone_number = self.cleaned_data['phone_number']
+
+            # And address
+            address = user.userprofile.address
+            address.zip_code = self.cleaned_data['zip_code']
+
+            if commit:
+                user.save()
+                userprofile.save()
+                address.save()
+
+            log.log_event(user=user, event="User changed profile")
+
+        return user

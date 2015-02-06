@@ -1,10 +1,13 @@
 from braces.views import AnonymousRequiredMixin, LoginRequiredMixin
+from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
+from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.shortcuts import redirect
 from django.views.generic import FormView, DetailView, UpdateView, TemplateView, View
-from accounts.forms import VokoUserCreationForm, VokoUserFinishForm, RequestPasswordResetForm, PasswordResetForm
+from accounts.forms import VokoUserCreationForm, VokoUserFinishForm, RequestPasswordResetForm, PasswordResetForm, \
+    ChangeProfileForm
 from accounts.models import EmailConfirmation, VokoUser, PasswordResetRequest
 from django.conf import settings
 import log
@@ -150,3 +153,16 @@ class PasswordResetView(AnonymousRequiredMixin, FormView, DetailView):
 class PasswordResetFinishedView(AnonymousRequiredMixin, TemplateView):
     template_name = "accounts/passwordreset_finished.html"
 
+
+class EditProfileView(LoginRequiredMixin, UpdateView):
+    form_class = ChangeProfileForm
+    success_url = "/"
+    template_name = "accounts/profile.html"
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def form_valid(self, form):
+        messages.add_message(self.request, messages.SUCCESS,
+                             "Je profiel is aangepast.")
+        return super(EditProfileView, self).form_valid(form)
