@@ -1,3 +1,4 @@
+from django.conf import settings
 import log
 from django.core.mail import send_mail
 from django.template import Template, Context
@@ -21,7 +22,11 @@ def render_mail_template(template, **kwargs):
 
 
 def get_template_by_id(template_id):
-    return MailTemplate.objects.get(id=template_id)
+    try:
+        return MailTemplate.objects.get(id=template_id)
+    except MailTemplate.DoesNotExist:
+        if settings.DEBUG:
+            return MailTemplate(title="TEST")
 
 
 def mail_user(user, subject, html_body, plain_body):
