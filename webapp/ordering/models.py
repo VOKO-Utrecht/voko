@@ -43,7 +43,7 @@ class OrderRound(TimeStampedModel):
     collect_datetime = models.DateTimeField()
     # TODO: Set default values to the values of previous object
     markup_percentage = models.DecimalField(decimal_places=2, max_digits=5, default=7.0)
-    transaction_costs = models.DecimalField(decimal_places=2, max_digits=5, default=0.35)
+    transaction_costs = models.DecimalField(decimal_places=2, max_digits=5, default=0.42)
     order_placed = models.BooleanField(default=False)
     suppliers_reminder_sent = models.BooleanField(default=False)
 
