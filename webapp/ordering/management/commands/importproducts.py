@@ -35,8 +35,9 @@ class Command(BaseCommand):
                     maximum = int(maximum) if maximum else None
 
                     # Strip off euro sign
-                    if not price.isdigit():
-                        price = price[3:]
+                    if ' ' in price:
+                        price = price.split(" ")[1]
+                    
                     price = float(price)
                     # print "PRICE: %s -> %s" % (old_price, price)
 
