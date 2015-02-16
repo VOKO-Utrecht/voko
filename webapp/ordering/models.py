@@ -257,6 +257,7 @@ class Product(TimeStampedModel):
         ('Half pond', 'Half pond (250g)'),
         ('Pond',  'Pond (500g)'),
         ('Kilogram', 'Kilogram'),
+        ('5 Kilogram', '5 Kilogram'),
         ('Deciliter', 'Deciliter (100ml)'),
         ('Liter',  'Liter'),
     )
