@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.db.models.loading import get_models, get_app
 from finance.models import Balance
-from .models import Order, OrderProduct
+from .models import Order, OrderProduct, Product
 
 for model in get_models(get_app('ordering')):
-    if model == Order:
+    if model in (Order, Product):
         continue
     admin.site.register(model)
 
@@ -30,3 +30,11 @@ class OrderAdmin(admin.ModelAdmin):
     actions = (create_credit_for_order, )
 
 admin.site.register(Order, OrderAdmin)
+
+
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ["order_round", "supplier", "name", "base_price", "maximum_total_order"]
+    ordering = ("-id", )
+    list_filter = ("order_round", "supplier")
+
+admin.site.register(Product, ProductAdmin)
