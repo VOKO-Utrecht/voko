@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.db.models.loading import get_models, get_app
 from finance.models import Balance
-from .models import Order, OrderProduct, Product
+from .models import Order, OrderProduct, Product, OrderRound
 
 for model in get_models(get_app('ordering')):
-    if model in (Order, Product):
+    if model in (Order, Product, OrderRound):
         continue
     admin.site.register(model)
 
@@ -38,3 +38,12 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ("order_round", "supplier")
 
 admin.site.register(Product, ProductAdmin)
+
+
+class OrderRoundAdmin(admin.ModelAdmin):
+    list_display = ["id", "open_for_orders", "closed_for_orders", "collect_datetime",
+                    "markup_percentage", "transaction_costs", "order_placed", "suppliers_reminder_sent"]
+    ordering = ("-id", )
+
+admin.site.register(OrderRound, OrderRoundAdmin)
+
