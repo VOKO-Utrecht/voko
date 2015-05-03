@@ -249,7 +249,7 @@ class OrderProductCorrection(TimeStampedModel):
 class ProductCategory(TimeStampedModel):
     class Meta:
         verbose_name = "Productcategorie"
-        verbose_name_plural = "Productcategoriën"
+        verbose_name_plural = "Productcategorieën"
 
     name = models.CharField(max_length=100)
 
