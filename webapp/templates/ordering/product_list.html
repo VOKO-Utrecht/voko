@@ -86,12 +86,24 @@
 {% endblock %}
 {% block javascript %}
 <script language="javascript">
-    $(".btn-finish-order").click(function(event) {
-        event.preventDefault();k
-        console.log("aaa");
-        $("#order-form").ajaxSubmit({type: 'post'});
-        console.log("bbb");
-        console.log($(".btn-finish-order").href);
-    });
+    {# Let's generate some JS for the categories #}
+    $("#all-products").click(function(event) {
+            show_all_products();
+    }) ;
+
+    {% for category in view.categories %}
+        $("#category-{{ category.name }}").click(function(event) {
+            show_products_of_category("{{ category.name }}");
+        }) ;
+    {% endfor %}
+
+    function show_all_products() {
+        $(".product").fadeIn();
+    }
+
+    function show_products_of_category(category) {
+        $(".product").fadeOut();
+        $(".product.category-"+ category).fadeIn();
+    }
 </script>
 {% endblock %}
