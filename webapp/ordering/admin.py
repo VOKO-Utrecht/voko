@@ -33,7 +33,7 @@ admin.site.register(Order, OrderAdmin)
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ["order_round", "supplier", "name", "base_price", "maximum_total_order"]
+    list_display = ["name", "order_round", "supplier", "base_price", "maximum_total_order"]
     ordering = ("-id", )
     list_filter = ("order_round", "supplier")
 
