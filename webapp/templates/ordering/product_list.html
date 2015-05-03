@@ -29,6 +29,7 @@
             {% for category in view.categories %}
               <li role="presentation"><a href="#" role="tab" id="category-{{ category.id }}" data-toggle="tab">{{ category.name }}</a></li>
             {% endfor %}
+          <li role="presentation"><a href="#" id="no-category" role="tab" data-toggle="tab">Overig</a></li>
          </ul>
     </div>
 
@@ -46,7 +47,7 @@
     </thead>
     <tbody>
       {% for product in view.products %}
-      <tr class="product{% if product.category %} category-{{ product.category.id }}{% endif %}">
+      <tr class="product {% if product.category %}category-{{ product.category.id }}{% else %}no-category{% endif %}">
         <td class="col-md-1"><a href="{% url 'view_product' product.pk %}">{{ product.name|title }}</a></td>
         <td class="col-md-2"><a href="{% url 'view_supplier' product.supplier.pk %}">{{ product.supplier }}</a></td>
         <td class="col-md-5">{{ product.description }}</td>
@@ -91,6 +92,10 @@
             show_all_products();
     }) ;
 
+    $("#no-category").click(function(event) {
+            show_uncategorized_products();
+    }) ;
+
     {% for category in view.categories %}
         $("#category-{{ category.id }}").click(function(event) {
             show_products_of_category("{{ category.id }}");
@@ -105,5 +110,11 @@
         $(".product").fadeOut();
         $(".product.category-"+ category).fadeIn();
     }
+
+    function show_uncategorized_products() {
+        $(".product").fadeOut();
+        $(".product.no-category").fadeIn();
+    }
+
 </script>
 {% endblock %}
