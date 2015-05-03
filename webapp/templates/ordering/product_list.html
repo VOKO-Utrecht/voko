@@ -27,7 +27,7 @@
         <ul id="myTab" class="nav nav-tabs nav-justified" role="tablist">
           <li role="presentation" class="active"><a href="#" id="all-products" role="tab" data-toggle="tab">Alle producten</a></li>
             {% for category in view.categories %}
-              <li role="presentation"><a href="#" role="tab" id="category-{{ category.name }}" data-toggle="tab">{{ category.name }}</a></li>
+              <li role="presentation"><a href="#" role="tab" id="category-{{ category.id }}" data-toggle="tab">{{ category.name }}</a></li>
             {% endfor %}
          </ul>
     </div>
@@ -46,7 +46,7 @@
     </thead>
     <tbody>
       {% for product in view.products %}
-      <tr class="product{% if product.category %} category-{{ product.category }}{% endif %}">
+      <tr class="product{% if product.category %} category-{{ product.category.id }}{% endif %}">
         <td class="col-md-1"><a href="{% url 'view_product' product.pk %}">{{ product.name|title }}</a></td>
         <td class="col-md-2"><a href="{% url 'view_supplier' product.supplier.pk %}">{{ product.supplier }}</a></td>
         <td class="col-md-5">{{ product.description }}</td>
@@ -92,8 +92,8 @@
     }) ;
 
     {% for category in view.categories %}
-        $("#category-{{ category.name }}").click(function(event) {
-            show_products_of_category("{{ category.name }}");
+        $("#category-{{ category.id }}").click(function(event) {
+            show_products_of_category("{{ category.id }}");
         }) ;
     {% endfor %}
 
