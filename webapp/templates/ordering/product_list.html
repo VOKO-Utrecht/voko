@@ -22,6 +22,16 @@
       <strong>Onderstaande producten zijn leverbaar in bestelronde {{ current_order_round.id }}.</strong><br/>
   </div>
 
+    <!-- Categories -->
+    <div role="tabpanel" data-example-id="togglable-tabs">
+        <ul id="myTab" class="nav nav-tabs nav-justified" role="tablist">
+          <li role="presentation" class="active"><a href="#" id="all-products" role="tab" data-toggle="tab">Alle producten</a></li>
+            {% for category in view.categories %}
+              <li role="presentation"><a href="#" role="tab" id="category-{{ category.name }}" data-toggle="tab">{{ category.name }}</a></li>
+            {% endfor %}
+         </ul>
+    </div>
+
   <!-- Table -->
   <table class="table table-striped">
     <thead>

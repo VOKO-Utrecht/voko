@@ -9,7 +9,7 @@ from django.views.generic.detail import SingleObjectMixin
 from ordering.core import get_or_create_order, get_order_product, update_totals_for_products_with_max_order_amounts
 from ordering.forms import OrderProductForm
 from ordering.mixins import UserOwnsObjectMixin
-from ordering.models import Product, OrderProduct, Order, Supplier, OrderRound
+from ordering.models import Product, OrderProduct, Order, Supplier, OrderRound, ProductCategory
 
 
 class ProductsView(LoginRequiredMixin, ListView):
@@ -101,6 +101,9 @@ class ProductsView(LoginRequiredMixin, ListView):
             if prod.orderproducts.filter(order=order):
                 prod.ordered_amount = prod.orderproducts.get(order=order).amount
         return qs
+
+    def categories(self):
+        return ProductCategory.objects.all()
 
 
 class ProductDetail(LoginRequiredMixin, View):
