@@ -15,6 +15,10 @@
         <td>{{ object.description }}</td>
       </tr>
       <tr>
+        <td><strong>Categorie</strong></td>
+        <td>{% if object.category %}{{ object.category }}{% else %}Geen{% endif %}</td>
+      </tr>
+      <tr>
         <td><strong>Besteleenheid</strong></td>
         <td>{{ object.unit_of_measurement }}</td>
       </tr>
