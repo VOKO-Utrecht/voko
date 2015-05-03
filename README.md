@@ -16,3 +16,16 @@
 2. new shell
 3. mkvirtualenv vokou
 4. ...
+
+## Supervisor config
+```yaml
+[program:gunicorn]
+environment=
+    DJANGO_SETTINGS_MODULE=vokou.settings.production
+command=/home/voko/vokou/webapp/gunicorn.sh
+directory=/home/voko/vokou/webapp
+user=voko
+autostart=true
+autorestart=true
+redirect_stderr=true
+```
