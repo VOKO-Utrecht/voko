@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import pytz
 from datetime import datetime
 from decimal import Decimal, ROUND_UP, ROUND_DOWN
@@ -244,6 +246,17 @@ class OrderProductCorrection(TimeStampedModel):
         super(OrderProductCorrection, self).save(*args, **kwargs)
 
 
+class ProductCategory(TimeStampedModel):
+    class Meta:
+        verbose_name = "Productcategorie"
+        verbose_name_plural = "Productcategoriën"
+
+    name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
+
+
 class Product(TimeStampedModel):
     class Meta:
         verbose_name = "Product"
@@ -268,6 +281,7 @@ class Product(TimeStampedModel):
     base_price = models.DecimalField(max_digits=6, decimal_places=2)
     supplier = models.ForeignKey("Supplier", related_name="products")
     order_round = models.ForeignKey("OrderRound", related_name="products")
+    category = models.ForeignKey("ProductCategory", related_name="products", null=True, blank=True)
 
     minimum_total_order = models.IntegerField(null=True, blank=True)
     maximum_total_order = models.IntegerField(null=True, blank=True)
