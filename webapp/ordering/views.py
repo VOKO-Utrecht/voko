@@ -103,7 +103,7 @@ class ProductsView(LoginRequiredMixin, ListView):
         return qs
 
     def categories(self):
-        return ProductCategory.objects.all()
+        return ProductCategory.objects.all().order_by('name')
 
 
 class ProductDetail(LoginRequiredMixin, View):
