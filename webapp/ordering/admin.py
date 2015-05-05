@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.db.models.loading import get_models, get_app
+import sys
 from finance.models import Balance
-from .models import Order, OrderProduct, Product, OrderRound
+from .models import Order, OrderProduct, Product, OrderRound, ProductCategory
 
 for model in get_models(get_app('ordering')):
     if model in (Order, Product, OrderRound):
@@ -32,10 +33,38 @@ class OrderAdmin(admin.ModelAdmin):
 admin.site.register(Order, OrderAdmin)
 
 
+# Generate actions for categories
+def generate_action(category):
+    def fn(modeladmin, request, queryset):
+        for product in queryset:
+            product.category = category
+            product.save()
+    return fn
+
+thismodule = sys.modules[__name__]
+
+prod_cat_actions = []
+for category in ProductCategory.objects.all():
+    setattr(thismodule, "fn_%s" % category.id, generate_action(category))
+    fn = getattr(thismodule, "fn_%s" % category.id)
+    fn.short_description = "Set category to '%s'" % category.name
+    fn.__name__ = str(category.id)
+    prod_cat_actions.append(fn)
+
+
+def remove_category(_, __, queryset):
+    for product in queryset:
+        product.category = None
+        product.save()
+remove_category.short_description = "Remove category from product"
+prod_cat_actions.append(remove_category)
+
+
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ["name", "order_round", "supplier", "base_price", "maximum_total_order"]
+    list_display = ["name", "order_round", "supplier", "category", "base_price", "maximum_total_order"]
     ordering = ("-id", )
-    list_filter = ("order_round", "supplier")
+    list_filter = ("order_round", "supplier", "category")
+    actions = prod_cat_actions
 
 admin.site.register(Product, ProductAdmin)
 
