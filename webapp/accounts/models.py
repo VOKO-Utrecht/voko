@@ -89,7 +89,7 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     objects = VokoUserManager()
 
     def get_full_name(self):
-        return "%s %s" % (self.first_name, self.last_name)
+        return u"%s %s" % (self.first_name, self.last_name)
 
     def get_short_name(self):
         return self.email
@@ -137,7 +137,7 @@ class EmailConfirmation(TimeStampedModel):
         mail_user(self.user, *rendered_template_vars)
 
     def __unicode__(self):
-        return "Confirmed: %s | user: %s | email: %s" % (self.is_confirmed, self.user, self.user.email)
+        return "Confirmed: %s | user: %s | email: %s" % (self.is_confirmed, self.user.get_full_name(), self.user.email)
 
 
 class PasswordResetRequest(TimeStampedModel):
