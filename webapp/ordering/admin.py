@@ -65,6 +65,7 @@ class ProductAdmin(admin.ModelAdmin):
     ordering = ("-id", )
     list_filter = ("order_round", "supplier", "category")
     actions = prod_cat_actions
+    list_per_page = 500
 
 admin.site.register(Product, ProductAdmin)
 
