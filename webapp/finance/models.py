@@ -56,6 +56,6 @@ class Balance(models.Model):
     notes = models.TextField()
 
     def __unicode__(self):
-        return "[%s] %s: %s" % (self.user, self.type, self.amount)
+        return u"[%s] %s: %s" % (self.user, self.type, self.amount)
 
     objects = BalanceManager()
