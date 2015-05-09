@@ -90,7 +90,7 @@ class VokoUserAdmin(UserAdmin):
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
     list_display = ("first_name", "last_name", "email", phone, "email_confirmed", "can_activate", "is_active", "is_staff",
-                    "created", 'orders_round', 'debit', 'credit', roles)
+                    "created", 'orders_round', 'debit', 'credit', 'total_orders', roles)
     list_filter = ("is_staff", "is_superuser", "is_active", "groups")
     search_fields = ("email", 'first_name', 'last_name')
     ordering = ("-created", )
@@ -134,6 +134,9 @@ class VokoUserAdmin(UserAdmin):
 
     def credit(self, obj):
         return obj.balance.credit()
+
+    def total_orders(self, obj):
+        return Order.objects.filter(user=obj, finalized=True).count()
 
 admin.site.register(VokoUser, VokoUserAdmin)
 
