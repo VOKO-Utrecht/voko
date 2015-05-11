@@ -23,3 +23,17 @@ ALLOWED_HOSTS = ("leden.vokoutrecht.nl",)
 QANTANI_MERCHANT_ID = os.environ["QANTANI_MERCHANT_ID"]
 QANTANI_MERCHANT_KEY = os.environ["QANTANI_MERCHANT_KEY"]
 QANTANI_MERCHANT_SECRET = os.environ["QANTANI_MERCHANT_SECRET"]
+
+INSTALLED_APPS += (
+    "opbeat.contrib.django",
+)
+
+OPBEAT = {
+    "ORGANIZATION_ID": os.environ["OPBEAT_ORGANIZATION_ID"],
+    "APP_ID": os.environ["OPBEAT_APP_ID"],
+    "SECRET_TOKEN": os.environ["OPBEAT_SECRET"]
+}
+
+MIDDLEWARE_CLASSES = (
+    'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
+) + MIDDLEWARE_CLASSES
