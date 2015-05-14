@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from jsonfield import JSONField
 
 import pytz
 from datetime import datetime
@@ -329,3 +330,18 @@ class Product(TimeStampedModel):
                 supplied_percentage=0,
                 notes='Product niet geleverd: "%s" (%s) [%s]' % (self.name, self.supplier.name, self.id)
             )
+
+
+class DraftProduct(TimeStampedModel):
+    data = JSONField()
+    supplier = models.ForeignKey(Supplier)
+    order_round = models.ForeignKey(OrderRound)
+
+    def __unicode__(self):
+        return "Draft Product %d" % self.id
+
+    def validate(self):
+        pass  # TODO
+
+    def create_product(self):
+        pass  # TODO
