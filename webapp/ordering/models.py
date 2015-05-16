@@ -107,7 +107,7 @@ class Order(TimeStampedModel):
     debit = models.OneToOneField(Balance, null=True, blank=True)
 
     def __unicode__(self):
-        return "Order %d; value: E%s; user: %s" % (self.id, self.total_price, self.user)
+        return u"Order %d; value: E%s; user: %s" % (self.id, self.total_price, self.user)
 
     @property
     def has_products(self):
@@ -206,7 +206,7 @@ class OrderProduct(TimeStampedModel):
     amount = models.IntegerField(verbose_name="Aantal")
 
     def __unicode__(self):
-        return "%d x %s" % (self.amount, self.product)
+        return u"%d x %s" % (self.amount, self.product)
 
     @property
     def total_price(self):
@@ -224,7 +224,7 @@ class OrderProductCorrection(TimeStampedModel):
     credit = models.OneToOneField(Balance)
 
     def __unicode__(self):
-        return "Correction on OrderProduct: %s" % self.order_product
+        return u"Correction on OrderProduct: %s" % self.order_product
 
     def calculate_refund(self):
         return Decimal((self.order_product.total_price / 100) * (100 - self.supplied_percentage))\
@@ -287,7 +287,7 @@ class Product(TimeStampedModel):
     maximum_total_order = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
-        return '[ronde %s] %s (%s)' % (self.order_round.pk, self.name, self.supplier)
+        return u'[ronde %s] %s (%s)' % (self.order_round.pk, self.name, self.supplier)
 
     @property
     def retail_price(self):
