@@ -10,6 +10,7 @@ from mailing.helpers import get_template_by_id, render_mail_template
 from ordering.core import get_current_order_round
 from ordering.models import Order
 from django.utils.safestring import mark_safe
+from hijack.admin import HijackUserAdminMixin
 
 
 ACTIVATE_ACCOUNT_MAILTEMPLATE_ID = 1
@@ -82,7 +83,7 @@ def phone(self):
     return self.userprofile.phone_number
 
 
-class VokoUserAdmin(UserAdmin):
+class VokoUserAdmin(UserAdmin, HijackUserAdminMixin):
     # Set the add/modify forms
     add_form = VokoUserCreationForm
     form = VokoUserChangeForm
@@ -90,7 +91,7 @@ class VokoUserAdmin(UserAdmin):
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
     list_display = ("first_name", "last_name", "email", phone, "email_confirmed", "can_activate", "is_active", "is_staff",
-                    "created", 'orders_round', 'debit', 'credit', 'total_orders', roles)
+                    "created", 'orders_round', 'debit', 'credit', 'total_orders', roles, 'hijack_field')
     list_filter = ("is_staff", "is_superuser", "is_active", "groups")
     search_fields = ("email", 'first_name', 'last_name')
     ordering = ("-created", )

@@ -34,6 +34,7 @@ INSTALLED_APPS = (
     'finance',
     'ordering',
     'mailing',
+    'hijack',
 
     "django_cron",
 )
@@ -93,3 +94,5 @@ TINYMCE_DEFAULT_CONFIG = {
     "width": "75%",
     "height": "500px",
 }
+
+SHOW_HIJACKUSER_IN_ADMIN = False

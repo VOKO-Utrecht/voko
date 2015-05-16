@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     url(r'^ordering/', include(ordering.urls)),
     url(r'^finance/', include(finance.urls)),
     url(r'^tinymce/', include('tinymce.urls')),
+    url(r'^hijack/', include('hijack.urls')),
     url(r'^$', HomeView.as_view(), name="home"),
 
 )
