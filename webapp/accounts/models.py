@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pytz
 from datetime import datetime, timedelta
 from uuid import uuid4
@@ -39,7 +40,7 @@ class UserProfile(TimeStampedModel):
     notes = models.TextField()
     
     def __unicode__(self):
-        return "Profile for user: %s" % self.user
+        return u"Profile for user: %s" % self.user
 
 
 class VokoUserManager(BaseUserManager):
@@ -97,6 +98,9 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     def __unicode__(self):
         return self.get_full_name()
 
+    def __str__(self):
+        return self.get_short_name()
+
     def save(self, *args, **kwargs):
         # Disabled because this breaks admin login (TODO)
         # if self.is_active and not self.email_confirmation.is_confirmed:
@@ -137,7 +141,7 @@ class EmailConfirmation(TimeStampedModel):
         mail_user(self.user, *rendered_template_vars)
 
     def __unicode__(self):
-        return "Confirmed: %s | user: %s | email: %s" % (self.is_confirmed, self.user.get_full_name(), self.user.email)
+        return u"Confirmed: %s | user: %s | email: %s" % (self.is_confirmed, self.user.get_full_name(), self.user.email)
 
 
 class PasswordResetRequest(TimeStampedModel):
@@ -171,4 +175,4 @@ class PasswordResetRequest(TimeStampedModel):
         return True
 
     def __unicode__(self):
-        return "User: %s | Used: %s | Usable: %s" % (self.user, self.is_used, self.is_usable)
+        return u"User: %s | Used: %s | Usable: %s" % (self.user, self.is_used, self.is_usable)
