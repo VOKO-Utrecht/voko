@@ -96,10 +96,7 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
         return self.email
 
     def __unicode__(self):
-        return self.get_full_name()
-
-    def __str__(self):
-        return self.get_short_name()
+        return u"User %s" % self.email
 
     def save(self, *args, **kwargs):
         # Disabled because this breaks admin login (TODO)

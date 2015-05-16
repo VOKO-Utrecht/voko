@@ -6,7 +6,7 @@
 {% for op in object_list %}
     <div class="panel panel-default">
       <div class="panel-heading">
-          Bestelling (id {{ op.order.pk }}) van {{ op.order.user }}
+          Bestelling (id {{ op.order.pk }}) van {{ op.order.user.get_full_name }}
       </div>
 
       <table class="table">

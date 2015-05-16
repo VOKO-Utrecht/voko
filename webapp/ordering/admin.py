@@ -26,7 +26,7 @@ create_credit_for_order.short_description = "Contant betaald"
 class OrderAdmin(admin.ModelAdmin):
     list_display = ["id", "order_round", "user", "finalized", "total_price", "user_notes"]
     ordering = ("-id", )
-    inlines = [OrderProductInline]
+    # inlines = [OrderProductInline]  ## causes timeout
     list_filter = ("finalized", )
     actions = (create_credit_for_order, )
 

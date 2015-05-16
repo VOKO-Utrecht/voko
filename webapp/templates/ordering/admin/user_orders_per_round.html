@@ -11,7 +11,7 @@
 {% for order in object_list %}
 <div class="panel panel-default">
 <div class="panel-heading">
-<h4>#{{ forloop.counter }}: Bestelling van {{ order.user }}</h4>
+<h4>#{{ forloop.counter }}: Bestelling van {{ order.user.get_full_name }}</h4>
 </div>
   <div class="panel-body">
     ID: {{ order.pk }}

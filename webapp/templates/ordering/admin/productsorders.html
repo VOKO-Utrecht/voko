@@ -37,7 +37,7 @@
           <tr>
             <td>{{ op.amount }}</td>
             <td>{{ op.product.unit_of_measurement }}</td>
-            <td>{{ op.order.user }}</td>
+            <td>{{ op.order.user.get_full_name }}</td>
             <td>ID #{{ op.order.user.pk }}</td>
             <td>ID #{{ op.order.pk }}</td>
           </tr>
