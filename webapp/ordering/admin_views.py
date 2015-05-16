@@ -1,5 +1,4 @@
 import json
-from decimal import Decimal
 from braces.views import StaffuserRequiredMixin
 from django.contrib import messages
 from django.core.urlresolvers import reverse
@@ -12,7 +11,7 @@ from ordering.models import OrderProduct, Order, OrderRound, Supplier, OrderProd
 
 class OrderAdminMain(StaffuserRequiredMixin, ListView):
     def get_queryset(self):
-        return OrderRound.objects.all().order_by('id')
+        return OrderRound.objects.all().order_by('-id')
     template_name = "ordering/admin/orderrounds.html"
 
 
