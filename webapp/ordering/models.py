@@ -284,7 +284,6 @@ class Product(TimeStampedModel):
     order_round = models.ForeignKey("OrderRound", related_name="products")
     category = models.ForeignKey("ProductCategory", related_name="products", null=True, blank=True)
 
-    minimum_total_order = models.IntegerField(null=True, blank=True)  # TODO: remove field
     maximum_total_order = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
