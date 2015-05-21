@@ -1,4 +1,5 @@
 from braces.views import LoginRequiredMixin
+
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.forms import inlineformset_factory
@@ -6,7 +7,9 @@ from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, FormView, View, UpdateView
 from django.views.generic.detail import SingleObjectMixin
+
 from ordering.core import get_or_create_order, get_order_product, update_totals_for_products_with_max_order_amounts
+
 from ordering.forms import OrderProductForm
 from ordering.mixins import UserOwnsObjectMixin
 from ordering.models import Product, OrderProduct, Order, Supplier, OrderRound, ProductCategory
@@ -233,4 +236,5 @@ class OrderSummary(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
 
 class SupplierView(LoginRequiredMixin, DetailView):
     model = Supplier
+
 

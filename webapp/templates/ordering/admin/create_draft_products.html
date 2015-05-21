@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% block title %}Producten maken{% endblock %}
+{% block content %}
+<h1>Producten maken</h1>
+    <h3>Leverancier: {{ view.supplier }}; bestelronde: {{ view.current_order_round.id }}</h3>
+<form method="post">{% csrf_token %}
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Omschrijving</th>
+        <th>Cat.</th>
+        <th>Prijs</th>
+        <th>Eenheid</th>
+        <th>Aantal</th>
+        <th>X</th>
+      </tr>
+    </thead>
+    <tbody>
+    {# First a hidden row in the DOM so we can copy it #}
+      <tr style="display:none;" class="warning">
+        <td class="col-md-3"><input type="text" value="" class="form-control" name="product_name_0"></td>
+        <td class="col-md-4"><textarea class="form-control" rows="3" name="product_description_0"></textarea></td>
+        <td class="col-md-2"><select class="form-control" name="product_category_0"><option></option>
+        {% for cat in view.category_choices %}
+            <option>{{ cat }}</option>
+        {% endfor %}
+        </select></td>
+        <td class="col-md-2"><div class="input-group"><div class="input-group-addon">&euro;</div><input type="text" class="form-control" value="" name="product_base_price_0"></div></td>
+        <td class="col-md-2"><select class="form-control" name="product_unit_of_measurement_0"><option></option>
+        {% for unit in view.unit_choices %}
+            <option>{{ unit.1 }}</option>
+        {% endfor %}
+        </select></td>
+        <td class="col-md-2"><input value="" class="form-control" placeholder="onbep." name="product_maximum_total_order_0"></td>
+        <td><a href="#"><span class="glyphicon glyphicon-remove remove-product" style="color:red"></span></a></td>
+      </tr>
+
+      {% for product in view.draft_products %}
+      <tr class="{% if product.is_valid == True %}success valid-product{% elif product.is_valid == False %}danger invalid-product{% endif %}">
+                {% with product.data as product %}
+
+        <td class="col-md-3">
+            <input type="text" value="{{ product.name|title }}" class="form-control" name="product_name_{{ forloop.counter }}">
+        </td>
+        <td class="col-md-4">
+            <textarea class="form-control" rows="3" name="product_description_{{ forloop.counter }}">{{ product.description }}</textarea>
+        </td>
+        <td class="col-md-2">
+            <select class="form-control" name="product_category_{{ forloop.counter }}">
+                <option>Overig</option>
+                {% for cat in view.category_choices %}
+                <option {% if product.category == cat %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+            </select>
+        </td>
+        <td class="col-md-2">
+            <div class="input-group">
+                <div class="input-group-addon">&euro;</div>
+                    <input type="text" class="form-control" value="{{ product.base_price }}" name="product_base_price_{{ forloop.counter }}">
+                </div>
+        </td>
+        <td class="col-md-2">
+            <select class="form-control" name="product_unit_of_measurement_{{ forloop.counter }}">
+                <option></option>
+                {% for unit in view.unit_choices %}
+                <option {% if product.unit_of_measurement == unit.1 %}selected{% endif %}>{{ unit.1 }}</option>
+                {% endfor %}
+            </select>
+        </td>
+        <td class="col-md-1">
+            <input value="{% if product.maximum_total_order != None %}{{ product.maximum_total_order }}{% endif %}" class="form-control"
+                   placeholder="onbep." name="product_maximum_total_order_{{ forloop.counter }}">
+        </td>
+        <td>
+            <a href="#"><span class="glyphicon glyphicon-remove remove-product" style="color:red"></span></a>
+        </td>
+    </tr>
+          {% endwith %}
+  {% endfor %}
+    </tbody>
+  </table>
+    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Valideren</button>
+    <a class="btn btn-primary" href="#" role="button" id="add_product">
+        <span class="glyphicon glyphicon-plus"></span> Product toevoegen
+    </a>
+
+
+    <a class="btn btn-danger pull-right" href="{% url 'create_real_products' supplier %}" role="button" id="finish">
+        <span class="glyphicon glyphicon-ok"></span> Resultaat opslaan
+    </a>
+
+</form>
+{# Upload form #}
+<h2>Spreadsheet uploaden?</h2>
+<form action="{% url 'upload_products' view.supplier.id %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ view.upload_form.as_p }}
+    <button type="submit">Upload</button>
+</form>
+
+{% endblock %}
+{% block javascript %}
+<script language="javascript">
+    counter = $("tr").length;
+
+    function add_product_row() {
+        $("tbody tr:first").clone().find(":input").each(function() {
+            original_name = $(this).attr('name');
+            input_field = original_name.split("_").slice(0,-1).join("_");
+            new_name = input_field + "_" + counter;
+            $(this).attr('name', new_name);
+        }).end().appendTo("tbody").fadeIn();
+        counter++;
+    }
+
+    function assign_deletion_events() {
+        $(".remove-product").click(function (e) {
+            e.preventDefault();
+            console.log($(this));
+            $(this).closest('tr').fadeOut(250, function () {
+                $(this).closest('tr').remove();
+                deny_saving();
+            });
+        });
+    }
+
+    function deny_saving() {
+        $("#finish").addClass('disabled');
+    }
+
+    function deny_saving_on_invalid_drafts() {
+        if ($(".invalid-product").length > 0) {
+            deny_saving();
+        }
+    }
+
+    $("#add_product").click(function(e) {
+        e.preventDefault();
+        add_product_row();
+        assign_deletion_events();
+        deny_saving();
+    });
+
+    $(":input").change(function() {
+        deny_saving();
+    });
+
+    $(":input").keypress(function() {
+        deny_saving();
+    });
+
+    deny_saving_on_invalid_drafts();
+    assign_deletion_events();
+
+</script>
+{% endblock %}

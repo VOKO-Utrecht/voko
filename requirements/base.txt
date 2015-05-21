@@ -9,3 +9,5 @@ html2text==2014.9.25
 django-tinymce==1.5.3
 git+https://github.com/rikva/qantani.git@0e2c46422faa5e0b0a51ab433428c3fa93c92998
 django-hijack==1.0.7
+jsonfield==1.0.3
+openpyxl==2.1.4
