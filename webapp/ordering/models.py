@@ -340,7 +340,7 @@ class DraftProduct(TimeStampedModel):
     validation_error = models.CharField(max_length=255, blank=True, null=True)
 
     def __unicode__(self):
-        return "Draft Product %d" % self.id
+        return u"[%d] Draft Product [%s]" % (self.id, self.data)
 
     def validate(self):
         self.is_valid = False
