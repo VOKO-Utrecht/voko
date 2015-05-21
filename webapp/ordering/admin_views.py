@@ -1,13 +1,19 @@
 import json
-from decimal import Decimal
+import openpyxl
+import re
+from collections import defaultdict
+from tempfile import NamedTemporaryFile
 from braces.views import StaffuserRequiredMixin
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.db.models.aggregates import Sum
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from django.views.generic import ListView, DetailView, TemplateView, View
-from ordering.models import OrderProduct, Order, OrderRound, Supplier, OrderProductCorrection, Product
+from django.views.generic import ListView, DetailView, TemplateView, View, FormView
+from .core import get_current_order_round
+from .forms import UploadProductListForm
+from .models import OrderProduct, Order, OrderRound, Supplier, OrderProductCorrection, Product, DraftProduct, \
+    ProductCategory
 
 
 class OrderAdminMain(StaffuserRequiredMixin, ListView):
@@ -196,3 +202,161 @@ class OrderAdminMassCorrection(StaffuserRequiredMixin, View):
         messages.add_message(request, messages.SUCCESS, "De correcties zijn succesvol aangemaakt.")
 
         return redirect(reverse('orderadmin_correction', args=args, kwargs=kwargs))
+
+
+class ProductAdminMixin(StaffuserRequiredMixin):
+    def _convert_price(self, price):
+        if type(price) is unicode:
+            price = price.lstrip(u'\u20ac')  # Strip off euro sign
+        else:
+            price = unicode(str(price), 'utf-8')
+        price = price.strip()
+        # price = price.replace(".", ",")
+        return price
+
+    @property
+    def supplier(self):
+        return Supplier.objects.get(id=self.kwargs['supplier'])
+
+    @property
+    def current_order_round(self):
+        return get_current_order_round()
+
+
+class UploadProductList(FormView, ProductAdminMixin):
+    """
+    Used for parsing the form, not displaying anything
+    """
+
+    form_class = UploadProductListForm
+
+    def form_valid(self, form):
+        try:
+            self.create_draft_products_from_spreadsheet(self.request.FILES['product_list'])
+        except Exception as e:
+            messages.add_message(self.request, messages.ERROR, "Bestand kon niet worden ingelezen. Error: %s" % e)
+
+        return redirect(reverse('create_draft_products', kwargs=self.kwargs))
+
+    def create_draft_products_from_spreadsheet(self, file_handler):
+        f = NamedTemporaryFile(delete=False)
+        f.write(file_handler.read())
+        f.close()
+
+        workbook = openpyxl.load_workbook(f.name, read_only=True)
+        sheet = workbook.get_active_sheet()
+        PRODUCT_NAME, DESCRIPTION, UNIT, PRICE, MAX, CATEGORY = range(0, 6)
+
+        for idx, row in enumerate(sheet.rows):
+            name, description, unit, price, maximum, category = (row[PRODUCT_NAME].value,
+                                                                 row[DESCRIPTION].value,
+                                                                 row[UNIT].value,
+                                                                 row[PRICE].value,
+                                                                 row[MAX].value,
+                                                                 row[CATEGORY].value)
+
+            if not name or idx == 0:
+                continue  # skips header and empty rows
+
+            self._create_draft_product(
+                {'name': name,
+                 'description': description if description else "",
+                 'unit_of_measurement': unit,
+                 'base_price': self._convert_price(price),
+                 'maximum_total_order': maximum,
+                 'category': category}
+            )
+
+    def _create_draft_product(self, data):
+        return DraftProduct.objects.create(
+            supplier=self.supplier,
+            order_round=self.current_order_round,
+            data=data
+        )
+
+
+class CreateDraftProducts(TemplateView, ProductAdminMixin):
+    template_name = "ordering/admin/create_draft_products.html"
+    order_round = get_current_order_round()
+
+    def upload_form(self):
+        return UploadProductListForm()
+
+    def draft_products(self):
+        for dp in DraftProduct.objects.filter(order_round=self.order_round,
+                                              supplier=self.supplier).order_by('is_valid', 'id'):
+            dp.validate()
+            yield dp
+
+    def unit_choices(self):
+        return Product.UNITS
+
+    def category_choices(self):
+        return [pc.name for pc in ProductCategory.objects.all()]
+
+    def _parse_draft_product_post_data(self):
+        """
+        yields (product_index, field, data)
+        """
+        for key in self.request.POST:
+            try:
+                regex_match = re.match("^product_([a-z_]+)_(\d+)$", key)
+                if not regex_match:
+                    continue
+
+                field, index = regex_match.groups()
+                index = int(index)
+                data = self.request.POST[key]
+
+                print index, field, data
+
+                if not data:
+                    data = None
+                elif data.isdigit():
+                    data = int(data)
+
+                if index == 0:  # the first (hidden) row
+                    continue
+
+                yield index, field, data
+
+            except ValueError:
+                pass  # other POST value
+
+    def _generate_data_dict_for_draft_products(self):
+        tmp = defaultdict(dict)
+        for index, field, data in self._parse_draft_product_post_data():
+            tmp[index][field] = data
+
+        for index in tmp:
+            yield tmp[index]
+
+    def create_draft_products(self):
+        for data in self._generate_data_dict_for_draft_products():
+            DraftProduct.objects.create(
+                supplier=self.supplier,
+                order_round=self.current_order_round,
+                data=data
+            )
+
+    def post(self, *args, **kwargs):
+        old_draft_products = DraftProduct.objects.filter(order_round=self.current_order_round,
+                                                         supplier=self.supplier)
+        old_draft_products.delete()
+        self.create_draft_products()
+
+        return redirect(reverse('create_draft_products', kwargs=self.kwargs))
+
+
+class CreateRealProducts(TemplateView, ProductAdminMixin):
+    template_name = "ordering/admin/create_products.html"
+
+    def get(self, *args, **kwargs):
+        self.create_products()
+        return super(CreateRealProducts, self).get(*args, **kwargs)
+
+    def create_products(self):
+        for dp in DraftProduct.objects.filter(supplier=self.supplier,
+                                              order_round=self.current_order_round):
+            dp.create_product()
+            dp.delete()

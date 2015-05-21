@@ -28,3 +28,7 @@ class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
         exclude = []
+
+
+class UploadProductListForm(forms.Form):
+    product_list = forms.FileField()

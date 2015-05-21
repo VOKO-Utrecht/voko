@@ -284,7 +284,7 @@ class Product(TimeStampedModel):
     order_round = models.ForeignKey("OrderRound", related_name="products")
     category = models.ForeignKey("ProductCategory", related_name="products", null=True, blank=True)
 
-    minimum_total_order = models.IntegerField(null=True, blank=True)
+    minimum_total_order = models.IntegerField(null=True, blank=True)  # TODO: remove field
     maximum_total_order = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
@@ -336,12 +336,73 @@ class DraftProduct(TimeStampedModel):
     data = JSONField()
     supplier = models.ForeignKey(Supplier)
     order_round = models.ForeignKey(OrderRound)
+    is_valid = models.BooleanField(default=False)
+    validation_error = models.CharField(max_length=255, blank=True, null=True)
 
     def __unicode__(self):
         return "Draft Product %d" % self.id
 
     def validate(self):
-        pass  # TODO
+        self.is_valid = False
+        if not self._valid_name(self.data['name']):
+            self.validation_error = "Naam onjuist"
+        elif not self._valid_price(self.data['base_price']):
+            self.validation_error = "Prijs onjuist"
+        elif not self._valid_unit(self.data['unit_of_measurement']):
+            self.validation_error = "Eenheid onjuist"
+        elif not self._valid_max(self.data['maximum_total_order']):
+            self.validation_error = "Max. onjuist"
+        else:
+            self.is_valid = True
+            self.validation_error = None
+        self.save()
+
+    def _valid_name(self, name):
+        try:
+            return len(name) > 0
+        except (ValueError, TypeError):
+            return False
+
+    def _valid_price(self, price):
+        try:
+            float(price)
+            return True
+        except (ValueError, TypeError):
+            return False
+
+    def _valid_unit(self, unit):
+        try:
+            return unit.lower() in [u[1].lower() for u in Product.UNITS]
+        except (ValueError, TypeError, AttributeError):
+            return False
+
+    def _valid_max(self, max):
+        return max is None or (int(max) and max > 0)
 
     def create_product(self):
-        pass  # TODO
+        #self.validate()
+        if not self.is_valid:
+            return
+
+        prod = Product.objects.create(
+            name=self.data['name'],
+            description=self.data['description'] if self.data['description'] else "",
+            unit_of_measurement=self.data['unit_of_measurement'],
+            base_price=self.data['base_price'],
+            maximum_total_order=self.data['maximum_total_order'],
+            supplier=self.supplier,
+            order_round=self.order_round,
+        )
+
+        if self.data['category']:
+            try:
+                prod.category = ProductCategory.objects.get(name=self.data['category'])
+                prod.save()
+            except ProductCategory.DoesNotExist:
+                pass
+
+        return prod
+
+    @property
+    def product_data(self):
+        return self.data['product_data']
