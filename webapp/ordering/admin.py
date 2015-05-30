@@ -61,7 +61,7 @@ prod_cat_actions.append(remove_category)
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ["name", "order_round", "supplier", "category", "base_price", "maximum_total_order"]
+    list_display = ["name", 'description', "order_round", "supplier", "category", "base_price", "maximum_total_order"]
     ordering = ("-id", )
     list_filter = ("order_round", "supplier", "category")
     actions = prod_cat_actions
