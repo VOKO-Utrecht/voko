@@ -1,7 +1,7 @@
 import csv
 from django.core.management.base import BaseCommand
 from ordering.core import get_current_order_round
-from ordering.models import Product, Supplier
+from ordering.models import Product, Supplier, ProductCategory
 
 
 class Command(BaseCommand):
@@ -27,7 +27,7 @@ class Command(BaseCommand):
             reader = csv.reader(csvfile, delimiter=',', quotechar='"')
             for row in reader:
                 try:
-                    name, description, unit, price, maximum = row
+                    name, description, unit, price, maximum, category = row
 
                     if maximum.lower() == 'onbeperkt':
                         maximum = None
@@ -46,6 +46,12 @@ class Command(BaseCommand):
                         if u in unit:
                             unit = u
 
+                    # Decide on category
+                    try:
+                        cat = ProductCategory.objects.get(name=category)
+                    except ProductCategory.DoesNotExist:
+                        cat = None
+
                     product = Product(
                         name=unicode(name, 'utf-8'),
                         description=unicode(description, 'utf-8'),
@@ -54,6 +60,7 @@ class Command(BaseCommand):
                         order_round=order_round,
                         maximum_total_order=maximum,
                         unit_of_measurement=unit,
+                        category=cat,
                     )
 
                     data.append((row, product))
