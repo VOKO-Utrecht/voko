@@ -277,13 +277,12 @@ class UploadProductList(FormView, ProductAdminMixin):
 
 class CreateDraftProducts(TemplateView, ProductAdminMixin):
     template_name = "ordering/admin/create_draft_products.html"
-    order_round = get_current_order_round()
 
     def upload_form(self):
         return UploadProductListForm()
 
     def draft_products(self):
-        for dp in DraftProduct.objects.filter(order_round=self.order_round,
+        for dp in DraftProduct.objects.filter(order_round=self.current_order_round,
                                               supplier=self.supplier).order_by('is_valid', 'id'):
             dp.validate()
             yield dp
