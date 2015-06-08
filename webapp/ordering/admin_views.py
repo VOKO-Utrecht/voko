@@ -11,6 +11,7 @@ from django.db.models.aggregates import Sum
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, TemplateView, View, FormView
+import sys
 from .core import get_current_order_round
 from .forms import UploadProductListForm
 from .models import OrderProduct, Order, OrderRound, Supplier, OrderProductCorrection, Product, DraftProduct, \
@@ -309,6 +310,7 @@ class CreateDraftProducts(TemplateView, ProductAdminMixin):
                 data = self.request.POST[key]
 
                 print index, field, data
+                sys.stdout.flush()
 
                 if not data:
                     data = None
@@ -322,6 +324,7 @@ class CreateDraftProducts(TemplateView, ProductAdminMixin):
 
             except ValueError as e:
                 print e
+                sys.stdout.flush()
                 pass  # other POST value
 
     def _generate_data_dict_for_draft_products(self):
