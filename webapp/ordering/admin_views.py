@@ -320,7 +320,8 @@ class CreateDraftProducts(TemplateView, ProductAdminMixin):
 
                 yield index, field, data
 
-            except ValueError:
+            except ValueError as e:
+                print e
                 pass  # other POST value
 
     def _generate_data_dict_for_draft_products(self):
