@@ -379,14 +379,19 @@ class DraftProduct(TimeStampedModel):
         return max is None or (int(max) and max > 0)
 
     def create_product(self):
-        #self.validate()
         if not self.is_valid:
             return
+
+        # Decide on unit
+        unit = self.data['unit_of_measurement']
+        for u, _ in Product.UNITS:
+            if u in unit:
+                unit = u
 
         prod = Product.objects.create(
             name=self.data['name'],
             description=self.data['description'] if self.data['description'] else "",
-            unit_of_measurement=self.data['unit_of_measurement'],
+            unit_of_measurement=unit,
             base_price=self.data['base_price'],
             maximum_total_order=self.data['maximum_total_order'],
             supplier=self.supplier,
