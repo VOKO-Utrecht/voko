@@ -11,52 +11,6 @@ from mailing.models import MailTemplate
 from ordering.models import Supplier
 
 
-class SendReminderMailToSuppliersCron(CronJobBase):
-    RUN_AT_TIMES = ['10:00']
-    schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    code = 'ordering.send_reminder_mail_to_suppliers'
-
-    MAIL_TEMPLATE_ID = 8
-    DAYS_PRIOR = 3
-
-    def do(self):
-        order_round = get_current_order_round()
-
-        # Order round should not be open yet as we're reminding suppliers about it
-        if not order_round.is_not_open_yet():
-            return
-
-        # Send X days before order round opens
-        date_to_send = (order_round.open_for_orders - timedelta(days=self.DAYS_PRIOR)).date()
-        date_today = datetime.today().date()
-        if date_to_send != date_today:
-            return
-
-        # Check send state
-        if order_round.suppliers_reminder_sent:
-            return
-
-        # Better to fail than to keep mailing. Set flag before action.
-        order_round.suppliers_reminder_sent = True
-        order_round.save()
-
-        # Create mail for every supplier
-        mail_template = MailTemplate.objects.get(id=self.MAIL_TEMPLATE_ID)
-
-        for supplier in Supplier.objects.all():
-            subject, html_message, plain_message = render_mail_template(mail_template,
-                                                                        order_round=order_round,
-                                                                        supplier=supplier)
-            send_mail(subject=subject,
-                      message=plain_message,
-                      from_email="VOKO Utrecht <info@vokoutrecht.nl>",
-                      recipient_list=["%s <%s>" % (supplier.name, supplier.email)],
-                      html_message=html_message)
-
-            log_event(event="Herinneringsmail naar %s" % supplier.name,
-                      extra=html_message)
-
-
 class MailOrderLists(CronJobBase):
     RUN_EVERY_MINS = 30
 

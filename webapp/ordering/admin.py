@@ -72,7 +72,7 @@ admin.site.register(Product, ProductAdmin)
 
 class OrderRoundAdmin(admin.ModelAdmin):
     list_display = ["id", "open_for_orders", "closed_for_orders", "collect_datetime",
-                    "markup_percentage", "transaction_costs", "order_placed", "suppliers_reminder_sent"]
+                    "markup_percentage", "transaction_costs", "order_placed"]
     ordering = ("-id", )
 
 admin.site.register(OrderRound, OrderRoundAdmin)
