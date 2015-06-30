@@ -54,6 +54,13 @@ class OrderRound(TimeStampedModel):
         current_datetime = datetime.now(pytz.utc)  # Yes, UTC. see Django's timezone docs
         return current_datetime < self.open_for_orders
 
+    def is_over(self):
+        ## over, past, expired
+        current_datetime = datetime.now(pytz.utc)  # Yes, UTC. see Django's timezone docs
+        print current_datetime
+        print self.closed_for_orders
+        return current_datetime > self.closed_for_orders
+
     @property
     def is_open(self):
         current_datetime = datetime.now(pytz.utc)  # Yes, UTC. see Django's timezone docs

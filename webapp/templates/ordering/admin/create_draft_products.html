@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% block title %}Producten maken{% endblock %}
 {% block content %}
+{% if view.current_order_round.is_over %}
+De bestelronde is gesloten. Je kunt geen producten toevoegen.
+{% else %}
 <h1>Producten maken</h1>
     <h3>Leverancier: {{ view.supplier }}; bestelronde: {{ view.current_order_round.id }}</h3>
 <form method="post">{% csrf_token %}
@@ -98,8 +101,9 @@
     {{ view.upload_form.as_p }}
     <button type="submit">Upload</button>
 </form>
-
+{% endif %}
 {% endblock %}
+
 {% block javascript %}
 <script language="javascript">
     counter = $("tr").length;
