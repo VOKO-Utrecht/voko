@@ -113,6 +113,9 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
         except ObjectDoesNotExist:
             EmailConfirmation.objects.create(user=self)
 
+    def flat_groups(self):
+        return self.groups.values_list("name", flat=True)
+
 
 class EmailConfirmation(TimeStampedModel):
     class Meta:

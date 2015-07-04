@@ -4,7 +4,7 @@ import openpyxl
 import re
 from collections import defaultdict
 from tempfile import NamedTemporaryFile
-from braces.views import StaffuserRequiredMixin
+from braces.views import StaffuserRequiredMixin, GroupRequiredMixin
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.db.models.aggregates import Sum
@@ -206,7 +206,7 @@ class OrderAdminMassCorrection(StaffuserRequiredMixin, View):
         return redirect(reverse('orderadmin_correction', args=args, kwargs=kwargs))
 
 
-class ProductAdminMixin(StaffuserRequiredMixin):
+class ProductAdminMixin(GroupRequiredMixin):
     def _convert_price(self, price):
         if type(price) is unicode:
             price = price.lstrip(u'\u20ac')  # Strip off euro sign
@@ -223,6 +223,8 @@ class ProductAdminMixin(StaffuserRequiredMixin):
     @property
     def current_order_round(self):
         return get_current_order_round()
+
+    group_required = 'Boeren'
 
 
 class UploadProductList(FormView, ProductAdminMixin):

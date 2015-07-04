@@ -5,6 +5,9 @@
     {% endif %}
 {% endif %}
 
+{% if 'Boeren' in user.flat_groups or user.is_superuser %}
+    <li><a href="{% url 'productadmin_main' %}">Boerenadmin</a></li>
+{% endif %}
 {% if user.is_staff %}
     <li><a href="{% url 'orderadmin_main' %}">Besteloverzichten</a></li>
     <li><a href="{% url 'admin:index' %}">Admin</a></li>
