@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Leveranciers</h1>
+
+<div class="panel panel-default">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Leverancier</th>
+        <th>Producten maken</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for supplier in object_list %}
+          <tr>
+            <td>{{ supplier.pk }}</td>
+            <td>{{ supplier.name }}</td>
+            <td><a href="{% url 'create_draft_products' supplier.pk %}">Producten maken</a></td>
+          </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+
+
+

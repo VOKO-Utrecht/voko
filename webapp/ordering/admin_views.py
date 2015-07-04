@@ -364,3 +364,11 @@ class CreateRealProducts(TemplateView, ProductAdminMixin):
                                               order_round=self.current_order_round):
             dp.create_product()
             dp.delete()
+
+
+class ProductAdminMain(StaffuserRequiredMixin, ListView):
+    def get_queryset(self):
+        return Supplier.objects.all()
+    template_name = "ordering/admin/suppliers.html"
+
+
