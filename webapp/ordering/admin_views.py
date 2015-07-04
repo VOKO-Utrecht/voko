@@ -368,7 +368,7 @@ class CreateRealProducts(TemplateView, ProductAdminMixin):
 
 class ProductAdminMain(StaffuserRequiredMixin, ListView):
     def get_queryset(self):
-        return Supplier.objects.all()
+        return Supplier.objects.all().order_by("id")
     template_name = "ordering/admin/suppliers.html"
 
 
