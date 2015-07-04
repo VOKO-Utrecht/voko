@@ -83,10 +83,14 @@ class OverView(LoginRequiredMixin, TemplateView):
     template_name = "accounts/overview.html"
 
     def get_context_data(self, **kwargs):
+        ctx = super(OverView, self).get_context_data(**kwargs)
+
         if self.request.user.id:
             order = get_or_create_order(self.request.user)
             order.remove_debit_when_unfinalized()
-            return super(OverView, self).get_context_data(**kwargs)
+
+        ctx['orders'] = self.request.user.orders.filter(finalized=True).order_by("-pk")
+        return ctx
 
     def current_order_round(self):
         return self.request.current_order_round

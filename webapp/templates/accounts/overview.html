@@ -3,12 +3,12 @@
 {% block title %}Accountoverzicht{% endblock %}
 {% block content %}
 <h1>Accountoverzicht</h1>
-<h2>Bestelronde</h2>
+<h2>Bestelronde {{ view.current_order_round.id }}</h2>
 <div class="panel panel-default">
   <table class="table">
     <tbody>
           <tr>
-            <td>Bestelronde</td>
+            <td>Huidige Bestelronde</td>
             <td>{% if view.current_order_round.is_open %}Open{% else %}Gesloten{% endif %}</td>
           </tr>
           <tr>
@@ -32,18 +32,18 @@
   <table class="table">
     <thead>
       <tr>
-        <th>UID</th>
+        <th>Bestelling</th>
+        <th>Bestelronde</th>
         <th>Bedrag</th>
-        <th>Bevestigd</th>
       </tr>
     </thead>
     <tbody>
-      {% for order in user.orders.all|dictsortreversed:"pk" %}
+      {% for order in orders %}
           {% if order.has_products %}
           <tr>
-            <td><a href="{% if order.finalized %}{% url 'order_summary' order.pk %}{% else %}{% url 'view_order' order.pk  %}{% endif %}">Bestelling {{ order.user_order_id }}</a></td>
+            <td><a href="{% url 'order_summary' order.pk %}">Bestelling {{ order.user_order_id }}</a></td>
+            <td>{{ order.order_round }}</td>
             <td>&euro; {{ order.total_price }}</td>
-            <td>{% if order.finalized %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}</td>
           </tr>
           {% endif %}
       {% endfor %}
