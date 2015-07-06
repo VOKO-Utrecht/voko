@@ -7,13 +7,12 @@ from django.core.mail import send_mail
 from django.db.models.loading import get_models, get_app
 from django.shortcuts import redirect
 from accounts.forms import VokoUserCreationForm, VokoUserChangeForm
-from accounts.models import VokoUser, UserProfile
+from accounts.models import VokoUser, UserProfile, ReadOnlyVokoUser
 from mailing.helpers import get_template_by_id, render_mail_template
 from ordering.core import get_current_order_round
 from ordering.models import Order
 from django.utils.safestring import mark_safe
 from hijack.admin import HijackUserAdminMixin
-from webapp.accounts.models import ReadOnlyVokoUser
 
 ACTIVATE_ACCOUNT_MAILTEMPLATE_ID = 1
 
