@@ -176,3 +176,8 @@ class PasswordResetRequest(TimeStampedModel):
 
     def __unicode__(self):
         return u"User: %s | Used: %s | Usable: %s" % (self.user, self.is_used, self.is_usable)
+
+
+class ReadOnlyVokoUser(VokoUser):
+    class Meta:
+        proxy = True

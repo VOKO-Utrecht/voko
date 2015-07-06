@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import log
 from django.contrib import admin
+from django.contrib.admin.util import flatten_fieldsets
 from django.contrib.auth.admin import UserAdmin
 from django.core.mail import send_mail
 from django.db.models.loading import get_models, get_app
@@ -12,7 +13,7 @@ from ordering.core import get_current_order_round
 from ordering.models import Order
 from django.utils.safestring import mark_safe
 from hijack.admin import HijackUserAdminMixin
-
+from webapp.accounts.models import ReadOnlyVokoUser
 
 ACTIVATE_ACCOUNT_MAILTEMPLATE_ID = 1
 
@@ -142,3 +143,25 @@ class VokoUserAdmin(UserAdmin, HijackUserAdminMixin):
 
 admin.site.register(VokoUser, VokoUserAdmin)
 
+class ReadOnlyVokoUserAdmin(VokoUserAdmin):
+    # Source: https://code.djangoproject.com/ticket/17295
+    def get_readonly_fields(self, request, obj=None):
+        # untested, this could do:
+        # readonly_fields = self.model._meta.get_all_field_names()
+        # borrowed from ModelAdmin:
+        if self.declared_fieldsets:
+            fields = flatten_fieldsets(self.declared_fieldsets)
+        else:
+            form = self.get_formset(request, obj).form
+            fields = form.base_fields.keys()
+        return fields
+
+    def has_add_permission(self, request):
+        # Nobody is allowed to add
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        # Nobody is allowed to delete
+        return False
+
+admin.site.register(ReadOnlyVokoUser, ReadOnlyVokoUserAdmin)
