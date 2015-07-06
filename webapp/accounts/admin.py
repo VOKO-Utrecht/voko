@@ -93,7 +93,7 @@ class VokoUserAdmin(UserAdmin, HijackUserAdminMixin):
     # that reference specific fields on auth.User.
     list_display = ("first_name", "last_name", "email", phone, "email_confirmed", "can_activate", "is_active", "is_staff",
                     "created", 'orders_round', 'debit', 'credit', 'total_orders', roles, 'hijack_field')
-    list_filter = ("is_staff", "is_superuser", "is_active", "groups")
+    list_filter = ("is_staff", "is_superuser", "is_active", "can_activate", "groups")
     search_fields = ("email", 'first_name', 'last_name')
     ordering = ("-created", )
     filter_horizontal = ("groups", "user_permissions",)
