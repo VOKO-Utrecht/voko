@@ -17,7 +17,7 @@ from hijack.admin import HijackUserAdminMixin
 ACTIVATE_ACCOUNT_MAILTEMPLATE_ID = 1
 
 for model in get_models(get_app('accounts')):
-    if model == VokoUser:
+    if model in (VokoUser, ReadOnlyVokoUser):
         continue
     admin.site.register(model)
 
