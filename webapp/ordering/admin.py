@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db import OperationalError
 from django.db.models.loading import get_models, get_app
 import sys
 from finance.models import Balance
@@ -44,20 +45,24 @@ def generate_action(category):
 thismodule = sys.modules[__name__]
 
 prod_cat_actions = []
-for category in ProductCategory.objects.all():
-    setattr(thismodule, "fn_%s" % category.id, generate_action(category))
-    fn = getattr(thismodule, "fn_%s" % category.id)
-    fn.short_description = "Set category to '%s'" % category.name
-    fn.__name__ = str(category.id)
-    prod_cat_actions.append(fn)
+try:
+    for category in ProductCategory.objects.all():
+        setattr(thismodule, "fn_%s" % category.id, generate_action(category))
+        fn = getattr(thismodule, "fn_%s" % category.id)
+        fn.short_description = "Set category to '%s'" % category.name
+        fn.__name__ = str(category.id)
+        prod_cat_actions.append(fn)
 
 
-def remove_category(_, __, queryset):
-    for product in queryset:
-        product.category = None
-        product.save()
-remove_category.short_description = "Remove category from product"
-prod_cat_actions.append(remove_category)
+    def remove_category(_, __, queryset):
+        for product in queryset:
+            product.category = None
+            product.save()
+    remove_category.short_description = "Remove category from product"
+    prod_cat_actions.append(remove_category)
+
+except OperationalError:
+    pass  # This is to prevent failure during an initial migration run
 
 
 class ProductAdmin(admin.ModelAdmin):
