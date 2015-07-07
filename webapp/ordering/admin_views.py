@@ -88,7 +88,7 @@ class OrderAdminUserOrders(StaffuserRequiredMixin, ListView):
 
     def get_queryset(self):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
-        return Order.objects.filter(order_round=order_round, finalized=True).order_by("user")
+        return Order.objects.filter(order_round=order_round, finalized=True).order_by("user__last_name")
 
 
 class OrderAdminUserOrderProductsPerOrderRound(StaffuserRequiredMixin, ListView):
