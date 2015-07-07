@@ -15,7 +15,6 @@
 </div>
   <div class="panel-body">
     ID: {{ order.pk }}
-    | Afgerond: {% if order.finalized %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}
     | Laatst gewijzigd: {{ order.modified }}
     | e-mail: {{ order.user.email }}
     | telefoon: {{ order.user.userprofile.phone_number|default:"onbekend"  }}
