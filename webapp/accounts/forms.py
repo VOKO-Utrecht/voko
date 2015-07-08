@@ -30,8 +30,8 @@ class VokoUserFinishForm(forms.ModelForm):
     zip_code = forms.CharField(label="Postcode", widget=forms.TextInput)
     phone_number = forms.CharField(label="Telefoonnummer (optioneel)", widget=forms.TextInput, required=False)
 
-    password1 = forms.CharField(label="Wachtwoord (alleen invullen als je deze wilt wijzigen)", widget=forms.PasswordInput)
-    password2 = forms.CharField(label="Wachtwoord (bevestiging - alleen invullen als je deze wilt wijzigen)", widget=forms.PasswordInput)
+    password1 = forms.CharField(label="Wachtwoord", widget=forms.PasswordInput)
+    password2 = forms.CharField(label="Wachtwoord (bevestiging)", widget=forms.PasswordInput)
 
     notes = forms.CharField(label="Antwoorden op bovenstaande vragen", widget=forms.Textarea)
 
@@ -124,8 +124,8 @@ class ChangeProfileForm(forms.ModelForm):
     zip_code = forms.CharField(label="Postcode", widget=forms.TextInput)
     phone_number = forms.CharField(label="Telefoonnummer (optioneel)", widget=forms.TextInput, required=False)
 
-    password1 = forms.CharField(label="Wachtwoord", widget=forms.PasswordInput, required=False)
-    password2 = forms.CharField(label="Wachtwoord (bevestiging)", widget=forms.PasswordInput, required=False)
+    password1 = forms.CharField(label="Wachtwoord (alleen invullen als je deze wilt wijzigen)", widget=forms.PasswordInput, required=False)
+    password2 = forms.CharField(label="Wachtwoord (bevestiging; alleen invullen als je deze wilt wijzigen)", widget=forms.PasswordInput, required=False)
 
     # TODO: Notes and e-mail address cannot be changed atm.
 
