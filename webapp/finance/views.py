@@ -134,7 +134,6 @@ class ConfirmTransactionView(LoginRequiredMixin, QantaniMixin, TemplateView):
             payment.create_credit()
 
             payment.order.mail_confirmation()
-            payment.order._notify_admins_about_new_order()
 
 # Temporarely removed / 18-02-2015
 #        else:
@@ -176,6 +175,5 @@ class QantaniCallbackView(QantaniMixin, View):
             payment.create_credit()
 
             payment.order.mail_confirmation()
-            payment.order._notify_admins_about_new_order()
 
         return HttpResponse("+")  # This is the official "success" response
