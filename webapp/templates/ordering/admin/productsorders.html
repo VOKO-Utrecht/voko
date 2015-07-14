@@ -11,43 +11,45 @@
 <h1>Bestellingen per product van bestelronde #{{ object_list.0.order.order_round.pk }}</h1>
 <h6>Gegenereerd op {% now "DATETIME_FORMAT" %}</h6>
 
-{% for supplier, products in data.items %}
-    <h2>{{ supplier }}</h2>
-    {%  for product, orderproducts in products.items %}
-        <div class="panel panel-default">
-        <div class="panel-heading">
-        <h4>{{ product }} (Totaal besteld: {{ product.amount_ordered }} {{ product.unit_of_measurement }})</h4>
-        </div>
-        <div class="panel-body">
-        {{ product.description }}
-        </div>
+{% for unit, products in data.items %}
+    {% if products.items %}
+        <h3>Producten per {{ unit|lower }}</h3>
+        {%  for product, orderproducts in products.items %}
+            <div class="panel panel-default">
+            <div class="panel-heading">
+            <h4>{{ product.name }} [{{ product.supplier.name }}] (Totaal besteld: {{ product.amount_ordered }} {{ product.unit_of_measurement }})</h4>
+            </div>
+            <div class="panel-body">
+            {{ product.description }}
+            </div>
 
-  <table class="table table-condensed">
-    <thead>
-      <tr>
-        <th>Aantal</th>
-        <th>Eenheid</th>
-        <th>Lid</th>
-        <th>Lid ID</th>
-        <th>Bestelling ID</th>
-      </tr>
-    </thead>
-    <tbody>
-        {%  for op in orderproducts %}
+      <table class="table table-condensed">
+        <thead>
           <tr>
-            <td>{{ op.amount }}</td>
-            <td>{{ op.product.unit_of_measurement }}</td>
-            <td>{{ op.order.user.get_full_name }}</td>
-            <td>ID #{{ op.order.user.pk }}</td>
-            <td>ID #{{ op.order.pk }}</td>
+            <th>Aantal</th>
+            <th>Eenheid</th>
+            <th>Lid</th>
+            <th>Lid ID</th>
+            <th>Bestelling ID</th>
           </tr>
-        {% endfor %}
-    </tbody>
-  </table>
+        </thead>
+        <tbody>
+            {%  for op in orderproducts %}
+              <tr>
+                <td>{{ op.amount }}</td>
+                <td>{{ op.product.unit_of_measurement }}</td>
+                <td>{{ op.order.user.get_full_name }}</td>
+                <td>#{{ op.order.user.pk }}</td>
+                <td>#{{ op.order.pk }}</td>
+              </tr>
+            {% endfor %}
+        </tbody>
+      </table>
 </div>
 
 
     {% endfor %}
-
+    {% endif %}
 {% endfor %}
+
 {% endblock %}
