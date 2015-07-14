@@ -320,7 +320,7 @@ class Product(TimeStampedModel):
         return self.amount_available > 0
 
     def create_corrections(self):
-        for order_product in self.orderproducts.filter(correction__isnull=True):
+        for order_product in self.orderproducts.filter(correction__isnull=True, order__finalized=True):
             OrderProductCorrection.objects.create(
                 order_product=order_product,
                 supplied_percentage=0,
