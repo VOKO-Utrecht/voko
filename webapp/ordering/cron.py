@@ -49,7 +49,7 @@ class MailOrderLists(CronJobBase):
 
             # Generate mail
             subject = 'VOKO Utrecht - Bestellijst voor %s' % order_round.collect_datetime.strftime("%d %B %Y")
-            from_email = 'VOKO Utrecht <info@vokoutrecht.nl>'
+            from_email = 'VOKO Utrecht Boerencontact <boeren@vokoutrecht.nl>'
             to = '%s <%s>' % (supplier.name, supplier.email)
 
             text_content = """
@@ -67,6 +67,6 @@ VOKO Utrecht
 """ % (supplier, order_round.pk,  order_round.collect_datetime.strftime("%d %B %Y"))
 
             msg = EmailMultiAlternatives(subject, text_content, from_email,
-                                         [to], cc=["VOKO Utrecht <info@vokoutrecht.nl>"])
+                                         [to], cc=["VOKO Utrecht Boerencontact <boeren@vokoutrecht.nl>"])
             msg.attach('bestellijst_bestelronde_%d.csv' % order_round.pk, csv, 'text/csv')
             msg.send()
