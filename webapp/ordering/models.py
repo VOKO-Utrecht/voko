@@ -156,25 +156,11 @@ class Order(TimeStampedModel):
             if uo == self:
                 return index + 1
 
-    def remove_debit_when_unpaid(self):
-        # TODO remove?
-        if not self.paid and self.debit:
-            log_event(event="Removing debit '%s' from order '%s' because it is not paid" % (self.debit, self),
-                      user=self.user)
-
-            # Unlink debit
-            _debit = self.debit
-            self.debit = None
-            self.save()
-
-            _debit.delete()
-
     def complete_after_payment(self):
-        # TODO send mail
-        # TODO create debet
         log_event(event="Completing (paid) order %s" % self.id, user=self.user)
         self.paid = True
         self.save()
+        self.create_and_link_debit()
         self.mail_confirmation()
 
     def create_and_link_debit(self):

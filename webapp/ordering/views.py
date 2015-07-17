@@ -28,7 +28,7 @@ class ProductsView(LoginRequiredMixin, ListView):
 
     def post(self, request, *args, **kwargs):
         """
-        Handling complex forms using Django's forms framework is pretty nearly impossible without
+        Handling complex forms using Django's forms framework is nearly impossible without
          all kinds of trickery that don't necessarily make the code more readable. Hence: manual parsing of POST data.
         """
         order = get_or_create_order(self.request.user)
@@ -200,7 +200,6 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         update_totals_for_products_with_max_order_amounts(self.get_object())
-        self.get_object().remove_debit_when_unpaid()
         return super(UpdateView, self).get_context_data(**kwargs)
 
     def calculate_payment(self):
