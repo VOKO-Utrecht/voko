@@ -59,13 +59,13 @@ class TestChooseBank(VokoTestCase):
         o_p = OrderProductFactory.create(amount=1, product__base_price=10,
                                          order=order, product__order_round=order.order_round)
 
-        assert order.finalized is False
+        assert order.paid is False
         assert o_p.order.total_price < 100
         ret = self.client.get(self.url)
 
         # Re-fetch
         order = Order.objects.get(pk=order.pk)
-        self.assertTrue(order.finalized)
+        self.assertTrue(order.paid)
 
         self.assertEqual(ret.status_code, 302)
         self.assertEqual(ret.url, "http://testserver" + reverse('order_summary', args=(order.pk,)))

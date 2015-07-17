@@ -40,7 +40,7 @@ class MailOrderLists(CronJobBase):
             template = get_template("ordering/admin/orderlist_per_supplier.html")
             object_list = supplier.products.\
                 exclude(orderproducts=None).\
-                filter(orderproducts__order__finalized=True).\
+                filter(orderproducts__order__paid=True).\
                 filter(order_round=order_round).\
                 annotate(amount_sum=Sum('orderproducts__amount'))
 

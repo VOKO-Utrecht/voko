@@ -87,9 +87,9 @@ class OverView(LoginRequiredMixin, TemplateView):
 
         if self.request.user.id:
             order = get_or_create_order(self.request.user)
-            order.remove_debit_when_unfinalized()
+            order.remove_debit_when_unpaid()
 
-        ctx['orders'] = self.request.user.orders.filter(finalized=True).order_by("-pk")
+        ctx['orders'] = self.request.user.orders.filter(paid=True).order_by("-pk")
         return ctx
 
     def current_order_round(self):

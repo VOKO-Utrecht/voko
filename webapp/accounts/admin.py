@@ -128,7 +128,7 @@ class VokoUserAdmin(UserAdmin, HijackUserAdminMixin):
         current_order_round = get_current_order_round()
         orders = Order.objects.filter(order_round=current_order_round,
                                       user=obj,
-                                      finalized=True).count()
+                                      paid=True).count()
         return orders
 
     def debit(self, obj):
@@ -138,7 +138,7 @@ class VokoUserAdmin(UserAdmin, HijackUserAdminMixin):
         return obj.balance.credit()
 
     def total_orders(self, obj):
-        return Order.objects.filter(user=obj, finalized=True).count()
+        return Order.objects.filter(user=obj, paid=True).count()
 
 admin.site.register(VokoUser, VokoUserAdmin)
 

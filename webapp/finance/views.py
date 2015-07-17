@@ -58,8 +58,8 @@ class ChooseBankView(LoginRequiredMixin, QantaniMixin, FormView):
     def get(self, *args, **kwargs):
         user_debit = self.request.user.balance.debit()
         order = self.request.user.orders.get_current_order()
-        if user_debit == 0 and order.finalized is False:
-            order.finalized = True
+        if user_debit == 0 and order.paid is False:
+            order.paid = True
             order.save()
 
             messages.add_message(self.request, messages.SUCCESS,
@@ -129,7 +129,7 @@ class ConfirmTransactionView(LoginRequiredMixin, QantaniMixin, TemplateView):
         if success:
             payment.succeeded = True
             payment.save()
-            payment.order.finalized = True
+            payment.order.paid = True
             payment.order.save()
             payment.create_credit()
 
@@ -167,10 +167,10 @@ class QantaniCallbackView(QantaniMixin, View):
         payment.succeeded = True
         payment.save()
 
-        if payment.order.finalized is False:
+        if payment.order.paid is False:
             # This means that the user paid, but closed the browser after confirming. The callback view enables
             # us to finish the order anyway.
-            payment.order.finalized = True
+            payment.order.paid = True
             payment.order.save()
             payment.create_credit()
 

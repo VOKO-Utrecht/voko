@@ -77,14 +77,14 @@ class OrderManager(models.Manager):
 
     def get_current_order(self):
         try:
-            return super(OrderManager, self).get_queryset().filter(finalized=False,
+            return super(OrderManager, self).get_queryset().filter(paid=False,
                                                                    user=self.instance,
                                                                    order_round=get_current_order_round()).order_by('-pk')[0]
         except IndexError:
             return get_or_create_order(user=self.instance)
 
-    def get_last_finalized_order(self):
-        return super(OrderManager, self).get_queryset().filter(finalized=True,
+    def get_last_paid_order(self):
+        return super(OrderManager, self).get_queryset().filter(paid=True,
                                                                user=self.instance,
                                                                order_round=get_current_order_round()).order_by('-pk')[0]
 
@@ -108,8 +108,7 @@ class Order(TimeStampedModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="orders")
     user_notes = models.TextField(null=True, blank=True)
 
-    # If order has been paid
-    finalized = models.BooleanField(default=False)
+    paid = models.BooleanField(default=False)
 
     debit = models.OneToOneField(Balance, null=True, blank=True, related_name="order")
 
@@ -139,13 +138,13 @@ class Order(TimeStampedModel):
     @property
     def member_fee(self):
         # Return contribution fee if this is users' first order (unfinished orders not included)
-        amount_of_finalized_orders = self.user.orders.\
-            filter(finalized=True).\
+        amount_of_paid_orders = self.user.orders.\
+            filter(paid=True).\
             exclude(pk=self.pk).\
             exclude(pk__gt=self.pk).\
             count()
 
-        if amount_of_finalized_orders == 0:
+        if amount_of_paid_orders == 0:
             return Decimal(settings.MEMBER_FEE)
 
         return Decimal(0)
@@ -157,9 +156,9 @@ class Order(TimeStampedModel):
             if uo == self:
                 return index + 1
 
-    def remove_debit_when_unfinalized(self):
-        if not self.finalized and self.debit:
-            log_event(event="Removing debit '%s' from order '%s' because it is not finalized" % (self.debit, self),
+    def remove_debit_when_unpaid(self):
+        if not self.paid and self.debit:
+            log_event(event="Removing debit '%s' from order '%s' because it is not paid" % (self.debit, self),
                       user=self.user)
 
             # Unlink debit
@@ -303,7 +302,7 @@ class Product(TimeStampedModel):
 
     @property
     def amount_ordered(self):
-        orderproducts = self.orderproducts.filter(order__finalized=True)
+        orderproducts = self.orderproducts.filter(order__paid=True)
         total = sum(op.amount for op in orderproducts)
         return total
 
@@ -320,7 +319,7 @@ class Product(TimeStampedModel):
         return self.amount_available > 0
 
     def create_corrections(self):
-        for order_product in self.orderproducts.filter(correction__isnull=True, order__finalized=True):
+        for order_product in self.orderproducts.filter(correction__isnull=True, order__paid=True):
             OrderProductCorrection.objects.create(
                 order_product=order_product,
                 supplied_percentage=0,

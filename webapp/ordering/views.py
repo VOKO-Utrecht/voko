@@ -178,7 +178,7 @@ class OrderDisplay(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
         FormSet = inlineformset_factory(self.model, OrderProduct, extra=0, form=self.form_class)
         fs = FormSet(instance=self.get_object(), data=request.POST)
 
-        if self.object.finalized:
+        if self.object.paid:
             return HttpResponseBadRequest()
 
         if fs.is_valid():
@@ -195,11 +195,11 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
 
     def get_queryset(self):
         qs = super(FinishOrder, self).get_queryset()
-        return qs.filter(finalized=False)
+        return qs.filter(paid=False)
 
     def get_context_data(self, **kwargs):
         update_totals_for_products_with_max_order_amounts(self.get_object())
-        self.get_object().remove_debit_when_unfinalized()
+        self.get_object().remove_debit_when_unpaid()
         return super(UpdateView, self).get_context_data(**kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -231,7 +231,7 @@ class OrderSummary(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
 
     def get_queryset(self):
         qs = super(OrderSummary, self).get_queryset()
-        return qs.filter(finalized=True)
+        return qs.filter(paid=True)
 
 
 class SupplierView(LoginRequiredMixin, DetailView):

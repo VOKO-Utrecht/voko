@@ -37,7 +37,7 @@ class OrderAdminOrderLists(StaffuserRequiredMixin, DetailView):
                               'sum': self._get_total_prices_per_supplier(supplier, order_round)}
 
             for product in suppliers_products_this_round:
-                order_products = product.orderproducts.filter(order__finalized=True)
+                order_products = product.orderproducts.filter(order__paid=True)
                 product_sum = sum([op.amount for op in order_products])
                 if product_sum == 0:
                     continue
@@ -51,7 +51,7 @@ class OrderAdminOrderLists(StaffuserRequiredMixin, DetailView):
     def _get_total_prices_per_supplier(self, supplier, order_round):
         ops = OrderProduct.objects.filter(product__supplier=supplier,
                                           order__order_round=order_round,
-                                          order__finalized=True)
+                                          order__paid=True)
         return sum([op.amount * op.product.base_price for op in ops])
 
     def get_context_data(self, **kwargs):
@@ -69,7 +69,7 @@ class OrderAdminSupplierOrderCSV(StaffuserRequiredMixin, ListView):
 
         return supplier.products.\
             exclude(orderproducts=None).\
-            filter(orderproducts__order__finalized=True).\
+            filter(orderproducts__order__paid=True).\
             filter(order_round=order_round).\
             annotate(amount_sum=Sum('orderproducts__amount'))
 
@@ -79,7 +79,7 @@ class OrderAdminSupplierOrderCSV(StaffuserRequiredMixin, ListView):
 class OrderAdminUserOrdersPerProduct(StaffuserRequiredMixin, ListView):
     def get_queryset(self):
         return OrderProduct.objects.filter(product__pk=self.kwargs.get('pk'),
-                                           order__finalized=True).order_by("order__user")
+                                           order__paid=True).order_by("order__user")
     template_name = "ordering/admin/productorder.html"
 
 
@@ -88,13 +88,13 @@ class OrderAdminUserOrders(StaffuserRequiredMixin, ListView):
 
     def get_queryset(self):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
-        return Order.objects.filter(order_round=order_round, finalized=True).order_by("user__first_name")
+        return Order.objects.filter(order_round=order_round, paid=True).order_by("user__first_name")
 
 
 # Bestellingen per product
 class OrderAdminUserOrderProductsPerOrderRound(StaffuserRequiredMixin, ListView):
     def get_queryset(self):
-        return OrderProduct.objects.select_related().filter(order__order_round_id=self.kwargs.get('pk'), order__finalized=True).\
+        return OrderProduct.objects.select_related().filter(order__order_round_id=self.kwargs.get('pk'), order__paid=True).\
             order_by('product__supplier')
 
     def get_context_data(self, **kwargs):
@@ -132,7 +132,7 @@ class OrderAdminCorrectionJson(StaffuserRequiredMixin, View):
 
         for user in users:
             orders = []
-            for order in user.orders.filter(order_round=order_round, finalized=True).select_related():
+            for order in user.orders.filter(order_round=order_round, paid=True).select_related():
                 order_products = []
                 for order_product in order.orderproducts.filter(correction__isnull=True):
                     order_products.append({

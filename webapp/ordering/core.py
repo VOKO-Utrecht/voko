@@ -38,7 +38,7 @@ def get_current_order_round():
 
 def get_or_create_order(user):
     try:
-        return models.Order.objects.get_or_create(finalized=False,
+        return models.Order.objects.get_or_create(paid=False,
                                                   user=user,
                                                   order_round=get_current_order_round())[0]
     except IndexError:
