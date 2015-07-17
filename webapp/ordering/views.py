@@ -2,8 +2,7 @@ from braces.views import LoginRequiredMixin
 
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from django.forms import inlineformset_factory
-from django.http import HttpResponseBadRequest, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, FormView, View, UpdateView
 from django.views.generic.detail import SingleObjectMixin
@@ -149,7 +148,7 @@ class ProductOrder(LoginRequiredMixin, SingleObjectMixin, FormView):
     form_class = OrderProductForm
 
     def get_success_url(self):
-        return reverse("view_order", kwargs={'pk': get_or_create_order(self.request.user).pk})
+        return reverse("finish_order", kwargs={'pk': get_or_create_order(self.request.user).pk})
 
     def post(self, request, *args, **kwargs):
         form_class = self.get_form_class()
@@ -174,38 +173,6 @@ class ProductOrder(LoginRequiredMixin, SingleObjectMixin, FormView):
 
             order_product.save()
         return self.form_valid(form)
-
-
-class OrderDisplay(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
-    ## TODO: Remove this view, as it has become redundant.
-    ## It is still used to link to from the user overview. We need a replacement for that.
-    model = Order
-    form_class = OrderProductForm
-    success_url = "/hoera"
-
-    def formset(self):
-        update_totals_for_products_with_max_order_amounts(self.get_object())
-        FormSet = inlineformset_factory(self.model, OrderProduct, extra=0, form=self.form_class)
-        return FormSet(instance=self.get_object())
-
-    def post(self, request, *args, **kwargs):
-        order = self.get_object()
-        assert order.finalized is False
-        assert order.paid is False
-
-        self.object = self.get_object()
-        FormSet = inlineformset_factory(self.model, OrderProduct, extra=0, form=self.form_class)
-        fs = FormSet(instance=self.get_object(), data=request.POST)
-
-        if self.object.paid:
-            return HttpResponseBadRequest()
-
-        if fs.is_valid():
-            fs.save()
-            ## TODO: add 'succeeded' message
-
-        # Errors are saved in formset.errors: TODO: show them in template.
-        return self.render_to_response(self.get_context_data(form=self.get_form(self.form_class)))
 
 
 class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
