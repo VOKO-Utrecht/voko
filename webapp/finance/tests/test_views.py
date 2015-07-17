@@ -2,9 +2,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from mock import MagicMock
 from accounts.tests.factories import VokoUserFactory
-from finance.tests.factories import BalanceFactory
-from ordering.models import Order
-from ordering.tests.factories import OrderRoundFactory, OrderProductFactory, OrderFactory
+from ordering.tests.factories import OrderRoundFactory, OrderProductFactory
 from vokou.testing import VokoTestCase
 
 
