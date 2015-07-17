@@ -140,6 +140,8 @@ class ConfirmTransactionView(LoginRequiredMixin, QantaniMixin, TemplateView):
 
             payment.order.complete_after_payment()
 
+            del self.request.session['order_to_pay']
+
         else:
             log_event(event="Payment %s for order %s and amount %f failed" %
                       (payment.id, payment.order.id, payment.amount), user=payment.order.user)
@@ -187,6 +189,8 @@ class QantaniCallbackView(QantaniMixin, View):
             payment.order.save()
             payment.create_credit()
             payment.order.complete_after_payment()
+
+            del self.request.session['order_to_pay']
 
         return HttpResponse("+")  # This is the official "success" response
 
