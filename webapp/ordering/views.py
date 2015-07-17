@@ -7,6 +7,7 @@ from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, FormView, View, UpdateView
 from django.views.generic.detail import SingleObjectMixin
+from log import log_event
 
 from ordering.core import get_or_create_order, get_order_product, update_totals_for_products_with_max_order_amounts
 
@@ -213,14 +214,17 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
         if user_notes:
             order.user_notes = user_notes
 
+        log_event(event="Finalizing order %s" % order.id, user=order.user)
         order.finalized = True  # Freeze order
         order.save()
 
         if self.calculate_payment() == 0:
+            log_event(event="Payment for order %d not necessary because order total is %f and user's credit is %f" %
+                            (order.id, self.calculate_payment(), order.user.balance.credit()), user=order.user)
             messages.add_message(self.request, messages.SUCCESS,
                                  'Omdat je genoeg krediet had was betalen niet nodig. '
                                  'Je bestelling is bevestigd.')
-            order.finish_after_payment()
+            order.complete_after_payment()
             return redirect(reverse('order_summary', args=(order.pk,)))
 
         # Store order_id in session

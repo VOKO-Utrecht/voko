@@ -4,10 +4,11 @@
 {% block content %}
 <h1>Betalen via iDeal</h1>
     <p>
-    Bedrag huidige bestelling: &euro; {{ user.orders.get_current_order.total_price }}<br/>
-    Totaal openstaande debet: &euro; {{ user.balance.debit }}
+    Bedrag huidige bestelling: &euro; {{ order.total_price }}<br/>
+    Totaal openstaande debet: &euro; {{ user.balance.debit }}<br/>
+    Totaal credit: &euro; {{ user.balance.credit }}
     <br/><br/>
-    <strong>Te betalen: &euro; {{ user.balance.debit }}</strong>
+    <strong>Te betalen: &euro; {{ order.total_price_to_pay_with_balances_taken_into_account }}</strong>
     </p>
 
     <div class="row">

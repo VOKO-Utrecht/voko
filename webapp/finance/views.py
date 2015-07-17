@@ -7,7 +7,8 @@ from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import TemplateView, FormView, View
 from qantani import QantaniAPI
 from finance.models import Payment
-from django.contrib import messages
+from log import log_event
+from ordering.models import Order
 
 
 def choosebankform_factory(banks):
@@ -55,6 +56,11 @@ class ChooseBankView(LoginRequiredMixin, QantaniMixin, FormView):
         banks = self.qantani_api.get_ideal_banks()
         return choosebankform_factory(banks)
 
+    def get_context_data(self, **kwargs):
+        context = super(ChooseBankView, self).get_context_data(**kwargs)
+        context['order'] = Order.objects.get(id=self.request.session['order_to_pay'])
+        return context
+
 
 class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
     """
@@ -73,16 +79,23 @@ class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
             # Should not happen. Redirect back to prev. view
             redirect(reverse('finance.choosebank'))
 
-        user_debit = self.request.user.balance.debit()
-        assert user_debit > 0
+        order_to_pay = Order.objects.get(id=request.session['order_to_pay'])
+        amount_to_pay = order_to_pay.total_price_to_pay_with_balances_taken_into_account()
+        log_event("Initiating payment (creating transaction) for order %d and amount %f" %
+                  (order_to_pay.id, amount_to_pay), order_to_pay.user)
+
+        assert order_to_pay.user == request.user
+        assert order_to_pay.finalized is True
+        assert order_to_pay.paid is False
+        assert order_to_pay.debit is None
+
         bank_id = f.cleaned_data['bank']
         results = self._create_transaction(bank_id=bank_id,
-                                           amount=user_debit,
-                                           description="VOKO Utrecht ID %d" %
-                                                       self.request.user.orders.get_current_order().id)
+                                           amount=amount_to_pay,
+                                           description="VOKO Utrecht ID %d" % order_to_pay.id)
 
-        Payment.objects.create(amount=user_debit,
-                               order=self.request.user.orders.get_current_order(),
+        Payment.objects.create(amount=amount_to_pay,
+                               order=order_to_pay,
                                transaction_id=results.get("TransactionID"),
                                transaction_code=results.get("Code"))
 
@@ -119,12 +132,14 @@ class ConfirmTransactionView(LoginRequiredMixin, QantaniMixin, TemplateView):
             payment.order.paid = True
             payment.order.save()
             payment.create_credit()
+            log_event("Payment %s for order %s and amount %f succeeded" %
+                      (payment.id, payment.order.id, payment.amount), payment.order.user)
 
-            payment.order.mail_confirmation()
+            payment.order.complete_after_payment()
 
-# Temporarely removed / 18-02-2015
-#        else:
-#            payment.order.remove_debit_when_unfinalized()
+        else:
+            log_event("Payment %s for order %s and amount %f failed" %
+                      (payment.id, payment.order.id, payment.amount), payment.order.user)
 
         context['payment_succeeded'] = success
 
@@ -149,6 +164,8 @@ class QantaniCallbackView(QantaniMixin, View):
                                              transaction_id, transaction_status, transaction_salt)
 
         if not success:
+            log_event("Payment %s for order %s and amount %f failed" %
+                      (payment.id, payment.order.id, payment.amount), payment.order.user)
             return HttpResponse("")  # Any other response than "+" means failure.
 
         payment.succeeded = True
@@ -157,10 +174,12 @@ class QantaniCallbackView(QantaniMixin, View):
         if payment.order.paid is False:
             # This means that the user paid, but closed the browser after confirming. The callback view enables
             # us to finish the order anyway.
+            log_event("Payment %s for order %s and amount %f succeeded via callback" %
+                      (payment.id, payment.order.id, payment.amount), payment.order.user)
+
             payment.order.paid = True
             payment.order.save()
             payment.create_credit()
-
-            payment.order.mail_confirmation()
+            payment.order.complete_after_payment()
 
         return HttpResponse("+")  # This is the official "success" response

@@ -169,11 +169,13 @@ class Order(TimeStampedModel):
 
             _debit.delete()
 
-    def finish_after_payment(self):
+    def complete_after_payment(self):
         # TODO send mail
+        # TODO create debet
+        log_event(event="Completing (paid) order %s" % self.id, user=self.user)
         self.paid = True
         self.save()
-        pass
+        self.mail_confirmation()
 
     def create_and_link_debit(self):
         """
