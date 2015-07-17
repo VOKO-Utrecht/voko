@@ -4,7 +4,7 @@ from mock import MagicMock
 from accounts.tests.factories import VokoUserFactory
 from finance.tests.factories import BalanceFactory
 from ordering.models import Order
-from ordering.tests.factories import OrderRoundFactory, OrderProductFactory
+from ordering.tests.factories import OrderRoundFactory, OrderProductFactory, OrderFactory
 from vokou.testing import VokoTestCase
 
 
@@ -27,6 +27,11 @@ class TestChooseBank(VokoTestCase):
                                          order__user=self.user)
         o_p.order.create_and_link_debit()
         o_p.save()
+        self.order = o_p.order
+
+        s = self.client.session
+        s['order_to_pay'] = self.order.id
+        s.save()
 
     def test_that_qantani_api_client_is_initiated(self):
         self.client.get(self.url)
@@ -50,22 +55,6 @@ class TestChooseBank(VokoTestCase):
         expected = [tuple(x.values()) for x in banks]
         self.assertEqual(form.fields.get('bank').choices, expected)
 
-    def test_given_no_debit_and_unfinished_order_the_order_is_finished_and_we_are_redirected_to_summary_page(self):
-        BalanceFactory.create(user=self.user,
-                              type="CR",
-                              amount=100)
-
-        order = self.user.orders.get_current_order()
-        o_p = OrderProductFactory.create(amount=1, product__base_price=10,
-                                         order=order, product__order_round=order.order_round)
-
-        assert order.paid is False
-        assert o_p.order.total_price < 100
+    def test_order_is_placed_in_context(self):
         ret = self.client.get(self.url)
-
-        # Re-fetch
-        order = Order.objects.get(pk=order.pk)
-        self.assertTrue(order.paid)
-
-        self.assertEqual(ret.status_code, 302)
-        self.assertEqual(ret.url, "http://testserver" + reverse('order_summary', args=(order.pk,)))
+        self.assertEqual(ret.context[0]['order'], self.order)
