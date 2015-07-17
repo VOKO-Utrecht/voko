@@ -25,7 +25,7 @@ create_credit_for_order.short_description = "Contant betaald"
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ["id", "order_round", "user", "paid", "total_price", "user_notes"]
+    list_display = ["id", "order_round", "user", "finalized", "paid", "total_price", "user_notes"]
     ordering = ("-id", )
     # inlines = [OrderProductInline]  ## causes timeout
     list_filter = ("paid", )
@@ -52,7 +52,6 @@ try:
         fn.short_description = "Set category to '%s'" % category.name
         fn.__name__ = str(category.id)
         prod_cat_actions.append(fn)
-
 
     def remove_category(_, __, queryset):
         for product in queryset:
