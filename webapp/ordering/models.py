@@ -108,7 +108,8 @@ class Order(TimeStampedModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="orders")
     user_notes = models.TextField(null=True, blank=True)
 
-    paid = models.BooleanField(default=False)
+    finalized = models.BooleanField(default=False)  # To "freeze" order before payment
+    paid = models.BooleanField(default=False)  # True when paid
 
     debit = models.OneToOneField(Balance, null=True, blank=True, related_name="order")
 
@@ -157,6 +158,7 @@ class Order(TimeStampedModel):
                 return index + 1
 
     def remove_debit_when_unpaid(self):
+        # TODO remove?
         if not self.paid and self.debit:
             log_event(event="Removing debit '%s' from order '%s' because it is not paid" % (self.debit, self),
                       user=self.user)
