@@ -180,14 +180,6 @@ class Order(TimeStampedModel):
                                        notes="Debit van %s voor bestelling #%d" % (self.total_price, self.pk))
         self.debit = debit
 
-    def update_debit(self):
-        """
-        Update debit amount and note to current order total.
-        """
-        self.debit.amount = self.total_price
-        self.debit.notes = "Debit van %s voor bestelling #%d" % (self.total_price, self.pk)
-        self.debit.save()
-
     def mail_confirmation(self):
         mail_template = get_template_by_id(ORDER_CONFIRM_MAIL_ID)
         rendered_template_vars = render_mail_template(mail_template, user=self.user, order=self)
