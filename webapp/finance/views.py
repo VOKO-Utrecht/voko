@@ -2,7 +2,7 @@ from braces.views import LoginRequiredMixin
 from django import forms
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import TemplateView, FormView, View
 from qantani import QantaniAPI
@@ -81,8 +81,8 @@ class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
 
         order_to_pay = Order.objects.get(id=request.session['order_to_pay'])
         amount_to_pay = order_to_pay.total_price_to_pay_with_balances_taken_into_account()
-        log_event("Initiating payment (creating transaction) for order %d and amount %f" %
-                  (order_to_pay.id, amount_to_pay), order_to_pay.user)
+        log_event(event="Initiating payment (creating transaction) for order %d and amount %f" %
+                  (order_to_pay.id, amount_to_pay), user=order_to_pay.user)
 
         assert order_to_pay.user == request.user
         assert order_to_pay.finalized is True
@@ -127,19 +127,22 @@ class ConfirmTransactionView(LoginRequiredMixin, QantaniMixin, TemplateView):
                                              transaction_id, transaction_status, transaction_salt)
 
         if success:
+            assert payment.order.finalized is True
+            assert payment.order.paid is False
+
             payment.succeeded = True
             payment.save()
             payment.order.paid = True
             payment.order.save()
             payment.create_credit()
-            log_event("Payment %s for order %s and amount %f succeeded" %
-                      (payment.id, payment.order.id, payment.amount), payment.order.user)
+            log_event(event="Payment %s for order %s and amount %f succeeded" %
+                      (payment.id, payment.order.id, payment.amount), user=payment.order.user)
 
             payment.order.complete_after_payment()
 
         else:
-            log_event("Payment %s for order %s and amount %f failed" %
-                      (payment.id, payment.order.id, payment.amount), payment.order.user)
+            log_event(event="Payment %s for order %s and amount %f failed" %
+                      (payment.id, payment.order.id, payment.amount), user=payment.order.user)
 
         context['payment_succeeded'] = success
 
@@ -164,8 +167,8 @@ class QantaniCallbackView(QantaniMixin, View):
                                              transaction_id, transaction_status, transaction_salt)
 
         if not success:
-            log_event("Payment %s for order %s and amount %f failed" %
-                      (payment.id, payment.order.id, payment.amount), payment.order.user)
+            log_event(event="Payment %s for order %s and amount %f failed" %
+                      (payment.id, payment.order.id, payment.amount), user=payment.order.user)
             return HttpResponse("")  # Any other response than "+" means failure.
 
         payment.succeeded = True
@@ -174,8 +177,11 @@ class QantaniCallbackView(QantaniMixin, View):
         if payment.order.paid is False:
             # This means that the user paid, but closed the browser after confirming. The callback view enables
             # us to finish the order anyway.
-            log_event("Payment %s for order %s and amount %f succeeded via callback" %
-                      (payment.id, payment.order.id, payment.amount), payment.order.user)
+
+            assert payment.order.finalized is True
+
+            log_event(event="Payment %s for order %s and amount %f succeeded via callback" %
+                      (payment.id, payment.order.id, payment.amount), user=payment.order.user)
 
             payment.order.paid = True
             payment.order.save()
@@ -183,3 +189,22 @@ class QantaniCallbackView(QantaniMixin, View):
             payment.order.complete_after_payment()
 
         return HttpResponse("+")  # This is the official "success" response
+
+
+class CancelPaymentView(View):
+    """
+    When user clicks 'cancel' on the choosebankview
+    """
+
+    def get(self, request, *args, **kwargs):
+        order_to_pay = Order.objects.get(id=request.session['order_to_pay'])
+
+        assert order_to_pay.finalized is True
+        assert order_to_pay.paid is False
+
+        order_to_pay.finalized = False
+        order_to_pay.save()
+
+        log_event(event="Payment for order %s canceled" % order_to_pay.id, user=order_to_pay.user)
+
+        return HttpResponseRedirect(reverse("finish_order", args=(order_to_pay.pk,)))
