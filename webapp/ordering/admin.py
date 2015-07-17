@@ -28,7 +28,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = ["id", "order_round", "user", "finalized", "paid", "total_price", "user_notes"]
     ordering = ("-id", )
     # inlines = [OrderProductInline]  ## causes timeout
-    list_filter = ("paid", )
+    list_filter = ("paid", "finalized", "order_round")
     actions = (create_credit_for_order, )
 
 admin.site.register(Order, OrderAdmin)
