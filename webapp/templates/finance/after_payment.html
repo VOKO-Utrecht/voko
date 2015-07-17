@@ -5,7 +5,7 @@
     {% if payment_succeeded  %}
         <h1>Betaling geslaagd</h1>
         <p>
-        <a href="{% url 'order_summary' user.orders.get_last_finalized_order.pk %}">Er is een bevestiging naar je toe gemaild. Klik hier om je bestelling te bekijken.</a>
+        <a href="{% url 'order_summary' user.orders.get_last_paid_order.pk %}">Er is een bevestiging naar je toe gemaild. Klik hier om je bestelling te bekijken.</a>
         </p>
     {% else %}
             <h1>Betaling mislukt</h1>

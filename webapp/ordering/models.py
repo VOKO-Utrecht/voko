@@ -167,6 +167,7 @@ class Order(TimeStampedModel):
         """
         Create debit and save as self.debit one-to-one
         """
+        log_event(event="Creating debit for order %s" % self.id)
         debit = Balance.objects.create(user=self.user,
                                        type="DR",
                                        amount=self.total_price,
