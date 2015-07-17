@@ -202,6 +202,10 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
         self.get_object().remove_debit_when_unpaid()
         return super(UpdateView, self).get_context_data(**kwargs)
 
+    def calculate_payment(self):
+        order = self.get_object()
+        return order.total_price_to_pay_with_balances_taken_into_account()
+
     def post(self, request, *args, **kwargs):
         order = self.get_object()
 
@@ -209,7 +213,18 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
         if user_notes:
             order.user_notes = user_notes
 
+        order.finalized = True  # Freeze order
         order.save()
+
+        if self.calculate_payment() == 0:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 'Omdat je genoeg krediet had was betalen niet nodig. '
+                                 'Je bestelling is bevestigd.')
+            order.finish_after_payment()
+            return redirect(reverse('order_summary', args=(order.pk,)))
+
+        # Store order_id in session
+        request.session['order_to_pay'] = order.id
         return redirect('finance.choosebank')
 
 

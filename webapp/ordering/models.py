@@ -125,7 +125,6 @@ class Order(TimeStampedModel):
         product_sum = sum([p.total_price for p in self.orderproducts.all()])
         return product_sum + self.order_round.transaction_costs + self.member_fee
 
-    @property
     def total_price_to_pay_with_balances_taken_into_account(self):
         if self.user.balance.credit() > 0:
             total_price = self.total_price - self.user.balance.credit()
@@ -169,6 +168,12 @@ class Order(TimeStampedModel):
             self.save()
 
             _debit.delete()
+
+    def finish_after_payment(self):
+        # TODO send mail
+        self.paid = True
+        self.save()
+        pass
 
     def create_and_link_debit(self):
         """
