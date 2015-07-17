@@ -3,7 +3,7 @@ from braces.views import LoginRequiredMixin
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.forms import inlineformset_factory
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, FormView, View, UpdateView
 from django.views.generic.detail import SingleObjectMixin
@@ -26,12 +26,22 @@ class ProductsView(LoginRequiredMixin, ListView):
 
         return Product.objects.filter(order_round=order_round).order_by('name')
 
+    def get(self, *args, **kwargs):
+        ret = super(ProductsView, self).get(*args, **kwargs)
+        order = get_or_create_order(self.request.user)
+        if order.finalized is True:
+            messages.warning(self.request, "Je bent doorgestuurd naar de betaalpagina omdat je bestelling nog niet is betaald!")
+            return HttpResponseRedirect(reverse('finance.choosebank'))
+        return ret
+
     def post(self, request, *args, **kwargs):
         """
         Handling complex forms using Django's forms framework is nearly impossible without
          all kinds of trickery that don't necessarily make the code more readable. Hence: manual parsing of POST data.
         """
         order = get_or_create_order(self.request.user)
+        assert order.finalized is False
+        assert order.paid is False
 
         for key, value in request.POST.iteritems():
             if key.startswith("order-product-") and (value.isdigit() or value == ""):
@@ -148,8 +158,12 @@ class ProductOrder(LoginRequiredMixin, SingleObjectMixin, FormView):
                                                                        user=self.request.user
                                                                    )))
         if form.is_valid():
+            order = get_or_create_order(request.user)
+            assert order.finalized is False
+            assert order.paid is False
+
             order_product = form.save(commit=False)
-            order_product.order = get_or_create_order(request.user)
+            order_product.order = order
             assert order_product.product.order_round == self.request.current_order_round  # TODO: nicer error, or just disable ordering.
 
             # Remove product from order when amount is zero
@@ -175,6 +189,10 @@ class OrderDisplay(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
         return FormSet(instance=self.get_object())
 
     def post(self, request, *args, **kwargs):
+        order = self.get_object()
+        assert order.finalized is False
+        assert order.paid is False
+
         self.object = self.get_object()
         FormSet = inlineformset_factory(self.model, OrderProduct, extra=0, form=self.form_class)
         fs = FormSet(instance=self.get_object(), data=request.POST)
