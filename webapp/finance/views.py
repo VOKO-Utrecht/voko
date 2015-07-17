@@ -15,7 +15,7 @@ def choosebankform_factory(banks):
     choices = [(bank['Id'], bank['Name']) for bank in banks]
 
     class ChooseBankForm(forms.Form):
-        bank = forms.ChoiceField(choices=choices)
+        bank = forms.ChoiceField(choices=choices, required=True)
 
     return ChooseBankForm
 
@@ -75,7 +75,7 @@ class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
     def post(self, request, *args, **kwargs):
         form = self.get_form_class()
         f = form(data=request.POST)
-        if not f.is_valid():
+        if f.is_valid() is False:
             # Should not happen. Redirect back to prev. view
             redirect(reverse('finance.choosebank'))
 
@@ -96,10 +96,10 @@ class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
 
         Payment.objects.create(amount=amount_to_pay,
                                order=order_to_pay,
-                               transaction_id=results.get("TransactionID"),
-                               transaction_code=results.get("Code"))
+                               transaction_id=results["TransactionID"],
+                               transaction_code=results["Code"])
 
-        redirect_url = results.get("BankURL")
+        redirect_url = results["BankURL"]
         return redirect(redirect_url)
 
 
