@@ -3,6 +3,7 @@ from django.conf import settings
 
 
 class Payment(models.Model):
+    # TODO link to balance model
     amount = models.DecimalField(max_digits=6, decimal_places=2)
     order = models.ForeignKey("ordering.Order", null=True, related_name="payments")
 
