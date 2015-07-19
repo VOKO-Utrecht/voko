@@ -1,8 +1,9 @@
 from django.db import models
 from django.conf import settings
+from django_extensions.db.models import TimeStampedModel
 
 
-class Payment(models.Model):
+class Payment(TimeStampedModel):
     # TODO link to balance model
     amount = models.DecimalField(max_digits=6, decimal_places=2)
     order = models.ForeignKey("ordering.Order", null=True, related_name="payments")
@@ -45,7 +46,7 @@ class BalanceManager(models.Manager):
         return _debit if _debit > 0 else 0
 
 
-class Balance(models.Model):
+class Balance(TimeStampedModel):
     # TODO: add sanity check; amount may never be negative.
     TYPES = (
         ("CR", "Credit"),

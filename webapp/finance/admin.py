@@ -62,7 +62,7 @@ class CorrectionListFilter(admin.SimpleListFilter):
 
 
 class BalanceAdmin(admin.ModelAdmin):
-    list_display = ["id", "user", "type", "amount", "notes", "order", "is_correction", "is_payment"]
+    list_display = ["id", "created", "modified", "user", "type", "amount", "notes", "order", "is_correction", "is_payment"]
     ordering = ("-id", )
     list_filter = ("type", PaymentListFilter, CorrectionListFilter)
     search_fields = ['notes']
