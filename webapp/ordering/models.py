@@ -111,10 +111,10 @@ class Order(TimeStampedModel):
     # If order has been paid
     finalized = models.BooleanField(default=False)
 
-    debit = models.OneToOneField(Balance, null=True, blank=True)
+    debit = models.OneToOneField(Balance, null=True, blank=True, related_name="order")
 
     def __unicode__(self):
-        return u"Order %d; value: E%s; user: %s" % (self.id, self.total_price, self.user)
+        return u"Order %d; user: %s" % (self.id, self.user)
 
     @property
     def has_products(self):
