@@ -219,7 +219,7 @@ class OrderProductCorrection(TimeStampedModel):
     order_product = models.OneToOneField("OrderProduct", related_name="correction")
     supplied_percentage = models.IntegerField()
     notes = models.TextField(blank=True)
-    credit = models.OneToOneField(Balance)
+    credit = models.OneToOneField(Balance, related_name="correction")
 
     def __unicode__(self):
         return u"Correction on OrderProduct: %s" % self.order_product

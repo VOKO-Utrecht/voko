@@ -17,34 +17,17 @@ class PaymentListFilter(admin.SimpleListFilter):
 
     # TODO: link payment to balance and use that connection
 
-    # Human-readable title which will be displayed in the
-    # right admin sidebar just above the filter options.
     title = 'is payment'
-
-    # Parameter for the filter that will be used in the URL query.
     parameter_name = 'ispayment'
-
     default_value = None
 
     def lookups(self, request, model_admin):
-        """
-        Returns a list of tuples. The first element in each
-        tuple is the coded value for the option that will
-        appear in the URL query. The second element is the
-        human-readable name for the option that will appear
-        in the right sidebar.
-        """
         return (
             ('1', 'True'),
             ('0', 'False'),
         )
 
     def queryset(self, request, queryset):
-        """
-        Returns the filtered queryset based on the value
-        provided in the query string and retrievable via
-        `self.value()`.
-        """
         # Compare the requested value to decide how to filter the queryset.
         if self.value() == '1':
             return queryset.filter(notes__contains="iDeal betaling")
@@ -52,11 +35,41 @@ class PaymentListFilter(admin.SimpleListFilter):
             return queryset.exclude(notes__contains="iDeal betaling")
 
 
+class CorrectionListFilter(admin.SimpleListFilter):
+    """
+    This filter will always return a subset of the instances in a Model, either filtering by the
+    user choice or by a default value.
+    """
+
+    # TODO: link payment to balance and use that connection
+
+    title = 'is correction'
+    parameter_name = 'iscorr'
+    default_value = None
+
+    def lookups(self, request, model_admin):
+        return (
+            ('1', 'True'),
+            ('0', 'False'),
+        )
+
+    def queryset(self, request, queryset):
+        # Compare the requested value to decide how to filter the queryset.
+        if self.value() == '1':
+            return queryset.filter(correction__isnull=False)
+        if self.value() == '0':
+            return queryset.filter(correction__isnull=True)
+
+
 class BalanceAdmin(admin.ModelAdmin):
-    list_display = ["id", "user", "type", "amount", "notes", "order", "is_payment"]
+    list_display = ["id", "user", "type", "amount", "notes", "order", "is_correction", "is_payment"]
     ordering = ("-id", )
-    list_filter = ("type", PaymentListFilter)
+    list_filter = ("type", PaymentListFilter, CorrectionListFilter)
     search_fields = ['notes']
+
+    def is_correction(self, obj):
+        return True if obj.correction else False
+    is_correction.boolean = True
 
     def is_payment(self, obj):
         return "iDeal betaling" in obj.notes
