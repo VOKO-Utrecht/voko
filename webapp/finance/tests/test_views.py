@@ -3,7 +3,8 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from mock import MagicMock
 from accounts.tests.factories import VokoUserFactory
-from finance.models import Payment
+from finance.models import Payment, Balance
+from finance.tests.factories import PaymentFactory
 from ordering.tests.factories import OrderRoundFactory, OrderProductFactory, OrderFactory
 from vokou.testing import VokoTestCase
 
@@ -138,4 +139,125 @@ class TestCreateTransaction(VokoTestCase):
     def test_redirect_on_invalid_form(self):
         ret = self.client.post(self.url, {'bank': 'foo'})
         self.assertEqual(ret.status_code, 200)
+
+
+class TestConfirmTransaction(VokoTestCase):
+    def setUp(self):
+        self.url = reverse('finance.confirmtransaction')
+
+        self.user = VokoUserFactory.create()
+        self.user.set_password('secret')
+        self.user.is_active = True
+        self.user.save()
+        self.client.login(username=self.user.email, password='secret')
+
+        self.order = OrderFactory(user=self.user,
+                                  finalized=True,
+                                  paid=False)
+
+        s = self.client.session
+        s['order_to_pay'] = self.order.id
+        s.save()
+
+        self.payment = PaymentFactory(order=self.order)
+
+        self.mock_qantani_api = self.patch("finance.views.QantaniAPI")
+        self.mock_qantani_api.return_value.get_ideal_banks = MagicMock()
+        self.mock_qantani_api.return_value.validate_transaction_checksum = MagicMock()
+        self.mock_qantani_api.return_value.validate_transaction_checksum.return_value = True
+
+        self.mock_complete_after_payment = self.patch("ordering.models.Order.complete_after_payment")
+        self.mock_create_credit = self.patch("finance.models.Payment.create_credit")
+
+    def test_required_get_parameters(self):
+        ret = self.client.get(self.url, {
+            'id': 1234,
+            'status': '1',
+            'salt': 'pepper',
+            'checksum': 'yes',
+        })
+        self.assertEqual(ret.status_code, 404)
+
+    def test_no_validation_when_status_is_not_1(self):
+        ret = self.client.get(self.url, {
+            'id': self.payment.transaction_id,
+            'status': 'not 1',
+            'salt': 'pepper',
+            'checksum': 'yes',
+        })
+        self.assertEqual(ret.status_code, 200)
+        self.assertFalse(self.mock_qantani_api.return_value.validate_transaction_checksum.called)
+
+    def test_payment_and_order_status_after_failure_payment(self):
+        self.client.get(self.url, {
+            'id': self.payment.transaction_id,
+            'status': 'not 1',
+            'salt': 'pepper',
+            'checksum': 'yes',
+        })
+
+        payment = Payment.objects.get()
+        self.assertFalse(payment.succeeded)
+        self.assertFalse(payment.order.paid)
+        self.assertFalse(Balance.objects.all())
+
+    def test_that_payment_is_validated(self):
+        ret = self.client.get(self.url, {
+            'id': self.payment.transaction_id,
+            'status': '1',
+            'salt': 'pepper',
+            'checksum': 'checksum',
+        })
+        self.assertEqual(ret.status_code, 200)
+        self.mock_qantani_api.return_value.validate_transaction_checksum.assert_called_once_with(
+            "checksum",
+            str(self.payment.transaction_id),
+            self.payment.transaction_code,
+            "1",
+            "pepper"
+        )
+
+    def test_that_complete_after_payment_is_called_on_valid_payment(self):
+        ret = self.client.get(self.url, {
+            'id': self.payment.transaction_id,
+            'status': '1',
+            'salt': 'pepper',
+            'checksum': 'yes',
+        })
+        self.assertEqual(ret.status_code, 200)
+        self.mock_complete_after_payment.assert_called_once_with()
+
+    def test_payment_and_order_status_after_successful_payment(self):
+        self.client.get(self.url, {
+            'id': self.payment.transaction_id,
+            'status': '1',
+            'salt': 'pepper',
+            'checksum': 'yes',
+        })
+
+        payment = Payment.objects.get()
+        self.assertTrue(payment.succeeded)
+        self.assertTrue(payment.order.paid)
+        self.mock_create_credit.assert_called_once_with()
+
+    def test_that_order_id_is_removed_from_session_on_succesful_payment(self):
+        self.client.get(self.url, {
+            'id': self.payment.transaction_id,
+            'status': '1',
+            'salt': 'pepper',
+            'checksum': 'yes',
+        })
+
+        s = self.client.session
+        self.assertNotIn('order_to_pay', s)
+
+    def test_payment_status_in_context(self):
+        ret = self.client.get(self.url, {
+            'id': self.payment.transaction_id,
+            'status': '1',
+            'salt': 'pepper',
+            'checksum': 'yes',
+        })
+        self.assertEqual(ret.context[0]['payment_succeeded'], True)
+
 
