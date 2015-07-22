@@ -5,6 +5,7 @@ from mock import MagicMock
 from accounts.tests.factories import VokoUserFactory
 from finance.models import Payment, Balance
 from finance.tests.factories import PaymentFactory
+from ordering.models import Order
 from ordering.tests.factories import OrderRoundFactory, OrderProductFactory, OrderFactory
 from vokou.testing import VokoTestCase
 
@@ -357,3 +358,33 @@ class TestQantaniCallbackView(VokoTestCase):
 
         s = self.client.session
         self.assertNotIn('order_to_pay', s)
+
+
+class TestCancelPaymentView(VokoTestCase):
+    def setUp(self):
+        self.url = reverse('finance.cancelpayment')
+
+        self.user = VokoUserFactory.create()
+        self.user.set_password('secret')
+        self.user.is_active = True
+        self.user.save()
+        self.client.login(username=self.user.email, password='secret')
+
+        self.order = OrderFactory(user=self.user,
+                                  finalized=True,
+                                  paid=False)
+
+        s = self.client.session
+        s['order_to_pay'] = self.order.id
+        s.save()
+
+    def test_order_finalized_is_set_to_false(self):
+        self.client.get(self.url)
+        order = Order.objects.get()
+        self.assertFalse(order.finalized)
+
+    def test_redirect_to_finish_order(self):
+        ret = self.client.get(self.url)
+        self.assertRedirects(ret, "http://testserver%s" %
+                             reverse('finish_order', args=(self.order.id,)),
+                             fetch_redirect_response=False)
