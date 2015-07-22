@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.db.models.loading import get_models, get_app
-from finance.models import Balance
+from finance.models import Balance, Payment
 
 for model in get_models(get_app('finance')):
-    if model in (Balance,):
+    if model in (Balance, Payment):
         continue
 
     admin.site.register(model)
@@ -75,5 +75,13 @@ class BalanceAdmin(admin.ModelAdmin):
         return "iDeal betaling" in obj.notes
     is_payment.boolean = True
 
+
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = ["id", "created", "amount", "order",  "transaction_id", "succeeded"]
+    ordering = ("-id", )
+    list_filter = ("succeeded",)
+
+
 admin.site.register(Balance, BalanceAdmin)
+admin.site.register(Payment, PaymentAdmin)
 
