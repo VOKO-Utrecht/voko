@@ -1,5 +1,5 @@
 # VOKO automation
-![Travis CI](https://api.travis-ci.org/rikva/vokou.svg)
+[![Travis CI](https://api.travis-ci.org/rikva/vokou.svg)](https://travis-ci.org/rikva/vokou)
 ## Some notes
 1. This application depends on Django 1.7, RC1.
 2. It's been a while since I last crafted a Django application. 
