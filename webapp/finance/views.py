@@ -169,7 +169,7 @@ class QantaniCallbackView(QantaniMixin, View):
                                              transaction_id, transaction_status, transaction_salt)
 
         if not success:
-            log_event(event="Payment %s for order %s and amount %f failed" %
+            log_event(event="Payment %s for order %s and amount %f failed via callback" %
                       (payment.id, payment.order.id, payment.amount), user=payment.order.user)
             return HttpResponse("")  # Any other response than "+" means failure.
 
