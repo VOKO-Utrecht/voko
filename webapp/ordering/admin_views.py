@@ -366,8 +366,9 @@ class CreateRealProducts(TemplateView, ProductAdminMixin):
     def create_products(self):
         for dp in DraftProduct.objects.filter(supplier=self.supplier,
                                               order_round=self.current_order_round):
-            dp.create_product()
+            prod = dp.create_product()
             dp.delete()
+            prod.determine_if_product_is_new_and_set_label()
 
 
 class ProductAdminMain(StaffuserRequiredMixin, ListView):
