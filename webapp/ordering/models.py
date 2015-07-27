@@ -267,6 +267,7 @@ class Product(TimeStampedModel):
     supplier = models.ForeignKey("Supplier", related_name="products")
     order_round = models.ForeignKey("OrderRound", related_name="products")
     category = models.ForeignKey("ProductCategory", related_name="products", null=True, blank=True)
+    new = models.BooleanField(default=False, verbose_name="Show 'new' label")
 
     maximum_total_order = models.IntegerField(null=True, blank=True)
 
