@@ -315,6 +315,21 @@ class Product(TimeStampedModel):
                 notes='Product niet geleverd: "%s" (%s) [%s]' % (self.name, self.supplier.name, self.id)
             )
 
+    def determine_if_product_is_new_and_set_label(self):
+        try:
+            prev_round = OrderRound.objects.get(id=self.order_round.id-1)
+        except OrderRound.ObjectDoesNotExist:
+            return
+
+        if not prev_round.products.filter(name=self.name,
+                                          description=self.description,
+                                          supplier=self.supplier,
+                                          unit_of_measurement=self.unit_of_measurement):
+            self.new = True
+            self.save()
+            log_event(event="Setting product %s to 'new' because I could not find a "
+                            "similar product in order round %d" % (self, prev_round.id))
+
 
 class DraftProduct(TimeStampedModel):
     data = JSONField()
