@@ -65,9 +65,10 @@ except OperationalError:
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ["name", 'description', "order_round", "supplier", "category", "base_price", "maximum_total_order"]
+    list_display = ["name", 'description', "order_round", "supplier", "category", "base_price", "maximum_total_order",
+                    "new"]
     ordering = ("-id", )
-    list_filter = ("order_round", "supplier", "category")
+    list_filter = ("order_round", "supplier", "category", "new")
     actions = prod_cat_actions
     list_per_page = 500
 
