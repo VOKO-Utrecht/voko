@@ -190,8 +190,6 @@ class QantaniCallbackView(QantaniMixin, View):
             payment.create_credit()
             payment.order.complete_after_payment()
 
-            del self.request.session['order_to_pay']
-
         return HttpResponse("+")  # This is the official "success" response
 
 

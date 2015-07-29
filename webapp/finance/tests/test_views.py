@@ -347,18 +347,6 @@ class TestQantaniCallbackView(VokoTestCase):
         self.mock_create_credit.assert_called_once_with()
         self.mock_complete_after_payment.assert_called_once_with()
 
-    def test_that_order_id_is_removed_from_session_when_order_paid_is_false(self):
-        assert self.order.paid is False
-        self.client.get(self.url, {
-            'id': self.payment.transaction_id,
-            'status': '1',
-            'salt': 'pepper',
-            'checksum': 'yes',
-        })
-
-        s = self.client.session
-        self.assertNotIn('order_to_pay', s)
-
 
 class TestCancelPaymentView(VokoTestCase):
     def setUp(self):
