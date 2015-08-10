@@ -141,6 +141,10 @@ class TestCreateTransaction(VokoTestCase):
         ret = self.client.post(self.url, {'bank': 'foo'})
         self.assertEqual(ret.status_code, 200)
 
+    @skip("TODO!")
+    def test_redirect_when_order_round_is_closed(self):
+        pass
+
 
 class TestConfirmTransaction(VokoTestCase):
     def setUp(self):

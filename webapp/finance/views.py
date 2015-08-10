@@ -1,6 +1,7 @@
 from braces.views import LoginRequiredMixin
 from django import forms
 from django.conf import settings
+from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, get_object_or_404
@@ -89,6 +90,12 @@ class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
         assert order_to_pay.paid is False
         assert order_to_pay.debit is None
 
+        if order_to_pay.order_round.is_open is not True:
+            messages.error(request, "De bestelronde is gesloten, je kunt niet meer betalen.")
+            log_event(event="Payment for order %s canceled because order round %s is closed" %
+                            (order_to_pay.id, order_to_pay.order_round.id), user=order_to_pay.user)
+            redirect(reverse('finish_order', args=(order_to_pay.id,)))
+
         bank_id = f.cleaned_data['bank']
         results = self._create_transaction(bank_id=bank_id,
                                            amount=amount_to_pay,
@@ -129,6 +136,7 @@ class ConfirmTransactionView(LoginRequiredMixin, QantaniMixin, TemplateView):
         if success:
             assert payment.order.finalized is True
             assert payment.order.paid is False
+            assert payment.order.order_round.is_open is True
 
             payment.succeeded = True
             payment.save()
@@ -188,7 +196,17 @@ class QantaniCallbackView(QantaniMixin, View):
             payment.order.paid = True
             payment.order.save()
             payment.create_credit()
-            payment.order.complete_after_payment()
+
+            if payment.order.order_round.is_open:
+                payment.order.complete_after_payment()
+            else:
+                # Possible corner case where payment was executed before closing time, but never finished (user
+                # closed browser tab), the payment is now validated by callback, but order round is closed and our
+                # suppliers may have been mailed the totals. Credit for the user has just been created, but we don't
+                # want to complete the order because it was placed too late.
+                log_event(event="Order round %s is closed, so not finishing order %s via callback!" % (
+                    payment.order.order_round.id, payment.order.id
+                ), user=payment.order.user)
 
         return HttpResponse("+")  # This is the official "success" response
 
