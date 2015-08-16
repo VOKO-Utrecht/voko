@@ -87,6 +87,7 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
+    is_asleep = models.BooleanField(default=False)
     objects = VokoUserManager()
 
     def get_full_name(self):
