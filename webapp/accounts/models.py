@@ -185,3 +185,19 @@ class PasswordResetRequest(TimeStampedModel):
 class ReadOnlyVokoUser(VokoUser):
     class Meta:
         proxy = True
+        verbose_name = "Lid (read-only)"
+        verbose_name_plural = "Leden (read-only)"
+
+
+class SleepingVokoUserManager(VokoUserManager):
+    def get_queryset(self):
+        return super(BaseUserManager, self).get_queryset().filter(is_asleep=True)
+
+
+class SleepingVokoUser(VokoUser):
+    class Meta:
+        proxy = True
+        verbose_name = "Slapend lid"
+        verbose_name_plural = "Slapende leden"
+
+    objects = SleepingVokoUserManager()
