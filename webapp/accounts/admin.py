@@ -98,7 +98,7 @@ class VokoUserAdmin(UserAdmin, HijackUserAdminMixin):
     ordering = ("-created", )
     filter_horizontal = ("groups", "user_permissions",)
     fieldsets = (
-        (None, {"fields": ("email", "password", "first_name", "last_name")}),
+        (None, {"fields": ("email", "password", "first_name", "last_name", "is_asleep")}),
         ("Permissions", {"fields": ("is_staff", "is_superuser", "groups", "user_permissions")}),
         ("Important dates", {"fields": ("last_login",)}),
     )

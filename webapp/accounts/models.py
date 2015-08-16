@@ -64,6 +64,9 @@ class VokoUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+    def get_queryset(self):
+        return super(VokoUserManager, self).get_queryset().filter(is_asleep=False)
+
 
 class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     class Meta:
@@ -87,7 +90,7 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-    is_asleep = models.BooleanField(default=False)
+    is_asleep = models.BooleanField(default=False, verbose_name="Sleeping (inactive) member")
     objects = VokoUserManager()
 
     def get_full_name(self):
