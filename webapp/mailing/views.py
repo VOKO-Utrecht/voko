@@ -1,6 +1,7 @@
 from braces.views import StaffuserRequiredMixin
+from django.contrib import messages
 from django.core.mail import send_mail
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView, ListView, View
 from accounts.models import VokoUser
 from log import log_event
@@ -44,7 +45,8 @@ class SendMailView(StaffuserRequiredMixin, View):
 
         self._send_mails()
 
-        return HttpResponse("Klaar! <a href='/admin'>Klik</a>")
+        messages.success(request, "De mailing is verstuurd!")
+        return HttpResponseRedirect("/")
 
     def _send_mails(self):
         for user in self.users:
