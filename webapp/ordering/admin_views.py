@@ -8,7 +8,7 @@ from braces.views import StaffuserRequiredMixin, GroupRequiredMixin
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.db.models.aggregates import Sum
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, TemplateView, View, FormView
 import sys
@@ -235,6 +235,9 @@ class UploadProductList(FormView, ProductAdminMixin):
     """
 
     form_class = UploadProductListForm
+
+    def get(self, request, *args, **kwargs):
+        return HttpResponseRedirect(reverse('create_draft_products', args=args, kwargs=kwargs))
 
     def form_valid(self, form):
         try:
