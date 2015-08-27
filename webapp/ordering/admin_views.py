@@ -12,6 +12,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, TemplateView, View, FormView
 import sys
+from accounts.models import VokoUser
 from .core import get_current_order_round
 from .forms import UploadProductListForm
 from .models import OrderProduct, Order, OrderRound, Supplier, OrderProductCorrection, Product, DraftProduct, \
@@ -375,8 +376,30 @@ class CreateRealProducts(TemplateView, ProductAdminMixin):
 
 
 class ProductAdminMain(StaffuserRequiredMixin, ListView):
+    def get_context_data(self, **kwargs):
+        ctx = super(ProductAdminMain, self).get_context_data()
+        ctx['current_order_round'] = get_current_order_round()
+        return ctx
+
     def get_queryset(self):
         return Supplier.objects.all().order_by("id")
     template_name = "ordering/admin/suppliers.html"
 
 
+class RedirectToMailingView(StaffuserRequiredMixin, DetailView):
+    model = OrderRound
+
+
+    def get(self, request, *args, **kwargs):
+        if kwargs['mailing_type'] == "round-open":
+            queryset = VokoUser.objects.filter(can_activate=True)
+            MAILING_ID = 11  # Order round open
+
+        elif kwargs['mailing_type'] == "reminder":
+            queryset = VokoUser.objects.filter(is_active=True)
+            MAILING_ID = 4  # Order reminder
+
+        user_ids = [user.pk for user in queryset]
+        request.session['mailing_user_ids'] = user_ids
+
+        return HttpResponseRedirect(reverse("admin_preview_mail", args=(MAILING_ID,)))

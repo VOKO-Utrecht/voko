@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Leveranciers</h1>
+<h1>Boerenadmin</h1>
 
+<h2>Leveranciers</h2>
 <div class="panel panel-default">
   <table class="table">
     <thead>
@@ -22,6 +23,10 @@
     </tbody>
   </table>
 </div>
+
+<h2>Mailings</h2>
+    <a href="{% url "productadmin_mailing" current_order_round.pk "round-open" %}" role="button" class="btn btn-primary">Verstuur "Ronde open" mailing</a>
+    <a href="{% url "productadmin_mailing" current_order_round.pk "reminder" %}" role="button" class="btn btn-primary">Verstuur bestelherinnering mailing</a>
 {% endblock %}
 
 
