@@ -128,6 +128,7 @@ class OrderAdminCorrectionJson(StaffuserRequiredMixin, View):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
         data = []
         users = set([o.user for o in order_round.orders.all()])
+        users = sorted(users, key=lambda x: x.first_name)
 
         for user in users:
             orders = []
