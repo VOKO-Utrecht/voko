@@ -11,9 +11,9 @@
 <h1>Bestellingen per product van bestelronde #{{ object_list.0.order.order_round.pk }}</h1>
 <h6>Gegenereerd op {% now "DATETIME_FORMAT" %}</h6>
 
-{% for unit, products in data.items %}
+{% for supplier, products in data.items %}
     {% if products.items %}
-        <h3>Producten per {{ unit|lower }}</h3>
+        <h3>Producten van {{ supplier }}</h3>
         {%  for product, orderproducts in products.items %}
             <div class="panel panel-default">
             <div class="panel-heading">

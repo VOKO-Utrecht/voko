@@ -95,24 +95,22 @@ class OrderAdminUserOrders(StaffuserRequiredMixin, ListView):
 # Bestellingen per product
 class OrderAdminUserOrderProductsPerOrderRound(StaffuserRequiredMixin, ListView):
     def get_queryset(self):
-        return OrderProduct.objects.select_related().filter(order__order_round_id=self.kwargs.get('pk'), order__paid=True).\
-            order_by('product__supplier')
+        return OrderProduct.objects.select_related().filter(order__order_round_id=self.kwargs.get('pk'), order__paid=True)
 
     def get_context_data(self, **kwargs):
         context = super(OrderAdminUserOrderProductsPerOrderRound, self).get_context_data(**kwargs)
 
-        units = {u[0]: None for u in Product.UNITS}
+        suppliers = {s: None for s in Supplier.objects.all()}
 
         orderproducts = self.get_queryset()
 
-        for u in units:
-            units[u] = {op.product: [] for op in orderproducts.filter(product__unit_of_measurement=u)}
-            for product in units[u]:
+        for s in suppliers:
+            suppliers[s] = {op.product: [] for op in orderproducts.filter(product__supplier=s)}
+            for product in suppliers[s]:
                 for op in orderproducts.filter(product=product):
-                        units[u][product].append(op)
+                    suppliers[s][product].append(op)
 
-
-        context['data'] = units
+        context['data'] = suppliers
 
         return context
 
