@@ -376,7 +376,10 @@ class DraftProduct(TimeStampedModel):
             return False
 
     def _valid_max(self, max):
-        return max is None or (int(max) and max > 0)
+        try:
+            return max is None or (int(max) and max > 0)
+        except ValueError:
+            return False
 
     def create_product(self):
         if not self.is_valid:
