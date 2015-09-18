@@ -4,7 +4,6 @@ from jsonfield import JSONField
 import pytz
 from datetime import datetime
 from decimal import Decimal, ROUND_UP, ROUND_DOWN
-from django.core.mail import mail_admins
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 from accounts.models import Address
@@ -68,6 +67,28 @@ class OrderRound(TimeStampedModel):
     def is_current(self):
         return self == get_current_order_round()
 
+    def suppliers(self):
+        """
+        Return suppliers with at least one paid order in this round
+        """
+        supplier_ids = set(OrderProduct.objects.filter(order__order_round=self,
+                                                       order__paid=True).values_list(
+            'product__supplier', flat=True))
+
+        return [Supplier.objects.get(id=supplier_id) for supplier_id in supplier_ids]
+
+    def total_order_amount_per_supplier(self, supplier):
+        """
+        Return a dict with total order amount (in euro) for a supplier
+        """
+        order_products = OrderProduct.objects.filter(order__order_round=self, order__paid=True,
+                                                     product__supplier=supplier)
+        total = sum([o_p.total_cost_price() for o_p in order_products])
+        return total
+
+    def total_corrections_minus_markup(self):
+        corrections = OrderProductCorrection.objects.filter(order_product__order__order_round=self)
+
     def __unicode__(self):
         return "Bestelronde #%s" % self.pk
 
@@ -122,7 +143,7 @@ class Order(TimeStampedModel):
 
     @property
     def total_price(self):
-        product_sum = sum([p.total_price for p in self.orderproducts.all()])
+        product_sum = sum([p.total_retail_price for p in self.orderproducts.all()])
         return product_sum + self.order_round.transaction_costs + self.member_fee
 
     def total_price_to_pay_with_balances_taken_into_account(self):
@@ -194,8 +215,11 @@ class OrderProduct(TimeStampedModel):
         return u"%d x %s" % (self.amount, self.product)
 
     @property
-    def total_price(self):
+    def total_retail_price(self):
         return self.amount * self.product.retail_price
+
+    def total_cost_price(self):
+        return self.amount * self.product.base_price
 
 
 class OrderProductCorrection(TimeStampedModel):
@@ -212,7 +236,12 @@ class OrderProductCorrection(TimeStampedModel):
         return u"Correction on OrderProduct: %s" % self.order_product
 
     def calculate_refund(self):
-        return Decimal((self.order_product.total_price / 100) * (100 - self.supplied_percentage))\
+        """ rounded member refund """
+        return Decimal((self.order_product.total_retail_price / 100) * (100 - self.supplied_percentage))\
+            .quantize(Decimal('.01'), rounding=ROUND_DOWN)
+
+    def calculate_supplier_refund(self):
+        return Decimal((self.order_product.total_cost_price() / 100) * (100 - self.supplied_percentage))\
             .quantize(Decimal('.01'), rounding=ROUND_DOWN)
 
     def _create_credit(self):

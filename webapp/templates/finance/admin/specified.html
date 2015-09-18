@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}{{ year }} - inkomsten per ronde{% endblock %}
+{% block content %}
+    {{ suppliers_data }}
+    <h1>{{ year }} - inkomsten per ronde</h1>
+    {% regroup suppliers_data by round as rounds %}
+    {% for round in rounds %}
+        <div class="panel panel-default">
+            <div class="panel-heading">{{ round.grouper }}</div>
+                <table class="table table-bordered table-condensed">
+                    <thead>
+                        <td>Leverancier</td>
+                        <td>Besteld bedrag</td>
+                        <td>Correctie(s)</td>
+                        <td>Te betalen volgen systeem</td>
+                        <td>Werkelijk betaald</td>
+                    </thead>
+                    <tbody>
+                        {% for row in round.list %}
+                            <tr>
+                                <td>{{ row.supplier }}</td>
+                                <td>{{ row.total_amount }}</td>
+                                <td>{{ row.corrections_exc }} / {{ row.corrections_inc }}</td>
+                                <td>{{ row.to_pay }}</td>
+                                <td>{{ row.paid }}</td>
+                            </tr
+                        {% endfor %}
+                        <tr>
+                            <td>TOTAAL</td>
+                            <td>{{ round.total }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+        </div>
+    {% endfor %}
+{% endblock %}
+
+
+
+
