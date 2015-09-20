@@ -86,8 +86,18 @@ class OrderRound(TimeStampedModel):
         total = sum([o_p.total_cost_price() for o_p in order_products])
         return total
 
-    def total_corrections_minus_markup(self):
+    def total_order_amount(self):
+        order_products = OrderProduct.objects.filter(order__order_round=self, order__paid=True)
+        total = sum([o_p.total_cost_price() for o_p in order_products])
+        return total
+
+    def total_corrections(self):
         corrections = OrderProductCorrection.objects.filter(order_product__order__order_round=self)
+        return {'exc': sum([c.calculate_supplier_refund() for c in corrections]),
+                'inc': sum([c.calculate_refund() for c in corrections])}
+
+    def to_pay(self):
+        return self.total_order_amount() - self.total_corrections()['exc']
 
     def __unicode__(self):
         return "Bestelronde #%s" % self.pk

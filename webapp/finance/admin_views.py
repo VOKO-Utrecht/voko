@@ -13,6 +13,7 @@ class RoundsPerYearView(ListView):
         context = super(RoundsPerYearView, self).get_context_data(**kwargs)
         context['year'] = self.kwargs['year']
         context['suppliers_data'] = self.compose_table_data()
+        context['totals'] = self.get_order_totals_per_round()
         return context
 
     def compose_table_data(self):
@@ -34,3 +35,6 @@ class RoundsPerYearView(ListView):
 
         return ret
 
+    def get_order_totals_per_round(self):
+        for rnd in self.get_queryset():
+            yield {rnd: rnd.total_order_amount()}
