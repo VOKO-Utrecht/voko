@@ -93,11 +93,13 @@ class OrderRound(TimeStampedModel):
 
     def total_corrections(self):
         corrections = OrderProductCorrection.objects.filter(order_product__order__order_round=self)
-        return {'exc': sum([c.calculate_supplier_refund() for c in corrections]),
-                'inc': sum([c.calculate_refund() for c in corrections])}
+        return {'supplier_exc': sum([c.calculate_supplier_refund() for c in corrections.filter(charge_supplier=True)]),
+                'supplier_inc': sum([c.calculate_refund() for c in corrections.filter(charge_supplier=True)]),
+                'voko_inc': sum([c.calculate_refund() for c in corrections.filter(charge_supplier=False)])}
 
     def to_pay(self):
-        return self.total_order_amount() - self.total_corrections()['exc']
+        return self.total_order_amount() - self.total_corrections()['supplier_exc']
+
 
     def __unicode__(self):
         return "Bestelronde #%s" % self.pk

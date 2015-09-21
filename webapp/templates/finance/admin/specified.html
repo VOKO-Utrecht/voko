@@ -10,7 +10,8 @@
                     <thead>
                         <td><strong>Leverancier</strong></td>
                         <td><strong>Besteld bedrag</strong></td>
-                        <td><strong>Correctie(s)</strong></td>
+                        <td><strong>Correctie(s) boeren</strong></td>
+                        <td><strong>Correctie(s) VOKO</strong></td>
                         <td><strong>Te betalen volgens systeem</strong></td>
                         <td><strong>Werkelijk betaald</strong></td>
                     </thead>
@@ -19,7 +20,8 @@
                             <tr>
                                 <td>{{ row.supplier }}</td>
                                 <td>{{ row.total_amount }}</td>
-                                <td>{{ row.corrections_exc }} / {{ row.corrections_inc }}</td>
+                                <td>{{ row.supplier_corrections_exc }} / {{ row.supplier_corrections_inc }}</td>
+                                <td>{{ row.voko_corrections_inc }}</td>
                                 <td>{{ row.to_pay }}</td>
                                 <td>{{ row.paid }}</td>
                             </tr
@@ -27,7 +29,8 @@
                         <tr>
                             <td><strong>Totaal</strong></td>
                             <td>{{ round.grouper.total_order_amount }}</td>
-                            <td>{{ round.grouper.total_corrections.exc }} / {{ round.grouper.total_corrections.inc }} </td>
+                            <td>{{ round.grouper.total_corrections.supplier_exc }} / {{ round.grouper.total_corrections.supplier_inc }} </td>
+                            <td>{{ round.grouper.total_corrections.voko_inc }} </td>
                             <td>{{ round.grouper.to_pay }}</td>
                             <td>{{ round.grouper.paid }}</td>
                         </tr>

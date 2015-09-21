@@ -29,9 +29,14 @@ class RoundsPerYearView(ListView):
 
                 corrections = OrderProductCorrection.objects.filter(order_product__order__order_round=rnd,
                                                                     order_product__product__supplier=supplier)
-                d['corrections_exc'] = sum([c.calculate_supplier_refund() for c in corrections])
-                d['corrections_inc'] = sum([c.calculate_refund() for c in corrections])
-                d['to_pay'] = d['total_amount'] - d['corrections_exc']
+                d['supplier_corrections_exc'] = sum([c.calculate_supplier_refund()
+                                                     for c in corrections.filter(charge_supplier=True)])
+                d['supplier_corrections_inc'] = sum([c.calculate_refund()
+                                                     for c in corrections.filter(charge_supplier=True)])
+                d['voko_corrections_inc'] = sum([c.calculate_refund()
+                                                for c in corrections.filter(charge_supplier=False)])
+
+                d['to_pay'] = d['total_amount'] - d['supplier_corrections_exc']
                 ret.append(d)
 
         return ret
