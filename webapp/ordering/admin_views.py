@@ -105,9 +105,7 @@ class OrderAdminUserOrderProductsPerOrderRound(StaffuserRequiredMixin, ListView)
         orderproducts = self.get_queryset()
 
         for s in suppliers:
-            suppliers[s] = {op.product: [] for op in orderproducts.
-                filter(product__supplier=s).
-                order_by('product__unit_of_measurement')}
+            suppliers[s] = {op.product: [] for op in orderproducts.filter(product__supplier=s)}
             for product in suppliers[s]:
                 for op in orderproducts.filter(product=product):
                     suppliers[s][product].append(op)
