@@ -1,10 +1,11 @@
+from braces.views import GroupRequiredMixin
 from django.views.generic import ListView
 from ordering.models import OrderRound, OrderProductCorrection
 
 
-class RoundsPerYearView(ListView):
-    # TODO: RESTRICT VIEW
+class RoundsPerYearView(GroupRequiredMixin, ListView):
     template_name = "finance/admin/specified.html"
+    group_required = "Admin"
 
     def get_queryset(self):
         # return order rounds that *opened* in $year
