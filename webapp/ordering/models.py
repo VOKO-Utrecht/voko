@@ -241,6 +241,7 @@ class OrderProductCorrection(TimeStampedModel):
     supplied_percentage = models.IntegerField()
     notes = models.TextField(blank=True)
     credit = models.OneToOneField(Balance, related_name="correction")
+    charge_supplier = models.BooleanField(default=True, verbose_name="Charge expenses to supplier")
 
     def __unicode__(self):
         return u"Correction on OrderProduct: %s" % self.order_product
