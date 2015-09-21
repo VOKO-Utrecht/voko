@@ -19,7 +19,7 @@ def create_credit_for_order(modeladmin, request, queryset):
     for order in queryset:
         Balance.objects.create(user=order.user,
                                type="CR",
-                               amount=order.total_retail_price,
+                               amount=order.total_price,
                                notes="Bestelling #%d contant betaald" % order.pk)
 create_credit_for_order.short_description = "Contant betaald"
 

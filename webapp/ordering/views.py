@@ -204,7 +204,7 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
 
         if self.calculate_payment() == 0:
             log_event(event="Payment for order %d not necessary because order total is %f and user's credit is %f" %
-                            (order.id, order.total_retail_price, order.user.balance.credit()), user=order.user)
+                            (order.id, order.total_price, order.user.balance.credit()), user=order.user)
             messages.add_message(self.request, messages.SUCCESS,
                                  'Omdat je genoeg krediet had was betalen niet nodig. '
                                  'Je bestelling is bevestigd.')
