@@ -9,7 +9,7 @@ class RoundsPerYearView(GroupRequiredMixin, ListView):
 
     def get_queryset(self):
         # return order rounds that *opened* in $year
-        return OrderRound.objects.filter(open_for_orders__year=self.kwargs['year'])
+        return OrderRound.objects.filter(open_for_orders__year=self.kwargs['year']).order_by('-id')
 
     def get_context_data(self, **kwargs):
         context = super(RoundsPerYearView, self).get_context_data(**kwargs)
