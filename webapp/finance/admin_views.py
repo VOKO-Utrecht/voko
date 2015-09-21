@@ -3,6 +3,7 @@ from ordering.models import OrderRound, OrderProductCorrection
 
 
 class RoundsPerYearView(ListView):
+    # TODO: RESTRICT VIEW
     template_name = "finance/admin/specified.html"
 
     def get_queryset(self):

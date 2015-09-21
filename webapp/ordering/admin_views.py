@@ -148,7 +148,7 @@ class OrderAdminCorrectionJson(StaffuserRequiredMixin, View):
 
                 orders.append({
                     "id": order.id,
-                    "total_price": float(order.total_retail_price),
+                    "total_price": float(order.total_price),
                     "order_products": order_products
                 })
 
@@ -173,6 +173,7 @@ class OrderAdminCorrection(StaffuserRequiredMixin, TemplateView):
         order_product_id = int(request.POST['order_product_id'])
         supplied_percentage = int(request.POST['supplied_percentage'])
         notes = str((request.POST['notes']).strip())
+        charge_supplier = True if request.POST.get('charge') else False
 
         order_product = OrderProduct.objects.get(id=order_product_id,
                                                  order_id=order_id,
@@ -181,7 +182,8 @@ class OrderAdminCorrection(StaffuserRequiredMixin, TemplateView):
         OrderProductCorrection.objects.create(
             order_product=order_product,
             supplied_percentage=supplied_percentage,
-            notes=notes
+            notes=notes,
+            charge_supplier=charge_supplier
         )
 
         messages.add_message(request, messages.SUCCESS, "De correctie is succesvol aangemaakt.")

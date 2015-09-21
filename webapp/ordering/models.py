@@ -352,7 +352,8 @@ class Product(TimeStampedModel):
             OrderProductCorrection.objects.create(
                 order_product=order_product,
                 supplied_percentage=0,
-                notes='Product niet geleverd: "%s" (%s) [%s]' % (self.name, self.supplier.name, self.id)
+                notes='Product niet geleverd: "%s" (%s) [%s]' % (self.name, self.supplier.name, self.id),
+                charge_supplier=True,
             )
 
     def determine_if_product_is_new_and_set_label(self):
