@@ -35,7 +35,7 @@
     <tbody>
       {% for order_product in object.orderproducts.all %}
       <tr>
-        <td>{{ order_product.product.name }}</td>
+        <td>{{ order_product.product.name }} ({{ order_product.product.supplier.name }})</td>
         <td>{{ order_product.amount }}</td>
         <td>&euro; {{ order_product.product.retail_price }}</td>
         <td>&euro; {{ order_product.total_retail_price }}</td>
