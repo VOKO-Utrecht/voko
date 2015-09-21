@@ -100,6 +100,9 @@ class OrderRound(TimeStampedModel):
     def to_pay(self):
         return self.total_order_amount() - self.total_corrections()['supplier_exc']
 
+    def total_profit(self):
+        orderproducts = OrderProduct.objects.filter(order__order_round=self, order__paid=True)
+        return sum([orderprod.product.profit for orderprod in orderproducts])
 
     def __unicode__(self):
         return "Bestelronde #%s" % self.pk
@@ -315,6 +318,10 @@ class Product(TimeStampedModel):
 
     def __unicode__(self):
         return u'[ronde %s] %s (%s)' % (self.order_round.pk, self.name, self.supplier)
+
+    @property
+    def profit(self):
+        return self.retail_price - self.base_price
 
     @property
     def retail_price(self):
