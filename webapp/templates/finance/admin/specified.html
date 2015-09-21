@@ -8,11 +8,11 @@
             <div class="panel-heading">{{ round.grouper }}</div>
                 <table class="table table-bordered table-condensed">
                     <thead>
-                        <td>Leverancier</td>
-                        <td>Besteld bedrag</td>
-                        <td>Correctie(s)</td>
-                        <td>Te betalen volgens systeem</td>
-                        <td>Werkelijk betaald</td>
+                        <td><strong>Leverancier</strong></td>
+                        <td><strong>Besteld bedrag</strong></td>
+                        <td><strong>Correctie(s)</strong></td>
+                        <td><strong>Te betalen volgens systeem</strong></td>
+                        <td><strong>Werkelijk betaald</strong></td>
                     </thead>
                     <tbody>
                         {% for row in round.list %}
@@ -25,7 +25,7 @@
                             </tr
                         {% endfor %}
                         <tr>
-                            <td>TOTAAL</td>
+                            <td><strong>Totaal</strong></td>
                             <td>{{ round.grouper.total_order_amount }}</td>
                             <td>{{ round.grouper.total_corrections.exc }} / {{ round.grouper.total_corrections.inc }} </td>
                             <td>{{ round.grouper.to_pay }}</td>
@@ -33,6 +33,7 @@
                         </tr>
                     </tbody>
                 </table>
+        <div class="panel-footer">Panel footer</div>
         </div>
     {% endfor %}
 {% endblock %}
