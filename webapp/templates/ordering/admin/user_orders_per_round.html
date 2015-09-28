@@ -41,7 +41,7 @@
             <td>{{ o.product.supplier }}</td>
             <td>{{ o.product.description|truncatechars:50 }}</td>
             <td>&euro; {{ o.product.retail_price }}</td>
-            <td>&euro; {{ o.total_price }}</td>
+            <td>&euro; {{ o.total_retail_price }}</td>
           </tr>
       {% endfor %}
 
