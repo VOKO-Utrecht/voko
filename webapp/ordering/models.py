@@ -324,6 +324,7 @@ class Product(TimeStampedModel):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     unit_amount = models.IntegerField(default=1, help_text="e.g. if half a kilo: \"500\"")
+    temp_unit = models.ForeignKey(ProductUnit, null=True)
     unit_of_measurement = models.CharField(max_length=10, choices=UNITS, help_text="e.g. if half a kilo: \"Gram\"")
     base_price = models.DecimalField(max_digits=6, decimal_places=2)
     supplier = models.ForeignKey("Supplier", related_name="products")
