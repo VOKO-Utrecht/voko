@@ -44,7 +44,7 @@ def add_initial_units(apps, schema_editor):
     ProductUnit.objects.create(
         name='Kilogram',
         description='Kilogram (1000g)',
-        abbreviations='kg k'
+        abbreviations='kg k kilo'
     )
     ProductUnit.objects.create(
         name='Milliliter',
