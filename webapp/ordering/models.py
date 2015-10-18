@@ -305,27 +305,10 @@ class Product(TimeStampedModel):
         verbose_name = "Product"
         verbose_name_plural = "Producten"
 
-    UNITS = (
-        ('Stuk', 'Stuk'),
-        ('Bosje', 'Bosje'),
-
-        ('Gram',  'Gram'),
-        ('Decagram', 'Decagram (10g)'),
-        ('Hectogram', 'Hectogram (100g)'),
-        ('Half pond', 'Half pond (250g)'),
-        ('Pond',  'Pond (500g)'),
-        ('Kilogram', 'Kilogram'),
-        ('5 Kilogram', '5 Kilogram'),
-
-        ('Deciliter', 'Deciliter (100ml)'),
-        ('Liter',  'Liter'),
-    )
-
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
+    unit = models.ForeignKey(ProductUnit, null=True)
     unit_amount = models.IntegerField(default=1, help_text="e.g. if half a kilo: \"500\"")
-    temp_unit = models.ForeignKey(ProductUnit, null=True)
-    unit_of_measurement = models.CharField(max_length=10, choices=UNITS, help_text="e.g. if half a kilo: \"Gram\"")
     base_price = models.DecimalField(max_digits=6, decimal_places=2)
     supplier = models.ForeignKey("Supplier", related_name="products")
     order_round = models.ForeignKey("OrderRound", related_name="products")
@@ -336,6 +319,10 @@ class Product(TimeStampedModel):
 
     def __unicode__(self):
         return u'[ronde %s] %s (%s)' % (self.order_round.pk, self.name, self.supplier)
+
+    @property
+    def unit_of_measurement(self):
+        return "%s %s" % (self.unit_amount, self.unit.description.lower())
 
     @property
     def profit(self):
