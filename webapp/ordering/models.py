@@ -297,7 +297,7 @@ class ProductUnit(TimeStampedModel):
     abbreviations = models.CharField(max_length=255, help_text="whitespace separated")
 
     def __unicode__(self):
-        return "%s (%s)" % (self.name, self.description)
+        return self.description
 
 
 class Product(TimeStampedModel):
