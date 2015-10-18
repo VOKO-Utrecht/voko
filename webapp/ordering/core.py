@@ -1,4 +1,5 @@
 from pytz import UTC
+import re
 import models
 from datetime import datetime
 
@@ -61,3 +62,51 @@ def update_totals_for_products_with_max_order_amounts(order):
 
             else:
                 orderproduct.delete()
+
+
+def find_unit(unit):
+    """
+    Find ProductUnit object closest to :unit: string & amount.
+    Return tuple of (amount, ProductUnit)
+    Return '1 Piece' as fallback
+    """
+
+    regex = "^(\d*)\s?([a-zA-Z ]+)"  # optional amount, optional whitespace, 1+ sentence
+    match = re.match(regex, unit)
+    piece = models.ProductUnit.objects.get(name='Stuk')  # fallback unit
+
+    if not match:
+        return 1, piece
+
+    amount, unit_str = match.groups()
+    unit_str = unit_str.lower()
+
+    if amount == '':
+        amount = 1
+    else:
+        amount = int(amount)
+
+    by_name = _find_unit_by_name(unit_str)
+    by_abbr = _find_unit_by_abbr(unit_str)
+
+    if by_name:
+        return amount, by_name
+
+    if by_abbr:
+        return amount, by_abbr
+
+    return amount, piece
+
+
+def _find_unit_by_name(unit):
+    try:
+        return models.ProductUnit.objects.get(name__iexact=unit)
+    except models.ProductUnit.DoesNotExist:
+        return
+
+
+def _find_unit_by_abbr(unit):
+    for product_unit in models.ProductUnit.objects.all():
+        abbrs = [a.lower() for a in product_unit.abbreviations.split()]
+        if unit in abbrs:
+            return product_unit
