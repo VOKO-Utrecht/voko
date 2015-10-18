@@ -287,6 +287,19 @@ class ProductCategory(TimeStampedModel):
         return self.name
 
 
+class ProductUnit(TimeStampedModel):
+    class Meta:
+        verbose_name = "Producteenheid"
+        verbose_name_plural = "Producteenheden"
+
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=255)
+    abbreviations = models.CharField(max_length=255, help_text="whitespace separated")
+
+    def __unicode__(self):
+        return "%s (%s)" % (self.name, self.description)
+
+
 class Product(TimeStampedModel):
     class Meta:
         verbose_name = "Product"
@@ -294,6 +307,8 @@ class Product(TimeStampedModel):
 
     UNITS = (
         ('Stuk', 'Stuk'),
+        ('Bosje', 'Bosje'),
+
         ('Gram',  'Gram'),
         ('Decagram', 'Decagram (10g)'),
         ('Hectogram', 'Hectogram (100g)'),
@@ -301,6 +316,7 @@ class Product(TimeStampedModel):
         ('Pond',  'Pond (500g)'),
         ('Kilogram', 'Kilogram'),
         ('5 Kilogram', '5 Kilogram'),
+
         ('Deciliter', 'Deciliter (100ml)'),
         ('Liter',  'Liter'),
     )
