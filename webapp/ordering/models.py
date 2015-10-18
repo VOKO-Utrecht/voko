@@ -292,7 +292,7 @@ class ProductUnit(TimeStampedModel):
         verbose_name = "Producteenheid"
         verbose_name_plural = "Producteenheden"
 
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=255)
     abbreviations = models.CharField(max_length=255, help_text="whitespace separated")
 
