@@ -109,3 +109,5 @@ def _find_unit_by_abbr(unit):
         abbrs = [a.lower() for a in product_unit.abbreviations.split()]
         if unit in abbrs:
             return product_unit
+        if unit + "." in abbrs:
+            return product_unit
