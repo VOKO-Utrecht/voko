@@ -10,7 +10,7 @@ from accounts.models import Address
 from finance.models import Balance
 from log import log_event
 from mailing.helpers import mail_user, get_template_by_id, render_mail_template
-from ordering.core import get_or_create_order, get_current_order_round
+from ordering.core import get_or_create_order, get_current_order_round, find_unit
 from django.conf import settings
 
 ORDER_CONFIRM_MAIL_ID = 12
@@ -379,7 +379,7 @@ class Product(TimeStampedModel):
         if not prev_round.products.filter(name=self.name,
                                           description=self.description,
                                           supplier=self.supplier,
-                                          unit_of_measurement=self.unit_of_measurement):
+                                          unit=self.unit):
             self.new = True
             self.save()
             log_event(event="Setting product %s to 'new' because I could not find a "
@@ -402,7 +402,7 @@ class DraftProduct(TimeStampedModel):
             self.validation_error = "Naam onjuist"
         elif not self._valid_price(self.data['base_price']):
             self.validation_error = "Prijs onjuist"
-        elif not self._valid_unit(self.data['unit_of_measurement']):
+        elif not self._valid_unit(self.data['unit']):
             self.validation_error = "Eenheid onjuist"
         elif not self._valid_max(self.data['maximum_total_order']):
             self.validation_error = "Max. onjuist"
@@ -426,8 +426,9 @@ class DraftProduct(TimeStampedModel):
 
     def _valid_unit(self, unit):
         try:
-            return unit.lower() in [u[1].lower() for u in Product.UNITS]
-        except (ValueError, TypeError, AttributeError):
+            find_unit(unit)
+            return True
+        except RuntimeError:
             return False
 
     def _valid_max(self, max):
@@ -440,16 +441,15 @@ class DraftProduct(TimeStampedModel):
         if not self.is_valid:
             return
 
-        # Decide on unit
-        unit = self.data['unit_of_measurement']
-        for u, _ in Product.UNITS:
-            if u in unit:
-                unit = u
+        # Decide on unit & amount
+        unit = self.data['unit']
+        unit_amount, unit = find_unit(unit)
 
         prod = Product.objects.create(
             name=self.data['name'],
             description=self.data['description'] if self.data['description'] else "",
-            unit_of_measurement=unit,
+            unit=unit,
+            unit_amount=unit_amount,
             base_price=self.data['base_price'],
             maximum_total_order=self.data['maximum_total_order'],
             supplier=self.supplier,

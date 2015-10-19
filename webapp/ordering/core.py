@@ -68,15 +68,14 @@ def find_unit(unit):
     """
     Find ProductUnit object closest to :unit: string & amount.
     Return tuple of (amount, ProductUnit)
-    Return '1 Piece' as fallback
+    Raise RuntimeError when not matchable
     """
 
     regex = "^(\d*)\s?([a-zA-Z ]+)"  # optional amount, optional whitespace, 1+ sentence
     match = re.match(regex, unit)
-    piece = models.ProductUnit.objects.get(name='Stuk')  # fallback unit
 
     if not match:
-        return 1, piece
+        raise RuntimeError("No units could be matched")
 
     amount, unit_str = match.groups()
     unit_str = unit_str.lower()
@@ -95,7 +94,7 @@ def find_unit(unit):
     if by_abbr:
         return amount, by_abbr
 
-    return amount, piece
+    raise RuntimeError("No units could be matched")
 
 
 def _find_unit_by_name(unit):
