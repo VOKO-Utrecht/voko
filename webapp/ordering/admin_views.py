@@ -298,9 +298,6 @@ class CreateDraftProducts(TemplateView, ProductAdminMixin):
             dp.validate()
             yield dp
 
-    def unit_choices(self):
-        return ProductUnit.objects.all()
-
     def category_choices(self):
         return [pc.name for pc in ProductCategory.objects.all()]
 
