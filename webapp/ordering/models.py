@@ -428,7 +428,7 @@ class DraftProduct(TimeStampedModel):
         try:
             find_unit(unit)
             return True
-        except RuntimeError:
+        except (RuntimeError, TypeError):
             return False
 
     def _valid_max(self, max):
