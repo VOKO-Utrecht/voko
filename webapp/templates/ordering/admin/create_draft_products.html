@@ -62,12 +62,12 @@ De bestelronde is gesloten. Je kunt geen producten toevoegen.
                 </div>
         </td>
         <td class="col-md-2">
-            <input value="{% if product.unit != None %}{{ product.unit }}{% endif %}" class="form-control"
+            <input value="{{ product.unit|default_if_none:'' }}" class="form-control"
                    placeholder="" name="product_unit_{{ forloop.counter }}">
 
         </td>
         <td class="col-md-1">
-            <input value="{% if product.maximum_total_order != None %}{{ product.maximum_total_order }}{% endif %}" class="form-control"
+            <input value="{{ product.maximum_total_order|default_if_none:'' }}" class="form-control"
                    placeholder="onbep." name="product_maximum_total_order_{{ forloop.counter }}">
         </td>
         <td>
