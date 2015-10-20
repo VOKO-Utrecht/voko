@@ -27,13 +27,23 @@ class SupplierFactory(DjangoModelFactory):
     email = LazyAttribute(lambda o: '%s@example.org' % o.name)
 
 
+class ProductUnitFactory(DjangoModelFactory):
+    class Meta:
+        model = "ordering.ProductUnit"
+
+    name = FuzzyText()
+    description = FuzzyText()
+    abbreviations = ""
+
+
 class ProductFactory(DjangoModelFactory):
     class Meta:
         model = "ordering.Product"
 
     name = FuzzyText()
     description = FuzzyText()
-    unit_of_measurement = FuzzyChoice(Product.UNITS)
+    unit_amount = FuzzyInteger(low=1, high=100)
+    unit = ProductUnitFactory()
     base_price = FuzzyDecimal(0.1, 6.0)
     supplier = SubFactory(SupplierFactory)
     order_round = SubFactory(OrderRoundFactory)

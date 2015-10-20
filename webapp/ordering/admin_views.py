@@ -16,7 +16,7 @@ from accounts.models import VokoUser
 from .core import get_current_order_round
 from .forms import UploadProductListForm
 from .models import OrderProduct, Order, OrderRound, Supplier, OrderProductCorrection, Product, DraftProduct, \
-    ProductCategory
+    ProductCategory, ProductUnit
 
 
 class OrderAdminMain(StaffuserRequiredMixin, ListView):
@@ -272,7 +272,7 @@ class UploadProductList(FormView, ProductAdminMixin):
             self._create_draft_product(
                 {'name': name,
                  'description': description if description else "",
-                 'unit_of_measurement': unit,
+                 'unit': unit,
                  'base_price': self._convert_price(price),
                  'maximum_total_order': maximum,
                  'category': category}
@@ -297,9 +297,6 @@ class CreateDraftProducts(TemplateView, ProductAdminMixin):
                                               supplier=self.supplier).order_by('is_valid', 'id'):
             dp.validate()
             yield dp
-
-    def unit_choices(self):
-        return Product.UNITS
 
     def category_choices(self):
         return [pc.name for pc in ProductCategory.objects.all()]
