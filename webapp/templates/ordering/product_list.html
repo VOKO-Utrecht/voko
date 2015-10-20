@@ -49,7 +49,7 @@
       {% for product in view.products %}
       <tr class="product {% if product.category %}category-{{ product.category.id }}{% else %}no-category{% endif %}">
         <td class="col-md-1"><a href="{% url 'view_product' product.pk %}">{{ product.name|title }}</a>{% if product.new %} <span class="label label-primary">Nieuw!</span>{% endif %}</td>
-        <td class="col-md-2"><a href="{% url 'view_supplier' product.supplier.pk %}">{{ product.supplier }}</a></td>
+        <td class="col-md-2"><a class="supplier-{{ product.supplier.pk }}" href="{% url 'view_supplier' product.supplier.pk %}">{{ product.supplier }}</a></td>
         <td class="col-md-5">{{ product.description }}</td>
         <td class="col-md-2">&euro; {{ product.retail_price }} per {{ product.unit_of_measurement|lower }}</td>
         <td class="col-md-1">
@@ -116,5 +116,16 @@
         $(".product.no-category").fadeIn();
     }
 
+</script>
+
+<script>
+// Popovers
+{% for supplier in view.suppliers %}
+    $(".supplier-{{ supplier.pk }}").popover({
+        trigger: "hover",
+        title: "{{ supplier.name }}",
+        content: "{{ supplier.biography|truncatechars:400|escapejs }}"
+    });
+{% endfor %}
 </script>
 {% endblock %}
