@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>{{ object_list.0.product }}; Bestelronde #{{ object_list.0.order.order_round.pk }}</h1>
-<h4>Totaal besteld: {{ object_list.0.product.amount_ordered }} {{ object_list.0.product.unit_of_measurement }}</h4>
+<h4>Totaal besteld: {{ object_list.0.product.amount_ordered }} x {{ object_list.0.product.unit_of_measurement }}</h4>
 <h6>Gegenereerd op {% now "DATETIME_FORMAT" %}</h6>
 {% for op in object_list %}
     <div class="panel panel-default">
