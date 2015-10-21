@@ -294,7 +294,7 @@ class ProductUnit(TimeStampedModel):
 
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=255)
-    abbreviations = models.CharField(max_length=255, help_text="whitespace separated")
+    abbreviations = models.CharField(max_length=255, blank=True, help_text="whitespace separated")
 
     def __unicode__(self):
         return self.description
