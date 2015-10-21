@@ -86,10 +86,14 @@ def find_unit(unit):
         amount = int(amount)
 
     by_name = _find_unit_by_name(unit_str)
+    by_desc = _find_unit_by_desc(unit_str)
     by_abbr = _find_unit_by_abbr(unit_str)
 
     if by_name:
         return amount, by_name
+
+    if by_desc:
+        return amount, by_desc
 
     if by_abbr:
         return amount, by_abbr
@@ -100,6 +104,13 @@ def find_unit(unit):
 def _find_unit_by_name(unit):
     try:
         return models.ProductUnit.objects.get(name__iexact=unit)
+    except models.ProductUnit.DoesNotExist:
+        return
+
+
+def _find_unit_by_desc(unit):
+    try:
+        return models.ProductUnit.objects.get(description__iexact=unit)
     except models.ProductUnit.DoesNotExist:
         return
 
