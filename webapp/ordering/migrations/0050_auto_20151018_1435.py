@@ -12,7 +12,11 @@ def convert_units(apps, schema_editor):
     for p in Product.objects.all():
         old_unit = p.unit_of_measurement
 
-        amount, new_unit = find_unit(old_unit)
+        try:
+            amount, new_unit = find_unit(old_unit)
+        except RuntimeError:
+            amount = 1
+            new_unit = ProductUnit.objects.get(name="Stuk")
 
         new_unit = ProductUnit.objects.get(id=new_unit.id)
 
