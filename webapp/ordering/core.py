@@ -71,14 +71,15 @@ def find_unit(unit):
     Raise RuntimeError when not matchable
     """
 
-    regex = "^(\d*)\s?([a-zA-Z ]+)"  # optional amount, optional whitespace, 1+ sentence
+    unit = unit.strip()
+    regex = "^(\d*)\s?([a-zA-Z0-9() ]+)"  # optional amount, optional whitespace, 1+ sentence
     match = re.match(regex, unit)
 
     if not match:
         raise RuntimeError("No units could be matched")
 
     amount, unit_str = match.groups()
-    unit_str = unit_str.lower()
+    unit_str = unit_str.lower().strip()
 
     if amount == '':
         amount = 1
