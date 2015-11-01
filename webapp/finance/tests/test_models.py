@@ -1,16 +1,24 @@
-from accounts.models import VokoUser
+from accounts.tests.factories import VokoUserFactory
 from finance.models import Balance
+from finance.tests.factories import PaymentFactory
 from vokou.testing import VokoTestCase
+
+
+class TestPaymentModel(VokoTestCase):
+    def setUp(self):
+        self.payment = PaymentFactory()
+
+    def test_create_credit(self):
+        balance = self.payment.create_credit()
+        self.assertEqual(balance.user, self.payment.order.user)
+        self.assertEqual(balance.type, "CR")
+        self.assertEqual(balance.amount, self.payment.amount)
+        self.assertEqual(balance.notes, "iDeal betaling voor bestelling #%d" % self.payment.order.id)
 
 
 class TestBalanceManager(VokoTestCase):
     def setUp(self):
-        self.vokouser = VokoUser.objects.create(email="test@example.com",
-                                                first_name="John",
-                                                last_name="Doe")
-
-    def tearDown(self):
-        self.vokouser.delete()
+        self.vokouser = VokoUserFactory()
 
     def test_methods_on_user_object_via_balance_model(self):
         self.vokouser.balance.credit()
