@@ -94,7 +94,7 @@ class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
             messages.error(request, "De bestelronde is gesloten, je kunt niet meer betalen.")
             log_event(event="Payment for order %s canceled because order round %s is closed" %
                             (order_to_pay.id, order_to_pay.order_round.id), user=order_to_pay.user)
-            redirect(reverse('finish_order', args=(order_to_pay.id,)))
+            return redirect(reverse('finish_order', args=(order_to_pay.id,)))
 
         bank_id = f.cleaned_data['bank']
         results = self._create_transaction(bank_id=bank_id,

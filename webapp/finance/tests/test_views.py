@@ -1,7 +1,9 @@
 from unittest import skip
+from datetime import timedelta, datetime
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from mock import MagicMock
+from pytz import UTC
 from accounts.tests.factories import VokoUserFactory
 from finance.models import Payment, Balance
 from finance.tests.factories import PaymentFactory
@@ -141,9 +143,16 @@ class TestCreateTransaction(VokoTestCase):
         ret = self.client.post(self.url, {'bank': 'foo'})
         self.assertEqual(ret.status_code, 200)
 
-    @skip("TODO!")
     def test_redirect_when_order_round_is_closed(self):
-        pass
+        month_ago = datetime.now(tz=UTC) - timedelta(days=30)
+        order_round = OrderRoundFactory(closed_for_orders=month_ago)
+        assert order_round.is_open is False
+        self.order.order_round = order_round
+        self.order.save()
+
+        ret = self.client.post(self.url, {'bank': 1})
+        self.assertEqual(ret.status_code, 302)
+        self.assertRedirects(ret, reverse('finish_order', args=(self.order.id, )), fetch_redirect_response=False)
 
 
 class TestConfirmTransaction(VokoTestCase):
