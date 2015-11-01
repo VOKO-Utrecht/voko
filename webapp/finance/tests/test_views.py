@@ -129,7 +129,7 @@ class TestCreateTransaction(VokoTestCase):
         s.save()
 
         with self.assertRaises(AssertionError):
-            self.client.post(self.url)
+            self.client.post(self.url, {'bank': 1})
 
     def test_error_when_order_not_finalized(self):
         self.order.finalized = False
@@ -138,10 +138,9 @@ class TestCreateTransaction(VokoTestCase):
         with self.assertRaises(AssertionError):
             self.client.post(self.url, {'bank': 1})
 
-    @skip("Cannot seem to get the form invalid")
     def test_redirect_on_invalid_form(self):
         ret = self.client.post(self.url, {'bank': 'foo'})
-        self.assertEqual(ret.status_code, 200)
+        self.assertRedirects(ret, reverse('finance.choosebank'))
 
     def test_redirect_when_order_round_is_closed(self):
         month_ago = datetime.now(tz=UTC) - timedelta(days=30)
@@ -151,7 +150,6 @@ class TestCreateTransaction(VokoTestCase):
         self.order.save()
 
         ret = self.client.post(self.url, {'bank': 1})
-        self.assertEqual(ret.status_code, 302)
         self.assertRedirects(ret, reverse('finish_order', args=(self.order.id, )), fetch_redirect_response=False)
 
 

@@ -76,9 +76,10 @@ class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
     def post(self, request, *args, **kwargs):
         form = self.get_form_class()
         f = form(data=request.POST)
+        f.full_clean()
         if f.is_valid() is False:
             # Should not happen. Redirect back to prev. view
-            redirect(reverse('finance.choosebank'))
+            return redirect(reverse('finance.choosebank'))
 
         order_to_pay = Order.objects.get(id=request.session['order_to_pay'])
         amount_to_pay = order_to_pay.total_price_to_pay_with_balances_taken_into_account()
