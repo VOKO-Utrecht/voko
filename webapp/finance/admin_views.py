@@ -32,8 +32,8 @@ class RoundsPerYearView(GroupRequiredMixin, ListView):
                                                                     order_product__product__supplier=supplier)
                 d['supplier_corrections_exc'] = sum([c.calculate_supplier_refund()
                                                      for c in corrections.filter(charge_supplier=True)])
-                d['supplier_corrections_inc'] = sum([c.calculate_refund()
-                                                     for c in corrections.filter(charge_supplier=True)])
+                # d['supplier_corrections_inc'] = sum([c.calculate_refund()
+                #                                      for c in corrections.filter(charge_supplier=True)])
                 d['voko_corrections_inc'] = sum([c.calculate_refund()
                                                 for c in corrections.filter(charge_supplier=False)])
 
