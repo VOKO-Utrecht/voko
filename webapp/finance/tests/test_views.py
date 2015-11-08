@@ -1,4 +1,3 @@
-from unittest import skip
 from datetime import timedelta, datetime
 from django.conf import settings
 from django.core.urlresolvers import reverse

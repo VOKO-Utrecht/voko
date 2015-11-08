@@ -32,7 +32,8 @@ class Supplier(TimeStampedModel):
 
     def has_orders_in_current_order_round(self):
         return OrderProduct.objects.filter(product__supplier=self,
-                                           order__order_round=get_current_order_round()).exists()
+                                           order__order_round=get_current_order_round(),
+                                           order__paid=True).exists()
 
 
 class OrderRound(TimeStampedModel):
