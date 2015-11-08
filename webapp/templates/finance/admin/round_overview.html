@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Ronde {{ round_id }} - financiën{% endblock %}
+{% block content %}
+    <h1>Ronde {{ round_id }} - financiën</h1>
+    <div class="panel panel-default">
+        <table class="table table-bordered table-condensed">
+            <thead>
+                <td><strong>Leverancier</strong></td>
+                <td><strong>Besteld bedrag</strong></td>
+                <td><strong>Correctie(s) boeren</strong></td>
+                <td><strong>Correctie(s) VOKO</strong></td>
+                <td><strong>Te betalen volgens systeem</strong></td>
+            </thead>
+            <tbody></tbody>
+        </table>
+    <div class="panel-footer" id="total_profit"><strong>Marge: </strong> </div>
+    </div>
+{% endblock %}
+{% block javascript %}
+    <script>
+        function _currency(amount) {
+            return amount.toLocaleString('nl-NL', { style: 'currency', currency: 'EUR' });
+        }
+
+        $(function () {
+            var url = "/finance/admin/json/round/{{ round_id }}/";
+            var tbody = $("tbody");
+
+            $.getJSON(url, function (data) {
+                console.log(data);
+                var perSupplier = data['suppliers'];
+                for (var key in data['suppliers']) {
+                    var $newRow = $("<tr></tr>");
+                    tbody.append($newRow);
+                    $newRow.append("<td>" + key + "</td>");
+                    $newRow.append("<td>" + _currency(perSupplier[key]['total_amount']) + "</td>");
+                    $newRow.append("<td>" + _currency(perSupplier[key]['supplier_corrections_exc']) + "</td>");
+                    $newRow.append("<td>" + _currency(perSupplier[key]['voko_corrections_inc']) + "</td>");
+                    $newRow.append("<td>" + _currency(perSupplier[key]['to_pay']) + "</td>");
+                }
+                $("#total_profit").append(_currency(data['total_profit']));
+            });
+        });
+
+    </script>
+{% endblock %}
