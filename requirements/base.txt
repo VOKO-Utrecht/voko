@@ -12,4 +12,4 @@ django-hijack==1.0.7
 jsonfield==1.0.3
 openpyxl==2.1.4
 django-flat-theme==1.1.1
-simplejson-3.8.1
+simplejson==3.8.1
