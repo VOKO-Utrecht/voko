@@ -11,5 +11,5 @@ git+https://github.com/rikva/qantani.git@0e2c46422faa5e0b0a51ab433428c3fa93c9299
 django-hijack==1.0.7
 jsonfield==1.0.3
 openpyxl==2.1.4
-django-flat-theme-1.1.1
+django-flat-theme==1.1.1
 simplejson-3.8.1
