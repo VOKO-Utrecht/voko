@@ -89,3 +89,15 @@ class RoundOverview(GroupRequiredMixin, TemplateView):
         ctx['round_id'] = round_id
         return ctx
 
+
+class YearOverview(GroupRequiredMixin, TemplateView):
+    group_required = "Admin"
+    template_name = "finance/admin/year_overview.html"
+
+    def get_context_data(self, year, **kwargs):
+        ctx = super(YearOverview, self).get_context_data(**kwargs)
+        ctx['year'] = year
+        ctx['rounds'] = OrderRound.objects.filter(
+            open_for_orders__year=self.kwargs['year']).order_by('-id')  # Rounds that opened in :year:
+
+        return ctx

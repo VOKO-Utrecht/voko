@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}{{ year }} - financiën{% endblock %}
+{% block content %}
+    <h1>{{ year }} - financiën</h1>
+    <ul>
+    {% for r in rounds %}
+        <li><a href="{% url 'finance.admin.round.overview' r.id %}">{{ r }}</a></li>
+    {% empty %}
+        Niks!
+    {% endfor %}
+    </ul>
+{% endblock %}

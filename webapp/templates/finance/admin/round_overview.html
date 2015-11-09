@@ -2,7 +2,8 @@
 {% block title %}Ronde {{ round_id }} - financiën{% endblock %}
 {% block content %}
     <h1>Ronde {{ round_id }} - financiën</h1>
-    <div class="panel panel-default">
+    <div id="pending">Momentje...</div>
+    <div class="panel panel-default" style="display: none;">
         <table class="table table-bordered table-condensed">
             <thead>
                 <td><strong>Leverancier</strong></td>
@@ -13,7 +14,7 @@
             </thead>
             <tbody></tbody>
         </table>
-    <div class="panel-footer" id="total_profit"><strong>Marge: </strong> </div>
+        <div class="panel-footer" id="total_profit"><strong>Marge: </strong> </div>
     </div>
 {% endblock %}
 {% block javascript %}
@@ -24,14 +25,15 @@
 
         $(function () {
             var url = "/finance/admin/json/round/{{ round_id }}/";
-            var tbody = $("tbody");
+            var $tbody = $("tbody");
+            var $panel = $("div.panel");
+            var $pending = $("div#pending");
 
             $.getJSON(url, function (data) {
-                console.log(data);
                 var perSupplier = data['suppliers'];
                 for (var key in data['suppliers']) {
                     var $newRow = $("<tr></tr>");
-                    tbody.append($newRow);
+                    $tbody.append($newRow);
                     $newRow.append("<td>" + key + "</td>");
                     $newRow.append("<td>" + _currency(perSupplier[key]['total_amount']) + "</td>");
                     $newRow.append("<td>" + _currency(perSupplier[key]['supplier_corrections_exc']) + "</td>");
@@ -39,6 +41,8 @@
                     $newRow.append("<td>" + _currency(perSupplier[key]['to_pay']) + "</td>");
                 }
                 $("#total_profit").append(_currency(data['total_profit']));
+                $pending.hide();
+                $panel.fadeIn();
             });
         });
 
