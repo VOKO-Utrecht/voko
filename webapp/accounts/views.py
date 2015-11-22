@@ -2,7 +2,6 @@ from braces.views import AnonymousRequiredMixin, LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
-from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.shortcuts import redirect
 from django.views.generic import FormView, DetailView, UpdateView, TemplateView, View
@@ -20,7 +19,13 @@ class LoginView(AnonymousRequiredMixin, FormView):
 
     def form_valid(self, form):
         login(self.request, form.get_user())
-        return redirect(settings.LOGIN_REDIRECT_URL)
+        next_url = settings.LOGIN_REDIRECT_URL
+        try:
+            next_url = self.request.GET['next']
+        except KeyError:
+            pass
+
+        return redirect(next_url)
 
 
 class RegisterView(AnonymousRequiredMixin, FormView):
