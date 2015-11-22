@@ -33,11 +33,12 @@
           <a class="navbar-brand" href="{% url 'home' %}">VOKO Utrecht</a>
         </div>
         <div class="navbar-collapse collapse">
+          {% if user.is_authenticated %}
           <ul class="nav navbar-nav">
             <li><a href="/">Home</a></li>
             <li><a href="{% url 'view_products' %}">Producten</a></li>
+            <li><a href="{% url 'docs.document_overview' %}">Documenten</a></li>
           </ul>
-          {% if user.is_authenticated %}
           {% include 'header.html' %}
           {% endif %}
         </div><!--/.nav-collapse -->
