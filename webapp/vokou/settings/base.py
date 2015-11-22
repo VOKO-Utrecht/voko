@@ -35,6 +35,7 @@ INSTALLED_APPS = (
     'finance',
     'ordering',
     'mailing',
+    'docs',
     'hijack',
 
     "django_cron",

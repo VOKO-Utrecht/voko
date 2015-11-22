@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Documenten{% endblock %}
+{% block content %}
+    <h1>Documenten</h1>
+    <ul>
+    {% for d in object_list %}
+        <li>{{ d.created.date }}: <a href="{% url 'docs.document_download' d.slug %}">{{ d }}</a></li>
+    {% empty %}
+        Niks!
+    {% endfor %}
+    </ul>
+{% endblock %}
