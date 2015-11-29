@@ -4,7 +4,7 @@ import openpyxl
 import re
 from collections import defaultdict
 from tempfile import NamedTemporaryFile
-from braces.views import StaffuserRequiredMixin, GroupRequiredMixin
+from braces.views import GroupRequiredMixin
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.db.models.aggregates import Sum
@@ -16,18 +16,22 @@ from accounts.models import VokoUser
 from .core import get_current_order_round
 from .forms import UploadProductListForm
 from .models import OrderProduct, Order, OrderRound, Supplier, OrderProductCorrection, Product, DraftProduct, \
-    ProductCategory, ProductUnit
+    ProductCategory
 
 
-class OrderAdminMain(StaffuserRequiredMixin, ListView):
+class OrderAdminMain(GroupRequiredMixin, ListView):
+    template_name = "ordering/admin/orderrounds.html"
+    group_required = ('Uitdeel', 'Transport', 'Admin')
+
     def get_queryset(self):
         return OrderRound.objects.all().order_by('-id')
-    template_name = "ordering/admin/orderrounds.html"
 
 
-class OrderAdminOrderLists(StaffuserRequiredMixin, DetailView):
+class OrderAdminOrderLists(GroupRequiredMixin, DetailView):
     model = OrderRound
     template_name = "ordering/admin/orderround.html"
+    group_required = ('Uitdeel', 'Transport', 'Admin')
+
 
     def _get_orders_per_supplier(self):
         data = {}
@@ -61,8 +65,9 @@ class OrderAdminOrderLists(StaffuserRequiredMixin, DetailView):
         return context
 
 
-class OrderAdminSupplierOrderCSV(StaffuserRequiredMixin, ListView):
+class OrderAdminSupplierOrderCSV(GroupRequiredMixin, ListView):
     template_name = "ordering/admin/orderlist_per_supplier.html"
+    group_required = ('Uitdeel', 'Transport', 'Admin')
 
     def get_queryset(self):
         supplier = Supplier.objects.get(pk=self.kwargs.get('supplier_pk'))
@@ -77,14 +82,17 @@ class OrderAdminSupplierOrderCSV(StaffuserRequiredMixin, ListView):
     content_type = "text/csv"
 
 
-class OrderAdminUserOrdersPerProduct(StaffuserRequiredMixin, ListView):
+class OrderAdminUserOrdersPerProduct(GroupRequiredMixin, ListView):
+    group_required = ('Uitdeel', 'Transport', 'Admin')
+    template_name = "ordering/admin/productorder.html"
+
     def get_queryset(self):
         return OrderProduct.objects.filter(product__pk=self.kwargs.get('pk'),
                                            order__paid=True).order_by("order__user")
-    template_name = "ordering/admin/productorder.html"
 
 
-class OrderAdminUserOrders(StaffuserRequiredMixin, ListView):
+class OrderAdminUserOrders(GroupRequiredMixin, ListView):
+    group_required = ('Uitdeel', 'Transport', 'Admin')
     template_name = "ordering/admin/user_orders_per_round.html"
 
     def get_queryset(self):
@@ -93,7 +101,10 @@ class OrderAdminUserOrders(StaffuserRequiredMixin, ListView):
 
 
 # Bestellingen per product
-class OrderAdminUserOrderProductsPerOrderRound(StaffuserRequiredMixin, ListView):
+class OrderAdminUserOrderProductsPerOrderRound(GroupRequiredMixin, ListView):
+    group_required = ('Uitdeel', 'Transport', 'Admin')
+    template_name = "ordering/admin/productsorders.html"
+
     def get_queryset(self):
         return OrderProduct.objects.select_related().filter(order__order_round_id=self.kwargs.get('pk'), order__paid=True)
 
@@ -114,10 +125,10 @@ class OrderAdminUserOrderProductsPerOrderRound(StaffuserRequiredMixin, ListView)
 
         return context
 
-    template_name = "ordering/admin/productsorders.html"
 
+class OrderAdminCorrectionJson(GroupRequiredMixin, View):
+    group_required = ('Uitdeel', 'Admin')
 
-class OrderAdminCorrectionJson(StaffuserRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         return HttpResponse(
             self.orders_json(),
@@ -162,8 +173,9 @@ class OrderAdminCorrectionJson(StaffuserRequiredMixin, View):
         return json.dumps(data)
 
 
-class OrderAdminCorrection(StaffuserRequiredMixin, TemplateView):
+class OrderAdminCorrection(GroupRequiredMixin, TemplateView):
     template_name = "ordering/admin/correction.html"
+    group_required = ('Uitdeel', 'Admin')
 
     def post(self, request, *args, **kwargs):
         user_id = int(request.POST['member_id'])
@@ -197,7 +209,9 @@ class OrderAdminCorrection(StaffuserRequiredMixin, TemplateView):
         return order_round.products.all().order_by('name')
 
 
-class OrderAdminMassCorrection(StaffuserRequiredMixin, View):
+class OrderAdminMassCorrection(GroupRequiredMixin, View):
+    group_required = ('Uitdeel', 'Admin')
+
     def post(self, request, *args, **kwargs):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
         product_id = request.POST['product_id']
@@ -373,10 +387,13 @@ class CreateRealProducts(TemplateView, ProductAdminMixin):
             prod.determine_if_product_is_new_and_set_label()
 
 
-class ProductAdminMain(StaffuserRequiredMixin, ListView):
+class ProductAdminMain(GroupRequiredMixin, ListView):
+    group_required = 'Boeren'
+
     def get_context_data(self, **kwargs):
         ctx = super(ProductAdminMain, self).get_context_data()
         ctx['current_order_round'] = get_current_order_round()
+        ctx['last_ten_orders_with_notes'] = Order.objects.filter(user_notes__isnull=False).order_by('-id')[:10]
         ctx['last_ten_orders_with_notes'] = Order.objects.filter(user_notes__isnull=False).order_by('-id')[:10]
         return ctx
 
@@ -385,7 +402,8 @@ class ProductAdminMain(StaffuserRequiredMixin, ListView):
     template_name = "ordering/admin/suppliers.html"
 
 
-class RedirectToMailingView(StaffuserRequiredMixin, DetailView):
+class RedirectToMailingView(GroupRequiredMixin, DetailView):
+    group_required = 'Boeren'
     model = OrderRound
 
     def get(self, request, *args, **kwargs):
