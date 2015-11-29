@@ -27,8 +27,12 @@
 <h2>Mailings</h2>
     <a href="{% url "productadmin_mailing" current_order_round.pk "round-open" %}" role="button" class="btn btn-primary">Verstuur "Ronde open" mailing</a>
     <a href="{% url "productadmin_mailing" current_order_round.pk "reminder" %}" role="button" class="btn btn-primary">Verstuur bestelherinnering mailing</a>
+
+<h2>Laatste 10 opmerkingen</h2>
+<ol>
+    {% for o in last_ten_orders_with_notes %}
+        <li><strong>{{ o.user.get_full_name }}</strong> op <strong>{{ o.modified.date }}</strong> (ronde {{ o.order_round.id }}): {{ o.user_notes  }}</li>
+    {% endfor %}
+</ol>
+
 {% endblock %}
-
-
-
-
