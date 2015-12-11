@@ -64,14 +64,16 @@
     <thead>
       <tr>
         <th>Credit/debet</th>
+        <th>Datum</th>
         <th>Bedrag</th>
         <th>Opmerkingen</th>
       </tr>
     </thead>
     <tbody>
-      {% for b in user.balance.all reversed %}
+      {% for b in balances  %}
       <tr>
         <td>{{ b.type }}</td>
+        <td>{{ b.created.date }}</td>
         <td>&euro; {{ b.amount }}</td>
         <td>{{ b.notes }}</td>
       </tr>

@@ -91,9 +91,10 @@ class OverView(LoginRequiredMixin, TemplateView):
         ctx = super(OverView, self).get_context_data(**kwargs)
 
         if self.request.user.id:
-            order = get_or_create_order(self.request.user)
+            order = get_or_create_order(self.request.user)  # TODO: check if this is obsolete
 
         ctx['orders'] = self.request.user.orders.filter(paid=True).order_by("-pk")
+        ctx['balances'] = self.request.user.balance.all().order_by('-pk')
         return ctx
 
     def current_order_round(self):
