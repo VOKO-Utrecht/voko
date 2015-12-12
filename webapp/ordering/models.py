@@ -238,7 +238,22 @@ class OrderProduct(TimeStampedModel):
         return self.amount * self.product.base_price
 
 
+class CorrectionQuerySet(models.query.QuerySet):
+    def delete(self):
+        #  OneToOne relation isn't cascaded in this direction :(
+        for obj in self:
+            obj.credit.delete()
+        return super(CorrectionQuerySet, self).delete()
+
+
+class CorrectionManager(models.Manager):
+    def get_queryset(self):
+        return CorrectionQuerySet(self.model, using=self._db)
+
+
 class OrderProductCorrection(TimeStampedModel):
+    objects = CorrectionManager()
+
     class Meta:
         verbose_name = "Productbestelling-correctie"
         verbose_name_plural = "Productbestelling-correcties"
