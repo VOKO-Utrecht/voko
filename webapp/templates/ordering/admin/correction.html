@@ -120,7 +120,6 @@
                 <th>Compensatie</th>
                 <th>Leverancier belasten?</th>
                 <th>Notitie</th>
-                <th>Verwijder</th>
             </tr>
         </thead>
         <tbody>
@@ -134,7 +133,6 @@
                 <td>&euro; {{c.credit.amount}}</td>
                 <td>{% if c.charge_supplier %}Ja{% else %}Nee{% endif %}</td>
                 <td>{{c.notes}}</td>
-                <td><a href="javascript:void(0)" class="delete-correction" id="{{  }}"></a></td>
             </tr>
         {% endfor %}
         </tbody>
