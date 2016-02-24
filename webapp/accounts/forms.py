@@ -21,6 +21,14 @@ class VokoUserCreationForm(forms.ModelForm):
 
         return user
 
+    def clean_keep_empty(self):
+        if self.cleaned_data['keep_empty']:
+            print self.cleaned_data['keep_empty']
+            raise forms.ValidationError("Er ging iets mis")  # Stay vague
+        return self.cleaned_data['keep_empty']
+
+    keep_empty = forms.CharField(required=False, label="Niet invullen")  # Used to mislead spam bots
+
 
 class VokoUserFinishForm(forms.ModelForm):
     class Meta:

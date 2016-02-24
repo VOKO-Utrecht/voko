@@ -1,9 +1,8 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
 {% block title %}Registreren{% endblock %}
 {% block content %}
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-8">
         <h1>Lid worden?</h1>
             <p>
                 We nodigen iedereen die interesse heeft uit om lid te worden van VOKO Utrecht.
@@ -16,12 +15,27 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-3">
+    <div class="col-md-6">
+        {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ form.errors }}
+            </div>
+        {% endif %}
         <form action="" method="post">{% csrf_token %}
-            {% bootstrap_form form %}
-            {% buttons %}
+            <div class="form-group"><label class="control-label" for="id_email">E-mail adres</label><input
+                    class="form-control" id="id_email" maxlength="255" name="email" placeholder="E-mail adres"
+                    required="required" title="" type="email"/></div>
+            <div class="form-group"><label class="control-label" for="id_first_name">Voornaam</label><input
+                    class="form-control" id="id_first_name" maxlength="30" name="first_name" placeholder="Voornaam"
+                    required="required" title="" type="text"/></div>
+            <div class="form-group"><label class="control-label" for="id_last_name">Achternaam</label><input
+                    class="form-control" id="id_last_name" maxlength="30" name="last_name" placeholder="Achternaam"
+                    required="required" title="" type="text"/></div>
+            <div class="form-group" style="display: none;"><label class="control-label" for="id_keep_empty">Niet invullen</label><input
+                    class="form-control" id="id_keep_empty" name="keep_empty" placeholder="Niet invullen" title=""
+                    type="text"/></div>
+
             <button type="submit" class="btn btn-primary">Lidmaatschap aanvragen</button>
-            {% endbuttons %}
         </form>
     </div>
 </div>
