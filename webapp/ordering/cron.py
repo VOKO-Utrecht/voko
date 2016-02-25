@@ -1,10 +1,15 @@
+import cStringIO
 from django.core.mail import EmailMultiAlternatives
 from django.db.models.aggregates import Sum
-from django.template import Context
-from django.template.loader import get_template
 from django_cron import CronJobBase, Schedule
 from .core import get_current_order_round
 from ordering.models import Supplier
+import unicodecsv as csv
+
+
+def fix_decimal_separator(decimal_value):
+    # Because DECIMAL_SEPARATOR is being ignored :(
+    return str(decimal_value).replace('.', ',')
 
 
 class MailOrderLists(CronJobBase):
@@ -33,15 +38,37 @@ class MailOrderLists(CronJobBase):
                 continue
 
             # Generate CSV
-            template = get_template("ordering/admin/orderlist_per_supplier.html")
-            object_list = supplier.products.\
+            in_mem_file = cStringIO.StringIO()
+            csv_writer = csv.writer(in_mem_file, delimiter=';', quotechar='|')
+
+            # Write header row
+            csv_writer.writerow(["Aantal", "Eenheid", "Product", "Omschrijving", "Inkoopprijs Euro", "Subtotaal"])
+
+            ordered_products = supplier.products.\
                 exclude(orderproducts=None).\
                 filter(orderproducts__order__paid=True).\
                 filter(order_round=order_round).\
                 annotate(amount_sum=Sum('orderproducts__amount'))
 
-            c = Context({'object_list': object_list}, use_l10n=True)
-            csv = template.render(c)
+            # Write products and amounts
+            for obj in ordered_products:
+                csv_writer.writerow([
+                    fix_decimal_separator(obj.amount_sum),
+                    obj.unit_of_measurement,
+                    obj.name,
+                    obj.description.replace("\n", " ").replace("\r", " "),  # TODO make sure newlines aren't stored
+                                                                            # in our products
+                    fix_decimal_separator(obj.base_price),
+                    fix_decimal_separator(obj.amount_sum * obj.base_price)
+                ])
+
+            # Write 'total' row
+            total = fix_decimal_separator(sum([obj.amount_sum * obj.base_price for obj in ordered_products]))
+            csv_writer.writerow([])
+            csv_writer.writerow(["TOTAAL", "", "", "", "", total])
+
+            in_mem_file.seek(0)
+            in_mem_file.seek(0)
 
             # Generate mail
             subject = 'VOKO Utrecht - Bestellijst voor %s' % order_round.collect_datetime.strftime("%d %B %Y")
@@ -51,12 +78,12 @@ class MailOrderLists(CronJobBase):
             text_content = """
 Hoi %s,
 
-Hierbij stuur ik de bestelling van bestelronde %d
+Hierbij sturen we onze bestelling voor bestelronde %d
 voor ons uitlevermoment op %s.
 
 De bestelling is in CSV-formaat, dit is te openen in bijvoorbeeld Excel.
 
-Dit is een geautomatiseerd bericht. Reageren is gewoon mogelijk!
+Dit is een geautomatiseerd bericht, maar reageren is gewoon mogelijk.
 
 Vriendelijke groeten,
 VOKO Utrecht
@@ -64,5 +91,5 @@ VOKO Utrecht
 
             msg = EmailMultiAlternatives(subject, text_content, from_email,
                                          [to], cc=["VOKO Utrecht Boerencontact <boeren@vokoutrecht.nl>"])
-            msg.attach('bestellijst_bestelronde_%d.csv' % order_round.pk, csv, 'text/csv')
+            msg.attach('voko_utrecht_bestelling_ronde_%d.csv' % order_round.pk, in_mem_file.read(), 'text/csv')
             msg.send()
