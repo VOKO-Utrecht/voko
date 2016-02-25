@@ -62,7 +62,7 @@ WSGI_APPLICATION = 'vokou.wsgi.application'
 
 # Internationalization
 
-LANGUAGE_CODE = 'nl-NL'
+LANGUAGE_CODE = 'nl-nl'
 TIME_ZONE = 'Europe/Amsterdam'
 USE_I18N = True
 USE_L10N = False
