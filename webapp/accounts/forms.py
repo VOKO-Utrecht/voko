@@ -23,7 +23,6 @@ class VokoUserCreationForm(forms.ModelForm):
 
     def clean_keep_empty(self):
         if self.cleaned_data['keep_empty']:
-            print self.cleaned_data['keep_empty']
             raise forms.ValidationError("Er ging iets mis")  # Stay vague
         return self.cleaned_data['keep_empty']
 
