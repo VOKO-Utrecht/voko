@@ -34,8 +34,9 @@ class VokoUserFinishForm(forms.ModelForm):
         model = VokoUser
         fields = ()
 
-    zip_code = forms.CharField(label="Postcode", widget=forms.TextInput)
-    phone_number = forms.CharField(label="Telefoonnummer (optioneel)", widget=forms.TextInput, required=False)
+    zip_code = forms.CharField(label="Postcode", widget=forms.TextInput, max_length=7)
+    phone_number = forms.CharField(label="Telefoonnummer (optioneel)", widget=forms.TextInput, required=False,
+                                   max_length=25)
 
     password1 = forms.CharField(label="Wachtwoord", widget=forms.PasswordInput)
     password2 = forms.CharField(label="Wachtwoord (bevestiging)", widget=forms.PasswordInput)
