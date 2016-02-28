@@ -86,6 +86,7 @@ class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
         log_event(event="Initiating payment (creating transaction) for order %d and amount %f" %
                   (order_to_pay.id, amount_to_pay), user=order_to_pay.user)
 
+        # Sanity checks
         assert order_to_pay.user == request.user
         assert order_to_pay.finalized is True
         assert order_to_pay.paid is False

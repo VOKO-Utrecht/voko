@@ -1,6 +1,6 @@
 from braces.views import GroupRequiredMixin
 from django.http import HttpResponse
-from django.views.generic import ListView, View, TemplateView
+from django.views.generic import View, TemplateView
 from ordering.models import OrderRound, OrderProductCorrection
 import simplejson as json  # Decimal support
 from collections import OrderedDict
