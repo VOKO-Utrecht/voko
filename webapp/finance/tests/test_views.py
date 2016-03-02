@@ -353,9 +353,28 @@ class TestQantaniCallbackView(VokoTestCase):
         })
 
         payment = Payment.objects.get()
-        self.assertTrue(payment.order.paid)
         self.mock_create_credit.assert_called_once_with()
         self.mock_complete_after_payment.assert_called_once_with()
+
+    def test_order_is_not_completed_when_round_is_closed(self):
+        month_ago = datetime.now(tz=UTC) - timedelta(days=30)
+        order_round = OrderRoundFactory(closed_for_orders=month_ago)
+        assert order_round.is_open is False
+        self.order.order_round = order_round
+        self.order.save()
+
+        assert self.order.paid is False
+        self.client.get(self.url, {
+            'id': self.payment.transaction_id,
+            'status': '1',
+            'salt': 'pepper',
+            'checksum': 'yes',
+        })
+
+        payment = Payment.objects.get()
+        self.assertFalse(payment.order.paid)
+        self.mock_create_credit.assert_called_once_with()
+        self.assertFalse(self.mock_complete_after_payment.called)
 
 
 class TestCancelPaymentView(VokoTestCase):

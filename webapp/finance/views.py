@@ -163,7 +163,8 @@ class ConfirmTransactionView(LoginRequiredMixin, QantaniMixin, TemplateView):
 
 class QantaniCallbackView(QantaniMixin, View):
     """
-    For extra certainty. See http://www.easy-ideal.com/callback-url/
+    For when users close their browser after payment...
+    See http://www.easy-ideal.com/callback-url/
     """
 
     def get(self, request, *args, **kwargs):
@@ -195,20 +196,19 @@ class QantaniCallbackView(QantaniMixin, View):
             log_event(event="Payment %s for order %s and amount %f succeeded via callback" %
                       (payment.id, payment.order.id, payment.amount), user=payment.order.user)
 
-            payment.order.paid = True
-            payment.order.save()
             payment.create_credit()
 
             if payment.order.order_round.is_open:
                 payment.order.complete_after_payment()
             else:
-                # Possible corner case where payment was executed before closing time, but never finished (user
+                # Corner case where payment was executed before closing time, but never finished (user
                 # closed browser tab), the payment is now validated by callback, but order round is closed and our
-                # suppliers may have been mailed the totals. Credit for the user has just been created, but we don't
+                # suppliers likely have been mailed the totals. Credit for the user has just been created, but we don't
                 # want to complete the order because it was placed too late.
                 log_event(event="Order round %s is closed, so not finishing order %s via callback!" % (
                     payment.order.order_round.id, payment.order.id
                 ), user=payment.order.user)
+                # TODO notify user that order FAILED
 
         return HttpResponse("+")  # This is the official "success" response
 
