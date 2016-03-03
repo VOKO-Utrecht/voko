@@ -14,6 +14,7 @@ from ordering.core import get_or_create_order, get_current_order_round, find_uni
 from django.conf import settings
 
 ORDER_CONFIRM_MAIL_ID = 12
+ORDER_FAILED_ID = 37
 
 
 class Supplier(TimeStampedModel):
@@ -213,6 +214,14 @@ class Order(TimeStampedModel):
 
     def mail_confirmation(self):
         mail_template = get_template_by_id(ORDER_CONFIRM_MAIL_ID)
+        rendered_template_vars = render_mail_template(mail_template, user=self.user, order=self)
+        mail_user(self.user, *rendered_template_vars)
+
+    def mail_failure_notification(self):
+        """
+        When order was paid after round has closed (corner case)
+        """
+        mail_template = get_template_by_id(ORDER_FAILED_ID)
         rendered_template_vars = render_mail_template(mail_template, user=self.user, order=self)
         mail_user(self.user, *rendered_template_vars)
 

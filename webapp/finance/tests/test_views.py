@@ -297,6 +297,7 @@ class TestQantaniCallbackView(VokoTestCase):
 
         self.mock_complete_after_payment = self.patch("ordering.models.Order.complete_after_payment")
         self.mock_create_credit = self.patch("finance.models.Payment.create_credit")
+        self.mock_mail_failure_notification = self.patch("ordering.models.Order.mail_failure_notification")
 
     def test_404_when_payment_cannot_be_found(self):
         ret = self.client.get(self.url, {
@@ -356,7 +357,7 @@ class TestQantaniCallbackView(VokoTestCase):
         self.mock_create_credit.assert_called_once_with()
         self.mock_complete_after_payment.assert_called_once_with()
 
-    def test_order_is_not_completed_when_round_is_closed(self):
+    def test_order_is_not_completed_when_round_is_closed_and_notification_is_sent(self):
         month_ago = datetime.now(tz=UTC) - timedelta(days=30)
         order_round = OrderRoundFactory(closed_for_orders=month_ago)
         assert order_round.is_open is False
@@ -375,6 +376,8 @@ class TestQantaniCallbackView(VokoTestCase):
         self.assertFalse(payment.order.paid)
         self.mock_create_credit.assert_called_once_with()
         self.assertFalse(self.mock_complete_after_payment.called)
+
+        self.mock_mail_failure_notification.assert_called_once_with()
 
 
 class TestCancelPaymentView(VokoTestCase):

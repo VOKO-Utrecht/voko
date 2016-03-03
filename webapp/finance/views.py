@@ -208,7 +208,8 @@ class QantaniCallbackView(QantaniMixin, View):
                 log_event(event="Order round %s is closed, so not finishing order %s via callback!" % (
                     payment.order.order_round.id, payment.order.id
                 ), user=payment.order.user)
-                # TODO notify user that order FAILED
+
+                payment.order.mail_failure_notification()
 
         return HttpResponse("+")  # This is the official "success" response
 
