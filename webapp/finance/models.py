@@ -4,9 +4,9 @@ from django_extensions.db.models import TimeStampedModel
 
 
 class Payment(TimeStampedModel):
-    # TODO link to balance model
     amount = models.DecimalField(max_digits=6, decimal_places=2)
     order = models.ForeignKey("ordering.Order", null=True, related_name="payments")
+    balance = models.OneToOneField("finance.Balance", null=True, related_name="payment")
 
     transaction_id = models.IntegerField()
     transaction_code = models.CharField(max_length=255)
