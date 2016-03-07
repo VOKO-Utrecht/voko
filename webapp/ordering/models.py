@@ -149,8 +149,6 @@ class Order(TimeStampedModel):
     finalized = models.BooleanField(default=False)  # To "freeze" order before payment
     paid = models.BooleanField(default=False)  # True when paid
 
-    debit = models.OneToOneField(Balance, null=True, blank=True, related_name="order")
-
     def __unicode__(self):
         return u"Order %d; user: %s" % (self.id, self.user)
 
@@ -198,19 +196,18 @@ class Order(TimeStampedModel):
         log_event(event="Completing (paid) order %s" % self.id, user=self.user)
         self.paid = True
         self.save()
-        self.create_and_link_debit()
+        self.create_debit()
         self.mail_confirmation()
 
-    def create_and_link_debit(self):
+    def create_debit(self):
         """
-        Create debit and save as self.debit one-to-one
+        Create debit for order
         """
         log_event(event="Creating debit for order %s" % self.id)
-        debit = Balance.objects.create(user=self.user,
-                                       type="DR",
-                                       amount=self.total_price,
-                                       notes="Debit van %s voor bestelling #%d" % (self.total_price, self.pk))
-        self.debit = debit
+        Balance.objects.create(user=self.user,
+                               type="DR",
+                               amount=self.total_price,
+                               notes="Debit van %s voor bestelling #%d" % (self.total_price, self.pk))
 
     def mail_confirmation(self):
         mail_template = get_template_by_id(ORDER_CONFIRM_MAIL_ID)

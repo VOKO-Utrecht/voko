@@ -15,8 +15,6 @@ class PaymentListFilter(admin.SimpleListFilter):
     user choice or by a default value.
     """
 
-    # TODO: link payment to balance and use that connection
-
     title = 'is payment'
     parameter_name = 'ispayment'
     default_value = None
@@ -30,9 +28,9 @@ class PaymentListFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         # Compare the requested value to decide how to filter the queryset.
         if self.value() == '1':
-            return queryset.filter(notes__contains="iDeal betaling")
+            return queryset.exclude(balance=None)
         if self.value() == '0':
-            return queryset.exclude(notes__contains="iDeal betaling")
+            return queryset.filter(balance=None)
 
 
 class CorrectionListFilter(admin.SimpleListFilter):
@@ -62,7 +60,7 @@ class CorrectionListFilter(admin.SimpleListFilter):
 
 
 class BalanceAdmin(admin.ModelAdmin):
-    list_display = ["id", "created", "modified", "user", "type", "amount", "notes", "order", "is_correction", "is_payment"]
+    list_display = ["id", "created", "modified", "user", "type", "amount", "notes", "is_correction", "is_payment"]
     ordering = ("-id", )
     list_filter = ("type", PaymentListFilter, CorrectionListFilter)
     search_fields = ['notes']

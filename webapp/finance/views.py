@@ -90,7 +90,7 @@ class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
         assert order_to_pay.user == request.user
         assert order_to_pay.finalized is True
         assert order_to_pay.paid is False
-        assert order_to_pay.debit is None
+        assert order_to_pay.payments.filter(succeeded=True).exists() is False
 
         if order_to_pay.order_round.is_open is not True:
             messages.error(request, "De bestelronde is gesloten, je kunt niet meer betalen.")
@@ -144,7 +144,7 @@ class ConfirmTransactionView(LoginRequiredMixin, QantaniMixin, TemplateView):
             payment.save()
             payment.order.paid = True
             payment.order.save()
-            payment.create_credit()
+            payment.create_and_link_credit()
             log_event(event="Payment %s for order %s and amount %f succeeded" %
                       (payment.id, payment.order.id, payment.amount), user=payment.order.user)
 
@@ -196,7 +196,7 @@ class QantaniCallbackView(QantaniMixin, View):
             log_event(event="Payment %s for order %s and amount %f succeeded via callback" %
                       (payment.id, payment.order.id, payment.amount), user=payment.order.user)
 
-            payment.create_credit()
+            payment.create_and_link_credit()
 
             if payment.order.order_round.is_open:
                 payment.order.complete_after_payment()

@@ -28,7 +28,7 @@ class TestChooseBank(VokoTestCase):
         o_p = OrderProductFactory.create(order__order_round=order_round,
                                          product__order_round=order_round,
                                          order__user=self.user)
-        o_p.order.create_and_link_debit()
+        o_p.order.create_debit()
         o_p.save()
         self.order = o_p.order
 
@@ -110,6 +110,7 @@ class TestCreateTransaction(VokoTestCase):
         self.assertEqual(payment.order, self.order)
         self.assertEqual(payment.transaction_id, 1212)
         self.assertEqual(payment.transaction_code, "code")
+        self.assertEqual(payment.balance, None)
 
     def test_that_user_is_redirected_to_bank_url(self):
         self.mock_qantani_api.return_value.create_ideal_transaction.return_value = {
@@ -178,7 +179,7 @@ class TestConfirmTransaction(VokoTestCase):
         self.mock_qantani_api.return_value.validate_transaction_checksum.return_value = True
 
         self.mock_complete_after_payment = self.patch("ordering.models.Order.complete_after_payment")
-        self.mock_create_credit = self.patch("finance.models.Payment.create_credit")
+        self.mock_create_credit = self.patch("finance.models.Payment.create_and_link_credit")
 
     def test_required_get_parameters(self):
         ret = self.client.get(self.url, {
@@ -296,7 +297,7 @@ class TestQantaniCallbackView(VokoTestCase):
         self.mock_qantani_api.return_value.validate_transaction_checksum.return_value = True
 
         self.mock_complete_after_payment = self.patch("ordering.models.Order.complete_after_payment")
-        self.mock_create_credit = self.patch("finance.models.Payment.create_credit")
+        self.mock_create_credit = self.patch("finance.models.Payment.create_and_link_credit")
         self.mock_mail_failure_notification = self.patch("ordering.models.Order.mail_failure_notification")
 
     def test_404_when_payment_cannot_be_found(self):

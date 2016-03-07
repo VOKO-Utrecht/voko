@@ -9,11 +9,12 @@ class TestPaymentModel(VokoTestCase):
         self.payment = PaymentFactory()
 
     def test_create_credit(self):
-        balance = self.payment.create_credit()
+        balance = self.payment.create_and_link_credit()
         self.assertEqual(balance.user, self.payment.order.user)
         self.assertEqual(balance.type, "CR")
         self.assertEqual(balance.amount, self.payment.amount)
         self.assertEqual(balance.notes, "iDeal betaling voor bestelling #%d" % self.payment.order.id)
+        self.assertEqual(balance.payment, self.payment)
 
 
 class TestBalanceManager(VokoTestCase):

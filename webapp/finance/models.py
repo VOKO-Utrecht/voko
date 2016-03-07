@@ -12,11 +12,14 @@ class Payment(TimeStampedModel):
     transaction_code = models.CharField(max_length=255)
     succeeded = models.BooleanField(default=False)
 
-    def create_credit(self):
-        return Balance.objects.create(user=self.order.user,
-                                      type="CR",
-                                      amount=self.amount,
-                                      notes="iDeal betaling voor bestelling #%d" % self.order.pk)
+    def create_and_link_credit(self):
+        balance = Balance.objects.create(user=self.order.user,
+                                         type="CR",
+                                         amount=self.amount,
+                                         notes="iDeal betaling voor bestelling #%d" % self.order.pk)
+        self.balance = balance
+        self.save()
+        return balance
 
     def __unicode__(self):
         status = "Succeeded" if self.succeeded else "Failed"
