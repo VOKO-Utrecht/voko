@@ -33,11 +33,8 @@ class PaymentListFilter(admin.SimpleListFilter):
 
 class CorrectionListFilter(admin.SimpleListFilter):
     """
-    This filter will always return a subset of the instances in a Model, either filtering by the
-    user choice or by a default value.
+    Filter Balances on being the result of corrections or not
     """
-
-    # TODO: link payment to balance and use that connection
 
     title = 'is correction'
     parameter_name = 'iscorr'
@@ -50,7 +47,6 @@ class CorrectionListFilter(admin.SimpleListFilter):
         )
 
     def queryset(self, request, queryset):
-        # Compare the requested value to decide how to filter the queryset.
         if self.value() == '1':
             return queryset.filter(correction__isnull=False)
         if self.value() == '0':
@@ -64,11 +60,11 @@ class BalanceAdmin(admin.ModelAdmin):
     search_fields = ['notes']
 
     def is_correction(self, obj):
-        return True if obj.correction else False
+        return obj.correction is not None
     is_correction.boolean = True
 
     def is_payment(self, obj):
-        return "iDeal betaling" in obj.notes
+        return obj.payment is not None
     is_payment.boolean = True
 
 
