@@ -11,8 +11,7 @@ for model in get_models(get_app('finance')):
 
 class PaymentListFilter(admin.SimpleListFilter):
     """
-    This filter will always return a subset of the instances in a Model, either filtering by the
-    user choice or by a default value.
+    Filter Balances by being payments or not
     """
 
     title = 'is payment'
@@ -26,11 +25,10 @@ class PaymentListFilter(admin.SimpleListFilter):
         )
 
     def queryset(self, request, queryset):
-        # Compare the requested value to decide how to filter the queryset.
         if self.value() == '1':
-            return queryset.exclude(balance=None)
+            return queryset.exclude(payment=None)
         if self.value() == '0':
-            return queryset.filter(balance=None)
+            return queryset.filter(payment=None)
 
 
 class CorrectionListFilter(admin.SimpleListFilter):
