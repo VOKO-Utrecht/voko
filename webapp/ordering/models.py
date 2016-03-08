@@ -148,6 +148,10 @@ class Order(TimeStampedModel):
 
     finalized = models.BooleanField(default=False)  # To "freeze" order before payment
     paid = models.BooleanField(default=False)  # True when paid
+    # Debit created when this order was finished (describes total order value)
+    debit = models.OneToOneField(Balance, null=True, blank=True, related_name="order")
+
+    # TODO: order cannot be 'paid' without having a 'debit'. Add sanity check.
 
     def __unicode__(self):
         return u"Order %d; user: %s" % (self.id, self.user)
