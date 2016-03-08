@@ -205,13 +205,14 @@ class Order(TimeStampedModel):
 
     def create_debit(self):
         """
-        Create debit for order
+        Create debit for order and create one-to-one relation
         """
         log_event(event="Creating debit for order %s" % self.id)
-        Balance.objects.create(user=self.user,
-                               type="DR",
-                               amount=self.total_price,
-                               notes="Debit van %s voor bestelling #%d" % (self.total_price, self.pk))
+        self.debit = Balance.objects.create(user=self.user,
+                                            type="DR",
+                                            amount=self.total_price,
+                                            notes="Debit van %s voor bestelling #%d" % (self.total_price, self.pk))
+        self.save()
 
     def mail_confirmation(self):
         mail_template = get_template_by_id(ORDER_CONFIRM_MAIL_ID)
