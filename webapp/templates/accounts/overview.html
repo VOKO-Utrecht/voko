@@ -41,7 +41,7 @@
       {% for order in orders %}
           {% if order.has_products %}
           <tr>
-            <td><a href="{% url 'order_summary' order.pk %}">Bestelling {{ order.user_order_id }}</a></td>
+            <td><a href="{% url 'order_summary' order.pk %}">Bestelling {{ order.user_order_number }}</a></td>
             <td>{{ order.order_round }}</td>
             <td>&euro; {{ order.total_price }}</td>
           </tr>

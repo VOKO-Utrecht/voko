@@ -190,8 +190,12 @@ class Order(TimeStampedModel):
         return Decimal(0)
 
     @property
-    def user_order_id(self):
-        user_orders = self.user.orders.exclude(orderproducts=None).order_by("pk")
+    def user_order_number(self):
+        """
+        Counts all user's finished and paid orders, ascending, by ID, and
+        returns the number of this order
+        """
+        user_orders = self.user.orders.filter(paid=True, finalized=True).order_by("pk")
         for index, uo in enumerate(user_orders):
             if uo == self:
                 return index + 1

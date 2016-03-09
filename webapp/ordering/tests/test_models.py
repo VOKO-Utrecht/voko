@@ -1,4 +1,5 @@
 from unittest import skip
+from accounts.tests.factories import VokoUserFactory
 from finance.models import Balance
 from ordering.models import Order
 from ordering.tests.factories import SupplierFactory, OrderFactory, OrderProductFactory, OrderRoundFactory
@@ -42,3 +43,31 @@ class TestOrderModel(VokoTestCase):
         self.assertEqual(debit.notes, 'Debit van %s voor bestelling #%s' % (order.total_price, order.id))
 
         self.mock_mail_confirmation.assert_called_once_with()
+
+    def test_user_order_number_with_one_paid_order(self):
+        order = OrderFactory(paid=True, finalized=True)
+        self.assertEqual(order.user_order_number, 1)
+
+    def test_user_order_number_with_unpaid_order(self):
+        order = OrderFactory(paid=False, finalized=True)
+        self.assertEqual(order.user_order_number, None)
+
+    def test_user_order_number_with_multiple_orders(self):
+        user = VokoUserFactory()
+        order1 = OrderFactory.create(paid=True, finalized=True, user=user)
+        order2 = OrderFactory.create(paid=False, finalized=True, user=user)
+        order3 = OrderFactory.create(paid=True, finalized=True, user=user)
+        order4 = OrderFactory.create(paid=True, finalized=False, user=user)
+        self.assertEqual(order1.user_order_number, 1)
+        self.assertEqual(order2.user_order_number, None)
+        self.assertEqual(order3.user_order_number, 2)
+        self.assertEqual(order4.user_order_number, None)
+
+    def test_user_order_number_with_multiple_orders_but_different_users(self):
+        user1 = VokoUserFactory()
+        user2 = VokoUserFactory()
+        order1 = OrderFactory.create(paid=True, finalized=True, user=user1)
+        order2 = OrderFactory.create(paid=True, finalized=True, user=user2)
+        self.assertEqual(order1.user_order_number, 1)
+        self.assertEqual(order2.user_order_number, 1)
+
