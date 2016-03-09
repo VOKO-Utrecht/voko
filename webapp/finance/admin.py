@@ -1,28 +1,21 @@
 from django.contrib import admin
-from django.db.models.loading import get_models, get_app
 from finance.models import Balance, Payment
 
-for model in get_models(get_app('finance')):
-    if model in (Balance, Payment):
-        continue
 
-    admin.site.register(model)
-
-
-class PaymentListFilter(admin.SimpleListFilter):
-    """
-    Filter Balances by being payments or not
-    """
-
-    title = 'is payment'
-    parameter_name = 'ispayment'
+class BalanceFilterMixin(object):
     default_value = None
 
     def lookups(self, request, model_admin):
-        return (
-            ('1', 'True'),
-            ('0', 'False'),
-        )
+        return (('1', 'True'),
+                ('0', 'False'))
+
+
+class PaymentListFilter(BalanceFilterMixin, admin.SimpleListFilter):
+    """
+    Filter Balances by being payment credit or not
+    """
+    title = 'is payment'
+    parameter_name = 'ispayment'
 
     def queryset(self, request, queryset):
         if self.value() == '1':
@@ -31,20 +24,12 @@ class PaymentListFilter(admin.SimpleListFilter):
             return queryset.filter(payment=None)
 
 
-class CorrectionListFilter(admin.SimpleListFilter):
+class CorrectionListFilter(BalanceFilterMixin, admin.SimpleListFilter):
     """
     Filter Balances on being the result of corrections or not
     """
-
     title = 'is correction'
     parameter_name = 'iscorr'
-    default_value = None
-
-    def lookups(self, request, model_admin):
-        return (
-            ('1', 'True'),
-            ('0', 'False'),
-        )
 
     def queryset(self, request, queryset):
         if self.value() == '1':
