@@ -178,8 +178,8 @@ class TestConfirmTransaction(VokoTestCase):
         self.mock_qantani_api.return_value.validate_transaction_checksum = MagicMock()
         self.mock_qantani_api.return_value.validate_transaction_checksum.return_value = True
 
-        self.mock_complete_after_payment = self.patch("ordering.models.Order.complete_after_payment")
         self.mock_create_credit = self.patch("finance.models.Payment.create_and_link_credit")
+        self.mock_mail_confirmation = self.patch("ordering.models.Order.mail_confirmation")
 
     def test_required_get_parameters(self):
         ret = self.client.get(self.url, {
@@ -229,16 +229,6 @@ class TestConfirmTransaction(VokoTestCase):
             "pepper"
         )
 
-    def test_that_complete_after_payment_is_called_on_valid_payment(self):
-        ret = self.client.get(self.url, {
-            'id': self.payment.transaction_id,
-            'status': '1',
-            'salt': 'pepper',
-            'checksum': 'yes',
-        })
-        self.assertEqual(ret.status_code, 200)
-        self.mock_complete_after_payment.assert_called_once_with()
-
     def test_payment_and_order_status_after_successful_payment(self):
         self.client.get(self.url, {
             'id': self.payment.transaction_id,
@@ -252,7 +242,15 @@ class TestConfirmTransaction(VokoTestCase):
         self.assertTrue(payment.order.paid)
         self.mock_create_credit.assert_called_once_with()
 
-    def test_that_order_id_is_removed_from_session_on_succesful_payment(self):
+        debit = Balance.objects.get()
+        self.assertEqual(debit.user, payment.order.user)
+        self.assertEqual(debit.type, 'DR')
+        self.assertEqual(debit.amount, payment.order.total_price)
+        self.assertEqual(debit.notes, 'Debit van %s voor bestelling #%s' % (payment.order.total_price,
+                                                                            payment.order.id))
+        self.mock_mail_confirmation.assert_called_once_with()
+
+    def test_that_order_id_is_removed_from_session_on_successful_payment(self):
         self.client.get(self.url, {
             'id': self.payment.transaction_id,
             'status': '1',

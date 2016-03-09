@@ -13,6 +13,11 @@ from ordering.models import Order
 
 
 def choosebankform_factory(banks):
+    """
+    Generate a Django Form used to choose your bank from a drop down
+    Based on the up-to-date list of :banks: from our PSP
+    """
+
     choices = [(bank['Id'], bank['Name']) for bank in banks]
 
     class ChooseBankForm(forms.Form):
@@ -22,6 +27,9 @@ def choosebankform_factory(banks):
 
 
 class QantaniMixin(object):
+    """
+    Sugar coating for Qantani API calls used in our views
+    """
     def __init__(self):
         self.qantani_api = QantaniAPI(settings.QANTANI_MERCHANT_ID,
                                       settings.QANTANI_MERCHANT_KEY,
@@ -31,7 +39,8 @@ class QantaniMixin(object):
         return self.qantani_api.create_ideal_transaction(amount=amount,
                                                          bank_id=bank_id,
                                                          description=description,
-                                                         return_url=settings.BASE_URL + reverse('finance.confirmtransaction'))
+                                                         return_url=(settings.BASE_URL +
+                                                                     reverse('finance.confirmtransaction')))
 
     def _validate_transaction(self, transaction_code, transaction_checksum, transaction_id,
                               transaction_status, transaction_salt):
@@ -48,7 +57,7 @@ class QantaniMixin(object):
 
 class ChooseBankView(LoginRequiredMixin, QantaniMixin, FormView):
     """
-    Lets user choose bank to pay.
+    Let user choose a bank to use for iDeal payment
     POSTs to CreateTransactionView.
     """
     template_name = "finance/choose_bank.html"
@@ -74,11 +83,12 @@ class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
         return choosebankform_factory(banks)
 
     def post(self, request, *args, **kwargs):
-        form = self.get_form_class()
-        f = form(data=request.POST)
-        f.full_clean()
-        if f.is_valid() is False:
-            # Should not happen. Redirect back to prev. view
+        Form = self.get_form_class()
+        form = Form(data=request.POST)
+        form.full_clean()
+
+        if form.is_valid() is False:
+            # Should not happen, as the form has just one input field. Redirect back to previous view
             return redirect(reverse('finance.choosebank'))
 
         order_to_pay = Order.objects.get(id=request.session['order_to_pay'])
@@ -86,7 +96,7 @@ class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
         log_event(event="Initiating payment (creating transaction) for order %d and amount %f" %
                   (order_to_pay.id, amount_to_pay), user=order_to_pay.user)
 
-        # Sanity checks
+        # Sanity checks. If one of these fails, it's very likely that someone is tampering.
         assert order_to_pay.user == request.user
         assert order_to_pay.finalized is True
         assert order_to_pay.paid is False
@@ -98,7 +108,7 @@ class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
                             (order_to_pay.id, order_to_pay.order_round.id), user=order_to_pay.user)
             return redirect(reverse('finish_order', args=(order_to_pay.id,)))
 
-        bank_id = f.cleaned_data['bank']
+        bank_id = form.cleaned_data['bank']
         results = self._create_transaction(bank_id=bank_id,
                                            amount=amount_to_pay,
                                            description="VOKO Utrecht ID %d" % order_to_pay.id)
@@ -114,11 +124,10 @@ class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
 
 class ConfirmTransactionView(LoginRequiredMixin, QantaniMixin, TemplateView):
     """
-    $bank redirects user back to this view after payment
-
+    $bank redirects user back to this view after payment, or after payment was canceled.
     Transaction details are sent in GET parameters.
 
-    Validate payment.
+    Validate the payment and finish order when valid.
     """
     template_name = "finance/after_payment.html"
 
@@ -142,13 +151,12 @@ class ConfirmTransactionView(LoginRequiredMixin, QantaniMixin, TemplateView):
 
             payment.succeeded = True
             payment.save()
-            payment.order.paid = True
-            payment.order.save()
+
             payment.create_and_link_credit()
+            payment.order.complete_after_payment()
+
             log_event(event="Payment %s for order %s and amount %f succeeded" %
                       (payment.id, payment.order.id, payment.amount), user=payment.order.user)
-
-            payment.order.complete_after_payment()
 
             del self.request.session['order_to_pay']
 
@@ -157,16 +165,14 @@ class ConfirmTransactionView(LoginRequiredMixin, QantaniMixin, TemplateView):
                       (payment.id, payment.order.id, payment.amount), user=payment.order.user)
 
         context['payment_succeeded'] = success
-
         return context
 
 
 class QantaniCallbackView(QantaniMixin, View):
     """
-    For when users close their browser after payment...
+    Web hook, for when users close their browser after payment...
     See http://www.easy-ideal.com/callback-url/
     """
-
     def get(self, request, *args, **kwargs):
         transaction_id = request.GET.get('id')
         transaction_status = request.GET.get('status')
@@ -184,19 +190,20 @@ class QantaniCallbackView(QantaniMixin, View):
                       (payment.id, payment.order.id, payment.amount), user=payment.order.user)
             return HttpResponse("")  # Any other response than "+" means failure.
 
+        # Successful payment!
+
         payment.succeeded = True
         payment.save()
+        payment.create_and_link_credit()
+        log_event(event="Payment %s for order %s and amount %f succeeded via callback" %
+                        (payment.id, payment.order.id, payment.amount), user=payment.order.user)
 
         if payment.order.paid is False:
-            # This means that the user paid, but closed the browser after confirming. The callback view enables
-            # us to finish the order anyway.
+            # Order has not been paid, but the payment has now been confirmed and credit has been created.
+            # Time to finish the order, if the order round is still open.
 
+            # Sanity Check
             assert payment.order.finalized is True
-
-            log_event(event="Payment %s for order %s and amount %f succeeded via callback" %
-                      (payment.id, payment.order.id, payment.amount), user=payment.order.user)
-
-            payment.create_and_link_credit()
 
             if payment.order.order_round.is_open:
                 payment.order.complete_after_payment()
@@ -216,12 +223,12 @@ class QantaniCallbackView(QantaniMixin, View):
 
 class CancelPaymentView(View):
     """
-    When user clicks 'cancel' on the choosebankview
+    When user clicks 'cancel' on the ChooseBankView.
     """
-
     def get(self, request, *args, **kwargs):
         order_to_pay = Order.objects.get(id=request.session['order_to_pay'])
 
+        # Sanity checks
         assert order_to_pay.finalized is True
         assert order_to_pay.paid is False
 

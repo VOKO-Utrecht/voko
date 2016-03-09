@@ -122,9 +122,12 @@ class OrderManager(models.Manager):
             return get_or_create_order(user=self.instance)
 
     def get_last_paid_order(self):
-        return super(OrderManager, self).get_queryset().filter(paid=True,
-                                                               user=self.instance,
-                                                               order_round=get_current_order_round()).order_by('-pk')[0]
+        try:
+            return super(OrderManager, self).get_queryset().filter(paid=True,
+                                                                   user=self.instance,
+                                                                   order_round=get_current_order_round()).order_by('-pk')[0]
+        except IndexError:
+            return
 
 
 class Order(TimeStampedModel):
