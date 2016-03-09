@@ -4,22 +4,30 @@ from django_extensions.db.models import TimeStampedModel
 
 
 class Payment(TimeStampedModel):
+    """
+    Represents a payment initiated by our payment service provider.
+    """
     amount = models.DecimalField(max_digits=6, decimal_places=2)
-    order = models.ForeignKey("ordering.Order", null=True, related_name="payments")
+
+    # A Payment is always used to finish an order
+    order = models.ForeignKey("ordering.Order", related_name="payments")
+
+    # Credit Balance, for successful payment
     balance = models.OneToOneField("finance.Balance", null=True, related_name="payment")
 
     transaction_id = models.IntegerField()
     transaction_code = models.CharField(max_length=255)
-    succeeded = models.BooleanField(default=False)
+    succeeded = models.BooleanField(default=False, help_text="Payment was validated by PSP")
 
     def create_and_link_credit(self):
-        balance = Balance.objects.create(user=self.order.user,
-                                         type="CR",
-                                         amount=self.amount,
-                                         notes="iDeal betaling voor bestelling #%d" % self.order.pk)
-        self.balance = balance
+        """
+        Create user's credit following a succesful payment
+        Returns newly created Balance object
+        """
+        self.balance = Balance.objects.create(user=self.order.user, type="CR", amount=self.amount,
+                                              notes="iDeal betaling voor bestelling #%d" % self.order.pk)
         self.save()
-        return balance
+        return self.balance
 
     def __unicode__(self):
         status = "Succeeded" if self.succeeded else "Failed"
@@ -27,6 +35,11 @@ class Payment(TimeStampedModel):
 
 
 class BalanceManager(models.Manager):
+    """
+    Implements:
+      * vokouser.balance.credit()
+      * vokouser.balance.debit()
+    """
     use_for_related_fields = True
 
     def _credit(self):
@@ -50,7 +63,11 @@ class BalanceManager(models.Manager):
 
 
 class Balance(TimeStampedModel):
-    # TODO: add sanity check; amount may never be negative.
+    """
+    Represents a transaction. Perhaps 'Transaction' would be a better name for this class (FIXME)
+    Examples of transactions: iDeal payment, order debit, gas compensation, order correction, etc.
+    A transaction is either debit (DR) or credit (CR).
+    """
     TYPES = (
         ("CR", "Credit"),
         ("DR", "Debit"),
@@ -62,5 +79,11 @@ class Balance(TimeStampedModel):
 
     def __unicode__(self):
         return u"[%s] %s: %s" % (self.user, self.type, self.amount)
+
+    def save(self, *args, **kwargs):
+        """ Sanity check, the amount may not be zero or less. """
+        if self.amount <= 0:
+            raise ValueError("Amount may not be zero or negative.")
+        super(Balance, self).save(*args, **kwargs)
 
     objects = BalanceManager()

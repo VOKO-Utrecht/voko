@@ -1,4 +1,5 @@
 from factory.fuzzy import FuzzyInteger, FuzzyText, FuzzyDecimal
+from accounts.tests.factories import VokoUserFactory
 from ordering.tests.factories import OrderFactory
 from factory import DjangoModelFactory, SubFactory
 
@@ -6,6 +7,8 @@ from factory import DjangoModelFactory, SubFactory
 class BalanceFactory(DjangoModelFactory):
     class Meta:
         model = "finance.Balance"
+
+    user = SubFactory(VokoUserFactory)
 
 
 class PaymentFactory(DjangoModelFactory):

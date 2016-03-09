@@ -1,6 +1,6 @@
 from accounts.tests.factories import VokoUserFactory
 from finance.models import Balance
-from finance.tests.factories import PaymentFactory
+from finance.tests.factories import PaymentFactory, BalanceFactory
 from vokou.testing import VokoTestCase
 
 
@@ -8,13 +8,28 @@ class TestPaymentModel(VokoTestCase):
     def setUp(self):
         self.payment = PaymentFactory()
 
-    def test_create_credit(self):
+    def test_create_and_link_credit(self):
         balance = self.payment.create_and_link_credit()
         self.assertEqual(balance.user, self.payment.order.user)
         self.assertEqual(balance.type, "CR")
         self.assertEqual(balance.amount, self.payment.amount)
         self.assertEqual(balance.notes, "iDeal betaling voor bestelling #%d" % self.payment.order.id)
         self.assertEqual(balance.payment, self.payment)
+
+
+class TestBalanceModel(VokoTestCase):
+    def test_negative_amount_raises_valueerror(self):
+        with self.assertRaises(ValueError) as e:
+            BalanceFactory(amount=-1)
+        self.assertEqual(str(e.exception), "Amount may not be zero or negative.")
+
+    def test_zero_amount_raises_valueerror(self):
+        with self.assertRaises(ValueError) as e:
+            BalanceFactory(amount=0)
+        self.assertEqual(str(e.exception), "Amount may not be zero or negative.")
+
+    def test_positive_amount(self):
+        BalanceFactory(amount=0.1)
 
 
 class TestBalanceManager(VokoTestCase):
