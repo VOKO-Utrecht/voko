@@ -270,9 +270,15 @@ class OrderProduct(TimeStampedModel):
 
     @property
     def total_retail_price(self):
+        """
+        What the user will pay for this OrderProduct
+        """
         return self.amount * self.product.retail_price
 
     def total_cost_price(self):
+        """
+        What VOKO will pay for this product
+        """
         return self.amount * self.product.base_price
 
 

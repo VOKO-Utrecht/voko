@@ -313,3 +313,14 @@ class TestOrderModel(VokoTestCase):
                                                           order=order)
         self.mail_user.assert_called_once_with(order.user)
 
+
+class TestOrderProductModel(VokoTestCase):
+    def test_total_retail_price(self):
+        odp1 = OrderProductFactory()
+        self.assertEqual(odp1.total_retail_price,
+                         odp1.amount * odp1.product.retail_price)
+
+    def test_total_cost_price(self):
+        odp1 = OrderProductFactory()
+        self.assertEqual(odp1.total_cost_price(),
+                         odp1.amount * odp1.product.base_price)
