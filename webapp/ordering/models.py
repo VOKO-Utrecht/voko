@@ -155,14 +155,29 @@ class Order(TimeStampedModel):
 
     @property
     def has_products(self):
-        return len(self.orderproducts.all()) > 0
+        """
+        Return if any OrderProducts are created for this order.
+        Boolean.
+        """
+        return bool(self.orderproducts.all())
 
     @property
     def total_price(self):
-        product_sum = sum([p.total_retail_price for p in self.orderproducts.all()])
+        """
+        Return total retail price for this order.
+        Includes payment transaction costs and eventual member fee.
+        """
+        product_sum = sum([odp.total_retail_price for odp in self.orderproducts.all()])
         return product_sum + self.order_round.transaction_costs + self.member_fee
 
     def total_price_to_pay_with_balances_taken_into_account(self):
+        """
+        Calculate payment amount at the time of the order.
+        This amount can be less, equal to or larger than the :total_price:,
+        depending on the user's balance (debit or credit).
+
+        Users are forced to repay their debit when placing and order.
+        """
         if self.user.balance.credit() > 0:
             total_price = self.total_price - self.user.balance.credit()
             return total_price if total_price > 0 else 0
@@ -174,7 +189,9 @@ class Order(TimeStampedModel):
 
     @property
     def member_fee(self):
-        # Return contribution fee if this is users' first order (unfinished orders not included)
+        """
+        Return contribution fee if this is users' first order (non-paid orders not included)
+        """
         amount_of_paid_orders = self.user.orders.\
             filter(paid=True).\
             exclude(pk=self.pk).\
@@ -198,6 +215,9 @@ class Order(TimeStampedModel):
                 return index + 1
 
     def complete_after_payment(self):
+        """
+        Complete order by setting the 'paid' boolean, creating debit and mailing the user.
+        """
         log_event(event="Completing (paid) order %s" % self.id, user=self.user)
         self.paid = True
         self.save()
@@ -216,13 +236,16 @@ class Order(TimeStampedModel):
         self.save()
 
     def mail_confirmation(self):
+        """
+        Send confirmation mail to user about successful order placement
+        """
         mail_template = get_template_by_id(ORDER_CONFIRM_MAIL_ID)
         rendered_template_vars = render_mail_template(mail_template, user=self.user, order=self)
         mail_user(self.user, *rendered_template_vars)
 
     def mail_failure_notification(self):
         """
-        When order was paid after round has closed (corner case)
+        Use when order was paid after round has closed (corner case)
         """
         mail_template = get_template_by_id(ORDER_FAILED_ID)
         rendered_template_vars = render_mail_template(mail_template, user=self.user, order=self)

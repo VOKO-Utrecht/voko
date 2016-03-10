@@ -1,9 +1,13 @@
+from decimal import Decimal
 from unittest import skip
 from datetime import datetime, timedelta
+from django.conf import settings
+from mock import patch
 from pytz import UTC
 from accounts.tests.factories import VokoUserFactory
 from finance.models import Balance
-from ordering.models import Order, OrderProduct
+from finance.tests.factories import BalanceFactory
+from ordering.models import Order, OrderProduct, ORDER_CONFIRM_MAIL_ID, ORDER_FAILED_ID
 from ordering.tests.factories import SupplierFactory, OrderFactory, OrderProductFactory, OrderRoundFactory, \
     OrderProductCorrectionFactory
 from vokou.testing import VokoTestCase
@@ -146,24 +150,27 @@ class TestOrderRoundModel(VokoTestCase):
 
 class TestOrderModel(VokoTestCase):
     def setUp(self):
-        self.mock_mail_confirmation = self.patch("ordering.models.Order.mail_confirmation")
+        self.get_template_by_id = self.patch("ordering.models.get_template_by_id")
+        self.render_mail_template = self.patch("ordering.models.render_mail_template")
+        self.mail_user = self.patch("ordering.models.mail_user")
 
     def test_complete_after_payment_method(self):
-        order = OrderFactory(paid=False, finalized=True)
-        self.assertFalse(Balance.objects.exists())  # No debit created yet
+        with patch("ordering.models.Order.mail_confirmation") as mock_mail:
+            order = OrderFactory(paid=False, finalized=True)
+            self.assertFalse(Balance.objects.exists())  # No debit created yet
 
-        order.complete_after_payment()
+            order.complete_after_payment()
 
-        order = Order.objects.get()
-        self.assertTrue(order.paid)
+            order = Order.objects.get()
+            self.assertTrue(order.paid)
 
-        debit = Balance.objects.get()
-        self.assertEqual(debit.user, order.user)
-        self.assertEqual(debit.type, 'DR')
-        self.assertEqual(debit.amount, order.total_price)
-        self.assertEqual(debit.notes, 'Debit van %s voor bestelling #%s' % (order.total_price, order.id))
+            debit = Balance.objects.get()
+            self.assertEqual(debit.user, order.user)
+            self.assertEqual(debit.type, 'DR')
+            self.assertEqual(debit.amount, order.total_price)
+            self.assertEqual(debit.notes, 'Debit van %s voor bestelling #%s' % (order.total_price, order.id))
 
-        self.mock_mail_confirmation.assert_called_once_with()
+            mock_mail.assert_called_once_with()
 
     def test_user_order_number_with_one_paid_order(self):
         order = OrderFactory(paid=True, finalized=True)
@@ -191,4 +198,118 @@ class TestOrderModel(VokoTestCase):
         order2 = OrderFactory.create(paid=True, finalized=True, user=user2)
         self.assertEqual(order1.user_order_number, 1)
         self.assertEqual(order2.user_order_number, 1)
+
+    def test_has_products_with_no_products(self):
+        order = OrderFactory()
+        self.assertFalse(order.has_products)
+
+    def test_has_products_with_one_orderproduct(self):
+        order = OrderFactory()
+        OrderProductFactory(order=order)
+        self.assertTrue(order.has_products)
+
+    def test_total_price_with_no_products(self):
+        order = OrderFactory()
+        self.assertEqual(order.total_price, order.member_fee + order.order_round.transaction_costs)
+
+    def test_total_order_price_with_one_orderproduct(self):
+        order = OrderFactory()
+        odp1 = OrderProductFactory(order=order)
+        self.assertEqual(order.total_price, (order.member_fee + order.order_round.transaction_costs) +
+                         odp1.total_retail_price)
+
+    def test_total_order_price_with_two_orderproducts(self):
+        order = OrderFactory()
+        odp1 = OrderProductFactory(order=order)
+        odp2 = OrderProductFactory(order=order)
+        self.assertEqual(order.total_price, (order.member_fee + order.order_round.transaction_costs) +
+                         odp1.total_retail_price + odp2.total_retail_price)
+
+    def test_total_price_to_pay_with_no_balance(self):
+        order = OrderFactory()
+        odp1 = OrderProductFactory(order=order)
+        odp2 = OrderProductFactory(order=order)
+        self.assertEqual(order.total_price_to_pay_with_balances_taken_into_account(),
+                         order.total_price)
+
+    def test_total_price_to_pay_with_credit(self):
+        user = VokoUserFactory()
+        BalanceFactory(user=user, type="CR", amount=0.10)
+        order = OrderFactory(user=user)
+        odp1 = OrderProductFactory(order=order)
+        odp2 = OrderProductFactory(order=order)
+        self.assertEqual(order.total_price_to_pay_with_balances_taken_into_account(),
+                         order.total_price - Decimal("0.10"))
+
+    def test_total_price_to_pay_with_more_credit_than_order_price(self):
+        user = VokoUserFactory()
+        BalanceFactory(user=user, type="CR", amount=100)
+        order = OrderFactory(user=user)
+        odp1 = OrderProductFactory(order=order, amount=1, product__base_price=10)
+        self.assertEqual(order.total_price_to_pay_with_balances_taken_into_account(),
+                         0)
+
+    def test_total_price_to_pay_with_large_debit(self):
+        user = VokoUserFactory()
+        BalanceFactory(user=user, type="DR", amount=100)
+        order = OrderFactory(user=user)
+        odp1 = OrderProductFactory(order=order, amount=1, product__base_price=10)
+        self.assertEqual(order.total_price_to_pay_with_balances_taken_into_account(),
+                         order.total_price + Decimal("100"))
+
+    def test_member_fee_on_first_order(self):
+        order = OrderFactory()
+        self.assertEqual(order.member_fee, settings.MEMBER_FEE)
+
+    def test_member_fee_on_unpaid_orders(self):
+        user = VokoUserFactory()
+        order1 = OrderFactory(paid=False, user=user)
+        order2 = OrderFactory(paid=False, user=user)
+        order3 = OrderFactory(paid=False, user=user)
+
+        self.assertEqual(order1.member_fee, settings.MEMBER_FEE)
+        self.assertEqual(order2.member_fee, settings.MEMBER_FEE)
+        self.assertEqual(order3.member_fee, settings.MEMBER_FEE)
+
+    def test_member_fee_with_one_paid_order(self):
+        user = VokoUserFactory()
+        order1 = OrderFactory(paid=False, user=user)
+        order2 = OrderFactory(paid=True, user=user)
+        order3 = OrderFactory(paid=False, user=user)
+
+        self.assertEqual(order1.member_fee, settings.MEMBER_FEE)
+        self.assertEqual(order2.member_fee, settings.MEMBER_FEE)
+        self.assertEqual(order3.member_fee, Decimal("0"))
+
+    def test_create_debit(self):
+        order = OrderFactory()
+        odp1 = OrderProductFactory(order=order)
+        self.assertIsNone(order.debit)
+        order.create_debit()
+
+        order = Order.objects.get()
+        self.assertEqual(order.debit.user, order.user)
+        self.assertEqual(order.debit.type, "DR")
+        self.assertEqual(order.debit.amount, order.total_price)
+        self.assertEqual(order.debit.notes, "Debit van %s voor bestelling #%d" % (order.total_price, order.id))
+
+    def test_mail_confirmation(self):
+        order = OrderFactory()
+        order.mail_confirmation()
+
+        self.get_template_by_id.assert_called_once_with(ORDER_CONFIRM_MAIL_ID)
+        self.render_mail_template.assert_called_once_with(self.get_template_by_id.return_value,
+                                                          user=order.user,
+                                                          order=order)
+        self.mail_user.assert_called_once_with(order.user)
+
+    def test_mail_failure_notification(self):
+        order = OrderFactory()
+        order.mail_failure_notification()
+
+        self.get_template_by_id.assert_called_once_with(ORDER_FAILED_ID)
+        self.render_mail_template.assert_called_once_with(self.get_template_by_id.return_value,
+                                                          user=order.user,
+                                                          order=order)
+        self.mail_user.assert_called_once_with(order.user)
 
