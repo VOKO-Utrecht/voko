@@ -19,7 +19,7 @@ class JsonRoundOverview(GroupRequiredMixin, View):
 
         for supplier in round.suppliers():
             d = dict()
-            d['total_amount'] = round.total_order_amount_per_supplier(supplier)
+            d['total_amount'] = round.supplier_total_order_sum(supplier)
 
             corrections = OrderProductCorrection.objects.filter(order_product__order__order_round=round,
                                                                 order_product__product__supplier=supplier)

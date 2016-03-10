@@ -17,7 +17,7 @@ def get_current_order_round():
     order_rounds = models.OrderRound.objects.all()
 
     # No rounds at all (empty DB)
-    if order_rounds.count() == 0:
+    if not order_rounds:
         return
 
     # Exact match to open round

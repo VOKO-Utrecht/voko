@@ -9,6 +9,7 @@ class BalanceFactory(DjangoModelFactory):
         model = "finance.Balance"
 
     user = SubFactory(VokoUserFactory)
+    amount = FuzzyDecimal(low=1, high=99)
 
 
 class PaymentFactory(DjangoModelFactory):

@@ -1,9 +1,8 @@
 import datetime
 from factory import DjangoModelFactory, SubFactory, LazyAttribute
-from factory.fuzzy import FuzzyDateTime, FuzzyText, FuzzyChoice, FuzzyDecimal, FuzzyInteger
+from factory.fuzzy import FuzzyText, FuzzyChoice, FuzzyDecimal, FuzzyInteger
 from pytz import UTC
 from accounts.tests.factories import AddressFactory, VokoUserFactory
-from ordering.models import Product
 
 
 class OrderRoundFactory(DjangoModelFactory):
@@ -64,3 +63,14 @@ class OrderProductFactory(DjangoModelFactory):
     product = SubFactory(ProductFactory)
     order = SubFactory(OrderFactory)
     amount = FuzzyInteger(low=1, high=10)
+
+
+class OrderProductCorrectionFactory(DjangoModelFactory):
+    class Meta:
+        model = "ordering.OrderProductCorrection"
+
+    order_product = SubFactory("ordering.tests.factories.OrderProductFactory", order__paid=True, order__finalized=True)
+    supplied_percentage = FuzzyInteger(low=0, high=90)
+    notes = FuzzyText()
+    credit = SubFactory("finance.tests.factories.BalanceFactory")  # TODO: amount should not be random
+    # charge_supplier = FuzzyChoice(True, False)

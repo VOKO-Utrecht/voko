@@ -45,7 +45,6 @@ class OrderRound(TimeStampedModel):
     open_for_orders = models.DateTimeField()
     closed_for_orders = models.DateTimeField()
     collect_datetime = models.DateTimeField()
-    # TODO: Set default values to the values of previous object
     markup_percentage = models.DecimalField(decimal_places=2, max_digits=5, default=7.0)
     transaction_costs = models.DecimalField(decimal_places=2, max_digits=5, default=0.42)
     order_placed = models.BooleanField(default=False, editable=False)
@@ -55,10 +54,8 @@ class OrderRound(TimeStampedModel):
         return current_datetime < self.open_for_orders
 
     def is_over(self):
-        ## over, past, expired
+        # Over, past, expired
         current_datetime = datetime.now(pytz.utc)  # Yes, UTC. see Django's timezone docs
-        print current_datetime
-        print self.closed_for_orders
         return current_datetime > self.closed_for_orders
 
     @property
@@ -79,32 +76,36 @@ class OrderRound(TimeStampedModel):
 
         return [Supplier.objects.get(id=supplier_id) for supplier_id in supplier_ids]
 
-    def total_order_amount_per_supplier(self, supplier):
+    def supplier_total_order_sum(self, supplier):
         """
-        Return a dict with total order amount (in euro) for a supplier
+        Return sum of total order amount (in euro) for a supplier
         """
         order_products = OrderProduct.objects.filter(order__order_round=self, order__paid=True,
                                                      product__supplier=supplier)
-        total = sum([o_p.total_cost_price() for o_p in order_products])
-        return total
+        return sum([o_p.total_cost_price() for o_p in order_products])
 
-    def total_order_amount(self):
+    def total_order_sum(self):
         order_products = OrderProduct.objects.filter(order__order_round=self, order__paid=True)
-        total = sum([o_p.total_cost_price() for o_p in order_products])
-        return total
+        return sum([o_p.total_cost_price() for o_p in order_products])
 
     def total_corrections(self):
+        """
+        supplier_exc:   Total supplier refund (product cost prices) to be paid by suppliers
+        supplier_inc:   Total member refund (product retail prices) ...
+        voko:inc:       Total member refund to be paid by VOKO (e.g. lost/broken products)
+        """
         corrections = OrderProductCorrection.objects.filter(order_product__order__order_round=self)
         return {'supplier_exc': sum([c.calculate_supplier_refund() for c in corrections.filter(charge_supplier=True)]),
                 'supplier_inc': sum([c.calculate_refund() for c in corrections.filter(charge_supplier=True)]),
                 'voko_inc': sum([c.calculate_refund() for c in corrections.filter(charge_supplier=False)])}
 
-    def to_pay(self):
-        return self.total_order_amount() - self.total_corrections()['supplier_exc']
-
     def total_profit(self):
+        """
+        Total profit purely by markup on products for this round
+        """
+        # FIXME: Does not take corrections into account. Is this by design?
         orderproducts = OrderProduct.objects.filter(order__order_round=self, order__paid=True)
-        return sum([orderprod.product.profit for orderprod in orderproducts])
+        return sum([orderprod.product.profit * orderprod.amount for orderprod in orderproducts])
 
     def __unicode__(self):
         return "Bestelronde #%s" % self.pk
@@ -131,13 +132,6 @@ class OrderManager(models.Manager):
 
 
 class Order(TimeStampedModel):
-    """ Order order: ;)
-    1. create order (this is implicit even)
-    2. place/confirm order (make it definitive for payment)
-    3. pay/finalize order
-    4. collect order
-    """
-
     class Meta:
         verbose_name = "Bestelling"
         verbose_name_plural = "Bestellingen"
@@ -150,7 +144,7 @@ class Order(TimeStampedModel):
     user_notes = models.TextField(null=True, blank=True)
 
     finalized = models.BooleanField(default=False)  # To "freeze" order before payment
-    paid = models.BooleanField(default=False)  # True when paid
+    paid = models.BooleanField(default=False)
     # Debit created when this order was finished (describes total order value)
     debit = models.OneToOneField(Balance, null=True, blank=True, related_name="order")
 
@@ -196,7 +190,7 @@ class Order(TimeStampedModel):
     def user_order_number(self):
         """
         Counts all user's finished and paid orders, ascending, by ID, and
-        returns the number of this order
+        returns the number of the current order
         """
         user_orders = self.user.orders.filter(paid=True, finalized=True).order_by("pk")
         for index, uo in enumerate(user_orders):
@@ -236,6 +230,9 @@ class Order(TimeStampedModel):
 
 
 class OrderProduct(TimeStampedModel):
+    """
+    Represents an order of one particular product
+    """
     class Meta:
         verbose_name = "Productbestelling"
         verbose_name_plural = "Productbestellingen"
@@ -258,7 +255,8 @@ class OrderProduct(TimeStampedModel):
 
 class CorrectionQuerySet(models.query.QuerySet):
     def delete(self):
-        #  OneToOne relation isn't cascaded in this direction :(
+        # OneToOne relation isn't cascaded in this direction :(
+        # Make sure credit is deleted anyway when correction is deleted
         for obj in self:
             obj.credit.delete()
         return super(CorrectionQuerySet, self).delete()
@@ -270,6 +268,10 @@ class CorrectionManager(models.Manager):
 
 
 class OrderProductCorrection(TimeStampedModel):
+    """
+    Represents a "correction" on an OrderProduct
+    Used to register and compensate for non/partly delivered products.
+    """
     objects = CorrectionManager()
 
     class Meta:
@@ -346,6 +348,7 @@ class Product(TimeStampedModel):
     base_price = models.DecimalField(max_digits=6, decimal_places=2)
     supplier = models.ForeignKey("Supplier", related_name="products")
     order_round = models.ForeignKey("OrderRound", related_name="products")
+    # No category means "Other"
     category = models.ForeignKey("ProductCategory", related_name="products", null=True, blank=True)
     new = models.BooleanField(default=False, verbose_name="Show 'new' label")
 
@@ -411,7 +414,6 @@ class Product(TimeStampedModel):
             return
 
         if not prev_round.products.filter(name=self.name,
-                                          description=self.description,
                                           supplier=self.supplier,
                                           unit=self.unit):
             self.new = True
@@ -421,6 +423,9 @@ class Product(TimeStampedModel):
 
 
 class DraftProduct(TimeStampedModel):
+    """
+    Product Draft, used to create new products in the backend
+    """
     data = JSONField()
     supplier = models.ForeignKey(Supplier)
     order_round = models.ForeignKey(OrderRound)
