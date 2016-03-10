@@ -1,21 +1,19 @@
-# VOKO automation
+# VOKO
+Django based custom web application for food collective www.vokoutrecht.nl.
+
 [![Travis CI](https://api.travis-ci.org/rikva/vokou.svg)](https://travis-ci.org/rikva/vokou)
 ## Some notes
-1. This application depends on Django 1.7, RC1.
-2. It's been a while since I last crafted a Django application. 
-2. Because of time shortage,
-   1. This app is not written TDD
-   2. There will be no i18n support (at least initially)
-   3. Code or styling may be ugly - functionality is the main concern.
-3. No license yet.
-4. Limited support ;)
+1. This application was built on Django 1.7, RC1 and upgrading is a WIP
+1. The code base needs cleaning up and adding of tests.
+1. License: GNU GPLv3
+1. Use at your own risk, no support.
 
 ## Dev environment
 
 1. apt-get install virtualenvwrapper
-2. new shell
+2. restart shell
 3. mkvirtualenv vokou
-4. ...
+4. clone...
 
 ## Supervisor config
 ```yaml
