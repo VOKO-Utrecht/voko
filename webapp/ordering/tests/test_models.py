@@ -168,7 +168,7 @@ class TestOrderModel(VokoTestCase):
             self.assertEqual(debit.user, order.user)
             self.assertEqual(debit.type, 'DR')
             self.assertEqual(debit.amount, order.total_price)
-            self.assertEqual(debit.notes, 'Debit van %s voor bestelling #%s' % (order.total_price, order.id))
+            self.assertEqual(debit.notes, 'Debit van %.2f voor bestelling #%s' % (order.total_price, order.id))
 
             mock_mail.assert_called_once_with()
 
