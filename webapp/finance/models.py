@@ -83,7 +83,7 @@ class Balance(TimeStampedModel):
     def save(self, *args, **kwargs):
         """ Sanity check, the amount may not be zero or less. """
         if self.amount <= 0:
-            raise ValueError("Amount may not be zero or negative.")
+            raise ValueError("Amount may not be zero or negative. Amount was: %s" % self.amount)
         super(Balance, self).save(*args, **kwargs)
 
     objects = BalanceManager()

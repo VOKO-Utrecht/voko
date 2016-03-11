@@ -21,12 +21,12 @@ class TestBalanceModel(VokoTestCase):
     def test_negative_amount_raises_valueerror(self):
         with self.assertRaises(ValueError) as e:
             BalanceFactory(amount=-1)
-        self.assertEqual(str(e.exception), "Amount may not be zero or negative.")
+        self.assertEqual(str(e.exception), "Amount may not be zero or negative. Amount was: -1")
 
     def test_zero_amount_raises_valueerror(self):
         with self.assertRaises(ValueError) as e:
             BalanceFactory(amount=0)
-        self.assertEqual(str(e.exception), "Amount may not be zero or negative.")
+        self.assertEqual(str(e.exception), "Amount may not be zero or negative. Amount was: 0")
 
     def test_positive_amount(self):
         BalanceFactory(amount=0.1)

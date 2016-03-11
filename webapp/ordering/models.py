@@ -317,11 +317,16 @@ class OrderProductCorrection(TimeStampedModel):
         return u"Correction on OrderProduct: %s" % self.order_product
 
     def calculate_refund(self):
-        """ rounded member refund """
-        return Decimal((self.order_product.total_retail_price / 100) * (100 - self.supplied_percentage))\
+        """
+        Return member refund for this correction
+        """
+        return Decimal((self.order_product.total_retail_price / Decimal("100.0")) * (100 - self.supplied_percentage))\
             .quantize(Decimal('.01'), rounding=ROUND_DOWN)
 
     def calculate_supplier_refund(self):
+        """
+        Return supplier refund for this correction
+        """
         return Decimal((self.order_product.total_cost_price() / 100) * (100 - self.supplied_percentage))\
             .quantize(Decimal('.01'), rounding=ROUND_DOWN)
 
@@ -388,6 +393,10 @@ class Product(TimeStampedModel):
 
     @property
     def unit_of_measurement(self):
+        """
+        This function used to be a field, it merely exists for backwards compatibility.
+        TODO: Check usages, fix them, remove this function.
+        """
         return "%s %s" % (self.unit_amount, self.unit.description.lower())
 
     @property
@@ -396,13 +405,20 @@ class Product(TimeStampedModel):
 
     @property
     def retail_price(self):
+        """
+        Return base price plus round's markup percentage, rounded up to 2 decimals.
+        """
         total_percentage = 100 + self.order_round.markup_percentage
-        new_price = (self.base_price / 100) * total_percentage
+        new_price = (Decimal(self.base_price) / Decimal('100.0')) * Decimal(total_percentage)
         rounded = new_price.quantize(Decimal('.01'), rounding=ROUND_UP)
         return rounded
 
     @property
     def amount_available(self):
+        """
+        Return how many items of this product are available.
+        Returns None when there is no maximum.
+        """
         if self.maximum_total_order is None:
             return
         maximum = self.maximum_total_order
@@ -411,23 +427,40 @@ class Product(TimeStampedModel):
 
     @property
     def amount_ordered(self):
+        """
+        Return how many items of this product are ordered
+        """
         orderproducts = self.orderproducts.filter(order__paid=True)
         total = sum(op.amount for op in orderproducts)
         return total
 
     @property
     def percentage_available_of_max(self):
+        """
+        Return the percentage of availability of this product.
+        Useful for filling progress bars.
+        """
         if self.maximum_total_order is None:
             return 100
         return int((float(self.amount_available) / float(self.maximum_total_order)) * 100)
 
     @property
     def is_available(self):
+        """
+        Return if this product is still available for ordering.
+        Boolean.
+        """
         if self.maximum_total_order is None:
             return True
         return self.amount_available > 0
 
     def create_corrections(self):
+        """
+        Create a 0% delivered-correction for all OrderProducts of this product.
+
+        Can be used to automatically create OrderProductCorrections when the product was ordered,
+        but not supplied at all.
+        """
         for order_product in self.orderproducts.filter(correction__isnull=True, order__paid=True):
             OrderProductCorrection.objects.create(
                 order_product=order_product,
@@ -437,9 +470,13 @@ class Product(TimeStampedModel):
             )
 
     def determine_if_product_is_new_and_set_label(self):
+        """
+        Set new=True on product when similar product cannot be found in previous order round.
+        'new' attribute is used to show 'New' label in product list.
+        """
         try:
             prev_round = OrderRound.objects.get(id=self.order_round.id-1)
-        except OrderRound.ObjectDoesNotExist:
+        except OrderRound.DoesNotExist:
             return
 
         if not prev_round.products.filter(name=self.name,

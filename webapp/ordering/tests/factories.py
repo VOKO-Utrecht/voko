@@ -13,8 +13,8 @@ class OrderRoundFactory(DjangoModelFactory):
     closed_for_orders = open_for_orders + datetime.timedelta(days=4)
     collect_datetime = closed_for_orders + datetime.timedelta(days=5)
 
-    transaction_costs = FuzzyDecimal(low=0, high=0.40)
-    markup_percentage = FuzzyDecimal(low=0, high=10)
+    transaction_costs = FuzzyDecimal(low=0.01, high=0.40)
+    markup_percentage = FuzzyDecimal(low=1, high=10)
 
 
 class SupplierFactory(DjangoModelFactory):
@@ -72,5 +72,14 @@ class OrderProductCorrectionFactory(DjangoModelFactory):
     order_product = SubFactory("ordering.tests.factories.OrderProductFactory", order__paid=True, order__finalized=True)
     supplied_percentage = FuzzyInteger(low=0, high=90)
     notes = FuzzyText()
-    credit = SubFactory("finance.tests.factories.BalanceFactory")  # TODO: amount should not be random
+    # credit = SubFactory("finance.tests.factories.BalanceFactory")  # TODO: amount should not be random
+    # Credit is created by save() function on model
     # charge_supplier = FuzzyChoice(True, False)
+
+
+class UnitFactory(DjangoModelFactory):
+    class Meta:
+            model = "ordering.ProductUnit"
+
+    name = FuzzyText()
+    description = FuzzyText()

@@ -7,9 +7,10 @@ from pytz import UTC
 from accounts.tests.factories import VokoUserFactory
 from finance.models import Balance
 from finance.tests.factories import BalanceFactory
-from ordering.models import Order, OrderProduct, ORDER_CONFIRM_MAIL_ID, ORDER_FAILED_ID
+from ordering.models import Order, OrderProduct, ORDER_CONFIRM_MAIL_ID, ORDER_FAILED_ID, OrderProductCorrection, \
+    OrderRound, Product
 from ordering.tests.factories import SupplierFactory, OrderFactory, OrderProductFactory, OrderRoundFactory, \
-    OrderProductCorrectionFactory
+    OrderProductCorrectionFactory, ProductFactory, UnitFactory
 from vokou.testing import VokoTestCase
 
 
@@ -324,3 +325,164 @@ class TestOrderProductModel(VokoTestCase):
         odp1 = OrderProductFactory()
         self.assertEqual(odp1.total_cost_price(),
                          odp1.amount * odp1.product.base_price)
+
+
+class TestProductModel(VokoTestCase):
+    def test_unit_of_measurement(self):
+        product = ProductFactory()
+        self.assertEqual(product.unit_of_measurement, "%s %s" % (product.unit_amount, product.unit.description.lower()))
+
+    def test_retail_price_1(self):
+        product = ProductFactory(base_price=10, order_round__markup_percentage=10)
+        self.assertEqual(product.retail_price, Decimal("11"))
+
+    def test_retail_price_2(self):
+        product = ProductFactory(base_price=10.50, order_round__markup_percentage=7)
+        self.assertEqual(product.retail_price, Decimal("11.24"))
+
+    def test_retail_price_3(self):
+        product = ProductFactory(base_price=10.50, order_round__markup_percentage=0)
+        self.assertEqual(product.retail_price, Decimal("10.50"))
+
+    def test_amount_ordered_only_counts_orderproducts_of_paid_orders(self):
+        product = ProductFactory()
+        odp1 = OrderProductFactory(product=product, order__paid=False)
+        odp2 = OrderProductFactory(product=product, order__paid=True)
+        odp3 = OrderProductFactory(product=product, order__paid=True)
+
+        self.assertEqual(product.amount_ordered, odp2.amount + odp3.amount)
+
+    def test_amount_ordered_with_no_orders(self):
+        product = ProductFactory()
+        self.assertEqual(product.amount_ordered, 0)
+
+    def test_amount_available_when_no_max(self):
+        product = ProductFactory(maximum_total_order=None)
+        self.assertIsNone(product.amount_available)
+
+    def test_amount_available_with_filled_max(self):
+        product = ProductFactory(maximum_total_order=1)
+        odp1 = OrderProductFactory(product=product, order__paid=True, amount=1)
+        self.assertEqual(product.amount_available, 0)
+
+    def test_amount_available_with_max(self):
+        product = ProductFactory(maximum_total_order=10)
+        odp1 = OrderProductFactory(product=product, order__paid=True, amount=1)
+        self.assertEqual(product.amount_available, 9)
+
+    def test_amount_available_ignores_non_paid_orders(self):
+        product = ProductFactory(maximum_total_order=10)
+        odp1 = OrderProductFactory(product=product, order__paid=False, amount=1)
+        self.assertEqual(product.amount_available, 10)
+
+    def test_percentage_available_with_no_max(self):
+        product = ProductFactory(maximum_total_order=None)
+        self.assertEqual(product.percentage_available_of_max, 100)
+
+    def test_percentage_available_with_filled_max(self):
+        product = ProductFactory(maximum_total_order=1)
+        odp1 = OrderProductFactory(product=product, order__paid=True, amount=1)
+        self.assertEqual(product.percentage_available_of_max, 0)
+
+    def test_percentage_available_with_max(self):
+        product = ProductFactory(maximum_total_order=10)
+        odp1 = OrderProductFactory(product=product, order__paid=True, amount=1)
+        self.assertEqual(product.percentage_available_of_max, 90)
+
+    def test_percentage_available_ignores_non_paid_orders(self):
+        product = ProductFactory(maximum_total_order=10)
+        odp1 = OrderProductFactory(product=product, order__paid=False, amount=1)
+        self.assertEqual(product.percentage_available_of_max, 100)
+
+    def test_percentage_available_is_rounded_to_int(self):
+        product = ProductFactory(maximum_total_order=99)
+        odp1 = OrderProductFactory(product=product, order__paid=True, amount=25)
+        self.assertEqual(product.percentage_available_of_max, 74)
+
+    def test_is_available_when_no_max(self):
+        product = ProductFactory(maximum_total_order=None)
+        self.assertTrue(product.is_available)
+
+    def test_is_available_when_sold_out(self):
+        product = ProductFactory(maximum_total_order=1)
+        odp1 = OrderProductFactory(product=product, order__paid=True, amount=1)
+        self.assertFalse(product.is_available)
+
+    def test_is_available_when_not_sold_out(self):
+        product = ProductFactory(maximum_total_order=10)
+        odp1 = OrderProductFactory(product=product, order__paid=True, amount=1)
+        self.assertTrue(product.is_available)
+
+    def test_create_corrections_creates_corrections_for_all_orderproducts_of_paid_orders(self):
+        product = ProductFactory()
+        paid_odp1 = OrderProductFactory(product=product, order__paid=True)
+        paid_odp2 = OrderProductFactory(product=product, order__paid=True)
+        nonpaid_odp2 = OrderProductFactory(product=product, order__paid=False)
+
+        self.assertItemsEqual(OrderProductCorrection.objects.all(), [])
+        product.create_corrections()
+
+        corrections = OrderProductCorrection.objects.all().order_by('id')
+        self.assertEqual(len(corrections), 2)
+
+        self.assertEqual(corrections[0].order_product, paid_odp1)
+        self.assertEqual(corrections[0].supplied_percentage, 0)
+        self.assertEqual(corrections[0].notes,
+                         'Product niet geleverd: "%s" (%s) [%s]' %
+                         (paid_odp1.product.name, paid_odp1.product.supplier.name, paid_odp1.product.id))
+        self.assertEqual(corrections[0].charge_supplier, True)
+
+        self.assertEqual(corrections[1].order_product, paid_odp2)
+
+    def test_determine_new_product_with_one_order_round(self):
+        product = ProductFactory()
+        self.assertEqual(len(OrderRound.objects.all()), 1)
+        self.assertIsNone(product.determine_if_product_is_new_and_set_label())
+
+    def test_determine_new_product_1(self):
+        round1 = OrderRoundFactory()
+        round2 = OrderRoundFactory()
+
+        product1 = ProductFactory(order_round=round1)
+        product2 = ProductFactory(order_round=round2)
+
+        self.assertFalse(product2.new)
+        product2.determine_if_product_is_new_and_set_label()
+        product2 = Product.objects.get(id=product2.id)
+        self.assertTrue(product2.new)
+
+    def test_determine_new_product_2(self):
+        round1 = OrderRoundFactory()
+        round2 = OrderRoundFactory()
+        supplier = SupplierFactory()
+        unit = UnitFactory()
+
+        product1 = ProductFactory(order_round=round1, name="Appels", supplier=supplier, unit=unit)
+        product2 = ProductFactory(order_round=round1, name="Appels", supplier=supplier, unit=unit)
+
+        self.assertFalse(product2.new)
+        product2.determine_if_product_is_new_and_set_label()
+        product2 = Product.objects.get(id=product2.id)
+        self.assertFalse(product2.new)
+
+
+""" WIP
+class TestOrderProductCorrectionModel(VokoTestCase):
+    def test_calculate_refund(self):
+        round = OrderRoundFactory(markup_percentage=7)
+        corr = OrderProductCorrectionFactory(order_product__order__order_round=round,
+                                             order_product__product__base_price=10,
+                                             order_product__amount=2,
+                                             supplied_percentage=25)
+
+        self.assertEqual(corr.order_product.product.base_price, Decimal(10))
+        self.assertEqual(corr.order_product.order.order_round.markup_percentage, 7)
+
+        original_retail_price = corr.order_product.product.retail_price
+        self.assertEqual(original_retail_price, Decimal('10.70'))
+
+        original_total_retail_price = original_retail_price * 2
+        corrected = original_total_retail_price * Decimal("0.75")
+
+        self.assertEqual(corr.calculate_refund(), corrected + (Decimal("0.15") * corr.order_product.order.order_round.markup_percentage))
+"""
