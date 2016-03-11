@@ -4,7 +4,6 @@ from django.contrib import admin
 from django.contrib.admin.util import flatten_fieldsets
 from django.contrib.auth.admin import UserAdmin
 from django.core.mail import send_mail
-from django.db.models.loading import get_models, get_app
 from django.shortcuts import redirect
 from accounts.forms import VokoUserCreationForm, VokoUserChangeForm
 from accounts.models import VokoUser, UserProfile, ReadOnlyVokoUser, SleepingVokoUser
@@ -13,10 +12,12 @@ from ordering.core import get_current_order_round
 from ordering.models import Order
 from django.utils.safestring import mark_safe
 from hijack.admin import HijackUserAdminMixin
+from django.apps import apps
 
 ACTIVATE_ACCOUNT_MAILTEMPLATE_ID = 1
 
-for model in get_models(get_app('accounts')):
+
+for model in apps.get_app_config('accounts').get_models():
     if model in (VokoUser, ReadOnlyVokoUser, SleepingVokoUser):
         continue
     admin.site.register(model)

@@ -27,18 +27,20 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_nose',
-    'bootstrap3',
-    'braces',
     'tinymce',
-    'log',
+    'django_extensions',
+    'braces',
+    'bootstrap3',
+    "django_cron",
+
+    'mailing',
     'accounts',
+    'log',
     'finance',
     'ordering',
-    'mailing',
     'docs',
     'hijack',
 
-    "django_cron",
 )
 
 MIDDLEWARE_CLASSES = (
