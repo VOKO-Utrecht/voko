@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import log
 from django.contrib import admin
-from django.contrib.admin.util import flatten_fieldsets
 from django.contrib.auth.admin import UserAdmin
 from django.core.mail import send_mail
 from django.shortcuts import redirect
+from django.contrib.admin.utils import flatten_fieldsets
 from accounts.forms import VokoUserCreationForm, VokoUserChangeForm
 from accounts.models import VokoUser, UserProfile, ReadOnlyVokoUser, SleepingVokoUser
 from mailing.helpers import get_template_by_id, render_mail_template
@@ -85,7 +85,7 @@ def phone(self):
     return self.userprofile.phone_number
 
 
-class VokoUserAdmin(UserAdmin, HijackUserAdminMixin):
+class VokoUserAdmin(HijackUserAdminMixin, UserAdmin):
     # Set the add/modify forms
     add_form = VokoUserCreationForm
     form = VokoUserChangeForm
@@ -141,7 +141,6 @@ class VokoUserAdmin(UserAdmin, HijackUserAdminMixin):
     def total_orders(self, obj):
         return Order.objects.filter(user=obj, paid=True).count()
 
-admin.site.register(VokoUser, VokoUserAdmin)
 
 class ReadOnlyVokoUserAdmin(VokoUserAdmin):
     # Source: https://code.djangoproject.com/ticket/17295
@@ -164,5 +163,6 @@ class ReadOnlyVokoUserAdmin(VokoUserAdmin):
         # Nobody is allowed to delete
         return False
 
+admin.site.register(VokoUser, VokoUserAdmin)
 admin.site.register(ReadOnlyVokoUser, ReadOnlyVokoUserAdmin)
 admin.site.register(SleepingVokoUser, VokoUserAdmin)

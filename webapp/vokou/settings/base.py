@@ -20,8 +20,8 @@ TEMPLATE_DEBUG = DEBUG
 
 INSTALLED_APPS = (
     'flat',
-    'django.contrib.admin',
     'django.contrib.auth',
+    'django.contrib.admin',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'ordering',
     'docs',
     'hijack',
+    'compat'  # Requirement of hijack
 
 )
 
@@ -100,4 +101,4 @@ TINYMCE_DEFAULT_CONFIG = {
     "height": "500px",
 }
 
-SHOW_HIJACKUSER_IN_ADMIN = False
+HIJACK_DISPLAY_ADMIN_BUTTON = False  # Because of custom user model

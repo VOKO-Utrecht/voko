@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.contrib import admin
 import accounts.urls
 import docs.urls
@@ -8,7 +8,7 @@ import ordering.urls
 import ordering.admin_urls
 from vokou.views import HomeView
 
-urlpatterns = patterns('',
+urlpatterns = (
     url(r'^admin/mailing/', include(mailing.urls)),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/', include(accounts.urls)),

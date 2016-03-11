@@ -1,10 +1,10 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from .admin_views import OrderAdminMain, OrderAdminOrderLists, OrderAdminUserOrdersPerProduct, OrderAdminUserOrders, \
     OrderAdminSupplierOrderCSV, OrderAdminUserOrderProductsPerOrderRound, OrderAdminCorrection, OrderAdminMassCorrection, \
     OrderAdminCorrectionJson, UploadProductList, CreateDraftProducts, CreateRealProducts, ProductAdminMain, \
     RedirectToMailingView
 
-urlpatterns = patterns('',
+urlpatterns = (
     url(r'^rounds/$', OrderAdminMain.as_view(), name="orderadmin_main"),
     url(r'^suppliers/$', ProductAdminMain.as_view(), name="productadmin_main"),
 
