@@ -1,2 +1,7 @@
 #!/bin/bash
-python manage.py test --settings=vokou.settings.testing --nologcapture #--with-coverage --cover-package=vokou,ordering,mailing,log,finance,accounts
+export DJANGO_SETTINGS_MODULE=vokou.settings.testing
+
+python manage.py test --nologcapture "$@" 
+
+# To enable coverage:
+#--with-coverage --cover-package=vokou,ordering,mailing,log,finance,accounts

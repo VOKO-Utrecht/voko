@@ -8,12 +8,6 @@ PASSWORD_HASHERS = (
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'testing_db',
-    }
-}
 
 # https://stackoverflow.com/questions/25161425/disable-migrations-when-running-unit-tests-in-django-1-7 
 class DisableMigrations(object):
