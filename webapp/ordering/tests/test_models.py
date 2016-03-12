@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from mock import patch
 from pytz import UTC
+import sys
 from accounts.tests.factories import VokoUserFactory
 from finance.models import Balance
 from finance.tests.factories import BalanceFactory
@@ -466,23 +467,37 @@ class TestProductModel(VokoTestCase):
         self.assertFalse(product2.new)
 
 
-""" WIP
 class TestOrderProductCorrectionModel(VokoTestCase):
-    def test_calculate_refund(self):
+    def test_calculate_refund_with_simple_values(self):
         round = OrderRoundFactory(markup_percentage=7)
         corr = OrderProductCorrectionFactory(order_product__order__order_round=round,
+                                             order_product__product__order_round=round,
                                              order_product__product__base_price=10,
                                              order_product__amount=2,
                                              supplied_percentage=25)
 
-        self.assertEqual(corr.order_product.product.base_price, Decimal(10))
-        self.assertEqual(corr.order_product.order.order_round.markup_percentage, 7)
-
         original_retail_price = corr.order_product.product.retail_price
         self.assertEqual(original_retail_price, Decimal('10.70'))
 
-        original_total_retail_price = original_retail_price * 2
-        corrected = original_total_retail_price * Decimal("0.75")
+        self.assertEqual(corr.calculate_refund(), Decimal('16.05'))
 
-        self.assertEqual(corr.calculate_refund(), corrected + (Decimal("0.15") * corr.order_product.order.order_round.markup_percentage))
-"""
+    def test_calculate_refund_with_complex_values(self):
+        round = OrderRoundFactory(markup_percentage=7.9)
+        corr = OrderProductCorrectionFactory(order_product__order__order_round=round,
+                                             order_product__product__order_round=round,
+                                             order_product__product__base_price=9.95,
+                                             order_product__amount=2,
+                                             supplied_percentage=24)
+
+        original_retail_price = corr.order_product.product.retail_price
+        self.assertEqual(original_retail_price, Decimal('10.74'))
+
+        self.assertEqual(corr.calculate_refund(), Decimal('16.32'))
+
+    def test_total_refund(self):
+        round = OrderRoundFactory()
+        corr = OrderProductCorrectionFactory(order_product__order__order_round=round,
+                                             order_product__product__order_round=round,
+                                             supplied_percentage=0)
+
+        self.assertEqual(corr.calculate_refund(), corr.order_product.total_retail_price)
