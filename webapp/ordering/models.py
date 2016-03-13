@@ -265,6 +265,8 @@ class OrderProduct(TimeStampedModel):
     product = models.ForeignKey("Product", related_name="orderproducts")
     amount = models.IntegerField(verbose_name="Aantal")
 
+    # TODO: assert order.order_round == product.order_round on save()
+
     def __unicode__(self):
         return u"%d x %s" % (self.amount, self.product)
 
