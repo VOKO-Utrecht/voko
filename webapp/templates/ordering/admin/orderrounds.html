@@ -11,7 +11,7 @@
         <th>Datum open</th>
         <th>Datum gesloten</th>
         <th>Bestellijsten voor leveranciers</th>
-        <th>Overzicht bestellingen per lid</th>
+        <th>Unieke bestellingen</th>
         <th>Overzicht bestellingen per product</th>
         <th>Correcties</th>
       </tr>
@@ -24,7 +24,7 @@
             <td>{{ orderround.open_for_orders }}</td>
             <td>{{ orderround.closed_for_orders }}</td>
             <td><a href="{% url 'orderadmin_orderlists' orderround.pk %}">Bestellijsten</a></td>
-            <td><a href="{% url 'orderadmin_userorders' orderround.pk %}">Overzicht</a></td>
+            <td><a href="{% url 'orderadmin_userorders' orderround.pk %}">{{ orderround.number_of_orders }}</a></td>
             <td><a href="{% url 'orderadmin_orders_per_product' orderround.pk %}">Overzicht</a></td>
             <td><a href="{% url 'orderadmin_correction' orderround.pk %}">Correcties</a></td>
           </tr>

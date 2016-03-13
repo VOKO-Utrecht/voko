@@ -107,6 +107,12 @@ class OrderRound(TimeStampedModel):
         orderproducts = OrderProduct.objects.filter(order__order_round=self, order__paid=True)
         return sum([orderprod.product.profit * orderprod.amount for orderprod in orderproducts])
 
+    def number_of_orders(self):
+        """
+        Return the total number of paid orders
+        """
+        return self.orders.filter(paid=True).count()
+
     def __unicode__(self):
         return "Bestelronde #%s" % self.pk
 

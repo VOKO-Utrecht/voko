@@ -149,6 +149,19 @@ class TestOrderRoundModel(VokoTestCase):
                                                    order_product__order__paid=True)
         # TODO: How do we handle (partly) lost profit of corrections?
 
+    def test_number_of_orders_with_no_orders(self):
+        round = OrderRoundFactory()
+        self.assertEqual(round.number_of_orders(), 0)
+
+    def test_number_of_orders_with_paid_and_unpaid_orders(self):
+        round = OrderRoundFactory()
+        paid1 = OrderFactory(order_round=round, paid=True)
+        paid2 = OrderFactory(order_round=round, paid=True)
+        paid3 = OrderFactory(order_round=round, paid=True)
+        unpaid1 = OrderFactory(order_round=round, paid=False)
+        unpaid2 = OrderFactory(order_round=round, paid=False, finalized=True)
+        self.assertEqual(round.number_of_orders(), 3)
+
 
 class TestOrderModel(VokoTestCase):
     def setUp(self):
