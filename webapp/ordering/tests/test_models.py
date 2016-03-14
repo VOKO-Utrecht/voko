@@ -507,10 +507,65 @@ class TestOrderProductCorrectionModel(VokoTestCase):
 
         self.assertEqual(corr.calculate_refund(), Decimal('16.32'))
 
-    def test_total_refund(self):
+    def test_calculate_refund_when_0_percent_supplied(self):
         round = OrderRoundFactory()
         corr = OrderProductCorrectionFactory(order_product__order__order_round=round,
                                              order_product__product__order_round=round,
                                              supplied_percentage=0)
 
         self.assertEqual(corr.calculate_refund(), corr.order_product.total_retail_price)
+
+    def test_calculate_supplier_refund_with_simple_values(self):
+        round = OrderRoundFactory()
+        corr = OrderProductCorrectionFactory(order_product__order__order_round=round,
+                                             order_product__product__order_round=round,
+                                             order_product__product__base_price=10,
+                                             order_product__amount=2,
+                                             supplied_percentage=25)
+
+        self.assertEqual(corr.calculate_supplier_refund(), Decimal('15'))
+
+    def test_no_supplier_refund_ignores_corrections_where_charge_supplier_is_false(self):
+        round = OrderRoundFactory()
+        corr = OrderProductCorrectionFactory(order_product__order__order_round=round,
+                                             order_product__product__order_round=round,
+                                             order_product__product__base_price=10,
+                                             order_product__amount=2,
+                                             supplied_percentage=25,
+                                             charge_supplier=False)
+
+        self.assertEqual(corr.calculate_supplier_refund(), Decimal('0'))
+
+    def test_calculate_supplier_refund_with_complex_values(self):
+        round = OrderRoundFactory()
+        corr = OrderProductCorrectionFactory(order_product__order__order_round=round,
+                                             order_product__product__order_round=round,
+                                             order_product__product__base_price=9.95,
+                                             order_product__amount=2,
+                                             supplied_percentage=24)
+        # Total price: 9.95 * 2 = 19.90
+        # 19.90 * 0.76 = 15.12
+
+        self.assertEqual(corr.calculate_supplier_refund(), Decimal('15.12'))
+
+    def test_that_credit_is_created_on_save(self):
+        self.assertFalse(Balance.objects.all().exists())
+        corr = OrderProductCorrectionFactory()
+
+        self.assertEqual(corr.credit.user, corr.order_product.order.user)
+        self.assertEqual(corr.credit.amount, corr.calculate_refund())
+        self.assertEqual(corr.credit.notes, "Correctie in ronde %s, %dx %s, geleverd: %s%%" %
+                         (corr.order_product.product.order_round.id,
+                          corr.order_product.amount,
+                          corr.order_product.product.name,
+                          corr.supplied_percentage))
+
+    def test_that_credit_is_not_overwritten_on_second_save(self):
+        corr = OrderProductCorrectionFactory()
+        credit_id = corr.credit.pk
+
+        corr.save()
+
+        corr = OrderProductCorrection.objects.get()
+        self.assertEqual(corr.credit.pk, credit_id)
+

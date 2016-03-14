@@ -113,6 +113,7 @@ class OrderRound(TimeStampedModel):
         """
         return self.orders.filter(paid=True).count()
 
+
     def __unicode__(self):
         return "Bestelronde #%s" % self.pk
 
@@ -281,13 +282,13 @@ class OrderProduct(TimeStampedModel):
         """
         What the user will pay for this OrderProduct
         """
-        return self.amount * self.product.retail_price
+        return Decimal(self.amount) * Decimal(str(self.product.retail_price))
 
     def total_cost_price(self):
         """
         What VOKO will pay for this product
         """
-        return self.amount * self.product.base_price
+        return Decimal(self.amount) * Decimal(str(self.product.base_price))
 
 
 class CorrectionQuerySet(models.query.QuerySet):
@@ -307,7 +308,8 @@ class CorrectionManager(models.Manager):
 class OrderProductCorrection(TimeStampedModel):
     """
     Represents a "correction" on an OrderProduct
-    Used to register and compensate for non/partly delivered products.
+    Used to register (and compensate for) non/partly delivered products.
+    Creates Balance object upon creation.
     """
     objects = CorrectionManager()
 
@@ -326,16 +328,23 @@ class OrderProductCorrection(TimeStampedModel):
 
     def calculate_refund(self):
         """
-        Return member refund for this correction
+        Return member refund for this correction.
+        This is the amount which the member should be compensated for.
         """
         return Decimal((self.order_product.total_retail_price / Decimal("100.0")) * (100 - self.supplied_percentage))\
             .quantize(Decimal('.01'), rounding=ROUND_DOWN)
 
     def calculate_supplier_refund(self):
         """
-        Return supplier refund for this correction
+        Return supplier refund for this correction.
+        This is the amount owed by the supplier for this OrderProduct.
+
+        FIXME: Rename this method to change refund to debit or something?
         """
-        return Decimal((self.order_product.total_cost_price() / 100) * (100 - self.supplied_percentage))\
+        if self.charge_supplier is False:
+            return Decimal('0')
+        return Decimal((self.order_product.total_cost_price() / Decimal('100')) *
+                       (Decimal('100') - self.supplied_percentage))\
             .quantize(Decimal('.01'), rounding=ROUND_DOWN)
 
     def _create_credit(self):
@@ -393,8 +402,9 @@ class Product(TimeStampedModel):
     # No category means "Other"
     category = models.ForeignKey("ProductCategory", related_name="products", null=True, blank=True)
     new = models.BooleanField(default=False, verbose_name="Show 'new' label")
-
     maximum_total_order = models.IntegerField(null=True, blank=True)
+
+    # TODO: Prevent deleting of product when it has (paid) orders
 
     def __unicode__(self):
         return u'[ronde %s] %s (%s)' % (self.order_round.pk, self.name, self.supplier)
