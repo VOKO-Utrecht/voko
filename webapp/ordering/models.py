@@ -122,6 +122,10 @@ class OrderManager(models.Manager):
     use_for_related_fields = True
 
     def get_current_order(self):
+        """
+        Allows us to use:
+        VokoUser.orders.get_current_order()
+        """
         try:
             return super(OrderManager, self).get_queryset().filter(paid=False,
                                                                    user=self.instance,
@@ -130,6 +134,10 @@ class OrderManager(models.Manager):
             return get_or_create_order(user=self.instance)
 
     def get_last_paid_order(self):
+        """
+        Allows us to use:
+        VokoUser.orders.get_last_paid_order()
+        """
         try:
             return super(OrderManager, self).get_queryset().filter(paid=True,
                                                                    user=self.instance,

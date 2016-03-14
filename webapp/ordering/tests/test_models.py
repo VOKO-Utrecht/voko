@@ -168,6 +168,7 @@ class TestOrderModel(VokoTestCase):
         self.get_template_by_id = self.patch("ordering.models.get_template_by_id")
         self.render_mail_template = self.patch("ordering.models.render_mail_template")
         self.mail_user = self.patch("ordering.models.mail_user")
+        self.get_or_create_order = self.patch("ordering.models.get_or_create_order")
 
     def test_complete_after_payment_method(self):
         with patch("ordering.models.Order.mail_confirmation") as mock_mail:
@@ -327,6 +328,26 @@ class TestOrderModel(VokoTestCase):
                                                           user=order.user,
                                                           order=order)
         self.mail_user.assert_called_once_with(order.user)
+
+    def test_ordermanager_get_current_order_1(self):
+        order = OrderFactory(paid=False)
+        self.assertEqual(order.user.orders.get_current_order(), order)
+
+    def test_ordermanager_get_current_order_2(self):
+        order = OrderFactory(paid=True)
+        self.assertEqual(len(Order.objects.all()), 1)
+
+        current_order = order.user.orders.get_current_order()
+        self.get_or_create_order.assert_called_once_with(user=order.user)
+        self.assertEqual(order.user.orders.get_current_order(), self.get_or_create_order.return_value)
+
+    def test_ordermanager_get_last_paid_order_1(self):
+        order = OrderFactory(paid=False)
+        self.assertIsNone(order.user.orders.get_last_paid_order())
+
+    def test_ordermanager_get_last_paid_order_2(self):
+        order = OrderFactory(paid=True)
+        self.assertEqual(order.user.orders.get_last_paid_order(), order)
 
 
 class TestOrderProductModel(VokoTestCase):
