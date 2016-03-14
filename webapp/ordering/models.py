@@ -370,6 +370,12 @@ class OrderProductCorrection(TimeStampedModel):
             self.credit = self._create_credit()
         super(OrderProductCorrection, self).save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        # OneToOne relation isn't cascaded in this direction :(
+        # Make sure credit is deleted anyway when correction is deleted
+        self.credit.delete()
+        super(OrderProductCorrection, self).delete(*args, **kwargs)
+
 
 class ProductCategory(TimeStampedModel):
     class Meta:

@@ -590,3 +590,17 @@ class TestOrderProductCorrectionModel(VokoTestCase):
         corr = OrderProductCorrection.objects.get()
         self.assertEqual(corr.credit.pk, credit_id)
 
+    def test_that_balance_is_removed_upon_deletion_of_single_item(self):
+        corr = OrderProductCorrectionFactory()
+
+        self.assertEqual(len(Balance.objects.all()), 1)
+        corr.delete()
+        self.assertEqual(len(Balance.objects.all()), 0)
+
+    def test_that_balance_is_removed_upon_deletion_of_queryset(self):
+        OrderProductCorrectionFactory()
+        OrderProductCorrectionFactory()
+
+        self.assertEqual(len(Balance.objects.all()), 2)
+        OrderProductCorrection.objects.all().delete()
+        self.assertEqual(len(Balance.objects.all()), 0)
