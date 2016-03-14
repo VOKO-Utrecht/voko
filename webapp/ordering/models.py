@@ -13,6 +13,7 @@ from mailing.helpers import mail_user, get_template_by_id, render_mail_template
 from ordering.core import get_or_create_order, get_current_order_round, find_unit
 from django.conf import settings
 
+# TODO move to settings/production.py
 ORDER_CONFIRM_MAIL_ID = 12
 ORDER_FAILED_ID = 37
 
