@@ -1,5 +1,5 @@
 from accounts.tests.factories import VokoUserFactory
-from finance.models import Balance
+from finance.models import Balance, Payment
 from finance.tests.factories import PaymentFactory, BalanceFactory
 from vokou.testing import VokoTestCase
 
@@ -15,6 +15,13 @@ class TestPaymentModel(VokoTestCase):
         self.assertEqual(balance.amount, self.payment.amount)
         self.assertEqual(balance.notes, "iDeal betaling voor bestelling #%d" % self.payment.order.id)
         self.assertEqual(balance.payment, self.payment)
+
+    def test_create_and_link_credit_does_not_overwrite_existing_balance(self):
+        balance = self.payment.create_and_link_credit()
+        self.payment.create_and_link_credit()
+
+        payment = Payment.objects.get(id=self.payment.id)
+        self.assertEqual(balance, payment.balance)
 
 
 class TestBalanceModel(VokoTestCase):

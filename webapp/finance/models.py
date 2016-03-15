@@ -21,12 +21,13 @@ class Payment(TimeStampedModel):
 
     def create_and_link_credit(self):
         """
-        Create user's credit following a succesful payment
+        Create user's credit following a successful payment
         Returns newly created Balance object
         """
-        self.balance = Balance.objects.create(user=self.order.user, type="CR", amount=self.amount,
-                                              notes="iDeal betaling voor bestelling #%d" % self.order.pk)
-        self.save()
+        if not self.balance:
+            self.balance = Balance.objects.create(user=self.order.user, type="CR", amount=self.amount,
+                                                  notes="iDeal betaling voor bestelling #%d" % self.order.pk)
+            self.save()
         return self.balance
 
     def __unicode__(self):
