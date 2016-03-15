@@ -64,6 +64,7 @@ class VokoUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+    # NOTE: Remove following lines when doing a 'loaddata' management command (FIXME)
     def get_queryset(self):
         return super(VokoUserManager, self).get_queryset().filter(is_asleep=False)
 
