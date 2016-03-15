@@ -68,7 +68,8 @@ class ChooseBankView(LoginRequiredMixin, QantaniMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super(ChooseBankView, self).get_context_data(**kwargs)
-        context['order'] = Order.objects.get(id=self.request.session['order_to_pay'])
+        context['order'] = Order.objects.get(id=self.request.GET.get('order_to_pay',
+                                                                     Order.objects.get(paid=False, finalized=True).id))
         return context
 
 

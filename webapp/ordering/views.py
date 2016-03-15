@@ -29,16 +29,20 @@ class ProductsView(LoginRequiredMixin, ListView):
         ret = super(ProductsView, self).get(*args, **kwargs)
         order = get_or_create_order(self.request.user)
         if order.finalized is True:
-            messages.warning(self.request, "Je bent doorgestuurd naar de betaalpagina omdat je bestelling nog niet is betaald!")
+            messages.warning(self.request, "Je bent doorgestuurd naar de betaalpagina omdat je "
+                                           "bestelling nog niet is betaald!")
             return HttpResponseRedirect(reverse('finance.choosebank'))
         return ret
 
     def post(self, request, *args, **kwargs):
         """
         Handling complex forms using Django's forms framework is nearly impossible without
-         all kinds of trickery that don't necessarily make the code more readable. Hence: manual parsing of POST data.
+        all kinds of trickery that don't necessarily make the code more readable.
+
+        Hence: manual parsing of POST data.
         """
         order = get_or_create_order(self.request.user)
+
         assert order.finalized is False
         assert order.paid is False
 
@@ -47,13 +51,13 @@ class ProductsView(LoginRequiredMixin, ListView):
                 try:
                     prod_id = int(key.split("-")[-1])
                     value = value.strip()
-                except (IndexError, ValueError):
+                    product = Product.objects.get(id=prod_id)
+                except (IndexError, ValueError, Product.DoesNotExist):
                     messages.add_message(self.request, messages.ERROR,
                                          "Er ging iets fout bij het opslaan. "
                                          "Probeer het opnieuw of neem contact met ons op.")
                     return redirect('view_products')
 
-                product = Product.objects.get(id=prod_id)
                 try:
                     order_product = OrderProduct.objects.get(order=order, product=product)
                 except OrderProduct.DoesNotExist:
@@ -103,22 +107,30 @@ class ProductsView(LoginRequiredMixin, ListView):
         context['order'] = get_or_create_order(self.request.user)
         return context
 
-    def order_products(self):
-        order = get_or_create_order(self.request.user)
-        return order.orderproducts.all().select_related()
-
     def products(self):
-        order = get_or_create_order(self.request.user)
+        """
+        Return all products in this round.
+        Assign an 'ordered_amount' attribute to any product for which an OrderProduct exists for the
+        current open order and the product.
+        """
+        user_open_order = get_or_create_order(self.request.user)
         qs = self.get_queryset()
-        for prod in qs:
-            if prod.orderproducts.filter(order=order):
-                prod.ordered_amount = prod.orderproducts.get(order=order).amount
+
+        for product in qs:
+            if product.orderproducts.filter(order=user_open_order):
+                product.ordered_amount = product.orderproducts.get(order=user_open_order).amount
         return qs
 
     def categories(self):
+        """
+        Return all categories, alphabetically ordered
+        """
         return ProductCategory.objects.all().order_by('name')
 
     def suppliers(self):
+        """
+        Return all suppliers
+        """
         return Supplier.objects.all()
 
 

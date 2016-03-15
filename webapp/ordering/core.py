@@ -1,7 +1,8 @@
 from pytz import UTC
 import re
-import models
 from datetime import datetime
+import sys
+import models
 
 
 def get_current_order_round():
@@ -16,15 +17,15 @@ def get_current_order_round():
     now = datetime.now(UTC)
     order_rounds = models.OrderRound.objects.all()
 
-    # No rounds at all (empty DB)
-    if not order_rounds:
+    # No rounds at all (empty table)
+    if order_rounds.count() == 0:
         return
 
-    # Exact match to open round
+    # Exact match to open round(s)
     filtered = order_rounds.filter(open_for_orders__lte=now,
                                    collect_datetime__gt=now)
-    if filtered.count() == 1:
-        return filtered.get()
+    if filtered:
+        return filtered.first()  # First, if there are multiple open rounds
 
     # Future round(s)
     filtered = order_rounds.filter(open_for_orders__gte=now)
@@ -38,13 +39,19 @@ def get_current_order_round():
 
 
 def get_or_create_order(user):
-    try:
-        return models.Order.objects.get_or_create(paid=False,
-                                                  user=user,
-                                                  order_round=get_current_order_round())[0]
-    except IndexError:
+    current_order_round = get_current_order_round()
+
+    if current_order_round is None:
         raise RuntimeError("Nog geen bestelronde aangemaakt!")
 
+    order = models.Order.objects.filter(paid=False,
+                                        user=user,
+                                        order_round=get_current_order_round()).order_by('id').last()
+    if order is None:
+        order = models.Order.objects.create(paid=False,
+                                            user=user,
+                                            order_round=get_current_order_round())
+    return order
 
 def get_order_product(product, order):
     existing_ops = models.OrderProduct.objects.filter(product=product, order=order)

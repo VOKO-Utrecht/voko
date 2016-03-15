@@ -14,12 +14,7 @@ from vokou.testing import VokoTestCase
 class TestChooseBank(VokoTestCase):
     def setUp(self):
         self.url = reverse('finance.choosebank')
-
-        self.user = VokoUserFactory.create()
-        self.user.set_password('secret')
-        self.user.is_active = True
-        self.user.save()
-        self.client.login(username=self.user.email, password='secret')
+        self.login()
 
         self.mock_qantani_api = self.patch("finance.views.QantaniAPI")
         self.mock_qantani_api.return_value.get_ideal_banks = MagicMock()
@@ -27,7 +22,8 @@ class TestChooseBank(VokoTestCase):
         order_round = OrderRoundFactory.create()
         o_p = OrderProductFactory.create(order__order_round=order_round,
                                          product__order_round=order_round,
-                                         order__user=self.user)
+                                         order__user=self.user,
+                                         order__finalized=True)
         o_p.order.create_debit()
         o_p.save()
         self.order = o_p.order

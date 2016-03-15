@@ -1,11 +1,14 @@
 import datetime
 from factory import DjangoModelFactory, SubFactory, LazyAttribute
-from factory.fuzzy import FuzzyText, FuzzyChoice, FuzzyDecimal, FuzzyInteger
+from factory.fuzzy import FuzzyText, FuzzyDecimal, FuzzyInteger
 from pytz import UTC
 from accounts.tests.factories import AddressFactory, VokoUserFactory
 
 
 class OrderRoundFactory(DjangoModelFactory):
+    """
+    Creates an OPEN order round
+    """
     class Meta:
         model = "ordering.OrderRound"
 
@@ -42,7 +45,7 @@ class ProductFactory(DjangoModelFactory):
     name = FuzzyText()
     description = FuzzyText()
     unit_amount = FuzzyInteger(low=1, high=100)
-    unit = ProductUnitFactory()
+    unit = SubFactory(ProductUnitFactory)
     base_price = FuzzyDecimal(0.1, 6.0)
     supplier = SubFactory(SupplierFactory)
     order_round = SubFactory(OrderRoundFactory)
@@ -83,3 +86,11 @@ class UnitFactory(DjangoModelFactory):
 
     name = FuzzyText()
     description = FuzzyText()
+
+
+class ProductCategoryFactory(DjangoModelFactory):
+    class Meta:
+            model = "ordering.ProductCategory"
+
+    name = FuzzyText()
+

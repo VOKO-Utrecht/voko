@@ -13,6 +13,7 @@ class DocumentOverview(LoginRequiredMixin, ListView):
 class DocumentDownload(LoginRequiredMixin, DetailView):
     model = Document
 
+    # TODO: Enforce Login Required permission!
     def dispatch(self, request, *args, **kwargs):
         doc = self.get_object()
 
