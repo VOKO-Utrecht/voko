@@ -3,7 +3,6 @@ Django based custom web application for food collective www.vokoutrecht.nl.
 
 [![Travis CI](https://api.travis-ci.org/rikva/vokou.svg)](https://travis-ci.org/rikva/vokou)
 ## Some notes
-1. This application was built on Django 1.7, RC1 and upgrading is a WIP
 1. The code base needs cleaning up and adding of tests.
 1. License: GNU GPLv3
 1. Use at your own risk, no support.
