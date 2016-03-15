@@ -193,6 +193,7 @@ class ProductOrder(LoginRequiredMixin, SingleObjectMixin, FormView):
 class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
     template_name = "ordering/order_finish.html"
     model = Order
+    fields = []  # Prevent ImproperlyConfigured since 1.9
 
     def get_queryset(self):
         qs = super(FinishOrder, self).get_queryset()
@@ -242,6 +243,7 @@ class OrdersDisplay(LoginRequiredMixin, UserOwnsObjectMixin, ListView):
 class OrderSummary(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
     template_name = "ordering/order_summary.html"
     model = Order
+    fields = []  # Prevent ImproperlyConfigured since 1.9
 
     def get_queryset(self):
         qs = super(OrderSummary, self).get_queryset()
