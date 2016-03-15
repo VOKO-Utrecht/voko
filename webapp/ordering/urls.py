@@ -1,7 +1,7 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from .views import ProductsView, ProductDetail, FinishOrder, OrdersDisplay, OrderSummary, SupplierView
 
-urlpatterns = patterns('',
+urlpatterns = (
     url(r'^supplier/(?P<pk>[0-9]+)/$', SupplierView.as_view(), name="view_supplier"),
     url(r'^products/$', ProductsView.as_view(), name="view_products"),
     url(r'^product/(?P<pk>[0-9]+)/$', ProductDetail.as_view(), name="view_product"),

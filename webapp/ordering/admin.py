@@ -1,11 +1,11 @@
+from django.apps import apps
 from django.contrib import admin
 from django.db import OperationalError
-from django.db.models.loading import get_models, get_app
 import sys
 from finance.models import Balance
 from .models import Order, OrderProduct, Product, OrderRound, ProductCategory
 
-for model in get_models(get_app('ordering')):
+for model in apps.get_app_config('ordering').get_models():
     if model in (Order, Product, OrderRound):
         continue
     admin.site.register(model)

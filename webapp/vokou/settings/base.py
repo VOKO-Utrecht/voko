@@ -20,25 +20,28 @@ TEMPLATE_DEBUG = DEBUG
 
 INSTALLED_APPS = (
     'flat',
-    'django.contrib.admin',
     'django.contrib.auth',
+    'django.contrib.admin',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_nose',
-    'bootstrap3',
-    'braces',
     'tinymce',
-    'log',
+    'django_extensions',
+    'braces',
+    'bootstrap3',
+    "django_cron",
+
+    'mailing',
     'accounts',
+    'log',
     'finance',
     'ordering',
-    'mailing',
     'docs',
     'hijack',
+    'compat'  # Requirement of hijack
 
-    "django_cron",
 )
 
 MIDDLEWARE_CLASSES = (
@@ -98,4 +101,4 @@ TINYMCE_DEFAULT_CONFIG = {
     "height": "500px",
 }
 
-SHOW_HIJACKUSER_IN_ADMIN = False
+HIJACK_DISPLAY_ADMIN_BUTTON = False  # Because of custom user model

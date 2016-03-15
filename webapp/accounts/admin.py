@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 import log
 from django.contrib import admin
-from django.contrib.admin.util import flatten_fieldsets
 from django.contrib.auth.admin import UserAdmin
 from django.core.mail import send_mail
-from django.db.models.loading import get_models, get_app
 from django.shortcuts import redirect
+from django.contrib.admin.utils import flatten_fieldsets
 from accounts.forms import VokoUserCreationForm, VokoUserChangeForm
 from accounts.models import VokoUser, UserProfile, ReadOnlyVokoUser, SleepingVokoUser
 from mailing.helpers import get_template_by_id, render_mail_template
@@ -13,10 +12,12 @@ from ordering.core import get_current_order_round
 from ordering.models import Order
 from django.utils.safestring import mark_safe
 from hijack.admin import HijackUserAdminMixin
+from django.apps import apps
 
 ACTIVATE_ACCOUNT_MAILTEMPLATE_ID = 1
 
-for model in get_models(get_app('accounts')):
+
+for model in apps.get_app_config('accounts').get_models():
     if model in (VokoUser, ReadOnlyVokoUser, SleepingVokoUser):
         continue
     admin.site.register(model)
@@ -84,7 +85,7 @@ def phone(self):
     return self.userprofile.phone_number
 
 
-class VokoUserAdmin(UserAdmin, HijackUserAdminMixin):
+class VokoUserAdmin(HijackUserAdminMixin, UserAdmin):
     # Set the add/modify forms
     add_form = VokoUserCreationForm
     form = VokoUserChangeForm
@@ -140,7 +141,6 @@ class VokoUserAdmin(UserAdmin, HijackUserAdminMixin):
     def total_orders(self, obj):
         return Order.objects.filter(user=obj, paid=True).count()
 
-admin.site.register(VokoUser, VokoUserAdmin)
 
 class ReadOnlyVokoUserAdmin(VokoUserAdmin):
     # Source: https://code.djangoproject.com/ticket/17295
@@ -163,5 +163,6 @@ class ReadOnlyVokoUserAdmin(VokoUserAdmin):
         # Nobody is allowed to delete
         return False
 
+admin.site.register(VokoUser, VokoUserAdmin)
 admin.site.register(ReadOnlyVokoUser, ReadOnlyVokoUserAdmin)
 admin.site.register(SleepingVokoUser, VokoUserAdmin)
