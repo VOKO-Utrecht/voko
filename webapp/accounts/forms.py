@@ -21,12 +21,12 @@ class VokoUserCreationForm(forms.ModelForm):
 
         return user
 
-    def clean_keep_empty(self):
-        if self.cleaned_data['keep_empty']:
+    def clean_honingpot(self):
+        if self.cleaned_data['honingpot']:
             raise forms.ValidationError("Er ging iets mis")  # Stay vague
-        return self.cleaned_data['keep_empty']
+        return self.cleaned_data['honingpot']
 
-    keep_empty = forms.CharField(required=False, label="Niet invullen")  # Used to mislead spam bots
+    honingpot = forms.CharField(required=False, label="Niet invullen")  # Honeypot field, used to mislead spam bots
 
 
 class VokoUserFinishForm(forms.ModelForm):
