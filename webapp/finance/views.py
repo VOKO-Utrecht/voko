@@ -9,6 +9,7 @@ from django.views.generic import TemplateView, FormView, View
 from qantani import QantaniAPI
 from finance.models import Payment
 from log import log_event
+from ordering.core import get_current_order_round
 from ordering.models import Order
 
 
@@ -68,8 +69,11 @@ class ChooseBankView(LoginRequiredMixin, QantaniMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super(ChooseBankView, self).get_context_data(**kwargs)
+        # TODO write tests for this quick 'n dirty bugfix
+        cur_order_round = get_current_order_round()
         context['order'] = Order.objects.get(id=self.request.GET.get('order_to_pay',
-                                                                     Order.objects.get(paid=False, finalized=True).id))
+                                                                     Order.objects.get(paid=False, finalized=True,
+                                                                                       order_round=cur_order_round).id))
         return context
 
 
