@@ -20,18 +20,19 @@ class TestChooseBank(VokoTestCase):
         self.mock_qantani_api = self.patch("finance.views.QantaniAPI")
         self.mock_qantani_api.return_value.get_ideal_banks = MagicMock()
 
-        order_round = OrderRoundFactory.create()
-        o_p = OrderProductFactory.create(order__order_round=order_round,
-                                         product__order_round=order_round,
+        self.order_round = OrderRoundFactory.create()
+        o_p = OrderProductFactory.create(order__order_round=self.order_round,
+                                         product__order_round=self.order_round,
                                          order__user=self.user,
                                          order__finalized=True)
         o_p.order.create_debit()
         o_p.save()
         self.order = o_p.order
 
-        s = self.client.session
-        s['order_to_pay'] = self.order.id
-        s.save()
+        # TODO: test session data usage & determine if it's still necessary
+        # s = self.client.session
+        # s['order_to_pay'] = self.order.id
+        # s.save()
 
     def test_that_qantani_api_client_is_initiated(self):
         self.client.get(self.url)
@@ -58,6 +59,16 @@ class TestChooseBank(VokoTestCase):
     def test_order_is_placed_in_context(self):
         ret = self.client.get(self.url)
         self.assertEqual(ret.context[0]['order'], self.order)
+
+    def test_no_order(self):
+        self.order.delete()
+        ret = self.client.get(self.url)
+        self.assertEqual(ret.status_code, 200)
+        self.assertContains(ret, "Je hebt geen bestelling om te betalen.")
+        self.assertNotContains(ret, "Te betalen")
+
+    def test_multiple_orders(self):
+
 
 
 class TestCreateTransaction(VokoTestCase):

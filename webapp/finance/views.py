@@ -69,12 +69,15 @@ class ChooseBankView(LoginRequiredMixin, QantaniMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super(ChooseBankView, self).get_context_data(**kwargs)
-        # TODO write tests for this quick 'n dirty bugfix
         cur_order_round = get_current_order_round()
-        context['order'] = Order.objects.get(id=self.request.GET.get('order_to_pay',
-                                                                     Order.objects.get(paid=False, finalized=True,
-                                                                                       order_round=cur_order_round,
-                                                                                       user=self.request.user).id))
+        try:
+            context['order'] = Order.objects.get(id=self.request.GET.get('order_to_pay',
+                                                                         Order.objects.get(paid=False, finalized=True,
+                                                                                           order_round=cur_order_round,
+                                                                                           user=self.request.user).id))
+        except Order.DoesNotExist:
+            pass  # Warning is shown in template
+
         return context
 
 
