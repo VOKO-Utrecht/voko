@@ -67,9 +67,6 @@ class TestChooseBank(VokoTestCase):
         self.assertContains(ret, "Je hebt geen bestelling om te betalen.")
         self.assertNotContains(ret, "Te betalen")
 
-    def test_multiple_orders(self):
-
-
 
 class TestCreateTransaction(VokoTestCase):
     def setUp(self):
