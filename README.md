@@ -14,6 +14,14 @@ Django based custom web application for food collective www.vokoutrecht.nl.
 3. mkvirtualenv vokou
 4. clone...
 
+### Run tests
+    cd webapp
+    ./runtests.sh
+    
+### Run development server
+    cd webapp
+    ./manage.py runserver --settings=vokou.settings.development
+
 ## Supervisor config
 ```yaml
 [program:gunicorn]
