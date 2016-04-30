@@ -17,6 +17,10 @@ Django based custom web application for food collective www.vokoutrecht.nl.
 ### Run tests
     cd webapp
     ./runtests.sh
+
+### Set up sqlite database
+    ./manage.py migrate --settings=vokou.settings.development 
+    ./manage.py createsuperuser --settings=vokou.settings.development
     
 ### Run development server
     cd webapp
