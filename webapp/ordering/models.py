@@ -413,7 +413,8 @@ class Product(TimeStampedModel):
     unit_amount = models.IntegerField(default=1, help_text="e.g. if half a kilo: \"500\"")
     base_price = models.DecimalField(max_digits=6, decimal_places=2)
     supplier = models.ForeignKey("Supplier", related_name="products")
-    order_round = models.ForeignKey("OrderRound", related_name="products")
+    # order_round NULL means: recurring / stock product
+    order_round = models.ForeignKey("OrderRound", related_name="products", blank=True, null=True)
     # No category means "Other"
     category = models.ForeignKey("ProductCategory", related_name="products", null=True, blank=True)
     new = models.BooleanField(default=False, verbose_name="Show 'new' label")
