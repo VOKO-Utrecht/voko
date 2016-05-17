@@ -92,7 +92,8 @@ class ProductsView(LoginRequiredMixin, ListView):
 
                 # Create orderproduct
                 if value and int(value) > 0:
-                    OrderProduct.objects.create(order=order, product=product, amount=int(value))
+                    OrderProduct.objects.create(order=order, product=product, amount=int(value),
+                                                retail_price=product.retail_price)
 
         return redirect(reverse('finish_order', args=(order.pk,)))
 

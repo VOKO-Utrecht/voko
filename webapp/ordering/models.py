@@ -280,6 +280,7 @@ class OrderProduct(TimeStampedModel):
     order = models.ForeignKey("Order", related_name="orderproducts")
     product = models.ForeignKey("Product", related_name="orderproducts")
     amount = models.IntegerField(verbose_name="Aantal")
+    retail_price = models.DecimalField(max_digits=6, decimal_places=2, help_text="The price the product was sold for", blank=True, null=True)  # TODO remove blank & null
 
     # TODO: assert order.order_round == product.order_round on save()
 
@@ -289,9 +290,11 @@ class OrderProduct(TimeStampedModel):
     @property
     def total_retail_price(self):
         """
-        What the user will pay for this OrderProduct
+        What the user will pay or paid for this OrderProduct. Stored in model as historical record.
         """
         return Decimal(self.amount) * Decimal(str(self.product.retail_price))
+
+        # TODO return Decimal(self.amount) * Decimal(str(self.retail_price))
 
     def total_cost_price(self):
         """
