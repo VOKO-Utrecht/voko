@@ -1,7 +1,7 @@
 # VOKO
 Django based custom web application for food collective www.vokoutrecht.nl.
 
-[![Travis CI](https://api.travis-ci.org/rikva/vokou.svg)](https://travis-ci.org/rikva/vokou)
+[![Travis CI](https://api.travis-ci.org/rikva/voko.svg)](https://travis-ci.org/rikva/voko)
 ## Some notes
 1. The code base needs cleaning up and adding of tests.
 1. License: GNU GPLv3
