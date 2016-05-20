@@ -67,6 +67,7 @@ class OrderProductFactory(DjangoModelFactory):
     order = SubFactory(OrderFactory)
     amount = FuzzyInteger(low=1, high=10)
     retail_price = FuzzyDecimal(0.1, 6.0)   # TODO use product.retail_price, somehow
+    base_price = FuzzyDecimal(0.1, 6.0)  # TODO: ditto
 
 
 class OrderProductCorrectionFactory(DjangoModelFactory):
