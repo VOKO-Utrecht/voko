@@ -9,7 +9,7 @@ def copy_base_prices(apps, _):
     OrderProduct = apps.get_model("ordering", "OrderProduct")
 
     for odp in OrderProduct.objects.all():
-        odp.retail_price = odp.product.base_price
+        odp.base_price = odp.product.base_price
         odp.save()
 
 
