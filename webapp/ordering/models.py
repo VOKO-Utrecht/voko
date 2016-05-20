@@ -293,17 +293,15 @@ class OrderProduct(TimeStampedModel):
         """
         What the user will pay or paid for this OrderProduct. Stored in model as historical record.
         """
-        return Decimal(self.amount) * Decimal(str(self.product.retail_price))
 
-        # TODO return Decimal(self.amount) * Decimal(str(self.retail_price))
+        return Decimal(self.amount) * Decimal(str(self.retail_price))
 
     def total_cost_price(self):
         """
         What VOKO will pay for this product
         """
-        return Decimal(self.amount) * Decimal(str(self.product.base_price))
 
-        # TODO return Decimal(self.amount) * Decimal(str(self.base_price))
+        return Decimal(self.amount) * Decimal(str(self.base_price))
 
 
 class CorrectionQuerySet(models.query.QuerySet):
