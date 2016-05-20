@@ -280,8 +280,8 @@ class OrderProduct(TimeStampedModel):
     order = models.ForeignKey("Order", related_name="orderproducts")
     product = models.ForeignKey("Product", related_name="orderproducts")
     amount = models.IntegerField(verbose_name="Aantal")
-    retail_price = models.DecimalField(max_digits=6, decimal_places=2, help_text="The price the product was sold for", blank=True, null=True)  # TODO remove blank & null
-    base_price = models.DecimalField(max_digits=6, decimal_places=2, help_text="The price the product was bought for", blank=True, null=True)  # TODO remove blank & null
+    retail_price = models.DecimalField(max_digits=6, decimal_places=2, help_text="The price the product was sold for")
+    base_price = models.DecimalField(max_digits=6, decimal_places=2, help_text="The price the product was bought for")
 
     # TODO: assert order.order_round == product.order_round on save()
 
