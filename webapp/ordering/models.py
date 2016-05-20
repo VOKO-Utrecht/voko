@@ -406,6 +406,20 @@ class ProductUnit(TimeStampedModel):
         return self.description
 
 
+class ProductStock(TimeStampedModel):
+    """ Product purchase / stock """
+    class Meta:
+        verbose_name = verbose_name_plural = "Productvoorraad"
+
+    product = models.ForeignKey("Product")
+    amount = models.IntegerField()
+
+    # TODO: make sure amount can't be changed?
+
+    def __unicode__(self):
+        return u'%d x %s' % (self.amount, self.product)
+
+
 class Product(TimeStampedModel):
     class Meta:
         verbose_name = "Product"
@@ -427,7 +441,9 @@ class Product(TimeStampedModel):
     # TODO: Prevent deleting of product when it has (paid) orders
 
     def __unicode__(self):
-        return u'[ronde %s] %s (%s)' % (self.order_round.pk, self.name, self.supplier)
+        if self.order_round:
+            return u'[ronde %s] %s (%s)' % (self.order_round.pk, self.name, self.supplier)
+        return u' [terugkerend] %s (%s)' % (self.name, self.supplier)
 
     @property
     def unit_of_measurement(self):
