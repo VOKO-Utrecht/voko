@@ -1,5 +1,5 @@
 import datetime
-from factory import DjangoModelFactory, SubFactory, LazyAttribute
+from factory import DjangoModelFactory, SubFactory, LazyAttribute, SelfAttribute
 from factory.fuzzy import FuzzyText, FuzzyDecimal, FuzzyInteger
 from pytz import UTC
 from accounts.tests.factories import AddressFactory, VokoUserFactory
@@ -66,8 +66,8 @@ class OrderProductFactory(DjangoModelFactory):
     product = SubFactory(ProductFactory)
     order = SubFactory(OrderFactory)
     amount = FuzzyInteger(low=1, high=10)
-    retail_price = FuzzyDecimal(0.1, 6.0)   # TODO use product.retail_price, somehow
-    base_price = FuzzyDecimal(0.1, 6.0)  # TODO: ditto
+    retail_price = SelfAttribute('product.retail_price')
+    base_price = SelfAttribute('product.base_price')
 
 
 class OrderProductCorrectionFactory(DjangoModelFactory):
