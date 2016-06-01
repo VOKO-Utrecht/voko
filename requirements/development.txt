@@ -1,4 +1,4 @@
 -r base.txt
 
-factory-boy==2.6.1
+factory-boy==2.7.0
 mock==1.0.1

@@ -280,6 +280,8 @@ class OrderProduct(TimeStampedModel):
     order = models.ForeignKey("Order", related_name="orderproducts")
     product = models.ForeignKey("Product", related_name="orderproducts")
     amount = models.IntegerField(verbose_name="Aantal")
+    retail_price = models.DecimalField(max_digits=6, decimal_places=2, help_text="The price the product was sold for")
+    base_price = models.DecimalField(max_digits=6, decimal_places=2, help_text="The price the product was bought for")
 
     # TODO: assert order.order_round == product.order_round on save()
 
@@ -289,15 +291,17 @@ class OrderProduct(TimeStampedModel):
     @property
     def total_retail_price(self):
         """
-        What the user will pay for this OrderProduct
+        What the user will pay or paid for this OrderProduct. Stored in model as historical record.
         """
-        return Decimal(self.amount) * Decimal(str(self.product.retail_price))
+
+        return Decimal(self.amount) * Decimal(str(self.retail_price))
 
     def total_cost_price(self):
         """
         What VOKO will pay for this product
         """
-        return Decimal(self.amount) * Decimal(str(self.product.base_price))
+
+        return Decimal(self.amount) * Decimal(str(self.base_price))
 
 
 class CorrectionQuerySet(models.query.QuerySet):
@@ -357,11 +361,16 @@ class OrderProductCorrection(TimeStampedModel):
             .quantize(Decimal('.01'), rounding=ROUND_DOWN)
 
     def _create_credit(self):
+        if self.order_product.product.order_round is None:
+            order_round = get_current_order_round()
+        else:
+            order_round = self.order_product.product.order_round
+
         return Balance.objects.create(user=self.order_product.order.user,
                                       type="CR",
                                       amount=self.calculate_refund(),
                                       notes="Correctie in ronde %d, %dx %s, geleverd: %s%%" %
-                                            (self.order_product.product.order_round.id,
+                                            (order_round.id,
                                              self.order_product.amount,
                                              self.order_product.product.name,
                                              self.supplied_percentage))
@@ -402,6 +411,20 @@ class ProductUnit(TimeStampedModel):
         return self.description
 
 
+class ProductStock(TimeStampedModel):
+    """ Product purchase / stock """
+    class Meta:
+        verbose_name = verbose_name_plural = "Productvoorraad"
+
+    product = models.ForeignKey("Product", related_name="stock")
+    amount = models.IntegerField()
+
+    # TODO: make sure amount can't be changed?
+
+    def __unicode__(self):
+        return u'%d x %s' % (self.amount, self.product)
+
+
 class Product(TimeStampedModel):
     class Meta:
         verbose_name = "Product"
@@ -413,16 +436,20 @@ class Product(TimeStampedModel):
     unit_amount = models.IntegerField(default=1, help_text="e.g. if half a kilo: \"500\"")
     base_price = models.DecimalField(max_digits=6, decimal_places=2)
     supplier = models.ForeignKey("Supplier", related_name="products")
-    order_round = models.ForeignKey("OrderRound", related_name="products")
+    # order_round NULL means: recurring / stock product
+    order_round = models.ForeignKey("OrderRound", related_name="products", blank=True, null=True)
     # No category means "Other"
     category = models.ForeignKey("ProductCategory", related_name="products", null=True, blank=True)
     new = models.BooleanField(default=False, verbose_name="Show 'new' label")
     maximum_total_order = models.IntegerField(null=True, blank=True)
+    enabled = models.BooleanField(default=True)
 
     # TODO: Prevent deleting of product when it has (paid) orders
 
     def __unicode__(self):
-        return u'[ronde %s] %s (%s)' % (self.order_round.pk, self.name, self.supplier)
+        if self.order_round:
+            return u'[ronde %s] %s (%s)' % (self.order_round.pk, self.name, self.supplier)
+        return u'%s (%s)' % (self.name, self.supplier)
 
     @property
     def unit_of_measurement(self):
@@ -441,10 +468,22 @@ class Product(TimeStampedModel):
         """
         Return base price plus round's markup percentage, rounded up to 2 decimals.
         """
-        total_percentage = 100 + self.order_round.markup_percentage
+        if self.order_round:
+            markup = self.order_round.markup_percentage
+        else:
+            markup = get_current_order_round().markup_percentage
+
+        total_percentage = 100 + markup
         new_price = (Decimal(self.base_price) / Decimal('100.0')) * Decimal(total_percentage)
         rounded = new_price.quantize(Decimal('.01'), rounding=ROUND_UP)
         return rounded
+
+    def all_stock(self):
+        """
+        Total stock bought, can be used to calculate current stock by subtracting total orders.
+        """
+        product_stock = self.stock.all()
+        return sum([s.amount for s in product_stock])
 
     @property
     def amount_available(self):
@@ -452,11 +491,27 @@ class Product(TimeStampedModel):
         Return how many items of this product are available.
         Returns None when there is no maximum.
         """
+        if self.stock.exists():
+            return self.all_stock() - self.amount_ordered
+
         if self.maximum_total_order is None:
             return
+
         maximum = self.maximum_total_order
         total = self.amount_ordered
         return maximum - total
+
+    def availability(self):
+        """
+        The value to show in the progress bar in product overview
+        """
+        if self.stock.exists():
+            return "%s uit voorraad" % (self.all_stock() - self.amount_ordered)
+
+        if self.maximum_total_order:
+            return "%s van %s" %(self.amount_available, self.maximum_total_order)
+
+        return "Onbeperkt"
 
     @property
     def amount_ordered(self):
@@ -468,11 +523,14 @@ class Product(TimeStampedModel):
         return total
 
     @property
-    def percentage_available_of_max(self):
+    def percentage_available(self):
         """
         Return the percentage of availability of this product.
         Useful for filling progress bars.
         """
+        if self.stock.exists():
+            return 100
+
         if self.maximum_total_order is None:
             return 100
         return int((float(self.amount_available) / float(self.maximum_total_order)) * 100)

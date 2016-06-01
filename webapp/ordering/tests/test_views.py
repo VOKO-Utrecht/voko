@@ -99,6 +99,9 @@ class TestProductsView(VokoTestCase):
         self.assertEqual(odp.product, product)
         self.assertEqual(odp.amount, 3)
         self.assertEqual(odp.order.order_round, self.round)
+        self.assertEqual(odp.total_retail_price, product.retail_price * 3)
+        self.assertEqual(odp.base_price, product.base_price)
+        self.assertEqual(odp.retail_price, product.retail_price)
 
         self.assertRedirects(ret, reverse("finish_order", args=(self.order.id,)))
 

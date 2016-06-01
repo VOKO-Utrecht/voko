@@ -2,6 +2,7 @@ from braces.views import LoginRequiredMixin
 
 from django.contrib import messages
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, FormView, View, UpdateView
@@ -23,7 +24,9 @@ class ProductsView(LoginRequiredMixin, ListView):
         if 'round' in self.request.GET:
             order_round = OrderRound.objects.get(id=int(self.request.GET.get('round')))
 
-        return Product.objects.filter(order_round=order_round).order_by('name')
+        return Product.objects.filter(enabled=True).\
+            filter(Q(order_round=order_round) | Q(order_round__isnull=True)).\
+            order_by('name')
 
     def get(self, *args, **kwargs):
         ret = super(ProductsView, self).get(*args, **kwargs)
@@ -92,7 +95,9 @@ class ProductsView(LoginRequiredMixin, ListView):
 
                 # Create orderproduct
                 if value and int(value) > 0:
-                    OrderProduct.objects.create(order=order, product=product, amount=int(value))
+                    OrderProduct.objects.create(order=order, product=product, amount=int(value),
+                                                retail_price=product.retail_price,
+                                                base_price=product.base_price)
 
         return redirect(reverse('finish_order', args=(order.pk,)))
 
@@ -178,7 +183,8 @@ class ProductOrder(LoginRequiredMixin, SingleObjectMixin, FormView):
 
             order_product = form.save(commit=False)
             order_product.order = order
-            assert order_product.product.order_round == self.request.current_order_round  # TODO: nicer error, or just disable ordering.
+            if order_product.product.order_round:
+                assert order_product.product.order_round == self.request.current_order_round  # TODO: nicer error, or just disable ordering.
 
             # Remove product from order when amount is zero
             if order_product.amount < 1:
