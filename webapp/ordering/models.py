@@ -437,13 +437,14 @@ class Product(TimeStampedModel):
     category = models.ForeignKey("ProductCategory", related_name="products", null=True, blank=True)
     new = models.BooleanField(default=False, verbose_name="Show 'new' label")
     maximum_total_order = models.IntegerField(null=True, blank=True)
+    enabled = models.BooleanField(default=True)
 
     # TODO: Prevent deleting of product when it has (paid) orders
 
     def __unicode__(self):
         if self.order_round:
             return u'[ronde %s] %s (%s)' % (self.order_round.pk, self.name, self.supplier)
-        return u' [terugkerend] %s (%s)' % (self.name, self.supplier)
+        return u'%s (%s)' % (self.name, self.supplier)
 
     @property
     def unit_of_measurement(self):
@@ -462,7 +463,12 @@ class Product(TimeStampedModel):
         """
         Return base price plus round's markup percentage, rounded up to 2 decimals.
         """
-        total_percentage = 100 + self.order_round.markup_percentage
+        if self.order_round:
+            markup = self.order_round.markup_percentage
+        else:
+            markup = get_current_order_round().markup_percentage
+
+        total_percentage = 100 + markup
         new_price = (Decimal(self.base_price) / Decimal('100.0')) * Decimal(total_percentage)
         rounded = new_price.quantize(Decimal('.01'), rounding=ROUND_UP)
         return rounded
