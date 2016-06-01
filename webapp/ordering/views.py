@@ -2,6 +2,7 @@ from braces.views import LoginRequiredMixin
 
 from django.contrib import messages
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, FormView, View, UpdateView
@@ -23,7 +24,9 @@ class ProductsView(LoginRequiredMixin, ListView):
         if 'round' in self.request.GET:
             order_round = OrderRound.objects.get(id=int(self.request.GET.get('round')))
 
-        return Product.objects.filter(order_round=order_round).order_by('name')
+        return Product.objects.filter(enabled=True).\
+            filter(Q(order_round=order_round) | Q(order_round__isnull=True)).\
+            order_by('name')
 
     def get(self, *args, **kwargs):
         ret = super(ProductsView, self).get(*args, **kwargs)
