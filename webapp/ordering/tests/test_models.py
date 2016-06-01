@@ -520,7 +520,7 @@ class TestProductModel(VokoTestCase):
 
     def test_availability_2(self):
         product = ProductFactory(maximum_total_order=None)
-        self.assertEqual(product.availability(), "onbeperkt")
+        self.assertEqual(product.availability(), "Onbeperkt")
 
     def test_availability_with_stock_1(self):
         product = ProductFactory()
