@@ -183,6 +183,10 @@ class ProductOrder(LoginRequiredMixin, SingleObjectMixin, FormView):
 
             order_product = form.save(commit=False)
             order_product.order = order
+
+            order_product.retail_price = self.get_object().retail_price
+            order_product.base_price = self.get_object().base_price
+
             if order_product.product.order_round:
                 assert order_product.product.order_round == self.request.current_order_round  # TODO: nicer error, or just disable ordering.
 
