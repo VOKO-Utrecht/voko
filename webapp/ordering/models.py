@@ -361,11 +361,16 @@ class OrderProductCorrection(TimeStampedModel):
             .quantize(Decimal('.01'), rounding=ROUND_DOWN)
 
     def _create_credit(self):
+        if self.order_product.product.order_round is None:
+            order_round = get_current_order_round()
+        else:
+            order_round = self.order_product.product.order_round
+
         return Balance.objects.create(user=self.order_product.order.user,
                                       type="CR",
                                       amount=self.calculate_refund(),
                                       notes="Correctie in ronde %d, %dx %s, geleverd: %s%%" %
-                                            (self.order_product.product.order_round.id,
+                                            (order_round.id,
                                              self.order_product.amount,
                                              self.order_product.product.name,
                                              self.supplied_percentage))
@@ -505,7 +510,8 @@ class Product(TimeStampedModel):
 
         if self.maximum_total_order:
             return "%s van %s" %(self.amount_available, self.maximum_total_order)
-        return "onbeperkt"
+
+        return "Onbeperkt"
 
     @property
     def amount_ordered(self):

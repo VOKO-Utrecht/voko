@@ -16,7 +16,7 @@
       </tr>
       <tr>
         <td><strong>Categorie</strong></td>
-        <td>{% if object.category %}{{ object.category }}{% else %}Geen{% endif %}</td>
+        <td>{% if object.category %}{{ object.category }}{% else %}Overig{% endif %}</td>
       </tr>
       <tr>
         <td><strong>Besteleenheid</strong></td>
@@ -24,11 +24,12 @@
       </tr>
       <tr>
         <td><strong>Maximaal beschikbaar</strong></td>
-        <td>{% if object.maximum_total_order %}{{ object.maximum_total_order }}{% else %}Onbeperkt{% endif %}</td>
+        <td>{{ object.maximum_total_order|default_if_none:"Onbeperkt" }}</td>
       </tr>
       <tr>
         <td><strong>Nog te bestellen</strong></td>
-        <td>{% if object.maximum_total_order %}{{ object.amount_available }} ({{ object.percentage_available }}%){% else %}Onbeperkt{% endif %}</td>
+          <td>{{ object.amount_available|default_if_none:"Onbeperkt" }}</td>
+
       </tr>
       <tr>
         <td><strong>Inkoopprijs per eenheid</strong></td>
@@ -36,7 +37,7 @@
       </tr>
       <tr>
         <td><strong>Verkoopprijs per eenheid</strong></td>
-        <td>&euro; {{ object.retail_price }} ({{ object.order_round.markup_percentage }}% marge)</td>
+        <td>&euro; {{ object.retail_price }}</td>
       </tr>
     </tbody>
   </table>

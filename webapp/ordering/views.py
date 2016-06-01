@@ -183,7 +183,8 @@ class ProductOrder(LoginRequiredMixin, SingleObjectMixin, FormView):
 
             order_product = form.save(commit=False)
             order_product.order = order
-            assert order_product.product.order_round == self.request.current_order_round  # TODO: nicer error, or just disable ordering.
+            if order_product.product.order_round:
+                assert order_product.product.order_round == self.request.current_order_round  # TODO: nicer error, or just disable ordering.
 
             # Remove product from order when amount is zero
             if order_product.amount < 1:
