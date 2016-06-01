@@ -411,7 +411,7 @@ class ProductStock(TimeStampedModel):
     class Meta:
         verbose_name = verbose_name_plural = "Productvoorraad"
 
-    product = models.ForeignKey("Product")
+    product = models.ForeignKey("Product", related_name="stock")
     amount = models.IntegerField()
 
     # TODO: make sure amount can't be changed?
@@ -473,17 +473,39 @@ class Product(TimeStampedModel):
         rounded = new_price.quantize(Decimal('.01'), rounding=ROUND_UP)
         return rounded
 
+    def all_stock(self):
+        """
+        Total stock bought, can be used to calculate current stock by subtracting total orders.
+        """
+        product_stock = self.stock.all()
+        return sum([s.amount for s in product_stock])
+
     @property
     def amount_available(self):
         """
         Return how many items of this product are available.
         Returns None when there is no maximum.
         """
+        if self.stock.exists():
+            return self.all_stock() - self.amount_ordered
+
         if self.maximum_total_order is None:
             return
+
         maximum = self.maximum_total_order
         total = self.amount_ordered
         return maximum - total
+
+    def availability(self):
+        """
+        The value to show in the progress bar in product overview
+        """
+        if self.stock.exists():
+            return "%s uit voorraad" % (self.all_stock() - self.amount_ordered)
+
+        if self.maximum_total_order:
+            return "%s van %s" %(self.amount_available, self.maximum_total_order)
+        return "onbeperkt"
 
     @property
     def amount_ordered(self):
@@ -495,11 +517,14 @@ class Product(TimeStampedModel):
         return total
 
     @property
-    def percentage_available_of_max(self):
+    def percentage_available(self):
         """
         Return the percentage of availability of this product.
         Useful for filling progress bars.
         """
+        if self.stock.exists():
+            return 100
+
         if self.maximum_total_order is None:
             return 100
         return int((float(self.amount_available) / float(self.maximum_total_order)) * 100)

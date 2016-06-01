@@ -51,6 +51,14 @@ class ProductFactory(DjangoModelFactory):
     order_round = SubFactory(OrderRoundFactory)
 
 
+class ProductStockFactory(DjangoModelFactory):
+    class Meta:
+        model = "ordering.ProductStock"
+
+    product = SubFactory(ProductFactory)
+    amount = FuzzyInteger(low=1, high=10)
+
+
 class OrderFactory(DjangoModelFactory):
     class Meta:
         model = "ordering.Order"

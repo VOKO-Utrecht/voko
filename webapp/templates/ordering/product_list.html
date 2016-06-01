@@ -55,14 +55,10 @@
         <td class="col-md-1">
             {% if not product.is_available %}Uitverkocht{% else %}
             <div class="progress">
-                <div class="progress-bar" role="progressbar" aria-valuenow="{{ product.percentage_available_of_max }}"
-                     aria-valuemin="0" aria-valuemax="100" style="width: {{ product.percentage_available_of_max }}%;">
-                    {% if product.maximum_total_order %}
-                        {{ product.amount_available }} van {{ product.maximum_total_order }}
-                    {% else %}
-                        onbeperkt
-                    {% endif %}
-                {% endif %}
+                <div class="progress-bar" role="progressbar" aria-valuenow="{{ product.percentage_available }}"
+                     aria-valuemin="0" aria-valuemax="100" style="width: {{ product.percentage_available }}%;">
+                    {{ product.availability }}
+            {% endif %}
                 </div>
             </div>
         </td>
