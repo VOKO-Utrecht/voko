@@ -38,6 +38,15 @@ class TestSupplierModel(VokoTestCase):
         OrderProductFactory(order=order, product__supplier=self.supplier)
         self.assertFalse(self.supplier.has_orders_in_current_order_round())
 
+    def test_has_orders_ignores_stock_products(self):
+        order = OrderFactory(finalized=True,
+                             paid=True)
+        OrderProductFactory(order=order,
+                            product__supplier=self.supplier,
+                            product__order_round=None)
+        self.assertFalse(
+            self.supplier.has_orders_in_current_order_round())
+
 
 class TestOrderRoundModel(VokoTestCase):
     def setUp(self):
@@ -523,18 +532,19 @@ class TestProductModel(VokoTestCase):
         self.assertEqual(product.availability(), "Onbeperkt")
 
     def test_availability_with_stock_1(self):
-        product = ProductFactory()
+        product = ProductFactory(order_round=None)
         stock = ProductStockFactory(product=product)
         self.assertEqual(product.availability(), "%s in voorraad" % stock.amount)
 
     def test_availability_with_stock_2(self):
-        product = ProductFactory()
+        product = ProductFactory(order_round=None)
         stock1 = ProductStockFactory(product=product)
         stock2 = ProductStockFactory(product=product)
         self.assertEqual(product.availability(), "%s in voorraad" % (stock1.amount + stock2.amount))
 
     def test_availability_with_stock_3(self):
-        product = ProductFactory()
+        OrderRoundFactory()
+        product = ProductFactory(order_round=None)
         stock1 = ProductStockFactory(product=product)
         stock2 = ProductStockFactory(product=product)
         odp1 = OrderProductFactory(product=product, amount=1, order__paid=True)

@@ -33,6 +33,9 @@ class Supplier(TimeStampedModel):
         return self.name
 
     def has_orders_in_current_order_round(self):
+        """
+         Ignores stock products!
+        """
         return OrderProduct.objects.filter(product__supplier=self,
                                            order__order_round=get_current_order_round(),
                                            order__paid=True).exists()
