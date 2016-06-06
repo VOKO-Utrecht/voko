@@ -450,6 +450,8 @@ class Product(TimeStampedModel):
     # TODO: Prevent deleting of product when it has (paid) orders
 
     def __unicode__(self):
+        if self.is_stock_product():
+            return u'[voorraadproduct] %s (%s)' % (self.name, self.supplier)
         if self.order_round:
             return u'[ronde %s] %s (%s)' % (self.order_round.pk, self.name, self.supplier)
         return u'%s (%s)' % (self.name, self.supplier)
