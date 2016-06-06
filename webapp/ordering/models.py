@@ -461,6 +461,7 @@ class Product(TimeStampedModel):
 
     @property
     def profit(self):
+        # TODO move to OrderProduct, update admin views
         return self.retail_price - self.base_price
 
     @property
@@ -491,7 +492,7 @@ class Product(TimeStampedModel):
         Return how many items of this product are available.
         Returns None when there is no maximum.
         """
-        if self.stock.exists():
+        if self.is_stock_product():
             return self.all_stock() - self.amount_ordered
 
         if self.maximum_total_order is None:
@@ -505,7 +506,7 @@ class Product(TimeStampedModel):
         """
         The value to show in the progress bar in product overview
         """
-        if self.stock.exists():
+        if self.is_stock_product():
             return "%s in voorraad" % (self.all_stock() - self.amount_ordered)
 
         if self.maximum_total_order:
@@ -528,7 +529,7 @@ class Product(TimeStampedModel):
         Return the percentage of availability of this product.
         Useful for filling progress bars.
         """
-        if self.stock.exists():
+        if self.is_stock_product():
             return 100
 
         if self.maximum_total_order is None:
@@ -577,6 +578,9 @@ class Product(TimeStampedModel):
             self.save()
             log_event(event="Setting product %s to 'new' because I could not find a "
                             "similar product in order round %d" % (self, prev_round.id))
+
+    def is_stock_product(self):
+        return self.stock.exists() and self.order_round is None
 
 
 class DraftProduct(TimeStampedModel):
