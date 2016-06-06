@@ -506,7 +506,7 @@ class Product(TimeStampedModel):
         The value to show in the progress bar in product overview
         """
         if self.stock.exists():
-            return "%s uit voorraad" % (self.all_stock() - self.amount_ordered)
+            return "%s in voorraad" % (self.all_stock() - self.amount_ordered)
 
         if self.maximum_total_order:
             return "%s van %s" %(self.amount_available, self.maximum_total_order)

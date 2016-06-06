@@ -525,13 +525,13 @@ class TestProductModel(VokoTestCase):
     def test_availability_with_stock_1(self):
         product = ProductFactory()
         stock = ProductStockFactory(product=product)
-        self.assertEqual(product.availability(), "%s uit voorraad" % stock.amount)
+        self.assertEqual(product.availability(), "%s in voorraad" % stock.amount)
 
     def test_availability_with_stock_2(self):
         product = ProductFactory()
         stock1 = ProductStockFactory(product=product)
         stock2 = ProductStockFactory(product=product)
-        self.assertEqual(product.availability(), "%s uit voorraad" % (stock1.amount + stock2.amount))
+        self.assertEqual(product.availability(), "%s in voorraad" % (stock1.amount + stock2.amount))
 
     def test_availability_with_stock_3(self):
         product = ProductFactory()
@@ -539,7 +539,7 @@ class TestProductModel(VokoTestCase):
         stock2 = ProductStockFactory(product=product)
         odp1 = OrderProductFactory(product=product, amount=1, order__paid=True)
 
-        self.assertEqual(product.availability(), "%s uit voorraad" % ((stock1.amount + stock2.amount) - odp1.amount))
+        self.assertEqual(product.availability(), "%s in voorraad" % ((stock1.amount + stock2.amount) - odp1.amount))
 
 
 class TestOrderProductCorrectionModel(VokoTestCase):
