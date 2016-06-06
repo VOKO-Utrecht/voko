@@ -2,6 +2,8 @@ import cStringIO
 from django.core.mail import EmailMultiAlternatives
 from django.db.models.aggregates import Sum
 from django_cron import CronJobBase, Schedule
+
+from log import log_event
 from .core import get_current_order_round
 from ordering.models import Supplier
 import unicodecsv as csv
@@ -35,6 +37,8 @@ class MailOrderLists(CronJobBase):
 
         for supplier in Supplier.objects.all():
             if not supplier.has_orders_in_current_order_round():
+                log_event("Supplier %s has no orders in current round, "
+                          "so not sending order list." % supplier)
                 continue
 
             # Generate CSV
