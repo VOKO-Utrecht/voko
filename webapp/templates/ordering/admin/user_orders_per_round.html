@@ -37,7 +37,7 @@
           <tr {% if o.product == object %}class="success"{% endif %}>
             <td>{{ o.amount }}</td>
             <td>{{ o.product.unit_of_measurement }}</td>
-            <td>{{ o.product.name }}</td>
+            <td>{{ o.product.name }} {% if o.product.is_stock_product %}<b><u>uit voorraad</u></b>{% endif %}</td>
             <td>{{ o.product.supplier }}</td>
             <td>{{ o.product.description|truncatechars:50 }}</td>
             <td>&euro; {{ o.product.retail_price }}</td>
