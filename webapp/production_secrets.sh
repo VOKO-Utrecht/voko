@@ -6,6 +6,4 @@ GROUP=voko
 
 export DJANGO_SECRET_KEY=""
 export DB_PASSWORD=""
-export QANTANI_MERCHANT_ID=""
-export QANTANI_MERCHANT_KEY=""
-export QANTANI_MERCHANT_SECRET=""
+export MOLLIE_API_KEY=""

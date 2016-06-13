@@ -20,9 +20,7 @@ ADMINS = (
 )
 ALLOWED_HOSTS = ("leden.vokoutrecht.nl",)
 
-QANTANI_MERCHANT_ID = os.environ["QANTANI_MERCHANT_ID"]
-QANTANI_MERCHANT_KEY = os.environ["QANTANI_MERCHANT_KEY"]
-QANTANI_MERCHANT_SECRET = os.environ["QANTANI_MERCHANT_SECRET"]
+MOLLIE_API_KEY = os.environ["MOLLIE_API_KEY"]
 
 INSTALLED_APPS += (
     "opbeat.contrib.django",

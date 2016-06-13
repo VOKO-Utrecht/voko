@@ -84,9 +84,7 @@ EMAIL_SUBJECT_PREFIX = "[Voko Admin] "
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-QANTANI_MERCHANT_ID = 0
-QANTANI_MERCHANT_KEY = ""
-QANTANI_MERCHANT_SECRET = ""
+MOLLIE_API_KEY = "SETME"
 
 BASE_URL = "http://leden.vokoutrecht.nl"
 
