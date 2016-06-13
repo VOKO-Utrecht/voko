@@ -1,3 +1,4 @@
+import Mollie
 from braces.views import LoginRequiredMixin
 from django import forms
 from django.conf import settings
@@ -6,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import TemplateView, FormView, View
-from qantani import QantaniAPI
+from qantani import QantaniAPI  # TODO remove
 from finance.models import Payment
 from log import log_event
 from ordering.core import get_current_order_round
@@ -18,8 +19,9 @@ def choosebankform_factory(banks):
     Generate a Django Form used to choose your bank from a drop down
     Based on the up-to-date list of :banks: from our PSP
     """
-
-    choices = [(bank['Id'], bank['Name']) for bank in banks]
+    choices = [(bank['id'], bank['name'])
+               for bank in banks['data']
+               if bank['method'] == Mollie.API.Object.Method.IDEAL]
 
     class ChooseBankForm(forms.Form):
         bank = forms.ChoiceField(choices=choices, required=True)
@@ -56,7 +58,13 @@ class QantaniMixin(object):
                                                               transaction_salt)
 
 
-class ChooseBankView(LoginRequiredMixin, QantaniMixin, FormView):
+class MollieMixin(object):
+    def __init__(self):
+        self.mollie = Mollie.API.Client()
+        self.mollie.setApiKey(settings.MOLLIE_API_KEY)
+
+
+class ChooseBankView(LoginRequiredMixin, MollieMixin, FormView):
     """
     Let user choose a bank to use for iDeal payment
     POSTs to CreateTransactionView.
@@ -64,8 +72,8 @@ class ChooseBankView(LoginRequiredMixin, QantaniMixin, FormView):
     template_name = "finance/choose_bank.html"
 
     def get_form_class(self):
-        banks = self.qantani_api.get_ideal_banks()
-        return choosebankform_factory(banks)
+        issuers = self.mollie.issuers.all()
+        return choosebankform_factory(issuers)
 
     def get_context_data(self, **kwargs):
         context = super(ChooseBankView, self).get_context_data(**kwargs)
