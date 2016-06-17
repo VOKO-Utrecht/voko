@@ -19,6 +19,6 @@ class PaymentFactory(DjangoModelFactory):
     order = SubFactory(OrderFactory)
     amount = FuzzyDecimal(low=1, high=99)
 
-    transaction_id = FuzzyInteger(low=1, high=999)
-    transaction_code = FuzzyText()
+    qantani_transaction_id = FuzzyInteger(low=1, high=999)
+    qantani_transaction_code = FuzzyText()
 

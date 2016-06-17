@@ -134,8 +134,8 @@ class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
 
         Payment.objects.create(amount=amount_to_pay,
                                order=order_to_pay,
-                               transaction_id=results["TransactionID"],
-                               transaction_code=results["Code"])
+                               qantani_transaction_id=results["TransactionID"],
+                               qantani_transaction_code=results["Code"])
 
         redirect_url = results["BankURL"]
         return redirect(redirect_url)
@@ -158,7 +158,7 @@ class ConfirmTransactionView(LoginRequiredMixin, QantaniMixin, TemplateView):
         transaction_checksum = self.request.GET['checksum']
 
         payment = get_object_or_404(Payment, transaction_id=transaction_id, succeeded=False)
-        transaction_code = payment.transaction_code
+        transaction_code = payment.qantani_transaction_code
 
         success = self._validate_transaction(transaction_code, transaction_checksum,
                                              transaction_id, transaction_status, transaction_salt)
@@ -198,8 +198,8 @@ class QantaniCallbackView(QantaniMixin, View):
         transaction_salt = request.GET.get('salt')
         transaction_checksum = request.GET.get('checksum1')
 
-        payment = get_object_or_404(Payment, transaction_id=transaction_id)
-        transaction_code = payment.transaction_code
+        payment = get_object_or_404(Payment, qantani_transaction_id=transaction_id)
+        transaction_code = payment.qantani_transaction_code
 
         success = self._validate_transaction(transaction_code, transaction_checksum,
                                              transaction_id, transaction_status, transaction_salt)

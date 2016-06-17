@@ -54,7 +54,7 @@ class BalanceAdmin(admin.ModelAdmin):
 
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ["id", "created", "amount", "order",  "transaction_id", "succeeded"]
+    list_display = ["id", "created", "amount", "order",  "qantani_transaction_id", "succeeded"]
     ordering = ("-id", )
     list_filter = ("succeeded",)
 

@@ -15,8 +15,8 @@ class Payment(TimeStampedModel):
     # Credit Balance, for successful payment
     balance = models.OneToOneField("finance.Balance", null=True, related_name="payment")
 
-    transaction_id = models.IntegerField()
-    transaction_code = models.CharField(max_length=255)
+    qantani_transaction_id = models.IntegerField()
+    qantani_transaction_code = models.CharField(max_length=255)
     succeeded = models.BooleanField(default=False, help_text="Payment was validated by PSP")
 
     def create_and_link_credit(self):

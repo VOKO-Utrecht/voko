@@ -114,8 +114,8 @@ class TestCreateTransaction(VokoTestCase):
         payment = Payment.objects.get()
         self.assertEqual(payment.amount, self.order.total_price_to_pay_with_balances_taken_into_account())
         self.assertEqual(payment.order, self.order)
-        self.assertEqual(payment.transaction_id, 1212)
-        self.assertEqual(payment.transaction_code, "code")
+        self.assertEqual(payment.qantani_transaction_id, 1212)
+        self.assertEqual(payment.qantani_transaction_code, "code")
         self.assertEqual(payment.balance, None)
 
     def test_that_user_is_redirected_to_bank_url(self):
@@ -198,7 +198,7 @@ class TestConfirmTransaction(VokoTestCase):
 
     def test_no_validation_when_status_is_not_1(self):
         ret = self.client.get(self.url, {
-            'id': self.payment.transaction_id,
+            'id': self.payment.qantani_transaction_id,
             'status': 'not 1',
             'salt': 'pepper',
             'checksum': 'yes',
@@ -208,7 +208,7 @@ class TestConfirmTransaction(VokoTestCase):
 
     def test_payment_and_order_status_after_failure_payment(self):
         self.client.get(self.url, {
-            'id': self.payment.transaction_id,
+            'id': self.payment.qantani_transaction_id,
             'status': 'not 1',
             'salt': 'pepper',
             'checksum': 'yes',
@@ -221,7 +221,7 @@ class TestConfirmTransaction(VokoTestCase):
 
     def test_that_payment_is_validated(self):
         ret = self.client.get(self.url, {
-            'id': self.payment.transaction_id,
+            'id': self.payment.qantani_transaction_id,
             'status': '1',
             'salt': 'pepper',
             'checksum': 'checksum',
@@ -229,15 +229,15 @@ class TestConfirmTransaction(VokoTestCase):
         self.assertEqual(ret.status_code, 200)
         self.mock_qantani_api.return_value.validate_transaction_checksum.assert_called_once_with(
             "checksum",
-            str(self.payment.transaction_id),
-            self.payment.transaction_code,
+            str(self.payment.qantani_transaction_id),
+            self.payment.qantani_transaction_code,
             "1",
             "pepper"
         )
 
     def test_payment_and_order_status_after_successful_payment(self):
         self.client.get(self.url, {
-            'id': self.payment.transaction_id,
+            'id': self.payment.qantani_transaction_id,
             'status': '1',
             'salt': 'pepper',
             'checksum': 'yes',
@@ -258,7 +258,7 @@ class TestConfirmTransaction(VokoTestCase):
 
     def test_that_order_id_is_removed_from_session_on_successful_payment(self):
         self.client.get(self.url, {
-            'id': self.payment.transaction_id,
+            'id': self.payment.qantani_transaction_id,
             'status': '1',
             'salt': 'pepper',
             'checksum': 'yes',
@@ -269,7 +269,7 @@ class TestConfirmTransaction(VokoTestCase):
 
     def test_payment_status_in_context(self):
         ret = self.client.get(self.url, {
-            'id': self.payment.transaction_id,
+            'id': self.payment.qantani_transaction_id,
             'status': '1',
             'salt': 'pepper',
             'checksum': 'yes',
@@ -317,7 +317,7 @@ class TestQantaniCallbackView(VokoTestCase):
     def test_empty_response_on_validation_failure(self):
         self.mock_qantani_api.return_value.validate_transaction_checksum.return_value = False
         ret = self.client.get(self.url, {
-            'id': self.payment.transaction_id,
+            'id': self.payment.qantani_transaction_id,
             'status': '1',
             'salt': 'pepper',
             'checksum': 'yes',
@@ -329,7 +329,7 @@ class TestQantaniCallbackView(VokoTestCase):
     def test_payment_is_set_to_succeeded_when_payment_is_valid(self):
         assert self.payment.succeeded is False
         self.client.get(self.url, {
-            'id': self.payment.transaction_id,
+            'id': self.payment.qantani_transaction_id,
             'status': '1',
             'salt': 'pepper',
             'checksum': 'yes',
@@ -340,7 +340,7 @@ class TestQantaniCallbackView(VokoTestCase):
 
     def test_response_on_valid_payment(self):
         ret = self.client.get(self.url, {
-            'id': self.payment.transaction_id,
+            'id': self.payment.qantani_transaction_id,
             'status': '1',
             'salt': 'pepper',
             'checksum': 'yes',
@@ -352,7 +352,7 @@ class TestQantaniCallbackView(VokoTestCase):
     def test_order_is_completed_when_order_paid_is_false(self):
         assert self.order.paid is False
         self.client.get(self.url, {
-            'id': self.payment.transaction_id,
+            'id': self.payment.qantani_transaction_id,
             'status': '1',
             'salt': 'pepper',
             'checksum': 'yes',
@@ -371,7 +371,7 @@ class TestQantaniCallbackView(VokoTestCase):
 
         assert self.order.paid is False
         self.client.get(self.url, {
-            'id': self.payment.transaction_id,
+            'id': self.payment.qantani_transaction_id,
             'status': '1',
             'salt': 'pepper',
             'checksum': 'yes',
