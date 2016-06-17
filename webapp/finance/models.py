@@ -21,8 +21,8 @@ class Payment(TimeStampedModel):
     succeeded = models.BooleanField(default=False, help_text="Payment was validated by PSP")
 
     # Obsolete but contain possible relevant information
-    qantani_transaction_id = models.IntegerField()
-    qantani_transaction_code = models.CharField(max_length=255)
+    qantani_transaction_id = models.IntegerField(null=True)
+    qantani_transaction_code = models.CharField(max_length=255, null=True)
 
     def create_and_link_credit(self):
         """
