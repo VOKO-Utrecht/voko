@@ -50,7 +50,7 @@ class OrderRound(TimeStampedModel):
     closed_for_orders = models.DateTimeField()
     collect_datetime = models.DateTimeField()
     markup_percentage = models.DecimalField(decimal_places=2, max_digits=5, default=7.0)
-    transaction_costs = models.DecimalField(decimal_places=2, max_digits=5, default=0.42)
+    transaction_costs = models.DecimalField(decimal_places=2, max_digits=5, default=0.21)
     order_placed = models.BooleanField(default=False, editable=False)
 
     def is_not_open_yet(self):
