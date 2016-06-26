@@ -289,7 +289,7 @@ class OrderProduct(TimeStampedModel):
     # TODO: assert order.order_round == product.order_round on save()
 
     def __unicode__(self):
-        return u"%d x %s" % (self.amount, self.product)
+        return u"%d x %s door %s" % (self.amount, self.product, self.order.user)
 
     @property
     def total_retail_price(self):
@@ -340,7 +340,7 @@ class OrderProductCorrection(TimeStampedModel):
     charge_supplier = models.BooleanField(default=True, verbose_name="Charge expenses to supplier")
 
     def __unicode__(self):
-        return u"Correction on OrderProduct: %s" % self.order_product
+        return u"Correctie van %s%%: %s" % (100-self.supplied_percentage, self.order_product)
 
     def calculate_refund(self):
         """
