@@ -22,13 +22,17 @@ class MailOrderLists(CronJobBase):
 
     def do(self):
         order_round = get_current_order_round()
+        print "Order round: %s" % order_round
         if order_round.is_open:
+            print "Order round is closed"
             return
 
         if order_round.is_not_open_yet():
+            print "Order round is not open yet"
             return
 
         if order_round.order_placed:
+            print "Order has already been placed"
             return
 
         # To prevent mail loops
@@ -37,6 +41,7 @@ class MailOrderLists(CronJobBase):
 
         for supplier in Supplier.objects.all():
             if not supplier.has_orders_in_current_order_round():
+                print "No orders for supplier %s" % supplier
                 log_event(event="Supplier %s has no orders in current round, "
                           "so not sending order list." % supplier)
                 continue
