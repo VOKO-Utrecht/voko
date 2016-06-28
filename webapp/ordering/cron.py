@@ -46,6 +46,8 @@ class MailOrderLists(CronJobBase):
                           "so not sending order list." % supplier)
                 continue
 
+            print "Generating lists for supplier %s" % supplier
+
             # Generate CSV
             in_mem_file = cStringIO.StringIO()
             csv_writer = csv.writer(in_mem_file, delimiter=';', quotechar='|')
