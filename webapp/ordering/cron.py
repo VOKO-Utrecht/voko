@@ -37,7 +37,7 @@ class MailOrderLists(CronJobBase):
 
         for supplier in Supplier.objects.all():
             if not supplier.has_orders_in_current_order_round():
-                log_event("Supplier %s has no orders in current round, "
+                log_event(event="Supplier %s has no orders in current round, "
                           "so not sending order list." % supplier)
                 continue
 
