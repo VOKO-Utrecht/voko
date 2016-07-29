@@ -69,6 +69,8 @@ class TestProductsView(VokoTestCase):
         self.assertItemsEqual(ret.context['view'].suppliers(), suppliers)
 
     def test_redirect_to_payment_page_when_current_order_is_finalized(self):
+        self.patch("finance.views.Mollie")
+
         OrderFactory(order_round=self.round, user=self.user, finalized=True)
         ret = self.client.get(self.url, follow=True)
         self.assertRedirects(ret, reverse('finance.choosebank'), fetch_redirect_response=True)
