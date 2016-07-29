@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import redirect, get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, FormView, View
 from finance.models import Payment
 from log import log_event
@@ -198,6 +199,10 @@ class ConfirmTransactionView(LoginRequiredMixin, MollieMixin, TemplateView):
 
 
 class PaymentWebHook(MollieMixin, View):
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super(PaymentWebHook, self).dispatch(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         mollie_id = request.POST.get('id')
 
