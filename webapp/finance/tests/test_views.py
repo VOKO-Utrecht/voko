@@ -254,6 +254,20 @@ class TestConfirmTransaction(FinanceTestCase):
         s = self.client.session
         self.assertNotIn('order_to_pay', s)
 
+    def test_nothing_is_changed_when_payment_already_confirmed(self):
+        self.order.paid = True
+        self.order.save()
+        self.client.get(self.url, {"order": self.order.id})
+
+        ret = self.client.get(self.url, {"order": self.order.id})
+        self.assertEqual(ret.context[0]['payment_succeeded'], True)
+
+        self.assertFalse(self.mollie_client.return_value.payments.get. \
+                         return_value.isPaid.called)
+
+        self.assertFalse(self.mock_create_credit.called)
+        self.assertFalse(self.mock_mail_confirmation.called)
+
 
 class TestPaymentWebhook(FinanceTestCase):
     def setUp(self):

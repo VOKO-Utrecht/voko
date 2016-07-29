@@ -156,8 +156,20 @@ class ConfirmTransactionView(LoginRequiredMixin, MollieMixin, TemplateView):
 
         order_id = self.request.GET.get('order')
 
+        # Payment may already be confirmed by the webhook
+        try:
+            order = Order.objects.get(id=order_id, user=self.request.user)
+        except Order.DoesNotExist:
+            raise Http404
+
+        if order.paid is True:
+            context['payment_succeeded'] = True
+            return context
+
         payment = Payment.objects.filter(order__id=order_id,
-                                         succeeded=False).order_by('id').last()
+                                         succeeded=False,)\
+            .order_by('id').last()
+
         if payment is None:
             raise Http404
 
