@@ -86,7 +86,7 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 MOLLIE_API_KEY = "SETME"
 
-BASE_URL = "http://leden.vokoutrecht.nl"
+BASE_URL = "https://leden.vokoutrecht.nl"
 
 TINYMCE_DEFAULT_CONFIG = {
     'plugins': "table,xhtmlxtras,paste,searchreplace",
