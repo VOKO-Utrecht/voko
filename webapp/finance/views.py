@@ -42,7 +42,7 @@ class MollieMixin(object):
             'redirectUrl': settings.BASE_URL +
                            reverse("finance.confirmtransaction") +
                            "?order=%s" % order_id,
-            'webhookUrl': "http://example.com/TODO",
+            'webhookUrl': settings.BASE_URL + reverse("finance.callback"),
             'method': Mollie.API.Object.Method.IDEAL,
             'issuer': issuer_id,
             'metadata': {

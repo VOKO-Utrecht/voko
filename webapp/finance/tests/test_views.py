@@ -111,7 +111,7 @@ class TestCreateTransaction(FinanceTestCase):
         self.client.post(self.url, {'bank': 'EXAMPLE_BANK'})
         self.mollie_client.return_value.payments.create.assert_called_once_with(
             {'description': 'VOKO Utrecht %d' % self.order.id,
-             'webhookUrl': 'http://example.com/TODO',
+             'webhookUrl': settings.BASE_URL + reverse('finance.callback'),
              'amount': float(self.order.total_price_to_pay_with_balances_taken_into_account()),
              'redirectUrl': settings.BASE_URL + '/finance/pay/transaction/confirm/?order=%d' % self.order.id,
              'metadata': {'order_id': self.order.id},
