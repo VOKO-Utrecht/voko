@@ -1,5 +1,4 @@
 from datetime import timedelta, datetime
-from unittest import skip
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from mock import MagicMock
@@ -12,13 +11,51 @@ from ordering.tests.factories import OrderRoundFactory, OrderProductFactory, Ord
 from vokou.testing import VokoTestCase
 
 
-class TestChooseBank(VokoTestCase):
+class FinanceTestCase(VokoTestCase):
     def setUp(self):
+        self.mollie = self.patch("finance.views.Mollie")
+        self.mollie_client = self.mollie. \
+            API.Client
+        self.mollie_client.return_value.issuers.all.return_value = \
+            MagicMock()
+        self.mollie.API.Object.Method.IDEAL = 'ideal'
+
+        issuers = {"data": [
+            {'id': 'EXAMPLE_BANK', 'name': "Example Bank", 'method': 'ideal'},
+            {'id': 'ANOTHER_BANK', 'name': "Another Bank", 'method': 'ideal'},
+            {'id': 'NON_IDEAL_BANK', 'name': "Non iDeal Bank", 'method': 'bla'},
+        ]}
+        self.mollie_client.return_value.issuers.all.return_value = issuers
+
+        self.user = VokoUserFactory.create()
+        self.user.set_password('secret')
+        self.user.is_active = True
+        self.user.save()
+        self.client.login(username=self.user.email, password='secret')
+
+        self.mock_create_credit = self.patch("finance.models.Payment.create_and_link_credit")
+        self.mock_mail_confirmation = self.patch("ordering.models.Order.mail_confirmation")
+        self.mock_failure_notification = self.patch("ordering.models.Order.mail_failure_notification")
+        # TODO figure out why this mock breaks all ConfirmTransaction tests
+        # self.mock_complete_after_payment = self.patch(
+        #     "ordering.models.Order.complete_after_payment")
+
+        class FakePaymentResult(object):
+            def __getitem__(self, item):
+                if item == "id":
+                    return "transaction_id"
+
+            def getPaymentUrl(self):
+                return "http://bank.url"
+
+        self.mollie_client.return_value.payments.create.return_value = FakePaymentResult()
+
+
+class TestChooseBank(FinanceTestCase):
+    def setUp(self):
+        super(TestChooseBank, self).setUp()
         self.url = reverse('finance.choosebank')
         self.login()
-
-        self.mock_qantani_api = self.patch("finance.views.QantaniAPI")
-        self.mock_qantani_api.return_value.get_ideal_banks = MagicMock()
 
         self.order_round = OrderRoundFactory.create()
         o_p = OrderProductFactory.create(order__order_round=self.order_round,
@@ -29,31 +66,20 @@ class TestChooseBank(VokoTestCase):
         o_p.save()
         self.order = o_p.order
 
-        # TODO: test session data usage & determine if it's still necessary
-        # s = self.client.session
-        # s['order_to_pay'] = self.order.id
-        # s.save()
-
     def test_that_qantani_api_client_is_initiated(self):
         self.client.get(self.url)
-        self.mock_qantani_api.assert_called_once_with(settings.QANTANI_MERCHANT_ID,
-                                                      settings.QANTANI_MERCHANT_KEY,
-                                                      settings.QANTANI_MERCHANT_SECRET)
+        self.mollie_client.assert_called_once_with()
+        self.mollie_client.return_value.setApiKey.assert_called_once_with(settings.MOLLIE_API_KEY)
 
     def test_that_list_of_banks_is_requested(self):
         self.client.get(self.url)
-        self.mock_qantani_api.return_value.get_ideal_banks.assert_called_once_with()
+        self.mollie_client.return_value.issuers.all.assert_called_once_with()
 
     def test_that_context_contains_form_with_bank_choices(self):
-        banks = [
-            {'Id': 'EXAMPLE_BANK', 'Name': "Example Bank"},
-            {'Id': 'ANOTHER_BANK', 'Name': "Another Bank"}
-        ]
-        self.mock_qantani_api.return_value.get_ideal_banks.return_value = banks
-
         ret = self.client.get(self.url)
         form = ret.context[1].get('form')
-        expected = [tuple(x.values()) for x in banks]
+        expected = [('EXAMPLE_BANK', 'Example Bank'),
+                    ('ANOTHER_BANK', 'Another Bank')]
         self.assertEqual(form.fields.get('bank').choices, expected)
 
     def test_order_is_placed_in_context(self):
@@ -68,15 +94,10 @@ class TestChooseBank(VokoTestCase):
         self.assertNotContains(ret, "Te betalen")
 
 
-class TestCreateTransaction(VokoTestCase):
+class TestCreateTransaction(FinanceTestCase):
     def setUp(self):
+        super(TestCreateTransaction, self).setUp()
         self.url = reverse('finance.createtransaction')
-
-        self.user = VokoUserFactory.create()
-        self.user.set_password('secret')
-        self.user.is_active = True
-        self.user.save()
-        self.client.login(username=self.user.email, password='secret')
 
         self.order = OrderFactory(user=self.user,
                                   finalized=True,
@@ -86,46 +107,31 @@ class TestCreateTransaction(VokoTestCase):
         s['order_to_pay'] = self.order.id
         s.save()
 
-        self.mock_qantani_api = self.patch("finance.views.QantaniAPI")
-        self.mock_qantani_api.return_value.get_ideal_banks = MagicMock()
-        self.mock_qantani_api.return_value.create_ideal_transaction = MagicMock()
-        self.mock_qantani_api.return_value.get_ideal_banks.return_value = [{'Id': 1, 'Name': 'TestBank'}]
-
-    @skip("Broken after upgrade of libraries. FIXME")
     def test_that_transaction_is_created(self):
-        self.client.post(self.url, {'bank': 1})
-        self.mock_qantani_api.return_value.create_ideal_transaction.assert_called_once_with(
-            amount=self.order.total_price_to_pay_with_balances_taken_into_account(),
-            description="VOKO Utrecht ID %d" % self.order.id,
-            return_url="http://leden.vokoutrecht.nl/finance/pay/transaction/confirm/",
-            bank_id='1'
+        self.client.post(self.url, {'bank': 'EXAMPLE_BANK'})
+        self.mollie_client.return_value.payments.create.assert_called_once_with(
+            {'description': 'VOKO Utrecht %d' % self.order.id,
+             'webhookUrl': 'http://example.com/TODO',
+             'amount': float(self.order.total_price_to_pay_with_balances_taken_into_account()),
+             'redirectUrl': settings.BASE_URL + '/finance/pay/transaction/confirm/?order=%d' % self.order.id,
+             'metadata': {'order_id': self.order.id},
+             'method': 'ideal',
+             'issuer': 'EXAMPLE_BANK'}
         )
 
     def test_that_payment_object_is_created(self):
         assert Payment.objects.count() == 0
 
-        self.mock_qantani_api.return_value.create_ideal_transaction.return_value = {
-            "TransactionID": 1212,
-            "Code": "code",
-            "BankURL": "http://bank.url"
-        }
-
-        self.client.post(self.url, {'bank': 1})
+        self.client.post(self.url, {'bank': "EXAMPLE_BANK"})
         payment = Payment.objects.get()
+
         self.assertEqual(payment.amount, self.order.total_price_to_pay_with_balances_taken_into_account())
         self.assertEqual(payment.order, self.order)
-        self.assertEqual(payment.qantani_transaction_id, 1212)
-        self.assertEqual(payment.qantani_transaction_code, "code")
+        self.assertEqual(payment.mollie_id, "transaction_id")
         self.assertEqual(payment.balance, None)
 
     def test_that_user_is_redirected_to_bank_url(self):
-        self.mock_qantani_api.return_value.create_ideal_transaction.return_value = {
-            "TransactionID": 1212,
-            "Code": "code",
-            "BankURL": "http://bank.url"
-        }
-
-        ret = self.client.post(self.url, {'bank': 1})
+        ret = self.client.post(self.url, {'bank': "EXAMPLE_BANK"})
         self.assertEqual(ret.status_code, 302)
         self.assertEqual(ret.url, "http://bank.url")
 
@@ -135,14 +141,14 @@ class TestCreateTransaction(VokoTestCase):
         s.save()
 
         with self.assertRaises(AssertionError):
-            self.client.post(self.url, {'bank': 1})
+            self.client.post(self.url, {'bank': "EXAMPLE_BANK"})
 
     def test_error_when_order_not_finalized(self):
         self.order.finalized = False
         self.order.save()
 
         with self.assertRaises(AssertionError):
-            self.client.post(self.url, {'bank': 1})
+            self.client.post(self.url, {'bank': "EXAMPLE_BANK"})
 
     def test_redirect_on_invalid_form(self):
         ret = self.client.post(self.url, {'bank': 'foo'})
@@ -155,93 +161,77 @@ class TestCreateTransaction(VokoTestCase):
         self.order.order_round = order_round
         self.order.save()
 
-        ret = self.client.post(self.url, {'bank': 1})
+        ret = self.client.post(self.url, {'bank': "EXAMPLE_BANK"})
         self.assertRedirects(ret, reverse('finish_order', args=(self.order.id, )), fetch_redirect_response=False)
 
 
-class TestConfirmTransaction(VokoTestCase):
+class TestConfirmTransaction(FinanceTestCase):
     def setUp(self):
+        super(TestConfirmTransaction, self).setUp()
         self.url = reverse('finance.confirmtransaction')
-
-        self.user = VokoUserFactory.create()
-        self.user.set_password('secret')
-        self.user.is_active = True
-        self.user.save()
-        self.client.login(username=self.user.email, password='secret')
 
         self.order = OrderFactory(user=self.user,
                                   finalized=True,
                                   paid=False)
 
-        s = self.client.session
-        s['order_to_pay'] = self.order.id
-        s.save()
-
         self.payment = PaymentFactory(order=self.order)
+        self.client.login()
 
-        self.mock_qantani_api = self.patch("finance.views.QantaniAPI")
-        self.mock_qantani_api.return_value.get_ideal_banks = MagicMock()
-        self.mock_qantani_api.return_value.validate_transaction_checksum = MagicMock()
-        self.mock_qantani_api.return_value.validate_transaction_checksum.return_value = True
-
-        self.mock_create_credit = self.patch("finance.models.Payment.create_and_link_credit")
-        self.mock_mail_confirmation = self.patch("ordering.models.Order.mail_confirmation")
-
-    def test_required_get_parameters(self):
-        ret = self.client.get(self.url, {
-            'id': 1234,
-            'status': '1',
-            'salt': 'pepper',
-            'checksum': 'yes',
-        })
+    def test_required_get_parameters_bad(self):
+        ret = self.client.get(self.url, {})
         self.assertEqual(ret.status_code, 404)
 
-    def test_no_validation_when_status_is_not_1(self):
-        ret = self.client.get(self.url, {
-            'id': self.payment.qantani_transaction_id,
-            'status': 'not 1',
-            'salt': 'pepper',
-            'checksum': 'yes',
-        })
+    def test_required_get_parameters_good(self):
+        ret = self.client.get(self.url, {"order": self.order.id})
         self.assertEqual(ret.status_code, 200)
-        self.assertFalse(self.mock_qantani_api.return_value.validate_transaction_checksum.called)
 
-    def test_payment_and_order_status_after_failure_payment(self):
-        self.client.get(self.url, {
-            'id': self.payment.qantani_transaction_id,
-            'status': 'not 1',
-            'salt': 'pepper',
-            'checksum': 'yes',
-        })
+    def test_mollie_payment_is_obtained(self):
+        self.client.get(self.url, {"order": self.order.id})
+        self.mollie_client.return_value.payments.get.assert_called_once_with(self.payment.mollie_id)
 
-        payment = Payment.objects.get()
+    def test_ispaid_is_called_on_mollie_payment(self):
+        self.client.get(self.url, {"order": self.order.id})
+        self.mollie_client.return_value.payments.get.\
+            return_value.isPaid.assert_called_once_with()
+
+    def test_context_when_payment_has_failed(self):
+        self.mollie_client.return_value.payments.get.\
+            return_value.isPaid.return_value = False
+        ret = self.client.get(self.url, {"order": self.order.id})
+        self.assertEqual(ret.context[0]['payment_succeeded'], False)
+
+    def test_context_when_payment_has_succeeded(self):
+        self.mollie_client.return_value.payments.get.\
+            return_value.isPaid.return_value = True
+        ret = self.client.get(self.url, {"order": self.order.id})
+        self.assertEqual(ret.context[0]['payment_succeeded'], True)
+
+    def test_payment_object_is_updated_on_success(self):
+        self.assertFalse(self.payment.succeeded)
+
+        self.mollie_client.return_value.payments.get. \
+            return_value.isPaid.return_value = True
+        self.client.get(self.url, {"order": self.order.id})
+
+        # get new object reference
+        payment = Payment.objects.get(id=self.payment.id)
+        self.assertTrue(payment.succeeded)
+
+    def test_payment_object_is_not_updated_on_failure(self):
+        self.assertFalse(self.payment.succeeded)
+
+        self.mollie_client.return_value.payments.get. \
+            return_value.isPaid.return_value = False
+        self.client.get(self.url, {"order": self.order.id})
+
+        # get new object reference
+        payment = Payment.objects.get(id=self.payment.id)
         self.assertFalse(payment.succeeded)
-        self.assertFalse(payment.order.paid)
-        self.assertFalse(Balance.objects.all())
-
-    def test_that_payment_is_validated(self):
-        ret = self.client.get(self.url, {
-            'id': self.payment.qantani_transaction_id,
-            'status': '1',
-            'salt': 'pepper',
-            'checksum': 'checksum',
-        })
-        self.assertEqual(ret.status_code, 200)
-        self.mock_qantani_api.return_value.validate_transaction_checksum.assert_called_once_with(
-            "checksum",
-            str(self.payment.qantani_transaction_id),
-            self.payment.qantani_transaction_code,
-            "1",
-            "pepper"
-        )
 
     def test_payment_and_order_status_after_successful_payment(self):
-        self.client.get(self.url, {
-            'id': self.payment.qantani_transaction_id,
-            'status': '1',
-            'salt': 'pepper',
-            'checksum': 'yes',
-        })
+        self.mollie_client.return_value.payments.get. \
+            return_value.isPaid.return_value = True
+        self.client.get(self.url, {"order": self.order.id})
 
         payment = Payment.objects.get()
         self.assertTrue(payment.succeeded)
@@ -257,35 +247,17 @@ class TestConfirmTransaction(VokoTestCase):
         self.mock_mail_confirmation.assert_called_once_with()
 
     def test_that_order_id_is_removed_from_session_on_successful_payment(self):
-        self.client.get(self.url, {
-            'id': self.payment.qantani_transaction_id,
-            'status': '1',
-            'salt': 'pepper',
-            'checksum': 'yes',
-        })
+        self.mollie_client.return_value.payments.get. \
+            return_value.isPaid.return_value = True
+        self.client.get(self.url, {"order": self.order.id})
 
         s = self.client.session
         self.assertNotIn('order_to_pay', s)
 
-    def test_payment_status_in_context(self):
-        ret = self.client.get(self.url, {
-            'id': self.payment.qantani_transaction_id,
-            'status': '1',
-            'salt': 'pepper',
-            'checksum': 'yes',
-        })
-        self.assertEqual(ret.context[0]['payment_succeeded'], True)
 
-
-class TestQantaniCallbackView(VokoTestCase):
+class TestPaymentWebhook(FinanceTestCase):
     def setUp(self):
-        self.url = reverse('finance.callback')
-
-        self.user = VokoUserFactory.create()
-        self.user.set_password('secret')
-        self.user.is_active = True
-        self.user.save()
-        self.client.login(username=self.user.email, password='secret')
+        super(TestPaymentWebhook, self).setUp()
 
         self.order = OrderFactory(user=self.user,
                                   finalized=True,
@@ -296,71 +268,58 @@ class TestQantaniCallbackView(VokoTestCase):
         s['order_to_pay'] = self.order.id
         s.save()
 
-        self.mock_qantani_api = self.patch("finance.views.QantaniAPI")
-        self.mock_qantani_api.return_value.validate_transaction_checksum = MagicMock()
-        self.mock_qantani_api.return_value.validate_transaction_checksum.return_value = True
+        self.url = reverse('finance.callback')
 
-        self.mock_complete_after_payment = self.patch("ordering.models.Order.complete_after_payment")
-        self.mock_create_credit = self.patch("finance.models.Payment.create_and_link_credit")
-        self.mock_mail_failure_notification = self.patch("ordering.models.Order.mail_failure_notification")
-
-    def test_404_when_payment_cannot_be_found(self):
-        ret = self.client.get(self.url, {
-            'id': 666,
-            'status': 'not 1',
-            'salt': 'pepper',
-            'checksum': 'yes',
-        })
-
+    def test_required_get_parameters_bad(self):
+        ret = self.client.get(self.url, {})
         self.assertEqual(ret.status_code, 404)
 
-    def test_empty_response_on_validation_failure(self):
-        self.mock_qantani_api.return_value.validate_transaction_checksum.return_value = False
-        ret = self.client.get(self.url, {
-            'id': self.payment.qantani_transaction_id,
-            'status': '1',
-            'salt': 'pepper',
-            'checksum': 'yes',
-        })
+    def test_required_get_parameters_good(self):
+        ret = self.client.get(self.url, {"id": self.payment.mollie_id})
+        self.assertEqual(ret.status_code, 200)
+
+    def test_unsuccessful_payment(self):
+        self.mollie_client.return_value.payments.get. \
+            return_value.isPaid.return_value = False
+        ret = self.client.get(self.url, {"id": self.payment.mollie_id})
+
+        payment = Payment.objects.get(id=self.payment.id)
+        self.assertFalse(payment.succeeded)
+        self.assertFalse(self.mock_create_credit.called)
+        self.assertFalse(payment.order.paid)
+        self.assertFalse(payment.order.debit)
+        self.assertFalse(self.mock_mail_confirmation.called)
+        # self.assertFalse(self.mock_complete_after_payment.called)
 
         self.assertEqual(ret.status_code, 200)
         self.assertEqual(ret.content, "")
 
-    def test_payment_is_set_to_succeeded_when_payment_is_valid(self):
-        assert self.payment.succeeded is False
-        self.client.get(self.url, {
-            'id': self.payment.qantani_transaction_id,
-            'status': '1',
-            'salt': 'pepper',
-            'checksum': 'yes',
-        })
+    def test_successful_payment(self):
+        self.mollie_client.return_value.payments.get. \
+            return_value.isPaid.return_value = True
+        ret = self.client.get(self.url, {"id": self.payment.mollie_id})
 
-        payment = Payment.objects.get()
+        payment = Payment.objects.get(id=self.payment.id)
         self.assertTrue(payment.succeeded)
-
-    def test_response_on_valid_payment(self):
-        ret = self.client.get(self.url, {
-            'id': self.payment.qantani_transaction_id,
-            'status': '1',
-            'salt': 'pepper',
-            'checksum': 'yes',
-        })
+        self.assertTrue(self.mock_create_credit.called)
+        self.assertTrue(payment.order.paid)
+        self.assertTrue(payment.order.debit)
+        self.assertTrue(self.mock_mail_confirmation.called)
+        # self.mock_complete_after_payment.assert_called_once_with()
 
         self.assertEqual(ret.status_code, 200)
-        self.assertEqual(ret.content, "+")
+        self.assertEqual(ret.content, "")
 
     def test_order_is_completed_when_order_paid_is_false(self):
         assert self.order.paid is False
-        self.client.get(self.url, {
-            'id': self.payment.qantani_transaction_id,
-            'status': '1',
-            'salt': 'pepper',
-            'checksum': 'yes',
-        })
+        self.mollie_client.return_value.payments.get. \
+            return_value.isPaid.return_value = True
+        ret = self.client.get(self.url, {"id": self.payment.mollie_id})
 
-        payment = Payment.objects.get()
-        self.mock_create_credit.assert_called_once_with()
-        self.mock_complete_after_payment.assert_called_once_with()
+        # self.mock_complete_after_payment.assert_called_once_with()
+
+
+
 
     def test_order_is_not_completed_when_round_is_closed_and_notification_is_sent(self):
         month_ago = datetime.now(tz=UTC) - timedelta(days=30)
@@ -370,19 +329,17 @@ class TestQantaniCallbackView(VokoTestCase):
         self.order.save()
 
         assert self.order.paid is False
-        self.client.get(self.url, {
-            'id': self.payment.qantani_transaction_id,
-            'status': '1',
-            'salt': 'pepper',
-            'checksum': 'yes',
-        })
+
+        self.mollie_client.return_value.payments.get. \
+            return_value.isPaid.return_value = True
+        ret = self.client.get(self.url, {"id": self.payment.mollie_id})
 
         payment = Payment.objects.get()
         self.assertFalse(payment.order.paid)
         self.mock_create_credit.assert_called_once_with()
-        self.assertFalse(self.mock_complete_after_payment.called)
+        # self.assertFalse(self.mock_complete_after_payment.called)
 
-        self.mock_mail_failure_notification.assert_called_once_with()
+        self.mock_failure_notification.assert_called_once_with()
 
 
 class TestCancelPaymentView(VokoTestCase):

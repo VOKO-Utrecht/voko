@@ -1,13 +1,13 @@
 import Mollie
+import sys
 from braces.views import LoginRequiredMixin
 from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import TemplateView, FormView, View
-from qantani import QantaniAPI  # TODO remove
 from finance.models import Payment
 from log import log_event
 from ordering.core import get_current_order_round
@@ -29,39 +29,29 @@ def choosebankform_factory(banks):
     return ChooseBankForm
 
 
-class QantaniMixin(object):
-    """
-    Sugar coating for Qantani API calls used in our views
-    """
-    def __init__(self):
-        self.qantani_api = QantaniAPI(settings.QANTANI_MERCHANT_ID,
-                                      settings.QANTANI_MERCHANT_KEY,
-                                      settings.QANTANI_MERCHANT_SECRET)
-
-    def _create_transaction(self, bank_id, amount, description):
-        return self.qantani_api.create_ideal_transaction(amount=amount,
-                                                         bank_id=bank_id,
-                                                         description=description,
-                                                         return_url=(settings.BASE_URL +
-                                                                     reverse('finance.confirmtransaction')))
-
-    def _validate_transaction(self, transaction_code, transaction_checksum, transaction_id,
-                              transaction_status, transaction_salt):
-
-        if transaction_status != "1":
-            return False
-
-        return self.qantani_api.validate_transaction_checksum(transaction_checksum,
-                                                              transaction_id,
-                                                              transaction_code,
-                                                              transaction_status,
-                                                              transaction_salt)
-
-
 class MollieMixin(object):
     def __init__(self):
         self.mollie = Mollie.API.Client()
         self.mollie.setApiKey(settings.MOLLIE_API_KEY)
+        self.issuers = self.mollie.issuers.all()
+
+    def create_payment(self, amount, description, issuer_id, order_id):
+        return self.mollie.payments.create({
+            'amount': amount,
+            'description': description,
+            'redirectUrl': settings.BASE_URL +
+                           reverse("finance.confirmtransaction") +
+                           "?order=%s" % order_id,
+            'webhookUrl': "http://example.com/TODO",
+            'method': Mollie.API.Object.Method.IDEAL,
+            'issuer': issuer_id,
+            'metadata': {
+                'order_id': order_id
+            },
+        })
+
+    def get_payment(self, payment_id):
+        return self.mollie.payments.get(payment_id)
 
 
 class ChooseBankView(LoginRequiredMixin, MollieMixin, FormView):
@@ -72,8 +62,7 @@ class ChooseBankView(LoginRequiredMixin, MollieMixin, FormView):
     template_name = "finance/choose_bank.html"
 
     def get_form_class(self):
-        issuers = self.mollie.issuers.all()
-        return choosebankform_factory(issuers)
+        return choosebankform_factory(self.issuers)
 
     def get_context_data(self, **kwargs):
         context = super(ChooseBankView, self).get_context_data(**kwargs)
@@ -91,15 +80,13 @@ class ChooseBankView(LoginRequiredMixin, MollieMixin, FormView):
         return context
 
 
-class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
+class CreateTransactionView(LoginRequiredMixin, MollieMixin, FormView):
     """
     Create transaction @ bank and redirect user to bank URL
     """
-    template_name = None
 
     def get_form_class(self):
-        banks = self.qantani_api.get_ideal_banks()
-        return choosebankform_factory(banks)
+        return choosebankform_factory(self.issuers)
 
     def post(self, request, *args, **kwargs):
         Form = self.get_form_class()
@@ -107,43 +94,55 @@ class CreateTransactionView(LoginRequiredMixin, QantaniMixin, FormView):
         form.full_clean()
 
         if form.is_valid() is False:
-            # Should not happen, as the form has just one input field. Redirect back to previous view
+            # Should not happen, as the form has just one input field.
+            # Redirect back to previous view
             return redirect(reverse('finance.choosebank'))
 
         order_to_pay = Order.objects.get(id=request.session['order_to_pay'])
-        amount_to_pay = order_to_pay.total_price_to_pay_with_balances_taken_into_account()
-        log_event(event="Initiating payment (creating transaction) for order %d and amount %f" %
+        amount_to_pay = order_to_pay\
+            .total_price_to_pay_with_balances_taken_into_account()
+        log_event(
+            event="Initiating payment (creating transaction) for order %d "
+                  "and amount %f" %
                   (order_to_pay.id, amount_to_pay), user=order_to_pay.user)
 
-        # Sanity checks. If one of these fails, it's very likely that someone is tampering.
+        # Sanity checks. If one of these fails, it's very likely that someone
+        # is tampering.
         assert order_to_pay.user == request.user
         assert order_to_pay.finalized is True
         assert order_to_pay.paid is False
         assert order_to_pay.payments.filter(succeeded=True).exists() is False
 
         if order_to_pay.order_round.is_open is not True:
-            messages.error(request, "De bestelronde is gesloten, je kunt niet meer betalen.")
-            log_event(event="Payment for order %s canceled because order round %s is closed" %
-                            (order_to_pay.id, order_to_pay.order_round.id), user=order_to_pay.user)
+            messages.error(request,
+                           "De bestelronde is gesloten, "
+                           "je kunt niet meer betalen.")
+            log_event(
+                event="Payment for order %s canceled because "
+                      "order round %s is closed" %
+                      (order_to_pay.id, order_to_pay.order_round.id),
+                user=order_to_pay.user)
             return redirect(reverse('finish_order', args=(order_to_pay.id,)))
 
         bank_id = form.cleaned_data['bank']
-        results = self._create_transaction(bank_id=bank_id,
-                                           amount=amount_to_pay,
-                                           description="VOKO Utrecht ID %d" % order_to_pay.id)
+        results = self.create_payment(amount=float(amount_to_pay),
+                                      description="VOKO Utrecht %d"
+                                                  % order_to_pay.id,
+                                      issuer_id=bank_id,
+                                      order_id=order_to_pay.id)
 
         Payment.objects.create(amount=amount_to_pay,
                                order=order_to_pay,
-                               qantani_transaction_id=results["TransactionID"],
-                               qantani_transaction_code=results["Code"])
+                               mollie_id=results["id"])
 
-        redirect_url = results["BankURL"]
+        redirect_url = results.getPaymentUrl()
         return redirect(redirect_url)
 
 
-class ConfirmTransactionView(LoginRequiredMixin, QantaniMixin, TemplateView):
+class ConfirmTransactionView(LoginRequiredMixin, MollieMixin, TemplateView):
     """
-    $bank redirects user back to this view after payment, or after payment was canceled.
+    $bank redirects user back to this view after payment, or after payment
+    was canceled.
     Transaction details are sent in GET parameters.
 
     Validate the payment and finish order when valid.
@@ -151,74 +150,83 @@ class ConfirmTransactionView(LoginRequiredMixin, QantaniMixin, TemplateView):
     template_name = "finance/after_payment.html"
 
     def get_context_data(self, **kwargs):
-        context = super(ConfirmTransactionView, self).get_context_data(**kwargs)
-        transaction_id = self.request.GET['id']
-        transaction_status = self.request.GET['status']
-        transaction_salt = self.request.GET['salt']
-        transaction_checksum = self.request.GET['checksum']
+        context = super(ConfirmTransactionView, self).get_context_data(
+            **kwargs)
 
-        payment = get_object_or_404(Payment, transaction_id=transaction_id, succeeded=False)
-        transaction_code = payment.qantani_transaction_code
+        order_id = self.request.GET.get('order')
 
-        success = self._validate_transaction(transaction_code, transaction_checksum,
-                                             transaction_id, transaction_status, transaction_salt)
+        payment = Payment.objects.filter(order__id=order_id,
+                                         succeeded=False).order_by('id').last()
+        if payment is None:
+            raise Http404
+
+        mollie_payment = self.get_payment(payment.mollie_id)
+        success = mollie_payment.isPaid()
 
         if success:
-            assert payment.order.finalized is True
-            assert payment.order.paid is False
-            assert payment.order.order_round.is_open is True
+            if (payment.order.finalized is True and
+                    payment.order.paid is False and
+                    payment.order.order_round.is_open is True):
 
-            payment.succeeded = True
-            payment.save()
+                payment.succeeded = True
+                payment.save()
 
-            payment.create_and_link_credit()
-            payment.order.complete_after_payment()
+                payment.create_and_link_credit()
+                payment.order.complete_after_payment()
 
-            log_event(event="Payment %s for order %s and amount %f succeeded" %
-                      (payment.id, payment.order.id, payment.amount), user=payment.order.user)
+                log_event(
+                    event="Payment %s for order %s and amount %f succeeded" %
+                          (payment.id, payment.order.id, payment.amount),
+                    user=payment.order.user)
 
-            del self.request.session['order_to_pay']
+            else:
+                log_event(event="Payment %s was already paid" % payment.id,
+                          user=payment.order.user)
+
+            try:
+                del self.request.session['order_to_pay']
+            except KeyError:
+                pass
 
         else:
             log_event(event="Payment %s for order %s and amount %f failed" %
-                      (payment.id, payment.order.id, payment.amount), user=payment.order.user)
+                            (payment.id, payment.order.id, payment.amount),
+                      user=payment.order.user)
 
         context['payment_succeeded'] = success
         return context
 
 
-class QantaniCallbackView(QantaniMixin, View):
-    """
-    Web hook, for when users close their browser after payment...
-    See http://www.easy-ideal.com/callback-url/
-    """
+class PaymentWebHook(MollieMixin, View):
     def get(self, request, *args, **kwargs):
-        transaction_id = request.GET.get('id')
-        transaction_status = request.GET.get('status')
-        transaction_salt = request.GET.get('salt')
-        transaction_checksum = request.GET.get('checksum1')
+        mollie_id = request.GET.get('id')
 
-        payment = get_object_or_404(Payment, qantani_transaction_id=transaction_id)
-        transaction_code = payment.qantani_transaction_code
-
-        success = self._validate_transaction(transaction_code, transaction_checksum,
-                                             transaction_id, transaction_status, transaction_salt)
+        payment = get_object_or_404(Payment, mollie_id=mollie_id)
+        mollie_payment = self.get_payment(payment.mollie_id)
+        success = mollie_payment.isPaid()
 
         if not success:
-            log_event(event="Payment %s for order %s and amount %f failed via callback" %
-                      (payment.id, payment.order.id, payment.amount), user=payment.order.user)
-            return HttpResponse("")  # Any other response than "+" means failure.
+            log_event(
+                event="Payment %s for order %s and amount %f "
+                      "failed via callback" %
+                      (payment.id, payment.order.id, payment.amount),
+                user=payment.order.user)
+            return HttpResponse("")
 
         # Successful payment!
-
         payment.succeeded = True
         payment.save()
+
         payment.create_and_link_credit()
-        log_event(event="Payment %s for order %s and amount %f succeeded via callback" %
-                        (payment.id, payment.order.id, payment.amount), user=payment.order.user)
+        log_event(
+            event="Payment %s for order %s and amount %f "
+                  "succeeded via callback" %
+                  (payment.id, payment.order.id, payment.amount),
+            user=payment.order.user)
 
         if payment.order.paid is False:
-            # Order has not been paid, but the payment has now been confirmed and credit has been created.
+            # Order has not been paid, but the payment has now been confirmed
+            # and credit has been created.
             # Time to finish the order, if the order round is still open.
 
             # Sanity Check
@@ -227,23 +235,28 @@ class QantaniCallbackView(QantaniMixin, View):
             if payment.order.order_round.is_open:
                 payment.order.complete_after_payment()
             else:
-                # Corner case where payment was executed before closing time, but never finished (user
-                # closed browser tab), the payment is now validated by callback, but order round is closed and our
-                # suppliers likely have been mailed the totals. Credit for the user has just been created, but we don't
+                # Corner case where payment was executed before closing time,
+                # but never finished (user closed browser tab),
+                # the payment is now validated by callback, but order round is
+                # closed and oursuppliers likely have been mailed the totals.
+                # Credit for the user has just been created, but we don't
                 # want to complete the order because it was placed too late.
-                log_event(event="Order round %s is closed, so not finishing order %s via callback!" % (
-                    payment.order.order_round.id, payment.order.id
-                ), user=payment.order.user)
+                log_event(
+                    event="Order round %s is closed, so not finishing "
+                          "order %s via callback!" % (
+                        payment.order.order_round.id, payment.order.id
+                    ), user=payment.order.user)
 
                 payment.order.mail_failure_notification()
 
-        return HttpResponse("+")  # This is the official "success" response
+        return HttpResponse("")
 
 
 class CancelPaymentView(View):
     """
     When user clicks 'cancel' on the ChooseBankView.
     """
+
     def get(self, request, *args, **kwargs):
         order_to_pay = Order.objects.get(id=request.session['order_to_pay'])
 
@@ -254,6 +267,8 @@ class CancelPaymentView(View):
         order_to_pay.finalized = False
         order_to_pay.save()
 
-        log_event(event="Payment for order %s canceled" % order_to_pay.id, user=order_to_pay.user)
+        log_event(event="Payment for order %s canceled" % order_to_pay.id,
+                  user=order_to_pay.user)
 
-        return HttpResponseRedirect(reverse("finish_order", args=(order_to_pay.pk,)))
+        return HttpResponseRedirect(
+            reverse("finish_order", args=(order_to_pay.pk,)))
