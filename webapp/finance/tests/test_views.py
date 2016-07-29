@@ -270,18 +270,18 @@ class TestPaymentWebhook(FinanceTestCase):
 
         self.url = reverse('finance.callback')
 
-    def test_required_get_parameters_bad(self):
-        ret = self.client.get(self.url, {})
+    def test_required_post_parameters_bad(self):
+        ret = self.client.post(self.url, {})
         self.assertEqual(ret.status_code, 404)
 
-    def test_required_get_parameters_good(self):
-        ret = self.client.get(self.url, {"id": self.payment.mollie_id})
+    def test_required_post_parameters_good(self):
+        ret = self.client.post(self.url, {"id": self.payment.mollie_id})
         self.assertEqual(ret.status_code, 200)
 
     def test_unsuccessful_payment(self):
         self.mollie_client.return_value.payments.get. \
             return_value.isPaid.return_value = False
-        ret = self.client.get(self.url, {"id": self.payment.mollie_id})
+        ret = self.client.post(self.url, {"id": self.payment.mollie_id})
 
         payment = Payment.objects.get(id=self.payment.id)
         self.assertFalse(payment.succeeded)
@@ -297,7 +297,7 @@ class TestPaymentWebhook(FinanceTestCase):
     def test_successful_payment(self):
         self.mollie_client.return_value.payments.get. \
             return_value.isPaid.return_value = True
-        ret = self.client.get(self.url, {"id": self.payment.mollie_id})
+        ret = self.client.post(self.url, {"id": self.payment.mollie_id})
 
         payment = Payment.objects.get(id=self.payment.id)
         self.assertTrue(payment.succeeded)
@@ -314,12 +314,9 @@ class TestPaymentWebhook(FinanceTestCase):
         assert self.order.paid is False
         self.mollie_client.return_value.payments.get. \
             return_value.isPaid.return_value = True
-        ret = self.client.get(self.url, {"id": self.payment.mollie_id})
+        ret = self.client.post(self.url, {"id": self.payment.mollie_id})
 
         # self.mock_complete_after_payment.assert_called_once_with()
-
-
-
 
     def test_order_is_not_completed_when_round_is_closed_and_notification_is_sent(self):
         month_ago = datetime.now(tz=UTC) - timedelta(days=30)
@@ -332,7 +329,7 @@ class TestPaymentWebhook(FinanceTestCase):
 
         self.mollie_client.return_value.payments.get. \
             return_value.isPaid.return_value = True
-        ret = self.client.get(self.url, {"id": self.payment.mollie_id})
+        ret = self.client.post(self.url, {"id": self.payment.mollie_id})
 
         payment = Payment.objects.get()
         self.assertFalse(payment.order.paid)

@@ -198,8 +198,8 @@ class ConfirmTransactionView(LoginRequiredMixin, MollieMixin, TemplateView):
 
 
 class PaymentWebHook(MollieMixin, View):
-    def get(self, request, *args, **kwargs):
-        mollie_id = request.GET.get('id')
+    def post(self, request, *args, **kwargs):
+        mollie_id = request.POST.get('id')
 
         payment = get_object_or_404(Payment, mollie_id=mollie_id)
         mollie_payment = self.get_payment(payment.mollie_id)
