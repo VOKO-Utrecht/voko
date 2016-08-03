@@ -255,7 +255,7 @@ class PaymentWebHook(MollieMixin, View):
                 # Corner case where payment was executed before closing time,
                 # but never finished (user closed browser tab),
                 # the payment is now validated by callback, but order round is
-                # closed and oursuppliers likely have been mailed the totals.
+                # closed and our suppliers likely have been mailed the totals.
                 # Credit for the user has just been created, but we don't
                 # want to complete the order because it was placed too late.
                 log_event(

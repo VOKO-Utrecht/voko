@@ -507,12 +507,17 @@ class Product(TimeStampedModel):
         total = self.amount_ordered
         return maximum - total
 
-    def availability(self):
+    def verbose_availability(self):
         """
         The value to show in the progress bar in product overview
         """
         if self.is_stock_product():
-            return "%s in voorraad" % (self.all_stock() - self.amount_ordered)
+            available = self.amount_available
+
+            if available == 0:
+                return "uitverkocht"
+
+            return "%s in voorraad" % available
 
         if self.maximum_total_order:
             return "%s van %s" %(self.amount_available, self.maximum_total_order)
@@ -547,8 +552,12 @@ class Product(TimeStampedModel):
         Return if this product is still available for ordering.
         Boolean.
         """
+        if self.is_stock_product():
+            return self.amount_available > 0
+
         if self.maximum_total_order is None:
             return True
+
         return self.amount_available > 0
 
     def create_corrections(self):

@@ -469,6 +469,19 @@ class TestProductModel(VokoTestCase):
         odp1 = OrderProductFactory(product=product, order__paid=True, amount=1)
         self.assertTrue(product.is_available)
 
+    def test_is_available_on_stock_product_1(self):
+        product = ProductFactory(order_round=None)
+        ProductStockFactory(product=product, amount=2)
+        self.assertTrue(product.is_available)
+
+    def test_is_available_on_stock_product_2(self):
+        OrderRoundFactory()
+        product = ProductFactory(order_round=None)
+        stock1 = ProductStockFactory(product=product, amount=5)
+        stock2 = ProductStockFactory(product=product, amount=4)
+        odp1 = OrderProductFactory(product=product, amount=9, order__paid=True)
+        self.assertFalse(product.is_available)
+
     def test_create_corrections_creates_corrections_for_all_orderproducts_of_paid_orders(self):
         product = ProductFactory()
         paid_odp1 = OrderProductFactory(product=product, order__paid=True)
@@ -521,35 +534,44 @@ class TestProductModel(VokoTestCase):
         product2 = Product.objects.get(id=product2.id)
         self.assertFalse(product2.new)
 
-    def test_availability_1(self):
+    def test_verbose_availability_1(self):
         product = ProductFactory(maximum_total_order=99)
         o1 = OrderProductFactory(product=product, order__paid=True).amount
         o2 = OrderProductFactory(product=product, order__paid=True).amount
-        self.assertEqual(product.availability(), "%s van 99" % (99 - (o1 + o2)))
+        self.assertEqual(product.verbose_availability(), "%s van 99" % (99 - (o1 + o2)))
 
-    def test_availability_2(self):
+    def test_verbose_availability_2(self):
         product = ProductFactory(maximum_total_order=None)
-        self.assertEqual(product.availability(), "Onbeperkt")
+        self.assertEqual(product.verbose_availability(), "Onbeperkt")
 
-    def test_availability_with_stock_1(self):
+    def test_verbose_availability_with_stock_1(self):
         product = ProductFactory(order_round=None)
         stock = ProductStockFactory(product=product)
-        self.assertEqual(product.availability(), "%s in voorraad" % stock.amount)
+        self.assertEqual(product.verbose_availability(), "%s in voorraad" % stock.amount)
 
-    def test_availability_with_stock_2(self):
+    def test_verbose_availability_with_stock_2(self):
         product = ProductFactory(order_round=None)
         stock1 = ProductStockFactory(product=product)
         stock2 = ProductStockFactory(product=product)
-        self.assertEqual(product.availability(), "%s in voorraad" % (stock1.amount + stock2.amount))
+        self.assertEqual(product.verbose_availability(), "%s in voorraad" % (stock1.amount + stock2.amount))
 
-    def test_availability_with_stock_3(self):
+    def test_verbose_availability_with_stock_3(self):
         OrderRoundFactory()
         product = ProductFactory(order_round=None)
         stock1 = ProductStockFactory(product=product)
         stock2 = ProductStockFactory(product=product)
         odp1 = OrderProductFactory(product=product, amount=1, order__paid=True)
 
-        self.assertEqual(product.availability(), "%s in voorraad" % ((stock1.amount + stock2.amount) - odp1.amount))
+        self.assertEqual(product.verbose_availability(), "%s in voorraad" % ((stock1.amount + stock2.amount) - odp1.amount))
+
+    def test_verbose_availability_with_stock_sold_out(self):
+        OrderRoundFactory()
+        product = ProductFactory(order_round=None)
+        stock = ProductStockFactory(product=product)
+        OrderProductFactory(product=product, amount=stock.amount,
+                            order__paid=True)
+
+        self.assertEqual(product.verbose_availability(), "uitverkocht")
 
 
 class TestOrderProductCorrectionModel(VokoTestCase):
