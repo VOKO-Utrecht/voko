@@ -138,7 +138,7 @@ class PasswordResetView(AnonymousRequiredMixin, FormView, DetailView):
 
     def get_context_data(self, **kwargs):
         if not self.get_object().is_usable:
-            return Http404
+            raise Http404
 
         context = super(PasswordResetView, self).get_context_data(**kwargs)
         context['form'] = self.form_class()

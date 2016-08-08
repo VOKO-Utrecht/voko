@@ -174,8 +174,8 @@ class PasswordResetRequest(TimeStampedModel):
         if self.is_used:
             return False
 
-        # Time window of 1 hour to reset
-        if (datetime.now(pytz.utc) - self.created) > timedelta(hours=1):
+        # Time window of 2 hours to reset
+        if (datetime.now(pytz.utc) - self.created) > timedelta(hours=2):
             return False
         return True
 
