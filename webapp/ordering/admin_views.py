@@ -96,8 +96,13 @@ class OrderAdminUserOrders(GroupRequiredMixin, ListView):
     template_name = "ordering/admin/user_orders_per_round.html"
 
     def get_queryset(self):
-        order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
-        return Order.objects.filter(order_round=order_round, paid=True).order_by("user__first_name")
+        self.order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
+        return Order.objects.filter(order_round=self.order_round, paid=True).order_by("user__first_name")
+
+    def get_context_data(self, **kwargs):
+        context = super(OrderAdminUserOrders, self).get_context_data(**kwargs)
+        context['order_round'] = self.order_round
+        return context
 
 
 # Bestellingen per product
@@ -106,6 +111,7 @@ class OrderAdminUserOrderProductsPerOrderRound(GroupRequiredMixin, ListView):
     template_name = "ordering/admin/productsorders.html"
 
     def get_queryset(self):
+        self.order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
         return OrderProduct.objects.select_related().filter(order__order_round_id=self.kwargs.get('pk'), order__paid=True)
 
     def get_context_data(self, **kwargs):
@@ -122,6 +128,8 @@ class OrderAdminUserOrderProductsPerOrderRound(GroupRequiredMixin, ListView):
                     suppliers[s][product].append(op)
 
         context['data'] = suppliers
+
+        context['order_round'] = self.order_round
 
         return context
 

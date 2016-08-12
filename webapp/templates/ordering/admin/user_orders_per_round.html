@@ -7,6 +7,9 @@
         font-size: 11px;
     }
     </style>
+    {% if order_round.is_open %}
+        <div class="alert alert-danger" role="alert"><strong>Let op!</strong> Deze bestelronde is nog open. Er kunnen nog nieuwe bestellingen worden gedaan!</div>
+    {% endif %}
 
 {% for order in object_list %}
 <div class="panel panel-default">
