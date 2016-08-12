@@ -9,7 +9,7 @@ from accounts.tests.factories import VokoUserFactory
 from finance.models import Balance
 from finance.tests.factories import BalanceFactory
 from ordering.models import Order, OrderProduct, ORDER_CONFIRM_MAIL_ID, ORDER_FAILED_ID, OrderProductCorrection, \
-    OrderRound, Product
+    OrderRound, Product, ProductStock
 from ordering.tests.factories import SupplierFactory, OrderFactory, OrderProductFactory, OrderRoundFactory, \
     OrderProductCorrectionFactory, ProductFactory, UnitFactory, ProductStockFactory
 from vokou.testing import VokoTestCase
@@ -414,11 +414,19 @@ class TestProductModel(VokoTestCase):
         odp1 = OrderProductFactory(product=product, order__paid=True, amount=1)
         self.assertEqual(product.amount_available, 9)
 
-    def test_amount_available_with_stock(self):
+    def test_amount_available_with_stock_1(self):
         product = ProductFactory(maximum_total_order=None, order_round=None)
-        stock1 = ProductStockFactory(product=product)
-        stock2 = ProductStockFactory(product=product)
+        stock1 = ProductStockFactory(product=product, type=ProductStock.TYPE_ADDED)
+        stock2 = ProductStockFactory(product=product, type=ProductStock.TYPE_ADDED)
         self.assertEqual(product.amount_available, (stock1.amount + stock2.amount))
+
+    def test_amount_available_with_stock_2(self):
+        product = ProductFactory(maximum_total_order=None, order_round=None)
+        stock1 = ProductStockFactory(product=product, type=ProductStock.TYPE_ADDED, amount=10)
+        stock2 = ProductStockFactory(product=product, type=ProductStock.TYPE_ADDED, amount=20),
+        stock3 = ProductStockFactory(product=product, type=ProductStock.TYPE_LOST, amount=5),
+
+        self.assertEqual(product.amount_available, 25)
 
     def test_amount_available_ignores_non_paid_orders(self):
         product = ProductFactory(maximum_total_order=10)
@@ -546,33 +554,42 @@ class TestProductModel(VokoTestCase):
 
     def test_verbose_availability_with_stock_1(self):
         product = ProductFactory(order_round=None)
-        stock = ProductStockFactory(product=product)
+        stock = ProductStockFactory(product=product, type=ProductStock.TYPE_ADDED)
         self.assertEqual(product.verbose_availability(), "%s in voorraad" % stock.amount)
 
     def test_verbose_availability_with_stock_2(self):
         product = ProductFactory(order_round=None)
-        stock1 = ProductStockFactory(product=product)
-        stock2 = ProductStockFactory(product=product)
+        stock1 = ProductStockFactory(product=product, type=ProductStock.TYPE_ADDED)
+        stock2 = ProductStockFactory(product=product, type=ProductStock.TYPE_ADDED)
         self.assertEqual(product.verbose_availability(), "%s in voorraad" % (stock1.amount + stock2.amount))
 
     def test_verbose_availability_with_stock_3(self):
         OrderRoundFactory()
         product = ProductFactory(order_round=None)
-        stock1 = ProductStockFactory(product=product)
-        stock2 = ProductStockFactory(product=product)
+        stock1 = ProductStockFactory(product=product, type=ProductStock.TYPE_ADDED)
+        stock2 = ProductStockFactory(product=product, type=ProductStock.TYPE_ADDED)
         odp1 = OrderProductFactory(product=product, amount=1, order__paid=True)
 
         self.assertEqual(product.verbose_availability(), "%s in voorraad" % ((stock1.amount + stock2.amount) - odp1.amount))
 
+    def test_verbose_availability_with_stock_4(self):
+        OrderRoundFactory()
+        product = ProductFactory(order_round=None)
+        stock1 = ProductStockFactory(product=product, type=ProductStock.TYPE_ADDED, amount=10)
+        stock2 = ProductStockFactory(product=product, type=ProductStock.TYPE_ADDED, amount=5)
+        stock3 = ProductStockFactory(product=product, type=ProductStock.TYPE_LOST, amount=3)
+        odp1 = OrderProductFactory(product=product, amount=1, order__paid=True)
+
+        self.assertEqual(product.verbose_availability(), "11 in voorraad")
+
     def test_verbose_availability_with_stock_sold_out(self):
         OrderRoundFactory()
         product = ProductFactory(order_round=None)
-        stock = ProductStockFactory(product=product)
+        stock = ProductStockFactory(product=product, type=ProductStock.TYPE_ADDED)
         OrderProductFactory(product=product, amount=stock.amount,
                             order__paid=True)
 
         self.assertEqual(product.verbose_availability(), "uitverkocht")
-
 
 class TestOrderProductCorrectionModel(VokoTestCase):
     def test_creating_a_correction(self):

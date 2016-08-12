@@ -497,10 +497,15 @@ class Product(TimeStampedModel):
 
     def all_stock(self):
         """
-        Total stock bought, can be used to calculate current stock by subtracting total orders.
+        Total stock bought and lost, can be used to calculate current stock by
+        subtracting total orders.
         """
-        product_stock = self.stock.all()
-        return sum([s.amount for s in product_stock])
+        stock_added = self.stock.filter(type=ProductStock.TYPE_ADDED)
+        stock_lost = self.stock.filter(type=ProductStock.TYPE_LOST)
+        total_added = sum([s.amount for s in stock_added])
+        total_lost = sum([s.amount for s in stock_lost])
+
+        return total_added - total_lost
 
     @property
     def amount_available(self):
