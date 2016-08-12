@@ -421,11 +421,17 @@ class ProductUnit(TimeStampedModel):
 
 class ProductStock(TimeStampedModel):
     """ Product purchase / stock """
-    class Meta:
-        verbose_name = verbose_name_plural = "Productvoorraad"
+    TYPE_ADDED = ('added', 'Added')
+    TYPE_LOST = ('lost', 'Lost')
 
     product = models.ForeignKey("Product", related_name="stock")
     amount = models.IntegerField()
+
+    type = models.CharField(max_length=5, choices=(TYPE_ADDED, TYPE_LOST),
+                            default=TYPE_ADDED)
+
+    class Meta:
+        verbose_name = verbose_name_plural = "Productvoorraad"
 
     # TODO: make sure amount can't be changed?
 
