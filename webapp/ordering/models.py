@@ -117,6 +117,11 @@ class OrderRound(TimeStampedModel):
         """
         return self.orders.filter(paid=True).count()
 
+    def days_since_collection(self):
+        """
+        Return days sincs collection date
+        """
+        return (datetime.now(tz=pytz.UTC) - self.collect_datetime).days
 
     def __unicode__(self):
         return "Bestelronde #%s" % self.pk

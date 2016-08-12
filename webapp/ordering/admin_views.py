@@ -216,6 +216,9 @@ class OrderAdminCorrection(GroupRequiredMixin, TemplateView):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
         return order_round.products.all().order_by('name')
 
+    def order_round(self):
+        return OrderRound.objects.get(pk=self.kwargs.get('pk'))
+
 
 class OrderAdminMassCorrection(GroupRequiredMixin, View):
     group_required = ('Uitdeel', 'Admin')

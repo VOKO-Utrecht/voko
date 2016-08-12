@@ -2,6 +2,11 @@
 {% block title %}Correcties{% endblock %}
 {% block content %}
     <h1>Correcties</h1>
+
+    {% if view.order_round.days_since_collection >= 14 %}
+        <div class="alert alert-warning" role="alert"><strong>Let op!</strong> Het ophaalmoment van deze bestelronde was <strong>{{  view.order_round.days_since_collection }}</strong> dagen geleden. Bedenk goed of je wel correcties voor deze ronde zou moeten maken.</div>
+    {% endif %}
+
     <hr>
     <h2>Correctie bij bestelling maken</h2>
     <p>Maak een bestelcorrectie aan en genereer automatisch krediet voor leden.</p>
