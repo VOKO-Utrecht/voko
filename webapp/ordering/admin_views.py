@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
+from decimal import Decimal
+
 import openpyxl
 import re
 from collections import defaultdict
@@ -10,13 +12,14 @@ from django.core.urlresolvers import reverse
 from django.db.models.aggregates import Sum
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, TemplateView, View, FormView
 import sys
 from accounts.models import VokoUser
 from .core import get_current_order_round
 from .forms import UploadProductListForm
 from .models import OrderProduct, Order, OrderRound, Supplier, OrderProductCorrection, Product, DraftProduct, \
-    ProductCategory
+    ProductCategory, ProductStock, ProductUnit
 
 
 class OrderAdminMain(GroupRequiredMixin, ListView):
@@ -438,3 +441,113 @@ class RedirectToMailingView(GroupRequiredMixin, DetailView):
         request.session['mailing_user_ids'] = user_ids
 
         return HttpResponseRedirect(reverse("admin_preview_mail", args=(mailing_id,)))
+
+
+class StockAdminView(GroupRequiredMixin, ListView):
+    group_required = ('Uitdeel', 'Transport', 'Admin')
+    template_name = "ordering/admin/stock.html"
+
+    def get_queryset(self):
+        return Product.objects.filter(order_round__isnull=True,
+                                      enabled=True).order_by("id")
+
+    def get_context_data(self, **kwargs):
+        context = super(StockAdminView, self).get_context_data(**kwargs)
+
+        context['product_units'] = ProductUnit.objects.all()
+        context['suppliers'] = Supplier.objects.all()
+        context['categories'] = ProductCategory.objects.all()
+
+        return context
+
+
+class ProductStockApiView(GroupRequiredMixin, View):
+    group_required = ('Uitdeel', 'Transport', 'Admin')
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super(ProductStockApiView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            amount = int(request.POST['amount'])
+            product_id = request.POST['product_id']
+            type = request.POST['type']
+            notes = request.POST['notes']
+            base_price = Decimal(request.POST['base_price'])
+            product = Product.objects.get(id=product_id)
+
+            assert product.enabled
+            assert product.order_round is None
+
+        except (IndexError, ValueError, AssertionError):
+            return HttpResponse(status=400)
+
+        if base_price != product.base_price:
+            # Clone product but change price
+            product.pk = None
+            product.base_price = base_price
+            product.save()
+
+            # Cannot decrease inventory for new product
+            assert type == ProductStock.TYPE_ADDED
+
+            messages.add_message(request, messages.WARNING,
+                                 "Product '%s' gekloond met nieuwe prijs."
+                                 % product.name)
+
+        ProductStock.objects.create(
+            product=product, amount=amount,
+            note=notes, type=type
+        )
+
+        messages.add_message(request, messages.SUCCESS,
+                             "De voorraad voor product '%s' is bijgewerkt."
+                             % product.name)
+        return HttpResponse(status=201)
+
+
+class ProductApiView(GroupRequiredMixin, View):
+    group_required = ('Uitdeel', 'Transport', 'Admin')
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super(ProductApiView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        category_id = request.POST['category']
+        name = request.POST['name']
+        description = request.POST['description']
+        unit_id = request.POST['unit']
+        base_price = request.POST['base_price']
+        supplier_id = request.POST['supplier']
+
+        stock = request.POST['stock']
+
+        assert name
+
+        # For now, create Stock product
+        product = Product.objects.create(
+            name=name,
+            description=description,
+            unit_id=unit_id,
+            category_id=category_id,
+            base_price=base_price,
+            supplier_id=supplier_id
+        )
+
+        messages.add_message(request, messages.SUCCESS,
+                             "Product '%s' toegevoegd."
+                             % product.name)
+
+        if stock:
+            ProductStock.objects.create(
+                product=product,
+                amount=stock
+            )
+
+            messages.add_message(request, messages.SUCCESS,
+                                 "De voorraad voor product '%s' is bijgewerkt."
+                                 % product.name)
+
+        return HttpResponse(status=200)

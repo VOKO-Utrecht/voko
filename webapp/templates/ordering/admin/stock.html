@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% block title %}Voorraadbeheer{% endblock %}
+{% block content %}
+    <h2>Voorraad</h2>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a class="btn btn-default btn-primary" href="javascript:void(0)" role="button" data-toggle="modal" data-target="#addProductModal" >Nieuw voorraadproduct</a>
+        </div>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Leverancier</th>
+                <th>Product</th>
+                <th>Inkoopprijs</th>
+                <th>Voorraad</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for product in object_list %}
+                <tr>
+                    <td>{{ product.supplier.name }}</td>
+                    <td>{{ product.name }}</td>
+                    <td>&euro; {{ product.base_price }}</td>
+                    <td><a href="javascript:void(0)"
+                           data-toggle="modal"
+                           data-target="#manageStockModal"
+                           data-product_id="{{ product.id }}"
+                           data-product_name="{{ product.name }}"
+                           data-unit="{{ product.unit }}"
+                           data-base_price="{{ product.base_price|stringformat:".2f" }}">
+                        {{ product.amount_available|default_if_none:0 }}</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Stock management Modal -->
+    <div class="modal fade" id="manageStockModal" tabindex="-1" role="dialog" aria-labelledby="manageStockModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="manageStockModalLabel">Voorraad bijwerken: <span id="manageStockProductName"></span></h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal">
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Bij / af</label>
+                            <div class="col-sm-10">
+                                <label class="radio-inline">
+                                    <input type="radio" name="type" value="added" checked> Bij
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="type" value="lost"> Af
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Hoeveelheid</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <input type="number" step="1" min="1" class="form-control" name="amount" placeholder="0">
+                                    <div class="input-group-addon"><span id="manageStockproductUnit"></span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Opmerking</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="notes" placeholder="Optioneel">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="BasePrice" class="col-sm-2 control-label">Inkoopprijs</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <div class="input-group-addon">&euro;</div>
+                                    <input type="number" step="0.1" class="form-control" name="base_price" id="manageStockBasePrice">
+                                </div>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="product_id" id="manageStockProductId" value="">
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Annuleren</button>
+                    <button type="button" class="btn btn-primary">Opslaan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product adding Modal -->
+    <div class="modal fade" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="addProductModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="addProductModalLabel">Nieuw voorraadproduct</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal">
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Leverancier</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="supplier">
+                                    <option></option>
+                                    {% for supplier in suppliers %}<option value="{{ supplier.id }}">{{ supplier.name }}</option>{% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Naam</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="name" placeholder="">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Omschrijving</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" rows="2" name="description"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="BasePrice" class="col-sm-2 control-label">Inkoopprijs</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <div class="input-group-addon">&euro;</div>
+                                    <input type="number" step="0.1" class="form-control" name="base_price" id="BasePrice" placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Eenheid</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="unit">
+                                    {% for unit in product_units %}<option value="{{ unit.id }}">{{ unit.name }}</option>{% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Categorie</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="category">
+                                    <option value="">Overig</option>
+                                    {% for cat in categories %}<option value="{{ cat.id }}">{{ cat.name }}</option>{% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Voorraad</label>
+                            <div class="col-sm-10">
+                                <input type="number" step="1" min="1" class="form-control" name="stock" placeholder="0">
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Annuleren</button>
+                    <button type="button" class="btn btn-primary">Opslaan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+{% endblock %}
+{% block javascript %}
+<script>
+    $(document).ready(function() {
+
+        $('#manageStockModal').on('show.bs.modal', function (e) {
+            var productId = e.relatedTarget.dataset.product_id;
+            var productName = e.relatedTarget.dataset.product_name;
+            var productUnit = e.relatedTarget.dataset.unit;
+            var productBasePrice = e.relatedTarget.dataset.base_price;
+
+            $("#manageStockProductId").val(productId);
+            $("#manageStockProductName").text(productName);
+            $("#manageStockproductUnit").text(productUnit);
+            $("#manageStockBasePrice").val(productBasePrice);
+
+        });
+
+        $("#manageStockModal .btn-primary").on('click', function(){
+            $.ajax({
+                url: '{% url 'ordering.api.productstock' %}',
+                type : "POST",
+                data : $("#manageStockModal").find('form').serialize(),
+                success : function(result) {
+                    location.reload();
+                },
+                error: function(xhr, resp, text) {
+                    window.alert("Dat ging niet helemaal goed, controleer het formulier");
+                }
+            })
+        });
+
+        $("#addProductModal .btn-primary").on('click', function(){
+            $.ajax({
+                url: '{% url 'ordering.api.product' %}',
+                type : "POST",
+                data : $("#addProductModal").find('form').serialize(),
+                success : function(result) {
+                    location.reload();
+                },
+                error: function(xhr, resp, text) {
+                    window.alert("Dat ging niet helemaal goed, controleer het formulier");
+                }
+            })
+        });
+
+
+    });
+</script>
+
+
+{% endblock %}
