@@ -5,9 +5,16 @@
     {% endif %}
 {% endif %}
 
-{% if 'Boeren' in user.flat_groups or user.is_superuser %}
-    <li><a href="{% url 'productadmin_main' %}">Boerenadmin</a></li>
+{% if 'Boeren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+    <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Boerenadmin<span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="{% url 'productadmin_main' %}">Producten</a></li>
+                <li><a href="{% url 'stockadmin_main' %}">Voorraad</a></li>
+              </ul>
+    </li>
 {% endif %}
+
 {% if 'Transport' in user.flat_groups or 'Uitdeel' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
     <li><a href="{% url 'orderadmin_main' %}">Besteloverzichten</a></li>
 {% endif %}
