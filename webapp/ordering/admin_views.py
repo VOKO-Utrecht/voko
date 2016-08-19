@@ -462,7 +462,7 @@ class StockAdminView(GroupRequiredMixin, ListView):
 
 
 class ProductStockApiView(GroupRequiredMixin, View):
-    group_required = ('Uitdeel', 'Transport', 'Admin')
+    group_required = ('Boeren', 'Admin')
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
@@ -471,10 +471,11 @@ class ProductStockApiView(GroupRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         try:
             amount = int(request.POST['amount'])
-            product_id = request.POST['product_id']
-            type = request.POST['type']
+            stock_type = request.POST['type']
             notes = request.POST['notes']
             base_price = Decimal(request.POST['base_price'])
+
+            product_id = request.POST['product_id']
             product = Product.objects.get(id=product_id)
 
             assert product.enabled
@@ -490,7 +491,7 @@ class ProductStockApiView(GroupRequiredMixin, View):
             product.save()
 
             # Cannot decrease inventory for new product
-            assert type == ProductStock.TYPE_ADDED
+            assert stock_type == ProductStock.TYPE_ADDED
 
             messages.add_message(request, messages.WARNING,
                                  "Product '%s' gekloond met nieuwe prijs."
@@ -498,7 +499,7 @@ class ProductStockApiView(GroupRequiredMixin, View):
 
         ProductStock.objects.create(
             product=product, amount=amount,
-            note=notes, type=type
+            note=notes, type=stock_type
         )
 
         messages.add_message(request, messages.SUCCESS,
@@ -508,7 +509,7 @@ class ProductStockApiView(GroupRequiredMixin, View):
 
 
 class ProductApiView(GroupRequiredMixin, View):
-    group_required = ('Uitdeel', 'Transport', 'Admin')
+    group_required = ('Boeren', 'Admin')
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
