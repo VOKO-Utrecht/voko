@@ -444,7 +444,7 @@ class RedirectToMailingView(GroupRequiredMixin, DetailView):
 
 
 class StockAdminView(GroupRequiredMixin, ListView):
-    group_required = ('Uitdeel', 'Transport', 'Admin')
+    group_required = ('Boeren', 'Admin')
     template_name = "ordering/admin/stock.html"
 
     def get_queryset(self):
