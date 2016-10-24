@@ -32,6 +32,7 @@ INSTALLED_APPS = (
     'braces',
     'bootstrap3',
     "django_cron",
+    "captcha",
 
     'mailing',
     'accounts',
@@ -100,3 +101,7 @@ TINYMCE_DEFAULT_CONFIG = {
 }
 
 HIJACK_DISPLAY_ADMIN_BUTTON = False  # Because of custom user model
+
+RECAPTCHA_PUBLIC_KEY = os.getenv("RECAPTCHA_SITE_KEY")
+RECAPTCHA_PRIVATE_KEY = os.getenv("RECAPTCHA_SECRET_KEY")
+NOCAPTCHA = True

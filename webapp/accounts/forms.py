@@ -1,3 +1,4 @@
+from captcha.fields import ReCaptchaField
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.mail import mail_admins
@@ -12,6 +13,8 @@ class VokoUserCreationForm(forms.ModelForm):
     class Meta:
         model = VokoUser
         fields = ("email", "first_name", "last_name")
+
+    captcha = ReCaptchaField()
 
     def save(self, commit=True):
         # Create user
