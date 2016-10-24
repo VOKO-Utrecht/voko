@@ -430,7 +430,7 @@ class ProductStock(TimeStampedModel):
     # TODO: convert to boolean or FK for normalization and speed
     type = models.CharField(max_length=5, choices=(
         (TYPE_ADDED, "Added"),
-        (TYPE_LOST, "Lost")), default=TYPE_ADDED)
+        (TYPE_LOST, "Lost")), default=TYPE_ADDED, db_index=True)
 
     notes = models.CharField(max_length=255, null=True, blank=True)
 
