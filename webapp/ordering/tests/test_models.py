@@ -591,6 +591,7 @@ class TestProductModel(VokoTestCase):
 
         self.assertEqual(product.verbose_availability(), "uitverkocht")
 
+
 class TestOrderProductCorrectionModel(VokoTestCase):
     def test_creating_a_correction(self):
         order_product = OrderProductFactory.create()
@@ -784,3 +785,33 @@ class TestOrderProductCorrectionModel(VokoTestCase):
         self.assertEqual(len(Balance.objects.all()), 2)
         OrderProductCorrection.objects.all().delete()
         self.assertEqual(len(Balance.objects.all()), 0)
+
+
+class TestProductStockModel(VokoTestCase):
+    def test_changing_amount_is_prohibited(self):
+        ps = ProductStockFactory()
+
+        ps.amount += 1
+
+        with self.assertRaises(AssertionError):
+            ps.save()
+
+    def test_changing_type_is_prohibited(self):
+        ps = ProductStockFactory(type='added')
+
+        ps.type = 'lost'
+
+        with self.assertRaises(AssertionError):
+            ps.save()
+
+    def test_changing_product_is_prohibited(self):
+        ps = ProductStockFactory(type='added')
+
+        ps.product = ProductFactory()
+
+        with self.assertRaises(AssertionError):
+            ps.save()
+
+    def test_regular_save(self):
+        ps = ProductStockFactory()
+        ps.save()

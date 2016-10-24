@@ -437,10 +437,17 @@ class ProductStock(TimeStampedModel):
     class Meta:
         verbose_name = verbose_name_plural = "Productvoorraad"
 
-    # TODO: make sure amount can't be changed?
-
     def __unicode__(self):
         return u'%d x %s' % (self.amount, self.product)
+
+    def save(self, *args, **kwargs):
+        if self.pk is not None:
+            orig = ProductStock.objects.get(pk=self.pk)
+            assert orig.amount == self.amount, "Amount may not be changed!"
+            assert orig.product == self.product, "Product may not be changed!"
+            assert orig.type == self.type, "Type may not be changed!"
+
+        super(ProductStock, self).save(*args, **kwargs)
 
 
 class Product(TimeStampedModel):
