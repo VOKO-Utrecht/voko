@@ -427,7 +427,6 @@ class ProductStock(TimeStampedModel):
     product = models.ForeignKey("Product", related_name="stock")
     amount = models.IntegerField()
 
-    # TODO: convert to boolean or FK for normalization and speed
     type = models.CharField(max_length=5, choices=(
         (TYPE_ADDED, "Added"),
         (TYPE_LOST, "Lost")), default=TYPE_ADDED, db_index=True)
