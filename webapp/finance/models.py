@@ -79,8 +79,7 @@ class Balance(TimeStampedModel):
         ("DR", "Debit"),
     )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="balance")
-    # TODO: convert to boolean or FK for normalization and speed
-    type = models.CharField(max_length=2, choices=TYPES)
+    type = models.CharField(max_length=2, choices=TYPES, db_index=True)
     amount = models.DecimalField(max_digits=6, decimal_places=2)
     notes = models.TextField()
 
