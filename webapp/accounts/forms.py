@@ -24,13 +24,6 @@ class VokoUserCreationForm(forms.ModelForm):
 
         return user
 
-    def clean_honingpot(self):
-        if self.cleaned_data['honingpot']:
-            raise forms.ValidationError("Er ging iets mis")  # Stay vague
-        return self.cleaned_data['honingpot']
-
-    honingpot = forms.CharField(required=False, label="Niet invullen")  # Honeypot field, used to mislead spam bots
-
 
 class VokoUserFinishForm(forms.ModelForm):
     class Meta:
