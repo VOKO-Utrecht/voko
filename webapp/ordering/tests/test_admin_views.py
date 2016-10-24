@@ -2,7 +2,8 @@ from django.core.urlresolvers import reverse
 
 from ordering.models import ProductStock, Product
 from ordering.tests.factories import ProductFactory, ProductStockFactory, \
-    OrderRoundFactory
+    OrderRoundFactory, SupplierFactory, ProductCategoryFactory, \
+    ProductUnitFactory
 from vokou.testing import VokoTestCase
 
 
@@ -164,7 +165,7 @@ class TestProductStockApiView(VokoTestCase):
 
         self.assertEqual(ret.status_code, 400)
 
-    def test_product_is_no_stock_product(self):
+    def test_call_with_regular_non_stock_product(self):
         product = ProductFactory(order_round=OrderRoundFactory())
 
         ret = self.client.post(self.url, data={
@@ -176,3 +177,94 @@ class TestProductStockApiView(VokoTestCase):
         })
 
         self.assertEqual(ret.status_code, 400)
+
+
+class TestProductApiView(VokoTestCase):
+    def setUp(self):
+        self.login(group="Boeren")
+        self.url = reverse('ordering.api.product')
+
+    def test_create_product_with_just_required_fields(self):
+        supplier = SupplierFactory()
+
+        ret = self.client.post(self.url, data={
+            'name': "foo",
+            'supplier': supplier.id,
+            'description': 'bar',
+            'base_price': "1",
+        })
+
+        self.assertEqual(ret.status_code, 201)
+
+        product = Product.objects.last()
+        self.assertEqual(product.order_round, None)
+        self.assertEqual(product.name, 'foo')
+        self.assertEqual(product.supplier, supplier)
+        self.assertEqual(product.description, 'bar')
+        self.assertEqual(product.base_price, 1)
+        self.assertEqual(product.unit, None)
+        self.assertEqual(product.category, None)
+
+        self.assertFalse(ProductStock.objects.all())
+
+    def test_create_product_with_all_fields(self):
+        supplier = SupplierFactory()
+        category = ProductCategoryFactory()
+        unit = ProductUnitFactory()
+
+        ret = self.client.post(self.url, data={
+            'name': "foo",
+            'supplier': supplier.id,
+            'description': 'bar',
+            'base_price': "1",
+            'category': category.id,
+            'unit': unit.id
+        })
+
+        self.assertEqual(ret.status_code, 201)
+
+        product = Product.objects.last()
+        self.assertEqual(product.order_round, None)
+        self.assertEqual(product.name, 'foo')
+        self.assertEqual(product.supplier, supplier)
+        self.assertEqual(product.description, 'bar')
+        self.assertEqual(product.base_price, 1)
+        self.assertEqual(product.unit, unit)
+        self.assertEqual(product.category, category)
+
+    def test_missing_fields(self):
+        supplier = SupplierFactory()
+
+        ret = self.client.post(self.url, data={
+            'name': "foo",
+            'supplier': supplier.id
+        })
+
+        self.assertEqual(ret.status_code, 400)
+
+    def test_create_product_with_stock(self):
+        supplier = SupplierFactory()
+
+        ret = self.client.post(self.url, data={
+            'name': "foo",
+            'supplier': supplier.id,
+            'description': 'bar',
+            'base_price': "1",
+            'stock': '13',
+        })
+
+        self.assertEqual(ret.status_code, 201)
+
+        product = Product.objects.last()
+        self.assertEqual(product.order_round, None)
+        self.assertEqual(product.name, 'foo')
+        self.assertEqual(product.supplier, supplier)
+        self.assertEqual(product.description, 'bar')
+        self.assertEqual(product.base_price, 1)
+        self.assertEqual(product.unit, None)
+        self.assertEqual(product.category, None)
+
+        stock = ProductStock.objects.last()
+
+        self.assertEqual(stock.amount, 13)
+        self.assertEqual(stock.product, product)

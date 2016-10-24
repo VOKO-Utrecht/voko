@@ -9,6 +9,7 @@ from tempfile import NamedTemporaryFile
 from braces.views import GroupRequiredMixin
 from django.contrib import messages
 from django.core.urlresolvers import reverse
+from django.db import IntegrityError
 from django.db.models.aggregates import Sum
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
@@ -518,26 +519,30 @@ class ProductApiView(GroupRequiredMixin, View):
         return super(ProductApiView, self).dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        category_id = request.POST['category']
-        name = request.POST['name']
-        description = request.POST['description']
-        unit_id = request.POST['unit']
-        base_price = request.POST['base_price']
-        supplier_id = request.POST['supplier']
+        category_id = request.POST.get('category')
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        unit_id = request.POST.get('unit')
+        base_price = request.POST.get('base_price')
+        supplier_id = request.POST.get('supplier')
 
-        stock = request.POST['stock']
+        stock = request.POST.get('stock')
 
         assert name
+        assert supplier_id, supplier_id
 
         # For now, create Stock product
-        product = Product.objects.create(
-            name=name,
-            description=description,
-            unit_id=unit_id,
-            category_id=category_id,
-            base_price=base_price,
-            supplier_id=supplier_id
-        )
+        try:
+            product = Product.objects.create(
+                name=name,
+                description=description,
+                unit_id=unit_id,
+                category_id=category_id,
+                base_price=base_price,
+                supplier_id=supplier_id
+            )
+        except IntegrityError:
+            return HttpResponse(status=400)
 
         messages.add_message(request, messages.SUCCESS,
                              "Product '%s' toegevoegd."
@@ -553,4 +558,4 @@ class ProductApiView(GroupRequiredMixin, View):
                                  "De voorraad voor product '%s' is bijgewerkt."
                                  % product.name)
 
-        return HttpResponse(status=200)
+        return HttpResponse(status=201)
