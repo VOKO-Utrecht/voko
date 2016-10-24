@@ -502,7 +502,7 @@ class ProductStockApiView(GroupRequiredMixin, View):
 
         ProductStock.objects.create(
             product=product, amount=amount,
-            note=notes, type=stock_type
+            notes=notes, type=stock_type
         )
 
         messages.add_message(request, messages.SUCCESS,

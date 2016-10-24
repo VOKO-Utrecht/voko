@@ -34,7 +34,7 @@ class TestProductStockApiView(VokoTestCase):
         self.assertEqual(prod_stock.product, product)
         self.assertEqual(prod_stock.type, 'added')
         self.assertEqual(prod_stock.amount, 10)
-        self.assertEqual(prod_stock.note, 'foo')
+        self.assertEqual(prod_stock.notes, 'foo')
         self.assertEqual(product.all_stock(), 10)
 
     def test_add_stock(self):
@@ -58,7 +58,7 @@ class TestProductStockApiView(VokoTestCase):
         self.assertEqual(prod_stock.product, product)
         self.assertEqual(prod_stock.type, 'added')
         self.assertEqual(prod_stock.amount, 5)
-        self.assertEqual(prod_stock.note, 'foo')
+        self.assertEqual(prod_stock.notes, 'foo')
 
         self.assertEqual(product.all_stock(), 10)
 
@@ -83,7 +83,7 @@ class TestProductStockApiView(VokoTestCase):
         self.assertEqual(prod_stock.product, product)
         self.assertEqual(prod_stock.type, 'lost')
         self.assertEqual(prod_stock.amount, 3)
-        self.assertEqual(prod_stock.note, 'foo')
+        self.assertEqual(prod_stock.notes, 'foo')
 
         self.assertEqual(product.all_stock(), 2)
 
@@ -110,7 +110,7 @@ class TestProductStockApiView(VokoTestCase):
         self.assertEqual(prod_stock.product, new_product)
         self.assertEqual(prod_stock.type, 'added')
         self.assertEqual(prod_stock.amount, 7)
-        self.assertEqual(prod_stock.note, 'foo')
+        self.assertEqual(prod_stock.notes, 'foo')
 
         self.assertEqual(product.all_stock(), 5)
         self.assertEqual(new_product.all_stock(), 7)

@@ -432,8 +432,7 @@ class ProductStock(TimeStampedModel):
         (TYPE_ADDED, "Added"),
         (TYPE_LOST, "Lost")), default=TYPE_ADDED)
 
-    # TODO: rename to 'notes' for consistency
-    note = models.CharField(max_length=255, null=True, blank=True)
+    notes = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         verbose_name = verbose_name_plural = "Productvoorraad"
