@@ -12,6 +12,7 @@ from django.core.urlresolvers import reverse
 from django.db.models.aggregates import Sum
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
+from django.utils.datastructures import MultiValueDictKeyError
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, TemplateView, View, FormView
 import sys
@@ -481,7 +482,8 @@ class ProductStockApiView(GroupRequiredMixin, View):
             assert product.enabled
             assert product.order_round is None
 
-        except (IndexError, ValueError, AssertionError):
+        except (IndexError, ValueError, AssertionError,
+                Product.DoesNotExist, MultiValueDictKeyError):
             return HttpResponse(status=400)
 
         if base_price != product.base_price:
