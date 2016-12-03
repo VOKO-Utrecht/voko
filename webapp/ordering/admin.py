@@ -4,10 +4,10 @@ from django.db import OperationalError
 import sys
 from finance.models import Balance
 from .models import Order, OrderProduct, Product, OrderRound, ProductCategory, \
-    OrderProductCorrection
+    OrderProductCorrection, ProductStock
 
 for model in apps.get_app_config('ordering').get_models():
-    if model in (Order, Product, OrderRound, OrderProductCorrection):
+    if model in (Order, Product, OrderRound, OrderProductCorrection, ProductStock):
         continue
     admin.site.register(model)
 
@@ -74,6 +74,15 @@ class ProductAdmin(admin.ModelAdmin):
     list_per_page = 500
 
 admin.site.register(Product, ProductAdmin)
+
+
+class ProductStockAdmin(admin.ModelAdmin):
+    list_display = ["id", "created", "product", 'amount', "type", "notes"]
+    ordering = ("-id", "created", "product", "amount", "type", "notes")
+    list_filter = ("type",)
+    raw_id_fields = ('product',)
+
+admin.site.register(ProductStock, ProductStockAdmin)
 
 
 class OrderRoundAdmin(admin.ModelAdmin):
