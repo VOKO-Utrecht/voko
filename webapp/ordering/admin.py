@@ -104,7 +104,7 @@ admin.site.register(OrderProductCorrection, OrderProductCorrectionAdmin)
 
 
 class OrderProductAdmin(admin.ModelAdmin):
-    list_display = ["id", 'order', 'order_paid', "product", "stock_product", "base_price", "retail_price"]
+    list_display = ["id", 'order', 'order_paid', "product", "amount", "stock_product", "base_price", "retail_price"]
     ordering = ("-id", 'order', 'product')
     list_filter = ("order__paid", "product__order_round")
     raw_id_fields = ('order', 'product')
