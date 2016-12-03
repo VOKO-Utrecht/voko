@@ -7,7 +7,8 @@ from .models import Order, OrderProduct, Product, OrderRound, ProductCategory, \
     OrderProductCorrection, ProductStock
 
 for model in apps.get_app_config('ordering').get_models():
-    if model in (Order, Product, OrderRound, OrderProductCorrection, ProductStock):
+    if model in (Order, Product, OrderRound, OrderProductCorrection,
+                 ProductStock, OrderProduct):
         continue
     admin.site.register(model)
 
@@ -100,3 +101,21 @@ class OrderProductCorrectionAdmin(admin.ModelAdmin):
     raw_id_fields = ('order_product',)
 
 admin.site.register(OrderProductCorrection, OrderProductCorrectionAdmin)
+
+
+class OrderProductAdmin(admin.ModelAdmin):
+    list_display = ["id", 'order', 'order_paid', "product", "stock_product", "base_price", "retail_price"]
+    ordering = ("-id", 'order', 'product')
+    list_filter = ("order__paid", "product__order_round")
+    raw_id_fields = ('order', 'product')
+
+    def order_paid(self, obj):
+        return obj.order.paid is True
+    order_paid.boolean = True
+
+    def stock_product(self, obj):
+        return obj.product.is_stock_product()
+    stock_product.boolean = True
+
+admin.site.register(OrderProduct, OrderProductAdmin)
+
