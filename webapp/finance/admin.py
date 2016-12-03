@@ -38,10 +38,24 @@ class CorrectionListFilter(BalanceFilterMixin, admin.SimpleListFilter):
             return queryset.filter(correction__isnull=True)
 
 
+class DebetListFilter(BalanceFilterMixin, admin.SimpleListFilter):
+    """
+    Filter Balances on being the result of corrections or not
+    """
+    title = 'is debet'
+    parameter_name = 'isdebet'
+
+    def queryset(self, request, queryset):
+        if self.value() == '1':
+            return queryset.filter(order__isnull=False)
+        if self.value() == '0':
+            return queryset.filter(order__isnull=True)
+
+
 class BalanceAdmin(admin.ModelAdmin):
-    list_display = ["id", "created", "modified", "user", "type", "amount", "notes", "is_correction", "is_payment"]
+    list_display = ["id", "created", "modified", "user", "type", "amount", "notes", "is_correction", "is_payment", 'is_order_debit']
     ordering = ("-id", )
-    list_filter = ("type", PaymentListFilter, CorrectionListFilter)
+    list_filter = ("type", PaymentListFilter, CorrectionListFilter, DebetListFilter)
     search_fields = ['notes']
 
     def is_correction(self, obj):
@@ -51,6 +65,12 @@ class BalanceAdmin(admin.ModelAdmin):
     def is_payment(self, obj):
         return obj.payment is not None
     is_payment.boolean = True
+
+    def is_order_debit(self, obj):
+        return obj.order is not None
+    is_order_debit.boolean = True
+
+
 
 
 class PaymentAdmin(admin.ModelAdmin):

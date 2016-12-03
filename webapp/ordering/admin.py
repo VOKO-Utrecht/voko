@@ -3,10 +3,11 @@ from django.contrib import admin
 from django.db import OperationalError
 import sys
 from finance.models import Balance
-from .models import Order, OrderProduct, Product, OrderRound, ProductCategory
+from .models import Order, OrderProduct, Product, OrderRound, ProductCategory, \
+    OrderProductCorrection
 
 for model in apps.get_app_config('ordering').get_models():
-    if model in (Order, Product, OrderRound):
+    if model in (Order, Product, OrderRound, OrderProductCorrection):
         continue
     admin.site.register(model)
 
@@ -82,3 +83,10 @@ class OrderRoundAdmin(admin.ModelAdmin):
 
 admin.site.register(OrderRound, OrderRoundAdmin)
 
+
+class OrderProductCorrectionAdmin(admin.ModelAdmin):
+    list_display = ["id", 'order_product', "supplied_percentage", "notes", "credit", "charge_supplier"]
+    ordering = ("-id", 'charge_supplier', 'supplied_percentage')
+    list_filter = ("charge_supplier",)
+
+admin.site.register(OrderProductCorrection, OrderProductCorrectionAdmin)
