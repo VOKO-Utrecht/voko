@@ -88,5 +88,6 @@ class OrderProductCorrectionAdmin(admin.ModelAdmin):
     list_display = ["id", 'order_product', "supplied_percentage", "notes", "credit", "charge_supplier"]
     ordering = ("-id", 'charge_supplier', 'supplied_percentage')
     list_filter = ("charge_supplier",)
+    raw_id_fields = ('order_product',)
 
 admin.site.register(OrderProductCorrection, OrderProductCorrectionAdmin)
