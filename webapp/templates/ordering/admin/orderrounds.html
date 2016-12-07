@@ -27,7 +27,7 @@
             <td>{{ orderround.closed_for_orders }}</td>
             <td><a href="{% url 'orderadmin_orderlists' orderround.pk %}">Bestellijsten</a></td>
             <td><a href="{% url 'orderadmin_userorders' orderround.pk %}">{{ orderround.number_of_orders }}</a></td>
-            <td><a href="{% url 'orderadmin_orders_per_product' orderround.pk %}">Overzicht</a></td>
+            <td><a href="{% url 'orderadmin_orders_per_product' orderround.pk %}">Per product</a></td>
             <td><a href="{% url 'orderadmin_correction' orderround.pk %}">Correcties</a></td>
           </tr>
       {% endfor %}
