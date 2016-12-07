@@ -16,7 +16,7 @@
 
 {% for supplier, products in data.items %}
     {% if products.items %}
-        <h3>Producten van {{ supplier }}</h3>
+        <h1>Producten van {{ supplier }}</h1>
         {%  for product, orderproducts in products.items %}
             <div class="panel panel-default">
             <div class="panel-heading">
@@ -53,6 +53,8 @@
 
     {% endfor %}
     {% endif %}
+    {# Ensure page break before new supplier header #}
+    <p style="page-break-after:always;"></p>
 {% endfor %}
 
 {% endblock %}
