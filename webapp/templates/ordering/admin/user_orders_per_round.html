@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block title %}Ledenbestellingen ronde {{ order_round.id }}{% endblock %}
 {% block content %}
     <style>
     .panel {
@@ -14,10 +15,11 @@
 {% for order in object_list %}
 <div class="panel panel-default">
 <div class="panel-heading">
-<h1>#{{ forloop.counter }}: {{ order.user.get_full_name }}</h1>
+<h1>{{ forloop.counter }}/{{ object_list|length }}: {{ order.user.get_full_name }}</h1>
 </div>
   <div class="panel-body">
     Bestelling-ID: {{ order.pk }}
+    | ronde {{ order.order_round.id }}
     | e-mail: {{ order.user.email }}
     | telefoon: {{ order.user.userprofile.phone_number|default:"onbekend"  }}
   </div>
