@@ -35,7 +35,7 @@
     </thead>
     <tbody>
 
-      {% for o in order.orderproducts.all %}
+      {% for o in order.orderproducts.all|dictsort:"product.name" %}
           <tr {% if o.product == object %}class="success"{% endif %}>
             <td>{{ o.amount }}</td>
             <td>{{ o.product.unit_of_measurement }}</td>
