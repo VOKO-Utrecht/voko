@@ -14,11 +14,10 @@
 {% for order in object_list %}
 <div class="panel panel-default">
 <div class="panel-heading">
-<h4>#{{ forloop.counter }}: Bestelling van {{ order.user.get_full_name }}</h4>
+<h1>#{{ forloop.counter }}: {{ order.user.get_full_name }}</h1>
 </div>
   <div class="panel-body">
-    ID: {{ order.pk }}
-    | Laatst gewijzigd: {{ order.modified }}
+    Bestelling-ID: {{ order.pk }}
     | e-mail: {{ order.user.email }}
     | telefoon: {{ order.user.userprofile.phone_number|default:"onbekend"  }}
   </div>
