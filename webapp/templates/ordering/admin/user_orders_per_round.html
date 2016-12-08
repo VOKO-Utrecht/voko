@@ -3,7 +3,6 @@
 {% block content %}
     <style>
     .panel {
-        page-break-after: always;
         page-break-inside: avoid;
         font-size: 11px;
     }
@@ -73,6 +72,10 @@
     </tbody>
   </table>
 </div>
+    {# Ensure page break before next supplier, but avoid final blank page #}
+    {% if not forloop.last %}
+        <p style="page-break-after:always;"></p>
+    {% endif %}
 
 {% endfor %}
 {% endblock %}
