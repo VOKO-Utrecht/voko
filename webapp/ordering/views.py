@@ -119,12 +119,18 @@ class ProductsView(LoginRequiredMixin, ListView):
         current open order and the product.
         """
         user_open_order = get_or_create_order(self.request.user)
-        qs = self.get_queryset()
+        qs = list(self.get_queryset())
 
         for product in qs:
             if product.orderproducts.filter(order=user_open_order):
                 product.ordered_amount = product.orderproducts.get(order=user_open_order).amount
-        return qs
+
+            # don't show unavailable stock products. This is not very efficient, it should be done at DB level
+            if product.is_stock_product() and not product.is_available:
+                continue
+
+            yield product
+
 
     def categories(self):
         """

@@ -51,7 +51,20 @@ class TestProductsView(VokoTestCase):
         odp1 = OrderProductFactory(order=order, product=product)
 
         ret = self.client.get(self.url)
-        self.assertEqual(ret.context['view'].products()[0].ordered_amount, odp1.amount)
+        self.assertEqual(list(ret.context['view'].products())[0].ordered_amount, odp1.amount)
+
+    def test_stock_products_without_stock_are_excluded(self):
+        order = OrderFactory(order_round=self.round, user=self.user)
+
+        product = ProductFactory(order_round=self.round)
+        sproduct = ProductFactory(order_round=None)
+
+        odp1 = OrderProductFactory(order=order, product=product)
+        odp2 = OrderProductFactory(order=order, product=sproduct)
+
+        ret = self.client.get(self.url)
+        self.assertNotIn(sproduct, list(ret.context['view'].products()))
+        self.assertIn(product, list(ret.context['view'].products()))
 
     def test_context_contains_categories_alphabetically_sorted(self):
         cat1 = ProductCategoryFactory(name="Zeep")

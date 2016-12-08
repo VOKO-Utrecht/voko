@@ -620,7 +620,7 @@ class Product(TimeStampedModel):
                             "similar product in order round %d" % (self, prev_round.id))
 
     def is_stock_product(self):
-        return self.stock.exists() and self.order_round is None
+        return self.order_round is None
 
 
 class DraftProduct(TimeStampedModel):
