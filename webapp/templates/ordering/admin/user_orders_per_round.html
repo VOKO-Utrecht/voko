@@ -7,71 +7,74 @@
         font-size: 11px;
     }
     </style>
+
     {% if order_round.is_open %}
         <div class="alert alert-danger" role="alert"><strong>Let op!</strong> Deze bestelronde is nog open. Er kunnen nog nieuwe bestellingen worden gedaan!</div>
     {% endif %}
 
-{% for order in object_list %}
-<div class="panel panel-default">
-<div class="panel-heading">
-<h1>{{ forloop.counter }}/{{ object_list|length }}: {{ order.user.get_full_name }}</h1>
-</div>
-  <div class="panel-body">
-    Bestelling-ID: {{ order.pk }}
-    | ronde {{ order.order_round.id }}
-    | e-mail: {{ order.user.email }}
-    | telefoon: {{ order.user.userprofile.phone_number|default:"onbekend"  }}
-  </div>
-  <table class="table table-condensed">
-    <thead>
-      <tr>
-        <th>Aantal</th>
-        <th>Eenheid</th>
-        <th>Product</th>
-        <th>Leverancier</th>
-        <th>Omschrijving</th>
-        <th>Per stuk</th>
-        <th>Totaal</th>
-      </tr>
-    </thead>
-    <tbody>
+    {% for order in object_list %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h1>{{ forloop.counter }}/{{ object_list|length }}: {{ order.user.get_full_name }}</h1>
+        </div>
 
-      {% for o in order.orderproducts.all|dictsort:"product.name" %}
-          <tr {% if o.product == object %}class="success"{% endif %}>
-            <td>{{ o.amount }}</td>
-            <td>{{ o.product.unit_of_measurement }}</td>
-            <td>{{ o.product.name }} {% if o.product.is_stock_product %}<b><u>uit voorraad</u></b>{% endif %}</td>
-            <td>{{ o.product.supplier }}</td>
-            <td>{{ o.product.description|truncatechars:50 }}</td>
-            <td>&euro; {{ o.product.retail_price }}</td>
-            <td>&euro; {{ o.total_retail_price }}</td>
-          </tr>
-      {% endfor %}
+        <div class="panel-body">
+            Bestelling-ID: {{ order.pk }}
+            | ronde {{ order.order_round.id }}
+            | e-mail: {{ order.user.email }}
+            | telefoon: {{ order.user.userprofile.phone_number|default:"onbekend" }}
+        </div>
 
-    {% if order.member_fee %}
-      <tr>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>Ledenbijdrage bij eerste bestelling</td>
-        <td>-</td>
-        <td>&euro; {{ order.member_fee }}</td>
-     </tr>
-    {% endif %}
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th>Aantal</th>
+                    <th>Eenheid</th>
+                    <th>Product</th>
+                    <th>Leverancier</th>
+                    <th>Omschrijving</th>
+                    <th>Per stuk</th>
+                    <th>Totaal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in order.orderproducts.all|dictsort:"product.name" %}
+                    <tr {% if o.product == object %}class="success"{% endif %}>
+                        <td>{{ o.amount }}</td>
+                        <td>{{ o.product.unit_of_measurement }}</td>
+                        <td>{{ o.product.name }} {% if o.product.is_stock_product %}<b><u>uit voorraad</u></b>{% endif %}</td>
+                        <td>{{ o.product.supplier }}</td>
+                        <td>{{ o.product.description|truncatechars:50 }}</td>
+                        <td>&euro; {{ o.product.retail_price }}</td>
+                        <td>&euro; {{ o.total_retail_price }}</td>
+                    </tr>
+                {% endfor %}
 
-    <tr class="panel-footer">
-       <td><strong>Totaal</strong></td>
-       <td></td>
-       <td></td>
-       <td></td>
-       <td></td>
-       <td></td>
-       <td><strong>&euro; {{ order.total_price }}</strong></td>
-        </tr>
-    </tbody>
-  </table>
-</div>
+                {% if order.member_fee %}
+                    <tr>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>Ledenbijdrage bij eerste bestelling</td>
+                        <td>-</td>
+                        <td>&euro; {{ order.member_fee }}</td>
+                    </tr>
+                {% endif %}
+
+                <tr class="panel-footer">
+                    <td><strong>Totaal</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><strong>&euro; {{ order.total_price }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
     {# Ensure page break before next supplier, but avoid final blank page #}
     {% if not forloop.last %}
         <p style="page-break-after:always;"></p>

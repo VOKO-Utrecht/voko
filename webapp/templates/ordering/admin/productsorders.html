@@ -8,15 +8,15 @@
     }
     </style>
 
+    <div class="page-header">
+        <h1>Bestellingen per product van bestelronde #{{ object_list.0.order.order_round.pk }}</h1>
+    </div>
+
     {% if order_round.is_open %}
         <div class="alert alert-danger" role="alert">
             <strong>Let op!</strong> Deze bestelronde is nog open. Er kunnen nog nieuwe bestellingen worden gedaan!
         </div>
     {% endif %}
-
-    <div class="page-header">
-        <h1>Bestellingen per product van bestelronde #{{ object_list.0.order.order_round.pk }}</h1>
-    </div>
 
     {% for supplier, categories in data.items %}
         {% for category, products in categories.items %}
