@@ -1,61 +1,61 @@
 {% extends 'base.html' %}
 {% block title %}Bestellingen per product ronde {{ order_round.id }}{% endblock %}
 {% block content %}
-<style>
-.panel {
-{#    page-break-after: always;#}
-    page-break-inside: avoid;
-    font-size: 11px;
-}
-</style>
+    <style>
+    .panel {
+        page-break-inside: avoid;
+        font-size: 11px;
+    }
+    </style>
+
     {% if order_round.is_open %}
-        <div class="alert alert-danger" role="alert"><strong>Let op!</strong> Deze bestelronde is nog open. Er kunnen nog nieuwe bestellingen worden gedaan!</div>
+        <div class="alert alert-danger" role="alert">
+            <strong>Let op!</strong> Deze bestelronde is nog open. Er kunnen nog nieuwe bestellingen worden gedaan!
+        </div>
     {% endif %}
 
-<h1>Bestellingen per product van bestelronde #{{ object_list.0.order.order_round.pk }}</h1>
-<h6>Gegenereerd op {% now "DATETIME_FORMAT" %}</h6>
+    <h1>Bestellingen per product van bestelronde #{{ object_list.0.order.order_round.pk }}</h1>
+    <h6>Gegenereerd op {% now "DATETIME_FORMAT" %}</h6>
 
-{% for supplier, products in data.items %}
-    {% if products.items %}
-        <h1>Producten van {{ supplier }}</h1>
-        {%  for product, orderproducts in products.items %}
-            <div class="panel panel-default">
-            <div class="panel-heading">
-            <h3>{{ product.name }} [{{ product.supplier.name }}] {% if product.is_stock_product %}<b><u>uit voorraad</u></b>{% endif %} (Totaal besteld: {{ product.amount_ordered }} x {{ product.unit_of_measurement }})</h3>
-            </div>
-            <div class="panel-body">
-            {{ product.description }}
-            </div>
+    {% for supplier, categories in data.items %}
+        {% for category, products in categories.items %}
+            {% if products.items %}
+                <h1><span class="label label-success">{{ category|default_if_none:"Overig" }}</span> van <span class="label label-primary">{{ supplier }}</span></h1>
+                <br/>
 
-      <table class="table table-condensed">
-        <thead>
-          <tr>
-            <th>Aantal</th>
-            <th>Eenheid</th>
-            <th>Lid</th>
-            <th>Lid ID</th>
-            <th>Bestelling ID</th>
-          </tr>
-        </thead>
-        <tbody>
-            {%  for op in orderproducts %}
-              <tr>
-                <td>{{ op.amount }}</td>
-                <td>{{ op.product.unit_of_measurement }}</td>
-                <td>{{ op.order.user.get_full_name }}</td>
-                <td>#{{ op.order.user.pk }}</td>
-                <td>#{{ op.order.pk }}</td>
-              </tr>
-            {% endfor %}
-        </tbody>
-      </table>
-</div>
-
-
+                {% for product, orderproducts in products.items %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3>{{ product.name }} [{{ product.supplier.name }}] {% if product.is_stock_product %}<b><u>uit voorraad</u></b>{% endif %} (Totaal besteld: {{ product.amount_ordered }} x {{ product.unit_of_measurement }})</h3>
+                        </div>
+                        <div class="panel-body">{{ product.description }}</div>
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>Aantal</th>
+                                        <th>Eenheid</th>
+                                        <th>Lid</th>
+                                        <th>Lid ID</th>
+                                        <th>Bestelling ID</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for op in orderproducts %}
+                                        <tr>
+                                            <td>{{ op.amount }}</td>
+                                            <td>{{ op.product.unit_of_measurement }}</td>
+                                            <td>{{ op.order.user.get_full_name }}</td>
+                                            <td>#{{ op.order.user.pk }}</td>
+                                            <td>#{{ op.order.pk }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+        {# Ensure page break before new supplier header #}
+        <p style="page-break-after:always;"></p>
     {% endfor %}
-    {% endif %}
-    {# Ensure page break before new supplier header #}
-    <p style="page-break-after:always;"></p>
-{% endfor %}
-
 {% endblock %}

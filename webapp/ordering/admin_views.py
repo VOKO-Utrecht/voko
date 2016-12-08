@@ -122,20 +122,21 @@ class OrderAdminUserOrderProductsPerOrderRound(GroupRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(OrderAdminUserOrderProductsPerOrderRound, self).get_context_data(**kwargs)
 
-        suppliers = {s: None for s in Supplier.objects.all()}
+        # this is one way to nest defaultdicts
+        data = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
 
-        orderproducts = self.get_queryset()
+        for orderprod in self.get_queryset():
+            data[orderprod.product.supplier][orderprod.product.category][orderprod.product].append(orderprod)
 
-        for s in suppliers:
-            suppliers[s] = {op.product: [] for op in orderproducts.filter(product__supplier=s)}
-            for product in suppliers[s]:
-                for op in orderproducts.filter(product=product):
-                    suppliers[s][product].append(op)
+        # convert to regular dicts so Django templating can handle it
+        data = dict(data)
+        for k, v in data.items():
+            data[k] = dict(v)
+            for a, b in data[k].items():
+                data[k][a] = dict(b)
 
-        context['data'] = suppliers
-
+        context['data'] = data
         context['order_round'] = self.order_round
-
         return context
 
 
