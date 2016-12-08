@@ -14,8 +14,9 @@
         </div>
     {% endif %}
 
-    <h1>Bestellingen per product van bestelronde #{{ object_list.0.order.order_round.pk }}</h1>
-    <h6>Gegenereerd op {% now "DATETIME_FORMAT" %}</h6>
+    <div class="page-header">
+        <h1>Bestellingen per product van bestelronde #{{ object_list.0.order.order_round.pk }}</h1>
+    </div>
 
     {% for supplier, categories in data.items %}
         {% for category, products in categories.items %}
@@ -26,7 +27,7 @@
                 {% for product, orderproducts in products.items %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h3>{{ product.name }} [{{ product.supplier.name }}] {% if product.is_stock_product %}<b><u>uit voorraad</u></b>{% endif %} (Totaal besteld: {{ product.amount_ordered }} x {{ product.unit_of_measurement }})</h3>
+                            <h3>{{ product.name }} {% if product.is_stock_product %} <span class="label label-danger">uit voorraad</span> {% endif %} {% if not product.is_stock_product %}(totaal besteld: {{ product.amount_ordered }} x {{ product.unit_of_measurement }}){% endif %}</h3>
                         </div>
                         <div class="panel-body">{{ product.description }}</div>
                             <table class="table table-condensed">
@@ -54,8 +55,11 @@
                     </div>
                 {% endfor %}
             {% endif %}
+            {# Ensure page break before next supplier, but avoid final blank page #}
+            {% if not forloop.parentloop.last %}
+                <p style="page-break-after:always;"></p>
+            {% endif %}
+
         {% endfor %}
-        {# Ensure page break before new supplier header #}
-        <p style="page-break-after:always;"></p>
     {% endfor %}
 {% endblock %}
