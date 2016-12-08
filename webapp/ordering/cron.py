@@ -61,6 +61,12 @@ class MailOrderLists(CronJobBase):
                 filter(order_round=order_round).\
                 annotate(amount_sum=Sum('orderproducts__amount'))
 
+            if not ordered_products:
+                log_event(event="Supplier %s has only STOCK orders "
+                                "in current round, "
+                                "so not sending order list." % supplier)
+                continue
+
             # Write products and amounts
             for obj in ordered_products:
                 csv_writer.writerow([
