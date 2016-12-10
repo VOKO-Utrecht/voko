@@ -27,7 +27,7 @@
                 {% for product, orderproducts in products.items %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h3>{{ product.name }} {% if product.is_stock_product %} <span class="label label-danger">uit voorraad</span> {% endif %} {% if not product.is_stock_product %}(totaal besteld: {{ product.amount_ordered }} x {{ product.unit_of_measurement }}){% endif %}</h3>
+                            <h2><b>{{ product.name }} {% if product.is_stock_product %} <span class="label label-danger">uit voorraad</span> {% endif %} {% if not product.is_stock_product %}(totaal besteld: {{ product.amount_ordered }} x {{ product.unit_of_measurement }}){% endif %}</b></h2>
                         </div>
                         <div class="panel-body">{{ product.description }}</div>
                             <table class="table table-condensed">
