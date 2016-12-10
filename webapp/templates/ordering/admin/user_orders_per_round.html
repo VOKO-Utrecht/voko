@@ -42,7 +42,7 @@
                     <tr {% if o.product == object %}class="success"{% endif %}>
                         <td>{{ o.amount }}</td>
                         <td>{{ o.product.unit_of_measurement }}</td>
-                        <td>{{ o.product.name }} {% if o.product.is_stock_product %}<b><u>uit voorraad</u></b>{% endif %}</td>
+                        <td><b>{{ o.product.name }}</b> {% if o.product.is_stock_product %}<b><u>uit voorraad</u></b>{% endif %}</td>
                         <td>{{ o.product.supplier }}</td>
                         <td>&euro; {{ o.product.retail_price }}</td>
                         <td>&euro; {{ o.total_retail_price }}</td>
