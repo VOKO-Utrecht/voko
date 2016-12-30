@@ -1,5 +1,6 @@
 from django.contrib import admin
 from finance.models import Balance, Payment
+from vokou.admin import DeleteDisabledMixin
 
 
 class BalanceFilterMixin(object):
@@ -52,7 +53,7 @@ class DebetListFilter(BalanceFilterMixin, admin.SimpleListFilter):
             return queryset.filter(order__isnull=True)
 
 
-class BalanceAdmin(admin.ModelAdmin):
+class BalanceAdmin(DeleteDisabledMixin, admin.ModelAdmin):
     list_display = ["id", "created", "modified", "user", "type", "amount", "notes", "is_correction", "is_payment", 'is_order_debit']
     ordering = ("-id", )
     list_filter = ("type", PaymentListFilter, CorrectionListFilter, DebetListFilter)
@@ -71,9 +72,7 @@ class BalanceAdmin(admin.ModelAdmin):
     is_order_debit.boolean = True
 
 
-
-
-class PaymentAdmin(admin.ModelAdmin):
+class PaymentAdmin(DeleteDisabledMixin, admin.ModelAdmin):
     list_display = ["id", "created", "amount", "order",  "qantani_transaction_id", "succeeded"]
     ordering = ("-id", )
     list_filter = ("succeeded",)
