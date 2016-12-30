@@ -93,3 +93,40 @@ class Balance(TimeStampedModel):
         super(Balance, self).save(*args, **kwargs)
 
     objects = BalanceManager()
+
+    """ next functions are used for csv export """
+
+    def _is_correction(self):
+        try:
+            return bool(self.correction)
+        except Balance.correction.RelatedObjectDoesNotExist:
+            return False
+
+    def _is_payment(self):
+        try:
+            return bool(self.payment)
+        except Balance.payment.RelatedObjectDoesNotExist:
+            return False
+
+    def _is_order_debit(self):
+        try:
+            return bool(self.order)
+        except Balance.order.RelatedObjectDoesNotExist:
+            return False
+
+    def balance_type(self):
+        if self._is_correction():
+            return 'correction'
+        elif self._is_payment():
+            return 'payment'
+        elif self._is_order_debit():
+            return 'order debit'
+        else:
+            return 'other'
+
+    def formatted_amount(self):
+        decimal = str(self.amount).replace('.', ',')
+        if self.type == 'CR':
+            return "+%s" % decimal
+        elif self.type == 'DR':
+            return "-%s" % decimal

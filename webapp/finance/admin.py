@@ -1,6 +1,6 @@
 from django.contrib import admin
 from finance.models import Balance, Payment
-from vokou.admin import DeleteDisabledMixin
+from vokou.admin import DeleteDisabledMixin, export_as_csv_action
 
 
 class BalanceFilterMixin(object):
@@ -54,10 +54,14 @@ class DebetListFilter(BalanceFilterMixin, admin.SimpleListFilter):
 
 
 class BalanceAdmin(DeleteDisabledMixin, admin.ModelAdmin):
-    list_display = ["id", "created", "modified", "user", "type", "amount", "notes", "is_correction", "is_payment", 'is_order_debit']
+    list_display = ["id", "created", "modified", "user", "type", "amount", "notes", "_is_correction", "_is_payment", '_is_order_debit']
     ordering = ("-id", )
     list_filter = ("type", PaymentListFilter, CorrectionListFilter, DebetListFilter)
     search_fields = ['notes']
+
+    actions = [export_as_csv_action("CSV Export",
+                                    fields=('id', 'created', 'user', 'type',
+                                            'formatted_amount', 'notes', 'balance_type'))]
 
     def is_correction(self, obj):
         return obj.correction is not None
