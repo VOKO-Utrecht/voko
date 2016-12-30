@@ -1,16 +1,10 @@
-from django.apps import apps
 from django.contrib import admin
 from django.db import OperationalError
 import sys
 from finance.models import Balance
+from vokou.admin import DeleteDisabledMixin
 from .models import Order, OrderProduct, Product, OrderRound, ProductCategory, \
-    OrderProductCorrection, ProductStock
-
-for model in apps.get_app_config('ordering').get_models():
-    if model in (Order, Product, OrderRound, OrderProductCorrection,
-                 ProductStock, OrderProduct):
-        continue
-    admin.site.register(model)
+    OrderProductCorrection, ProductStock, Supplier, ProductUnit, DraftProduct
 
 
 class OrderProductInline(admin.TabularInline):
@@ -26,7 +20,7 @@ def create_credit_for_order(modeladmin, request, queryset):
 create_credit_for_order.short_description = "Contant betaald"
 
 
-class OrderAdmin(admin.ModelAdmin):
+class OrderAdmin(DeleteDisabledMixin, admin.ModelAdmin):
     list_display = ["id", "created", "order_round", "user", "finalized", "paid", "total_price", "user_notes"]
     ordering = ("-id", )
     # inlines = [OrderProductInline]  ## causes timeout
@@ -77,7 +71,7 @@ class ProductAdmin(admin.ModelAdmin):
 admin.site.register(Product, ProductAdmin)
 
 
-class ProductStockAdmin(admin.ModelAdmin):
+class ProductStockAdmin(DeleteDisabledMixin, admin.ModelAdmin):
     list_display = ["id", "created", "product", 'amount', "type", "notes"]
     ordering = ("-id", "created", "product", "amount", "type", "notes")
     list_filter = ("type",)
@@ -86,7 +80,27 @@ class ProductStockAdmin(admin.ModelAdmin):
 admin.site.register(ProductStock, ProductStockAdmin)
 
 
-class OrderRoundAdmin(admin.ModelAdmin):
+class SupplierAdmin(DeleteDisabledMixin, admin.ModelAdmin):
+    pass
+admin.site.register(Supplier, SupplierAdmin)
+
+
+class CategoryAdmin(DeleteDisabledMixin, admin.ModelAdmin):
+    pass
+admin.site.register(ProductCategory, CategoryAdmin)
+
+
+class ProductUnitAdmin(DeleteDisabledMixin, admin.ModelAdmin):
+    pass
+admin.site.register(ProductUnit, ProductUnitAdmin)
+
+
+class DraftProductAdmin(admin.ModelAdmin):
+    pass
+admin.site.register(DraftProduct, DraftProductAdmin)
+
+
+class OrderRoundAdmin(DeleteDisabledMixin, admin.ModelAdmin):
     list_display = ["id", "open_for_orders", "closed_for_orders", "collect_datetime",
                     "markup_percentage", "transaction_costs", "order_placed"]
     ordering = ("-id", )
@@ -94,7 +108,7 @@ class OrderRoundAdmin(admin.ModelAdmin):
 admin.site.register(OrderRound, OrderRoundAdmin)
 
 
-class OrderProductCorrectionAdmin(admin.ModelAdmin):
+class OrderProductCorrectionAdmin(DeleteDisabledMixin, admin.ModelAdmin):
     list_display = ["id", 'order_product', "supplied_percentage", "notes", "credit", "charge_supplier"]
     ordering = ("-id", 'charge_supplier', 'supplied_percentage')
     list_filter = ("charge_supplier",)
@@ -103,7 +117,7 @@ class OrderProductCorrectionAdmin(admin.ModelAdmin):
 admin.site.register(OrderProductCorrection, OrderProductCorrectionAdmin)
 
 
-class OrderProductAdmin(admin.ModelAdmin):
+class OrderProductAdmin(DeleteDisabledMixin, admin.ModelAdmin):
     list_display = ["id", 'order', 'order_paid', "product", "amount", "stock_product", "base_price", "retail_price"]
     ordering = ("-id", 'order', 'product')
     list_filter = ("order__paid", "product__order_round")
