@@ -72,7 +72,7 @@ class OrderAdminOrderLists(GroupRequiredMixin, DetailView):
 
 class OrderAdminSupplierOrderCSV(GroupRequiredMixin, ListView):
     template_name = "ordering/admin/orderlist_per_supplier.html"
-    group_required = ('Uitdeel', 'Transport', 'Admin')
+    group_required = ('Uitdeel', 'Transport', 'Admin', 'Boeren')
 
     def get_queryset(self):
         supplier = Supplier.objects.get(pk=self.kwargs.get('supplier_pk'))
@@ -88,7 +88,7 @@ class OrderAdminSupplierOrderCSV(GroupRequiredMixin, ListView):
 
 
 class OrderAdminUserOrdersPerProduct(GroupRequiredMixin, ListView):
-    group_required = ('Uitdeel', 'Transport', 'Admin')
+    group_required = ('Uitdeel', 'Transport', 'Admin', 'Boeren')
     template_name = "ordering/admin/productorder.html"
 
     def get_queryset(self):
@@ -97,7 +97,7 @@ class OrderAdminUserOrdersPerProduct(GroupRequiredMixin, ListView):
 
 
 class OrderAdminUserOrders(GroupRequiredMixin, ListView):
-    group_required = ('Uitdeel', 'Transport', 'Admin')
+    group_required = ('Uitdeel', 'Transport', 'Admin', 'Boeren')
     template_name = "ordering/admin/user_orders_per_round.html"
 
     def get_queryset(self):
@@ -112,7 +112,7 @@ class OrderAdminUserOrders(GroupRequiredMixin, ListView):
 
 # Bestellingen per product
 class OrderAdminUserOrderProductsPerOrderRound(GroupRequiredMixin, ListView):
-    group_required = ('Uitdeel', 'Transport', 'Admin')
+    group_required = ('Uitdeel', 'Transport', 'Admin', 'Boeren')
     template_name = "ordering/admin/productsorders.html"
 
     def get_queryset(self):
