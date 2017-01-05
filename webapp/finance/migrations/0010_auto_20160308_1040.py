@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
+from django.db import migrations
 
 
 def link_balances_to_payments(apps, _):
@@ -9,8 +9,8 @@ def link_balances_to_payments(apps, _):
     Payment = apps.get_model("finance", "Payment")
 
     for p in Payment.objects.filter(succeeded=True):
-        print "======"
-        print "Payment %s, amount %s" % (p.id, p.amount)
+        print("======")
+        print("Payment %s, amount %s" % (p.id, p.amount))
 
         # exceptions
         if p.id == 44:
@@ -27,9 +27,9 @@ def link_balances_to_payments(apps, _):
                                                 notes="iDeal betaling voor bestelling #%s" % p.order.id)
 
         p.save()
-        print "Linking to Balance: ID %s, AMOUNT %s, NOTES: %s" % (p.balance.id, p.balance.amount, p.balance.notes)
+        print("Linking to Balance: ID %s, AMOUNT %s, NOTES: %s" % (p.balance.id, p.balance.amount, p.balance.notes))
 
-    print "Done!"
+    print("Done!")
 
 
 class Migration(migrations.Migration):
