@@ -1,8 +1,7 @@
 from pytz import UTC
 import re
 from datetime import datetime
-import sys
-import models
+from ordering import models
 
 
 def get_current_order_round():

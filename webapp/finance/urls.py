@@ -1,7 +1,6 @@
 from django.conf.urls import url
 from django.views.generic import RedirectView
-import views
-import admin_views
+from finance import views, admin_views
 
 urlpatterns = (
     url(r'^pay/choosebank/$', views.ChooseBankView.as_view(), name="finance.choosebank"),
