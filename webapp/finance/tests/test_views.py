@@ -306,7 +306,7 @@ class TestPaymentWebhook(FinanceTestCase):
         # self.assertFalse(self.mock_complete_after_payment.called)
 
         self.assertEqual(ret.status_code, 200)
-        self.assertEqual(ret.content, "")
+        self.assertEqual(ret.content, b"")
 
     def test_successful_payment(self):
         self.mollie_client.return_value.payments.get. \
@@ -322,7 +322,7 @@ class TestPaymentWebhook(FinanceTestCase):
         # self.mock_complete_after_payment.assert_called_once_with()
 
         self.assertEqual(ret.status_code, 200)
-        self.assertEqual(ret.content, "")
+        self.assertEqual(ret.content, b"")
 
     def test_order_is_completed_when_order_paid_is_false(self):
         assert self.order.paid is False

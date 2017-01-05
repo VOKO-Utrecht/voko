@@ -28,7 +28,7 @@ class TestProductStockApiView(VokoTestCase):
         self.assertEqual(ret.status_code, 201)
         prod_stock = ProductStock.objects.first()
 
-        self.assertItemsEqual(product.stock.all(),
+        self.assertCountEqual(product.stock.all(),
                               (prod_stock,))
 
         self.assertEqual(prod_stock.product, product)

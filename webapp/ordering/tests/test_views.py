@@ -24,10 +24,10 @@ class TestProductsView(VokoTestCase):
         products2 = ProductFactory.create_batch(50, order_round=round2)
 
         ret = self.client.get(self.url)
-        self.assertItemsEqual(ret.context['object_list'], products1)
+        self.assertCountEqual(ret.context['object_list'], products1)
 
         ret = self.client.get(self.url + "?round=%d" % round2.id)
-        self.assertItemsEqual(ret.context['object_list'], products2)
+        self.assertCountEqual(ret.context['object_list'], products2)
 
     def test_context_contains_current_order_round(self):
         current = self.round
@@ -42,7 +42,7 @@ class TestProductsView(VokoTestCase):
     def test_context_contains_products_ordered_by_name(self):
         ProductFactory.create_batch(50, order_round=self.round)
         ret = self.client.get(self.url)
-        self.assertItemsEqual(ret.context['view'].products(), Product.objects.all().order_by('name'))
+        self.assertCountEqual(ret.context['view'].products(), Product.objects.all().order_by('name'))
 
     def test_attribute_is_added_to_products_for_which_an_orderproduct_exists(self):
         order = OrderFactory(order_round=self.round, user=self.user)
@@ -79,7 +79,7 @@ class TestProductsView(VokoTestCase):
     def test_context_contains_supplier_objects(self):
         suppliers = SupplierFactory.create_batch(10)
         ret = self.client.get(self.url)
-        self.assertItemsEqual(ret.context['view'].suppliers(), suppliers)
+        self.assertCountEqual(ret.context['view'].suppliers(), suppliers)
 
     def test_redirect_to_payment_page_when_current_order_is_finalized(self):
         self.patch("finance.views.Mollie")
@@ -130,7 +130,7 @@ class TestProductsView(VokoTestCase):
 
         ret = self.client.post(self.url, data)
         self.assertEqual(len(OrderProduct.objects.all()), 10)
-        self.assertItemsEqual(OrderProduct.objects.all(), other_odps)
+        self.assertCountEqual(OrderProduct.objects.all(), other_odps)
 
         self.assertRedirects(ret, reverse("finish_order", args=(self.order.id,)))
 
@@ -144,7 +144,7 @@ class TestProductsView(VokoTestCase):
 
         ret = self.client.post(self.url, data)
         self.assertEqual(len(OrderProduct.objects.all()), 15)
-        self.assertItemsEqual(OrderProduct.objects.all(), other_odps + user_odps[5:])
+        self.assertCountEqual(OrderProduct.objects.all(), other_odps + user_odps[5:])
 
         self.assertRedirects(ret, reverse("finish_order", args=(self.order.id,)))
 
@@ -166,7 +166,7 @@ class TestProductsView(VokoTestCase):
         odps = OrderProductFactory.create_batch(10, product__order_round=self.round, order=self.order)
         ret = self.client.post(self.url, {"order_product_999": 12,
                                           "foo": "bar"})
-        self.assertItemsEqual(OrderProduct.objects.all(), odps)
+        self.assertCountEqual(OrderProduct.objects.all(), odps)
         self.assertRedirects(ret, reverse("finish_order", args=(self.order.id,)))
 
     def test_tamper_with_ids_1(self):

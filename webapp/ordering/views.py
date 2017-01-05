@@ -49,7 +49,7 @@ class ProductsView(LoginRequiredMixin, ListView):
         assert order.finalized is False
         assert order.paid is False
 
-        for key, value in request.POST.iteritems():
+        for key, value in request.POST.items():
             if key.startswith("order-product-") and (value.isdigit() or value == ""):
                 try:
                     prod_id = int(key.split("-")[-1])

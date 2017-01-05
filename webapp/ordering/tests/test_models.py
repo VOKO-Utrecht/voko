@@ -91,14 +91,14 @@ class TestOrderRoundModel(VokoTestCase):
         finalized_order = OrderFactory(paid=False, finalized=True, order_round=round)
         supplier1_orderproduct = OrderProductFactory(product__supplier=supplier1, order=paid_order)
         supplier2_orderproduct = OrderProductFactory(product__supplier=supplier2, order=finalized_order)
-        self.assertItemsEqual(round.suppliers(), [supplier1])
+        self.assertCountEqual(round.suppliers(), [supplier1])
 
     def test_supplier_total_order_sum_with_one_order(self):
         round = OrderRoundFactory()
         supplier1 = SupplierFactory()
         paid_order = OrderFactory(paid=True, finalized=True, order_round=round)
         supplier1_orderproduct = OrderProductFactory(product__supplier=supplier1, order=paid_order)
-        self.assertItemsEqual(round.suppliers(), [supplier1])
+        self.assertCountEqual(round.suppliers(), [supplier1])
 
         self.assertEqual(round.supplier_total_order_sum(supplier1),
                          supplier1_orderproduct.product.base_price * supplier1_orderproduct.amount)
@@ -496,7 +496,7 @@ class TestProductModel(VokoTestCase):
         paid_odp2 = OrderProductFactory(product=product, order__paid=True)
         nonpaid_odp2 = OrderProductFactory(product=product, order__paid=False)
 
-        self.assertItemsEqual(OrderProductCorrection.objects.all(), [])
+        self.assertCountEqual(OrderProductCorrection.objects.all(), [])
         product.create_corrections()
 
         corrections = OrderProductCorrection.objects.all().order_by('id')
