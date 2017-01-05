@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from django.db import migrations
 
@@ -11,9 +11,9 @@ def link_balances(apps, schema_editor):
 
     for p in Payment.objects.filter(succeeded=True):
         print("=============")
-        print("Payment: ID %s, AMOUNT %s" % (p.id, p.amount))
+        print(("Payment: ID %s, AMOUNT %s" % (p.id, p.amount)))
         order = p.order
-        print("Order: ID %s" % order.id)
+        print(("Order: ID %s" % order.id))
         balance = order.debit
 
         if balance is None:
@@ -24,7 +24,7 @@ def link_balances(apps, schema_editor):
                 notes__endswith="#%s" % order.id
             )
 
-        print("Linking to Balance: ID %s, AMOUNT %s, NOTES: %s" % (balance.id, balance.amount, balance.notes))
+        print(("Linking to Balance: ID %s, AMOUNT %s, NOTES: %s" % (balance.id, balance.amount, balance.notes)))
         p.balance = balance
         p.save()
 
