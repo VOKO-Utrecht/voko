@@ -16,5 +16,5 @@ class Document(TimeStampedModel):
         self.slug = slugify(self.name)
         return super(Document, self).save(*args, **kwargs)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name

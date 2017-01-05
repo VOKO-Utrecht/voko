@@ -35,7 +35,7 @@ class Payment(TimeStampedModel):
             self.save()
         return self.balance
 
-    def __unicode__(self):
+    def __str__(self):
         status = "Succeeded" if self.succeeded else "Failed"
         return "%s payment of E%s by %s" % (status, self.amount, self.order.user)
 
@@ -83,7 +83,7 @@ class Balance(TimeStampedModel):
     amount = models.DecimalField(max_digits=6, decimal_places=2)
     notes = models.TextField()
 
-    def __unicode__(self):
+    def __str__(self):
         return "[%s] %s: %s" % (self.user, self.type, self.amount)
 
     def save(self, *args, **kwargs):

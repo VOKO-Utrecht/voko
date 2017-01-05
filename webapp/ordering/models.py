@@ -29,7 +29,7 @@ class Supplier(TimeStampedModel):
     website = models.URLField(blank=True, null=True)
     facebook_url = models.URLField(blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def has_orders_in_current_order_round(self):
@@ -123,7 +123,7 @@ class OrderRound(TimeStampedModel):
         """
         return (datetime.now(tz=pytz.UTC) - self.collect_datetime).days
 
-    def __unicode__(self):
+    def __str__(self):
         return "Bestelronde #%s" % self.pk
 
 
@@ -174,7 +174,7 @@ class Order(TimeStampedModel):
 
     # TODO: order cannot be 'paid' without having a 'debit'. Add sanity check.
 
-    def __unicode__(self):
+    def __str__(self):
         return "Order %d; user: %s" % (self.id, self.user)
 
     @property
@@ -293,7 +293,7 @@ class OrderProduct(TimeStampedModel):
 
     # TODO: assert order.order_round == product.order_round on save()
 
-    def __unicode__(self):
+    def __str__(self):
         return "%d x %s door %s" % (self.amount, self.product, self.order.user)
 
     @property
@@ -344,7 +344,7 @@ class OrderProductCorrection(TimeStampedModel):
     credit = models.OneToOneField(Balance, related_name="correction")
     charge_supplier = models.BooleanField(default=True, verbose_name="Charge expenses to supplier")
 
-    def __unicode__(self):
+    def __str__(self):
         return "Correctie van %s%%: %s" % (100-self.supplied_percentage, self.order_product)
 
     def calculate_refund(self):
@@ -402,7 +402,7 @@ class ProductCategory(TimeStampedModel):
 
     name = models.CharField(max_length=100)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -415,7 +415,7 @@ class ProductUnit(TimeStampedModel):
     description = models.CharField(max_length=255)
     abbreviations = models.CharField(max_length=255, blank=True, help_text="whitespace separated")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.description
 
 
@@ -436,7 +436,7 @@ class ProductStock(TimeStampedModel):
     class Meta:
         verbose_name = verbose_name_plural = "Productvoorraad"
 
-    def __unicode__(self):
+    def __str__(self):
         return '%d x %s' % (self.amount, self.product)
 
     def save(self, *args, **kwargs):
@@ -470,7 +470,7 @@ class Product(TimeStampedModel):
 
     # TODO: Prevent deleting of product when it has (paid) orders
 
-    def __unicode__(self):
+    def __str__(self):
         if self.is_stock_product():
             return '[voorraadproduct] %s (%s)' % (self.name, self.supplier)
         if self.order_round:
@@ -633,7 +633,7 @@ class DraftProduct(TimeStampedModel):
     is_valid = models.BooleanField(default=False)
     validation_error = models.CharField(max_length=255, blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return "[%d] Draft Product [%s]" % (self.id, self.data)
 
     def validate(self):

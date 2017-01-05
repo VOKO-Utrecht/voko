@@ -25,7 +25,7 @@ class Address(TimeStampedModel):
     zip_code = models.CharField(max_length=7)
     city = models.CharField(max_length=100, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s - %s, %s" % (self.street_and_number, self.zip_code, self.city)
 
 
@@ -39,7 +39,7 @@ class UserProfile(TimeStampedModel):
     phone_number = models.CharField(max_length=25, blank=True)
     notes = models.TextField()
     
-    def __unicode__(self):
+    def __str__(self):
         return "Profile for user: %s" % self.user
 
 
@@ -100,7 +100,7 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.email
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s" % self.email
 
     def save(self, *args, **kwargs):
@@ -145,7 +145,7 @@ class EmailConfirmation(TimeStampedModel):
         rendered_template_vars = render_mail_template(mail_template, user=self.user)
         mail_user(self.user, *rendered_template_vars)
 
-    def __unicode__(self):
+    def __str__(self):
         return "Confirmed: %s | user: %s | email: %s" % (self.is_confirmed, self.user.get_full_name(), self.user.email)
 
 
@@ -179,7 +179,7 @@ class PasswordResetRequest(TimeStampedModel):
             return False
         return True
 
-    def __unicode__(self):
+    def __str__(self):
         return "User: %s | Used: %s | Usable: %s" % (self.user, self.is_used, self.is_usable)
 
 
