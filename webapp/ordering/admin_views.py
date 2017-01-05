@@ -344,7 +344,7 @@ class CreateDraftProducts(TemplateView, ProductAdminMixin):
 
                 field, index = regex_match.groups()
                 index = int(index)
-                data = unicode(self.request.POST[key])
+                data = str(self.request.POST[key])
 
                 sys.stdout.flush()
 
