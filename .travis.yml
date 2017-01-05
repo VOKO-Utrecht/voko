@@ -1,9 +1,9 @@
 language: python
 sudo: false
 python:
-  - "2.7"
+  - "3.5"
 # command to install dependencies
 install:
-  - "pip install -r requirements/development.txt"
+  - "pip3 install -r requirements/development.txt"
 # command to run tests
 script: cd webapp && ./runtests.sh
