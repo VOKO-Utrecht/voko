@@ -5,7 +5,7 @@ def log_event(operator=None,
               event="",
               extra=None):
 
-    from models import EventLog
+    from log.models import EventLog
 
     EventLog.objects.create(operator=operator,
                             user=user,
