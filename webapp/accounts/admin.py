@@ -152,7 +152,7 @@ class ReadOnlyVokoUserAdmin(VokoUserAdmin):
             fields = flatten_fieldsets(self.declared_fieldsets)
         else:
             form = self.get_formset(request, obj).form
-            fields = form.base_fields.keys()
+            fields = list(form.base_fields.keys())
         return fields
 
     def has_add_permission(self, request):
