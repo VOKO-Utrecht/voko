@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from django.db import models, migrations
 
@@ -15,7 +15,7 @@ def link_debits_to_orders(apps, schema_editor):
 
     for o in orders:
         print("======")
-        print("Order %s" % o.id)
+        print(("Order %s" % o.id))
 
         # exceptions (manually created debit objects)
         if o.id == 105:
@@ -36,7 +36,7 @@ def link_debits_to_orders(apps, schema_editor):
                                               notes__endswith="voor bestelling #%s" % o.id)
 
         o.save()
-        print("Linking to Balance: ID %s, AMOUNT %s, NOTES: %s" % (o.debit.id, o.debit.amount, o.debit.notes))
+        print(("Linking to Balance: ID %s, AMOUNT %s, NOTES: %s" % (o.debit.id, o.debit.amount, o.debit.notes)))
 
     print("Done!")
 

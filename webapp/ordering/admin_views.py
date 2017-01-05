@@ -130,9 +130,9 @@ class OrderAdminUserOrderProductsPerOrderRound(GroupRequiredMixin, ListView):
 
         # convert to regular dicts so Django templating can handle it
         data = dict(data)
-        for k, v in data.items():
+        for k, v in list(data.items()):
             data[k] = dict(v)
-            for a, b in data[k].items():
+            for a, b in list(data[k].items()):
                 data[k][a] = dict(b)
 
         context['data'] = data
@@ -244,7 +244,7 @@ class OrderAdminMassCorrection(GroupRequiredMixin, View):
 class ProductAdminMixin(GroupRequiredMixin):
     def _convert_price(self, price):
         if type(price) is str:
-            price = price.lstrip('\u20ac')  # Strip off euro sign
+            price = price.lstrip('\\u20ac')  # Strip off euro sign
         else:
             price = str(price)
         price = price.strip()
@@ -287,7 +287,7 @@ class UploadProductList(FormView, ProductAdminMixin):
 
         workbook = openpyxl.load_workbook(f.name, read_only=True)
         sheet = workbook.get_active_sheet()
-        PRODUCT_NAME, DESCRIPTION, UNIT, PRICE, MAX, CATEGORY = range(0, 6)
+        PRODUCT_NAME, DESCRIPTION, UNIT, PRICE, MAX, CATEGORY = list(range(0, 6))
 
         for idx, row in enumerate(sheet.rows):
             name, description, unit, price, maximum, category = (row[PRODUCT_NAME].value,
@@ -435,7 +435,7 @@ class RedirectToMailingView(GroupRequiredMixin, DetailView):
 
         elif kwargs['mailing_type'] == "reminder":
             mailing_id = 4  # Order reminder
-            queryset = filter(_user_has_no_orders_in_current_round, VokoUser.objects.filter(is_active=True))
+            queryset = list(filter(_user_has_no_orders_in_current_round, VokoUser.objects.filter(is_active=True)))
 
         user_ids = [user.pk for user in queryset]
         request.session['mailing_user_ids'] = user_ids
