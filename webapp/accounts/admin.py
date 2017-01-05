@@ -71,7 +71,7 @@ class UserProfileInline(admin.StackedInline):
 
 def roles(self):
     # https://djangosnippets.org/snippets/1650/
-    short_name = lambda x: unicode(x)[:3].upper()
+    short_name = lambda x: str(x)[:3].upper()
     p = sorted([u"<a title='%s'>%s</a>" % (x, short_name(x)) for x in self.groups.all()])
     if self.user_permissions.count():
         p += ['+']

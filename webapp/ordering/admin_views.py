@@ -243,10 +243,10 @@ class OrderAdminMassCorrection(GroupRequiredMixin, View):
 
 class ProductAdminMixin(GroupRequiredMixin):
     def _convert_price(self, price):
-        if type(price) is unicode:
+        if type(price) is str:
             price = price.lstrip(u'\u20ac')  # Strip off euro sign
         else:
-            price = unicode(str(price), 'utf-8')
+            price = str(price)
         price = price.strip()
         # price = price.replace(".", ",")
         return price
