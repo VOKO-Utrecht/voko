@@ -346,7 +346,6 @@ class CreateDraftProducts(TemplateView, ProductAdminMixin):
                 index = int(index)
                 data = unicode(self.request.POST[key])
 
-                print index, field, data
                 sys.stdout.flush()
 
                 if not data:
@@ -359,9 +358,7 @@ class CreateDraftProducts(TemplateView, ProductAdminMixin):
 
                 yield index, field, data
 
-            except ValueError as e:
-                print e
-                sys.stdout.flush()
+            except ValueError:
                 pass  # other POST value
 
     def _generate_data_dict_for_draft_products(self):
