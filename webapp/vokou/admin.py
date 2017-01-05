@@ -37,7 +37,7 @@ def export_as_csv_action(description="Export selected objects as CSV file",
 
         response = HttpResponse(content_type='text/csv')
         response[
-            'Content-Disposition'] = 'attachment; filename=%s.csv' % unicode(
+            'Content-Disposition'] = 'attachment; filename=%s.csv' % str(
             opts).replace('.', '_')
 
         writer = unicodecsv.writer(response, encoding='utf-8')
@@ -75,7 +75,7 @@ class ActionFilter(FilterBase):
     parameter_name = 'action_flag'
 
     def lookups(self, request, model_admin):
-        return action_names.items()
+        return list(action_names.items())
 
 
 class UserFilter(FilterBase):

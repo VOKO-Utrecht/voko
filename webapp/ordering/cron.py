@@ -1,4 +1,4 @@
-import cStringIO
+import io
 from django.core.mail import EmailMultiAlternatives
 from django.db.models.aggregates import Sum
 from django_cron import CronJobBase, Schedule
@@ -22,7 +22,7 @@ class MailOrderLists(CronJobBase):
 
     def do(self):
         order_round = get_current_order_round()
-        print("Order round: %s" % order_round)
+        print(("Order round: %s" % order_round))
         if order_round.is_open:
             print("Order round is closed")
             return
@@ -41,15 +41,15 @@ class MailOrderLists(CronJobBase):
 
         for supplier in Supplier.objects.all():
             if not supplier.has_orders_in_current_order_round():
-                print("No orders for supplier %s" % supplier)
+                print(("No orders for supplier %s" % supplier))
                 log_event(event="Supplier %s has no orders in current round, "
                           "so not sending order list." % supplier)
                 continue
 
-            print("Generating lists for supplier %s" % supplier)
+            print(("Generating lists for supplier %s" % supplier))
 
             # Generate CSV
-            in_mem_file = cStringIO.StringIO()
+            in_mem_file = io.StringIO()
             csv_writer = csv.writer(in_mem_file, delimiter=';', quotechar='|')
 
             # Write header row

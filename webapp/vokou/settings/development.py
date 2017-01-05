@@ -30,6 +30,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = '/tmp/app-messages'
 
 try:
-    from local import *
+    from .local import *
 except ImportError:
     pass
