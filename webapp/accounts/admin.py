@@ -72,13 +72,13 @@ class UserProfileInline(admin.StackedInline):
 def roles(self):
     # https://djangosnippets.org/snippets/1650/
     short_name = lambda x: str(x)[:3].upper()
-    p = sorted([u"<a title='%s'>%s</a>" % (x, short_name(x)) for x in self.groups.all()])
+    p = sorted(["<a title='%s'>%s</a>" % (x, short_name(x)) for x in self.groups.all()])
     if self.user_permissions.count():
         p += ['+']
     value = ', '.join(p)
     return mark_safe("<nobr>%s</nobr>" % value)
 roles.allow_tags = True
-roles.short_description = u'Groups'
+roles.short_description = 'Groups'
 
 
 def phone(self):

@@ -147,7 +147,7 @@ class LogEntryAdmin(admin.ModelAdmin):
 
         try:
             href = reverse('admin:%s_%s_change' % (obj._meta.app_label, obj.__class__.__name__.lower()), args=[obj.object_id])
-            link = u'<a href="%s">%s</a>' % (href, repr_)
+            link = '<a href="%s">%s</a>' % (href, repr_)
         except NoReverseMatch:
             link = repr_
 
@@ -155,7 +155,7 @@ class LogEntryAdmin(admin.ModelAdmin):
 
     object_link.allow_tags = True
     object_link.admin_order_field = 'object_repr'
-    object_link.short_description = u'object'
+    object_link.short_description = 'object'
 
     def queryset(self, request):
         return super(LogEntryAdmin, self).queryset(request) \

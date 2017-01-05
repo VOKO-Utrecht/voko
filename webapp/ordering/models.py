@@ -175,7 +175,7 @@ class Order(TimeStampedModel):
     # TODO: order cannot be 'paid' without having a 'debit'. Add sanity check.
 
     def __unicode__(self):
-        return u"Order %d; user: %s" % (self.id, self.user)
+        return "Order %d; user: %s" % (self.id, self.user)
 
     @property
     def has_products(self):
@@ -294,7 +294,7 @@ class OrderProduct(TimeStampedModel):
     # TODO: assert order.order_round == product.order_round on save()
 
     def __unicode__(self):
-        return u"%d x %s door %s" % (self.amount, self.product, self.order.user)
+        return "%d x %s door %s" % (self.amount, self.product, self.order.user)
 
     @property
     def total_retail_price(self):
@@ -345,7 +345,7 @@ class OrderProductCorrection(TimeStampedModel):
     charge_supplier = models.BooleanField(default=True, verbose_name="Charge expenses to supplier")
 
     def __unicode__(self):
-        return u"Correctie van %s%%: %s" % (100-self.supplied_percentage, self.order_product)
+        return "Correctie van %s%%: %s" % (100-self.supplied_percentage, self.order_product)
 
     def calculate_refund(self):
         """
@@ -437,7 +437,7 @@ class ProductStock(TimeStampedModel):
         verbose_name = verbose_name_plural = "Productvoorraad"
 
     def __unicode__(self):
-        return u'%d x %s' % (self.amount, self.product)
+        return '%d x %s' % (self.amount, self.product)
 
     def save(self, *args, **kwargs):
         if self.pk is not None:
@@ -472,10 +472,10 @@ class Product(TimeStampedModel):
 
     def __unicode__(self):
         if self.is_stock_product():
-            return u'[voorraadproduct] %s (%s)' % (self.name, self.supplier)
+            return '[voorraadproduct] %s (%s)' % (self.name, self.supplier)
         if self.order_round:
-            return u'[ronde %s] %s (%s)' % (self.order_round.pk, self.name, self.supplier)
-        return u'%s (%s)' % (self.name, self.supplier)
+            return '[ronde %s] %s (%s)' % (self.order_round.pk, self.name, self.supplier)
+        return '%s (%s)' % (self.name, self.supplier)
 
     @property
     def unit_of_measurement(self):
@@ -634,7 +634,7 @@ class DraftProduct(TimeStampedModel):
     validation_error = models.CharField(max_length=255, blank=True, null=True)
 
     def __unicode__(self):
-        return u"[%d] Draft Product [%s]" % (self.id, self.data)
+        return "[%d] Draft Product [%s]" % (self.id, self.data)
 
     def validate(self):
         self.is_valid = False

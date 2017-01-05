@@ -40,7 +40,7 @@ class UserProfile(TimeStampedModel):
     notes = models.TextField()
     
     def __unicode__(self):
-        return u"Profile for user: %s" % self.user
+        return "Profile for user: %s" % self.user
 
 
 class VokoUserManager(BaseUserManager):
@@ -95,13 +95,13 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     objects = VokoUserManager()
 
     def get_full_name(self):
-        return u"%s %s" % (self.first_name, self.last_name)
+        return "%s %s" % (self.first_name, self.last_name)
 
     def get_short_name(self):
         return self.email
 
     def __unicode__(self):
-        return u"%s" % self.email
+        return "%s" % self.email
 
     def save(self, *args, **kwargs):
         # Disabled because this breaks admin login (TODO)
@@ -146,7 +146,7 @@ class EmailConfirmation(TimeStampedModel):
         mail_user(self.user, *rendered_template_vars)
 
     def __unicode__(self):
-        return u"Confirmed: %s | user: %s | email: %s" % (self.is_confirmed, self.user.get_full_name(), self.user.email)
+        return "Confirmed: %s | user: %s | email: %s" % (self.is_confirmed, self.user.get_full_name(), self.user.email)
 
 
 class PasswordResetRequest(TimeStampedModel):
@@ -180,7 +180,7 @@ class PasswordResetRequest(TimeStampedModel):
         return True
 
     def __unicode__(self):
-        return u"User: %s | Used: %s | Usable: %s" % (self.user, self.is_used, self.is_usable)
+        return "User: %s | Used: %s | Usable: %s" % (self.user, self.is_used, self.is_usable)
 
 
 class ReadOnlyVokoUser(VokoUser):

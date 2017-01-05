@@ -84,7 +84,7 @@ class Balance(TimeStampedModel):
     notes = models.TextField()
 
     def __unicode__(self):
-        return u"[%s] %s: %s" % (self.user, self.type, self.amount)
+        return "[%s] %s: %s" % (self.user, self.type, self.amount)
 
     def save(self, *args, **kwargs):
         """ Sanity check, the amount may not be zero or less. """

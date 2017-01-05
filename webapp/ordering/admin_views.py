@@ -244,7 +244,7 @@ class OrderAdminMassCorrection(GroupRequiredMixin, View):
 class ProductAdminMixin(GroupRequiredMixin):
     def _convert_price(self, price):
         if type(price) is str:
-            price = price.lstrip(u'\u20ac')  # Strip off euro sign
+            price = price.lstrip('\u20ac')  # Strip off euro sign
         else:
             price = str(price)
         price = price.strip()
