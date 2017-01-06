@@ -18,7 +18,7 @@ SERVER_EMAIL = "info@vokoutrecht.nl"
 ADMINS = (
     ("Voko Utrecht", "info@vokoutrecht.nl"),
 )
-ALLOWED_HOSTS = ("leden.vokoutrecht.nl",)
+ALLOWED_HOSTS = ("leden.vokoutrecht.nl", "dev.vokoutrecht.nl")
 
 MOLLIE_API_KEY = os.environ["MOLLIE_API_KEY"]
 
