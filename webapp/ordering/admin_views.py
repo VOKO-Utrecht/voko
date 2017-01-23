@@ -216,7 +216,7 @@ class OrderAdminCorrection(GroupRequiredMixin, TemplateView):
 
     def corrections(self):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
-        return OrderProductCorrection.objects.filter(order_product__product__order_round=order_round).order_by("order_product__order__user")
+        return OrderProductCorrection.objects.filter(order_product__order__order_round=order_round).order_by("order_product__order__user")
 
     def products(self):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
