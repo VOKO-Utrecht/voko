@@ -108,5 +108,5 @@ VOKO Utrecht
 
             msg = EmailMultiAlternatives(subject, text_content, from_email,
                                          [to], cc=["VOKO Utrecht Boerencontact <boeren@vokoutrecht.nl>"])
-            msg.attach('voko_utrecht_bestelling_ronde_%d.csv' % order_round.pk, in_mem_file.read(), 'text/csv')
+            msg.attach('voko_utrecht_bestelling_ronde_%d.csv' % order_round.pk, in_mem_file.read().decode("utf-8"), 'text/csv')
             msg.send()
