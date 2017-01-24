@@ -49,7 +49,7 @@ class MailOrderLists(CronJobBase):
             print(("Generating lists for supplier %s" % supplier))
 
             # Generate CSV
-            in_mem_file = io.StringIO()
+            in_mem_file = io.BytesIO()
             csv_writer = csv.writer(in_mem_file, delimiter=';', quotechar='|')
 
             # Write header row
@@ -85,7 +85,7 @@ class MailOrderLists(CronJobBase):
             csv_writer.writerow(["TOTAAL", "", "", "", "", total])
 
             in_mem_file.seek(0)
-            in_mem_file.seek(0)
+            in_mem_file.seek(0)  # Why is this here twice?
 
             # Generate mail
             subject = 'VOKO Utrecht - Bestellijst voor %s' % order_round.collect_datetime.strftime("%d %B %Y")
