@@ -72,7 +72,7 @@ USE_I18N = True
 USE_L10N = False
 USE_TZ = True
 DECIMAL_SEPARATOR = ','
-
+DATETIME_FORMAT = "j F Y, H:i"
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
