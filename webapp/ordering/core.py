@@ -52,6 +52,7 @@ def get_or_create_order(user):
                                             order_round=get_current_order_round())
     return order
 
+
 def get_order_product(product, order):
     existing_ops = models.OrderProduct.objects.filter(product=product, order=order)
     if existing_ops:
@@ -60,7 +61,14 @@ def get_order_product(product, order):
 
 def update_totals_for_products_with_max_order_amounts(order):
     ### TODO: Add messages about deleted / changed orderproducts
-    for orderproduct in order.orderproducts.all().exclude(product__maximum_total_order__exact=None):
+
+    # stock products
+    stock_products = order.orderproducts.all().filter(
+        product__order_round__exact=None)
+    capped_products = order.orderproducts.all().exclude(
+        product__maximum_total_order__exact=None)
+
+    for orderproduct in stock_products | capped_products:
         if orderproduct.amount > orderproduct.product.amount_available:
             if orderproduct.product.amount_available > 0:
                 orderproduct.amount = orderproduct.product.amount_available

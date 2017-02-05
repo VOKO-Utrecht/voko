@@ -1,7 +1,10 @@
 from datetime import datetime
 from pytz import UTC
-from ordering.core import get_current_order_round
-from ordering.tests.factories import OrderRoundFactory
+from ordering.core import get_current_order_round, \
+    update_totals_for_products_with_max_order_amounts
+from ordering.models import OrderProduct
+from ordering.tests.factories import OrderRoundFactory, OrderFactory, \
+    ProductFactory, OrderProductFactory, ProductStockFactory
 from vokou.testing import VokoTestCase
 
 
@@ -113,3 +116,92 @@ class TestGetCurrentOrderRound(VokoTestCase):
 
         self.assertTrue(round1.is_open)
         self.assertEqual(get_current_order_round(), round1)
+
+
+class TestUpdateOrderTotals(VokoTestCase):
+    def setUp(self):
+        self.round = OrderRoundFactory()
+        self.order = OrderFactory(order_round=self.round)
+
+    def test_that_sold_out_product_is_removed(self):
+        product = ProductFactory(order_round=self.round, maximum_total_order=10)
+        self.assertEqual(10, product.amount_available)
+
+        order1 = OrderFactory(order_round=self.round, finalized=True, paid=True)
+        order1_product = OrderProductFactory(order=order1, product=product, amount=10)
+
+        self.assertEqual(10, product.amount_ordered)
+        self.assertEqual(0, product.amount_available)
+
+        order2 = OrderFactory(order_round=self.round)
+        order2_product = OrderProductFactory(order=order2, amount=1)
+
+        update_totals_for_products_with_max_order_amounts(order2)
+
+        self.assertEqual(1, len(product.orderproducts.all()))
+
+    def test_that_order_amount_is_decreased(self):
+        # 10 available
+        product = ProductFactory(order_round=self.round, maximum_total_order=10)
+        self.assertEqual(10, product.amount_available)
+
+        order1 = OrderFactory(order_round=self.round, finalized=True, paid=True)
+        order1_product = OrderProductFactory(order=order1, product=product, amount=8)
+
+        # 8 ordered, leaves 2
+        self.assertEqual(8, product.amount_ordered)
+        self.assertEqual(2, product.amount_available)
+
+        # attempt to order 5
+        order2 = OrderFactory(order_round=self.round)
+        order2_product = OrderProductFactory(order=order2, product=product, amount=5)
+
+        update_totals_for_products_with_max_order_amounts(order2)
+
+        # re-fetch, amount is decreased to remaining 2
+        order2_product = OrderProduct.objects.get(pk=order2_product.pk)
+        self.assertEqual(2, order2_product.amount)
+
+    def test_sold_out_stock_product_is_removed(self):
+        # 10 available
+        product = ProductFactory(order_round=None)
+        ProductStockFactory(product=product, amount=10)
+        self.assertEqual(10, product.amount_available)
+
+        order1 = OrderFactory(order_round=self.round, finalized=True, paid=True)
+        order1_product = OrderProductFactory(order=order1, product=product, amount=10)
+
+        # 10 ordered, 0 remain
+        self.assertEqual(10, product.amount_ordered)
+        self.assertEqual(0, product.amount_available)
+
+        # order 1 more
+        order2 = OrderFactory(order_round=self.round)
+        order2_product = OrderProductFactory(order=order2, product=product, amount=1)
+
+        self.assertEqual(2, len(product.orderproducts.all()))
+        update_totals_for_products_with_max_order_amounts(order2)
+        self.assertEqual(1, len(product.orderproducts.all()))
+
+    def test_that_stock_product_amount_is_decreased(self):
+        # 10 available
+        product = ProductFactory(order_round=None)
+        ProductStockFactory(product=product, amount=10)
+        self.assertEqual(10, product.amount_available)
+
+        order1 = OrderFactory(order_round=self.round, finalized=True, paid=True)
+        order1_product = OrderProductFactory(order=order1, product=product, amount=8)
+
+        # 8 ordered, leaves 2
+        self.assertEqual(8, product.amount_ordered)
+        self.assertEqual(2, product.amount_available)
+
+        # attempt to order 5
+        order2 = OrderFactory(order_round=self.round)
+        order2_product = OrderProductFactory(order=order2, product=product, amount=5)
+
+        update_totals_for_products_with_max_order_amounts(order2)
+
+        # re-fetch, amount is decreased to remaining 2
+        order2_product = OrderProduct.objects.get(pk=order2_product.pk)
+        self.assertEqual(2, order2_product.amount)
