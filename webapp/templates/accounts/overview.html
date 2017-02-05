@@ -84,14 +84,16 @@ Je hebt {{ orders|length }} bestellingen geplaatst.
                 "lengthChange": false,
                 "ordering": false,
                 "info": false,
-                "pagingType": "numbers"
+                "pagingType": "numbers",
+                "emptyTable": "Je hebt (nog) geen transacties"
             });
             $('#orders-table').DataTable({
                 "searching": false,
                 "lengthChange": false,
                 "ordering": false,
                 "info": false,
-                "pagingType": "numbers"
+                "pagingType": "numbers",
+                "emptyTable": "Je hebt (nog) geen bestellingen"
             });
         });
     </script>
