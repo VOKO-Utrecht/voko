@@ -2,89 +2,97 @@
 {% load bootstrap3 %}
 {% block title %}Accountoverzicht{% endblock %}
 {% block content %}
-<h1>Accountoverzicht</h1>
-<h2>Bestelronde {{ view.current_order_round.id }}</h2>
-<div class="panel panel-default">
-  <table class="table">
-    <tbody>
-          <tr>
-            <td>Huidige bestelronde</td>
-            <td>{% if view.current_order_round.is_open %}Open{% else %}Gesloten{% endif %}</td>
-          </tr>
-          <tr>
-            <td>Bestelronde open vanaf</td>
-            <td>{{ view.current_order_round.open_for_orders }}</td>
-          </tr>
-          <tr>
-            <td>Bestelronde open tot</td>
-            <td>{{ view.current_order_round.closed_for_orders }}</td>
-          </tr>
-          <tr>
-            <td>Ophaalmoment</td>
-            <td>{{ view.current_order_round.collect_datetime }}</td>
-          </tr>
-    </tbody>
-  </table>
-</div>
-
-<h2>Bestellingen</h2>
-<div class="panel panel-default">
-  <table class="table">
-    <thead>
+<h1 class="page-header">Welkom, {{ user.first_name }}</h1>
+<p class="lead">
+De huidige bestelronde is <strong>bestelronde {{ view.current_order_round.id }}</strong>. Deze bestelronde is nu <strong>{% if view.current_order_round.is_open %}open{% else %}gesloten{% endif %}</strong>.
+</p>
+<table class="table">
+<tbody>
       <tr>
-        <th>Bestelling</th>
-        <th>Bestelronde</th>
-        <th>Bedrag</th>
+        <td>Bestelronde open vanaf</td>
+        <td>{{ view.current_order_round.open_for_orders }}</td>
       </tr>
-    </thead>
-    <tbody>
-      {% for order in orders %}
-          {% if order.has_products %}
-          <tr>
-            <td><a href="{% url 'order_summary' order.pk %}">Bestelling {{ order.user_order_number }}</a></td>
-            <td>{{ order.order_round }}</td>
-            <td>&euro; {{ order.total_price }}</td>
-          </tr>
-          {% endif %}
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-
-<h2>Financiën</h2>
-    <div>
-    <p>
-    Credit: &euro; {{ user.balance.credit }}<br/>
-    Debet: &euro; {{ user.balance.debit }}
-    </p>
-    </div>
-
-<div class="panel panel-default">
-  <table class="table">
-    <thead>
       <tr>
-        <th>Credit/debet</th>
-        <th>Datum</th>
-        <th>Bedrag</th>
-        <th>Opmerkingen</th>
+        <td>Bestelronde open tot</td>
+        <td>{{ view.current_order_round.closed_for_orders }}</td>
       </tr>
-    </thead>
-    <tbody>
-      {% for b in balances  %}
       <tr>
-        <td>{{ b.type }}</td>
-        <td>{{ b.created.date }}</td>
-        <td>&euro; {{ b.amount }}</td>
-        <td>{{ b.notes }}</td>
+        <td>Ophaalmoment</td>
+        <td>{{ view.current_order_round.collect_datetime }}</td>
       </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+</tbody>
+</table>
 
+
+<h2 class="page-header">Jouw financiën</h2>
+   <p class="lead">
+       Credit: &euro; {{ user.balance.credit }}<br/>
+       Debet: &euro; {{ user.balance.debit }}
+   </p>
+
+   <table class="table table-condensed" id="finance-table">
+   <thead>
+     <tr>
+       <th>Datum</th>
+       <th>Bedrag</th>
+       <th>Opmerkingen</th>
+     </tr>
+   </thead>
+   <tbody>
+     {% for b in balances  %}
+     <tr>
+       <td>{{ b.created.date }}</td>
+       <td>&euro; {% if b.type == 'DR' %}-{% endif %}{{ b.amount }}</td>
+       <td>{{ b.notes }}</td>
+     </tr>
+     {% endfor %}
+   </tbody>
+   </table>
+
+<h2 class="page-header">Jouw bestellingen</h2>
+<p class="lead">
+Je hebt {{ orders|length }} bestellingen geplaatst.
+</p>
+<table class="table table-condensed" id="orders-table">
+<thead>
+  <tr>
+    <th>Bestelling</th>
+    <th>Bestelronde</th>
+    <th>Bedrag</th>
+  </tr>
+</thead>
+<tbody>
+  {% for order in orders %}
+      {% if order.has_products %}
+      <tr>
+        <td><a href="{% url 'order_summary' order.pk %}">Bestelling {{ order.user_order_number }}</a></td>
+        <td>{{ order.order_round }}</td>
+        <td>&euro; {{ order.total_price }}</td>
+      </tr>
+      {% endif %}
+  {% endfor %}
+</tbody>
+</table>
 
 {% endblock %}
 
-
-
-
+{% block javascript %}
+    <script>
+        $(document).ready(function() {
+            $('#finance-table').DataTable({
+                "searching": false,
+                "lengthChange": false,
+                "ordering": false,
+                "info": false,
+                "pagingType": "numbers"
+            });
+            $('#orders-table').DataTable({
+                "searching": false,
+                "lengthChange": false,
+                "ordering": false,
+                "info": false,
+                "pagingType": "numbers"
+            });
+        });
+    </script>
+{% endblock %}
