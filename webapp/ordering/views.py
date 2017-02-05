@@ -134,7 +134,6 @@ class ProductsView(LoginRequiredMixin, ListView):
 
             yield product
 
-
     def categories(self):
         """
         Return all categories, alphabetically ordered
@@ -145,7 +144,7 @@ class ProductsView(LoginRequiredMixin, ListView):
         """
         Return all suppliers
         """
-        return Supplier.objects.all()
+        return set([p.supplier for p in self.get_queryset()])
 
 
 class ProductDetail(LoginRequiredMixin, View):
