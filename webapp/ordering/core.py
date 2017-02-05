@@ -1,3 +1,4 @@
+from django.contrib import messages
 from pytz import UTC
 import re
 from datetime import datetime
@@ -59,8 +60,11 @@ def get_order_product(product, order):
         return existing_ops[0]
 
 
-def update_totals_for_products_with_max_order_amounts(order):
-    ### TODO: Add messages about deleted / changed orderproducts
+def update_totals_for_products_with_max_order_amounts(order, request=None):
+    """
+    request (Django request) is optional, when given it is used to add
+    a message when orderproducts are altered or removed.
+    """
 
     # stock products
     stock_products = order.orderproducts.all().filter(
@@ -74,8 +78,22 @@ def update_totals_for_products_with_max_order_amounts(order):
                 orderproduct.amount = orderproduct.product.amount_available
                 orderproduct.save()
 
+                if request:
+                    messages.add_message(
+                        request, messages.WARNING,
+                        "Je bestelling van product %s is verlaagd naar "
+                        "%d in verband met beschikbaarheid." %
+                        (orderproduct.product.name,
+                         orderproduct.product.amount_available))
+
             else:
                 orderproduct.delete()
+                if request:
+                    messages.add_message(
+                        request, messages.WARNING,
+                        "Je bestelling van product %s is verwijderd "
+                        "omdat het product inmiddels is uitverkocht." %
+                        (orderproduct.product.name,))
 
 
 def find_unit(unit):

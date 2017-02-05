@@ -216,7 +216,8 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
         return qs.filter(paid=False)
 
     def get_context_data(self, **kwargs):
-        update_totals_for_products_with_max_order_amounts(self.get_object())
+        update_totals_for_products_with_max_order_amounts(self.get_object(),
+                                                          self.request)
         return super(UpdateView, self).get_context_data(**kwargs)
 
     def calculate_payment(self):
