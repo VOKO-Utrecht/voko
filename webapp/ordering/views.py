@@ -112,6 +112,9 @@ class ProductsView(LoginRequiredMixin, ListView):
         context['order'] = get_or_create_order(self.request.user)
         return context
 
+    def product_count(self):
+        return self.get_queryset().count()
+
     def products(self):
         """
         Return all products in this round.

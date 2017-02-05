@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 {% block title %}Producten{% endblock %}
 {% block content %}
-<h1>Producten</h1>
+<h1 class="page-header">Producten in bestelronde {{ current_order_round.id }}</h1>
+    <p class="lead">
+        Deze ronde zijn er {{ view.product_count }} producten van {{ view.suppliers|length }} leveranciers.
+    </p>
 {% if current_order_round.is_open or user.is_staff %}
 
     {% if user.is_staff and not current_order_round.is_open %}
@@ -17,9 +20,6 @@
   <!-- Default panel contents -->
   <div class="panel-heading">
     <button type="submit" class="btn btn-success btn-save-order"><span class="glyphicon glyphicon-ok-sign"></span> Bestelling bevestigen</button>
-  </div>
-  <div class="panel-body">
-      <strong>Onderstaande producten zijn leverbaar in bestelronde {{ current_order_round.id }}.</strong><br/>
   </div>
 
     <!-- Categories -->
