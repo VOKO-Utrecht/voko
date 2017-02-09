@@ -34,7 +34,7 @@
     </div>
 
   <!-- Table -->
-  <table class="table table-hover">
+  <table class="table table-hover" id="products-table">
     <thead>
       <tr>
         <th>Product</th>
@@ -124,4 +124,19 @@
     });
 {% endfor %}
 </script>
+
+<script>
+    $(document).ready(function() {
+        $('#products-table').DataTable({
+            "lengthChange": false,
+            "info": false,
+            "paging": false,
+            "language": {
+                "search": "Zoeken:"
+            }
+        });
+    });
+</script>
+
+
 {% endblock %}

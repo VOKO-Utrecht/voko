@@ -12,7 +12,8 @@
     <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" media='screen,print'>
     <link href="{% static 'bootstrap/css/bootstrap-theme.min.css' %}" rel="stylesheet" media='screen,print'>
     <link href="{% static 'css/theme.css' %}" rel="stylesheet" media='screen,print'>
-    <link href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'datatables/datatables.min.css' %}">
+
     {% block extra_head %}{% endblock %}
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -72,7 +73,7 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 
-    <script src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="{% static 'datatables/datatables.min.js' %}"></script>
 
     {% block javascript %}{% endblock %}
   </body>
