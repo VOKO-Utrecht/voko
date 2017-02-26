@@ -36,7 +36,7 @@ TEMPLATES = [
 
 # Application definition
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'flat',
     'django.contrib.auth',
     'django.contrib.admin',
@@ -60,10 +60,9 @@ INSTALLED_APPS = (
     'docs',
     'hijack',
     'compat'  # Requirement of hijack
+]
 
-)
-
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -73,7 +72,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.common.BrokenLinkEmailsMiddleware',
     'vokou.middleware.OrderRoundMiddleware',
-)
+]
 
 CRON_CLASSES = [
     "ordering.cron.MailOrderLists",
