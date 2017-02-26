@@ -22,9 +22,9 @@ ALLOWED_HOSTS = ("leden.vokoutrecht.nl", "dev.vokoutrecht.nl")
 
 MOLLIE_API_KEY = os.environ["MOLLIE_API_KEY"]
 
-INSTALLED_APPS += (
+INSTALLED_APPS += [
     "opbeat.contrib.django",
-)
+]
 
 OPBEAT = {
     "ORGANIZATION_ID": os.environ["OPBEAT_ORGANIZATION_ID"],
@@ -32,6 +32,6 @@ OPBEAT = {
     "SECRET_TOKEN": os.environ["OPBEAT_SECRET"]
 }
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
-) + MIDDLEWARE_CLASSES
+] + MIDDLEWARE_CLASSES
