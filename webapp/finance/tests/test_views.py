@@ -103,10 +103,6 @@ class TestCreateTransaction(FinanceTestCase):
                                   finalized=True,
                                   paid=False)
 
-        s = self.client.session
-        s['order_to_pay'] = self.order.id
-        s.save()
-
     def test_that_transaction_is_created(self):
         self.client.post(self.url, {'bank': 'EXAMPLE_BANK'})
         self.mollie_client.return_value.payments.create.assert_called_once_with(
@@ -135,26 +131,20 @@ class TestCreateTransaction(FinanceTestCase):
         self.assertEqual(ret.status_code, 302)
         self.assertEqual(ret.url, "http://bank.url")
 
-    def test_error_when_user_doesnt_own_order(self):
-        s = self.client.session
-        s['order_to_pay'] = OrderFactory().id
-        s.save()
-
-        with self.assertRaises(AssertionError):
-            self.client.post(self.url, {'bank': "EXAMPLE_BANK"})
-
-    def test_error_when_order_not_finalized(self):
+    def test_redirect_when_order_not_finalized(self):
+        # No order matches, so not found
         self.order.finalized = False
         self.order.save()
 
-        with self.assertRaises(AssertionError):
-            self.client.post(self.url, {'bank': "EXAMPLE_BANK"})
+        ret = self.client.post(self.url, {'bank': "EXAMPLE_BANK"})
+        self.assertRedirects(ret, reverse('view_products'))
 
     def test_redirect_on_invalid_form(self):
         ret = self.client.post(self.url, {'bank': 'foo'})
         self.assertRedirects(ret, reverse('finance.choosebank'))
 
     def test_redirect_when_order_round_is_closed(self):
+        # No order matches, so not found
         month_ago = datetime.now(tz=UTC) - timedelta(days=30)
         order_round = OrderRoundFactory(closed_for_orders=month_ago)
         assert order_round.is_open is False
@@ -162,7 +152,7 @@ class TestCreateTransaction(FinanceTestCase):
         self.order.save()
 
         ret = self.client.post(self.url, {'bank': "EXAMPLE_BANK"})
-        self.assertRedirects(ret, reverse('finish_order', args=(self.order.id, )), fetch_redirect_response=False)
+        self.assertRedirects(ret, reverse('view_products'))
 
 
 class TestConfirmTransaction(FinanceTestCase):
@@ -246,14 +236,6 @@ class TestConfirmTransaction(FinanceTestCase):
                                                                             payment.order.id))
         self.mock_mail_confirmation.assert_called_once_with()
 
-    def test_that_order_id_is_removed_from_session_on_successful_payment(self):
-        self.mollie_client.return_value.payments.get. \
-            return_value.isPaid.return_value = True
-        self.client.get(self.url, {"order": self.order.id})
-
-        s = self.client.session
-        self.assertNotIn('order_to_pay', s)
-
     def test_nothing_is_changed_when_payment_already_confirmed(self):
         self.order.paid = True
         self.order.save()
@@ -277,10 +259,6 @@ class TestPaymentWebhook(FinanceTestCase):
                                   finalized=True,
                                   paid=False)
         self.payment = PaymentFactory(order=self.order)
-
-        s = self.client.session
-        s['order_to_pay'] = self.order.id
-        s.save()
 
         self.url = reverse('finance.callback')
 
@@ -366,10 +344,6 @@ class TestCancelPaymentView(VokoTestCase):
         self.order = OrderFactory(user=self.user,
                                   finalized=True,
                                   paid=False)
-
-        s = self.client.session
-        s['order_to_pay'] = self.order.id
-        s.save()
 
     def test_order_finalized_is_set_to_false(self):
         self.client.get(self.url)

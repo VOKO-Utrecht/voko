@@ -1,5 +1,4 @@
 import Mollie
-import sys
 from braces.views import LoginRequiredMixin
 from django import forms
 from django.conf import settings
@@ -28,6 +27,14 @@ def choosebankform_factory(banks):
         bank = forms.ChoiceField(choices=choices, required=True)
 
     return ChooseBankForm
+
+
+def get_order_to_pay(user):
+    cur_order_round = get_current_order_round()
+
+    return Order.objects.filter(paid=False, finalized=True,
+                                order_round=cur_order_round,
+                                user=user).last()
 
 
 class MollieMixin(object):
@@ -67,17 +74,7 @@ class ChooseBankView(LoginRequiredMixin, MollieMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super(ChooseBankView, self).get_context_data(**kwargs)
-        cur_order_round = get_current_order_round()
-        try:
-            context['order'] = Order.objects.get(
-                id=self.request.GET.get(
-                    'order_to_pay',
-                    Order.objects.get(paid=False, finalized=True,
-                                      order_round=cur_order_round,
-                                      user=self.request.user).id))
-        except Order.DoesNotExist:
-            pass  # Warning is shown in template
-
+        context['order'] = get_order_to_pay(self.request.user)
         return context
 
 
@@ -99,7 +96,11 @@ class CreateTransactionView(LoginRequiredMixin, MollieMixin, FormView):
             # Redirect back to previous view
             return redirect(reverse('finance.choosebank'))
 
-        order_to_pay = Order.objects.get(id=request.session['order_to_pay'])
+        order_to_pay = get_order_to_pay(request.user)
+        if not order_to_pay:
+            messages.error(request, "Geen bestelling gevonden")
+            return redirect(reverse('view_products'))
+
         amount_to_pay = order_to_pay\
             .total_price_to_pay_with_balances_taken_into_account()
         log_event(
@@ -196,11 +197,6 @@ class ConfirmTransactionView(LoginRequiredMixin, MollieMixin, TemplateView):
                 log_event(event="Payment %s was already paid" % payment.id,
                           user=payment.order.user)
 
-            try:
-                del self.request.session['order_to_pay']
-            except KeyError:
-                pass
-
         else:
             log_event(event="Payment %s for order %s and amount %f failed" %
                             (payment.id, payment.order.id, payment.amount),
@@ -275,7 +271,10 @@ class CancelPaymentView(View):
     """
 
     def get(self, request, *args, **kwargs):
-        order_to_pay = Order.objects.get(id=request.session['order_to_pay'])
+        order_to_pay = get_order_to_pay(request.user)
+        if not order_to_pay:
+            messages.error(request,"Geen bestelling gevonden")
+            return redirect(reverse('view_products'))
 
         # Sanity checks
         assert order_to_pay.finalized is True

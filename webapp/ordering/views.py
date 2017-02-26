@@ -246,8 +246,6 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
             order.complete_after_payment()
             return redirect(reverse('order_summary', args=(order.pk,)))
 
-        # Store order_id in session
-        request.session['order_to_pay'] = order.id
         return redirect('finance.choosebank')
 
 
