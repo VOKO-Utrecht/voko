@@ -17,10 +17,6 @@ def get_current_order_round():
     now = datetime.now(UTC)
     order_rounds = models.OrderRound.objects.all()
 
-    # No rounds at all (empty table)
-    if order_rounds.count() == 0:
-        return
-
     # Exact match to open round(s)
     filtered = order_rounds.filter(open_for_orders__lte=now,
                                    collect_datetime__gt=now)

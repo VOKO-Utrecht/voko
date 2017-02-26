@@ -26,7 +26,7 @@ class ProductsView(LoginRequiredMixin, ListView):
 
         return Product.objects.filter(enabled=True).\
             filter(Q(order_round=order_round) | Q(order_round__isnull=True)).\
-            order_by('name')
+            order_by('name').select_related('category', 'supplier', 'order_round', 'unit').prefetch_related('orderproducts')
 
     def get(self, *args, **kwargs):
         ret = super(ProductsView, self).get(*args, **kwargs)
