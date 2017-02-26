@@ -9,9 +9,8 @@ STATIC_ROOT = PROJECT_DIR.child("static")
 STATICFILES_DIRS = (
     PROJECT_DIR.child("assets"),
 )
-TEMPLATE_DIRS = (
-    PROJECT_DIR.child("templates"),
-)
+
+DEBUG = False
 
 TEMPLATES = [
     {
@@ -34,8 +33,6 @@ TEMPLATES = [
     },
 ]
 
-DEBUG = False
-TEMPLATE_DEBUG = DEBUG
 
 # Application definition
 

@@ -14,7 +14,6 @@ from .base import *
 SECRET_KEY = 'da)=ydvhyj*u6%ldu_8hf%1op2efv!3q*%(ks=j19dvi$fu0oh'
 
 DEBUG = True
-TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = []
 
 

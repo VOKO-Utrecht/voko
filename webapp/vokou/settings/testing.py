@@ -6,7 +6,6 @@ PASSWORD_HASHERS = (
 )
 
 DEBUG = False
-TEMPLATE_DEBUG = DEBUG
 
 
 # https://stackoverflow.com/questions/25161425/disable-migrations-when-running-unit-tests-in-django-1-7 
