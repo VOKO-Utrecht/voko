@@ -37,7 +37,6 @@ TEMPLATES = [
 # Application definition
 
 INSTALLED_APPS = [
-    'flat',
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
