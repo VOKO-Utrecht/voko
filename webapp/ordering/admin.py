@@ -49,11 +49,8 @@ def export_orders_for_financial_admin(modeladmin, request, queryset):
     writer.writerow(field_names)
 
     for order in queryset.filter(paid=True):
-        try:
-            payment = order.payments.get(succeeded=True)
-            actually_paid = payment.amount
-        except Payment.DoesNotExist:
-            actually_paid = 0
+        payment = order.payments.filter(succeeded=True).last()
+        actually_paid = payment.amount if payment else 0
 
         dd = dutch_decimal
 
