@@ -1,7 +1,11 @@
+import unicodecsv
 from django.contrib import admin
 from django.db import OperationalError
 import sys
-from finance.models import Balance
+
+from django.http import HttpResponse
+
+from finance.models import Balance, Payment
 from vokou.admin import DeleteDisabledMixin
 from .models import Order, OrderProduct, Product, OrderRound, ProductCategory, \
     OrderProductCorrection, ProductStock, Supplier, ProductUnit, DraftProduct
@@ -20,12 +24,66 @@ def create_credit_for_order(modeladmin, request, queryset):
 create_credit_for_order.short_description = "Contant betaald"
 
 
+def dutch_decimal(value):
+    return str(value).replace('.', ',')
+
+
+def export_orders_for_financial_admin(modeladmin, request, queryset):
+    field_names = [
+        'Bestelling ID',
+        'Lid',
+        'Datum',
+        'Ronde',
+        'Totaalsom producten (incl. marge)',
+        'ledenbijdrage',
+        'Transactiekosten',
+        'Betaald',
+        'Verrekening debit/credit',
+        'Totaalbedrag']
+
+    response = HttpResponse(content_type='text/csv')
+    response[
+        'Content-Disposition'] = 'attachment; filename=orders_export.csv'
+
+    writer = unicodecsv.writer(response, encoding='utf-8')
+    writer.writerow(field_names)
+
+    for order in queryset.filter(paid=True):
+        try:
+            payment = order.payments.get(succeeded=True)
+            actually_paid = payment.amount
+        except Payment.DoesNotExist:
+            actually_paid = 0
+
+        dd = dutch_decimal
+
+        row = [
+            order.id,
+            "{0} ({1})".format(order.user, order.user_id),
+            order.modified.date(),
+            order.order_round_id,
+            dd(sum([odp.total_retail_price
+                    for odp in order.orderproducts.all()])),
+            dd(order.member_fee),
+            dd(order.order_round.transaction_costs),
+            dd(actually_paid).replace('.', ','),
+            dd(order.debit.amount - actually_paid),
+            dd(order.debit.amount)
+        ]
+        writer.writerow(row)
+
+    return response
+
+export_orders_for_financial_admin.short_description = "Exporteer voor " \
+                                                      "financiële admin"
+
+
 class OrderAdmin(DeleteDisabledMixin, admin.ModelAdmin):
     list_display = ["id", "created", "order_round", "user", "finalized", "paid", "total_price", "user_notes"]
     ordering = ("-id", )
     # inlines = [OrderProductInline]  ## causes timeout
     list_filter = ("paid", "finalized", "order_round")
-    actions = (create_credit_for_order, )
+    actions = (create_credit_for_order, export_orders_for_financial_admin)
 
 admin.site.register(Order, OrderAdmin)
 
