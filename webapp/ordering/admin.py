@@ -49,11 +49,12 @@ def export_orders_for_financial_admin(modeladmin, request, queryset):
     writer.writerow(field_names)
 
     for order in queryset.filter(paid=True):
-        payment = order.payments.filter(succeeded=True).last()
-        actually_paid = payment.amount if payment else 0
+        # Why multiple payments? Because of (historical) corner case with
+        # double payment.
+        payments = order.payments.filter(succeeded=True)
+        actually_paid = sum([p.amount for p in payments])
 
         dd = dutch_decimal
-
         row = [
             order.id,
             "{0} ({1})".format(order.user, order.user_id),
