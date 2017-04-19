@@ -27,7 +27,9 @@
                 {% for product, orderproducts in products.items %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h2><b>{{ product.name }} {% if product.is_stock_product %} <span class="label label-danger">uit voorraad</span> {% endif %} {% if not product.is_stock_product %}(totaal besteld: {{ product.amount_ordered }} x {{ product.unit_of_measurement }}){% endif %}</b></h2>
+                            <h2><b>{{ product.name }} ({{ product.supplier.name }}) {% if product.is_stock_product %} <span class="label label-danger">uit voorraad</span> {% endif %} {% if not product.is_stock_product %}
+                                <small>totaal: {{ product.amount_ordered }} x {{ product.unit_of_measurement }}</small>
+                            {% endif %}</b></h2>
                         </div>
                         <div class="panel-body">{{ product.description }}</div>
                             <table class="table table-condensed">
@@ -36,7 +38,6 @@
                                         <th>Aantal</th>
                                         <th>Eenheid</th>
                                         <th>Lid</th>
-                                        <th>Lid ID</th>
                                         <th>Bestelling ID</th>
                                     </tr>
                                 </thead>
@@ -46,7 +47,6 @@
                                             <td>{{ op.amount }}</td>
                                             <td>{{ op.product.unit_of_measurement }}</td>
                                             <td>{{ op.order.user.get_full_name }}</td>
-                                            <td>#{{ op.order.user.pk }}</td>
                                             <td>#{{ op.order.pk }}</td>
                                         </tr>
                                     {% endfor %}
