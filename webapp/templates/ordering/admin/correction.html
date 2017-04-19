@@ -98,7 +98,7 @@
                 <select class="form-control" id="product" name="product_id">
                     <option></option>
                     {% for p in view.products %}
-                        <option value="{{ p.id }}">{{ p.name }} ({{ p.supplier.name }})</option>
+                        <option value="{{ p.id }}">[{{ p.unit_of_measurement }}] {{ p.name }} ({{ p.supplier.name }})</option>
                     {% endfor %}
                 </select>
             </div>
