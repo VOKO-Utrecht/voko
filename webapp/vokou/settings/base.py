@@ -80,6 +80,7 @@ MIDDLEWARE_CLASSES = [
 
 CRON_CLASSES = [
     "ordering.cron.MailOrderLists",
+    "ordering.cron.SendOrderReminders",
 ]
 
 ROOT_URLCONF = 'vokou.urls'

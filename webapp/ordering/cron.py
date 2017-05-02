@@ -1,4 +1,7 @@
 import io
+
+from datetime import datetime
+import pytz
 from django.core.mail import EmailMultiAlternatives
 from django.db.models.aggregates import Sum
 from django_cron import CronJobBase, Schedule
@@ -12,6 +15,31 @@ import unicodecsv as csv
 def fix_decimal_separator(decimal_value):
     # Because DECIMAL_SEPARATOR is being ignored :(
     return str(decimal_value).replace('.', ',')
+
+
+class SendOrderReminders(CronJobBase):
+    RUN_EVERY_MINS = 30
+
+    schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
+    code = 'ordering.send_order_reminders'
+
+    def do(self):
+        order_round = get_current_order_round()
+        print(("Order round: %s" % order_round))
+
+        if not order_round.is_open:
+            print("Order round is closed")
+            return
+
+        current_datetime = datetime.now(pytz.utc)
+        closing_delta = order_round.closed_for_orders - current_datetime
+        hours_before_closing = int(closing_delta.total_seconds() / 60 / 60)
+        print("Hours before closing (rounded): %s" % hours_before_closing)
+
+        if (hours_before_closing <= order_round.reminder_hours_before_closing) \
+                and order_round.reminder_sent is False:
+            print("Sending reminders!")
+            order_round.send_reminder_mails()
 
 
 class MailOrderLists(CronJobBase):
