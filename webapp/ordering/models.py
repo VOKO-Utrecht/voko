@@ -53,6 +53,8 @@ class OrderRound(TimeStampedModel):
     transaction_costs = models.DecimalField(decimal_places=2, max_digits=5, default=0.21)
     order_placed = models.BooleanField(default=False, editable=False)
 
+    reminder_sent = models.BooleanField(default=False, editable=False)
+
     def is_not_open_yet(self):
         current_datetime = datetime.now(pytz.utc)  # Yes, UTC. see Django's timezone docs
         return current_datetime < self.open_for_orders
