@@ -2,6 +2,7 @@
 import os
 from unipath import Path
 
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 PROJECT_DIR = Path(__file__).ancestor(3)
 MEDIA_ROOT = PROJECT_DIR.child("media")
@@ -57,8 +58,12 @@ INSTALLED_APPS = [
     'finance',
     'ordering',
     'docs',
+
+    'constance.backends.database',
+    'constance',
+    
     'hijack',
-    'compat'  # Requirement of hijack
+    'compat',  # Requirement of hijack
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -121,3 +126,10 @@ HIJACK_DISPLAY_ADMIN_BUTTON = False  # Because of custom user model
 RECAPTCHA_PUBLIC_KEY = os.getenv("RECAPTCHA_SITE_KEY")
 RECAPTCHA_PRIVATE_KEY = os.getenv("RECAPTCHA_SECRET_KEY")
 NOCAPTCHA = True
+
+
+CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+
+CONSTANCE_CONFIG = {
+    'ORDER_REMINDER_MAIL': (4, "Order reminder mail", int),
+}
