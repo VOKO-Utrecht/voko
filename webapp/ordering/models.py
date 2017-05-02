@@ -6,12 +6,13 @@ from datetime import datetime
 from decimal import Decimal, ROUND_UP, ROUND_DOWN
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
-from accounts.models import Address
+from accounts.models import Address, VokoUser
 from finance.models import Balance
 from log import log_event
 from mailing.helpers import mail_user, get_template_by_id, render_mail_template
 from ordering.core import get_or_create_order, get_current_order_round, find_unit
 from django.conf import settings
+from constance import config
 
 # TODO move to settings/production.py
 ORDER_CONFIRM_MAIL_ID = 12
@@ -124,6 +125,33 @@ class OrderRound(TimeStampedModel):
         Return days sincs collection date
         """
         return (datetime.now(tz=pytz.UTC) - self.collect_datetime).days
+
+    def get_users_without_orders(self):
+        def _users_without_orders_filter(voko_user):
+            return not Order.objects.filter(
+                order_round=self, user=voko_user, paid=True).exists()
+
+        return list(filter(_users_without_orders_filter,
+                           VokoUser.objects.filter(is_active=True)))
+
+    def send_reminder_mails(self):
+        if self.reminder_sent is True:
+            log_event(event="Not sending order reminder for round %d because "
+                            "reminder_sent is True" % self.pk)
+
+            return
+
+        log_event(event="Sending order reminder for round %d" % self.pk)
+
+        mail_template = get_template_by_id(config.ORDER_REMINDER_MAIL)
+
+        self.reminder_sent = True
+        self.save()
+
+        for user in self.get_users_without_orders():
+            rendered_template_vars = render_mail_template(
+                mail_template, user=user, order_round=self)
+            mail_user(user, *rendered_template_vars)
 
     def __str__(self):
         return "Bestelronde #%s" % self.pk
