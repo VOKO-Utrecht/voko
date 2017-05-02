@@ -47,14 +47,15 @@ class OrderRound(TimeStampedModel):
         verbose_name = "Bestelronde"
         verbose_name_plural = "Bestelronden"
 
-    open_for_orders = models.DateTimeField()
-    closed_for_orders = models.DateTimeField()
-    collect_datetime = models.DateTimeField()
+    open_for_orders = models.DateTimeField(help_text="When this order round will open")
+    closed_for_orders = models.DateTimeField(help_text="When this order round will close")
+    collect_datetime = models.DateTimeField(help_text="When the products can be collected")
     markup_percentage = models.DecimalField(decimal_places=2, max_digits=5, default=7.0)
     transaction_costs = models.DecimalField(decimal_places=2, max_digits=5, default=0.21)
-    order_placed = models.BooleanField(default=False, editable=False)
+    order_placed = models.BooleanField(default=False, editable=False, help_text="Whether the order was placed at our suppliers")
 
-    reminder_sent = models.BooleanField(default=False, editable=False)
+    reminder_hours_before_closing = models.IntegerField(default=12, help_text="Number of hours before closing time when order reminder mail will be sent")
+    reminder_sent = models.BooleanField(default=False, editable=False, help_text="Whether we've sent order reminders to our members")
 
     def is_not_open_yet(self):
         current_datetime = datetime.now(pytz.utc)  # Yes, UTC. see Django's timezone docs
