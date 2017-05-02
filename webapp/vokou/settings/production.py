@@ -16,8 +16,9 @@ DEFAULT_FROM_EMAIL = "VOKO Utrecht <info@vokoutrecht.nl>"
 SERVER_EMAIL = "info@vokoutrecht.nl"
 
 ADMINS = (
-    ("Voko Utrecht", "info@vokoutrecht.nl"),
+    ("Voko Utrecht", os.getenv('ADMIN_EMAIL', "info@vokoutrecht.nl")),
 )
+
 ALLOWED_HOSTS = ("leden.vokoutrecht.nl", "dev.vokoutrecht.nl")
 
 MOLLIE_API_KEY = os.environ["MOLLIE_API_KEY"]
