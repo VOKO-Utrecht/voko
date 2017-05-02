@@ -19,7 +19,7 @@ urlpatterns = (
     url(r'^round/(?P<pk>[0-9]+)/correction/json', OrderAdminCorrectionJson.as_view(), name="orderadmin_correction_json"),
     url(r'^round/(?P<pk>[0-9]+)/correction/mass$', OrderAdminMassCorrection.as_view(), name="orderadmin_mass_correction"),
     url(r'^round/(?P<pk>[0-9]+)/correction/$', OrderAdminCorrection.as_view(), name="orderadmin_correction"),
-    url(r'^round/(?P<pk>[0-9]+)/mailing/(?P<mailing_type>(round-open|reminder))/$', RedirectToMailingView.as_view(), name="productadmin_mailing"),
+    url(r'^round/(?P<pk>[0-9]+)/mailing/(?P<mailing_type>(round-open))/$', RedirectToMailingView.as_view(), name="productadmin_mailing"),
     url(r'^product/(?P<pk>[0-9]+)/$', OrderAdminUserOrdersPerProduct.as_view(), name="productorders_admin"),
 
     url(r'^supplier/(?P<supplier>[0-9]+)/$', CreateDraftProducts.as_view(), name="create_draft_products"),

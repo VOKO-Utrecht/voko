@@ -434,10 +434,6 @@ class RedirectToMailingView(GroupRequiredMixin, DetailView):
             mailing_id = 11  # Order round open
             queryset = VokoUser.objects.filter(can_activate=True)
 
-        elif kwargs['mailing_type'] == "reminder":
-            mailing_id = 4  # Order reminder
-            queryset = list(filter(_user_has_no_orders_in_current_round, VokoUser.objects.filter(is_active=True)))
-
         user_ids = [user.pk for user in queryset]
         request.session['mailing_user_ids'] = user_ids
 

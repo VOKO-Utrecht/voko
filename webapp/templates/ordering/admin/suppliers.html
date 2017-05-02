@@ -27,9 +27,8 @@
 <h2>Mailings</h2>
     {% if current_order_round.is_open %}
     <a href="{% url "productadmin_mailing" current_order_round.pk "round-open" %}" role="button" class="btn btn-primary">Verstuur "Ronde open" mailing</a>
-    <a href="{% url "productadmin_mailing" current_order_round.pk "reminder" %}" role="button" class="btn btn-primary">Verstuur bestelherinnering mailing</a>
     {% else %}
-        Je kunt geen mailings versturen want de huidige bestelronde is niet open.
+        Je kunt geen mailing versturen want de huidige bestelronde is niet open.
     {% endif %}
 
 <h2>Laatste 10 opmerkingen</h2>
