@@ -166,8 +166,8 @@ admin.site.register(OrderRound, OrderRoundAdmin)
 
 
 class OrderProductCorrectionAdmin(DeleteDisabledMixin, admin.ModelAdmin):
-    list_display = ["id", 'order_product', "supplied_percentage", "notes", "credit", "charge_supplier"]
-    ordering = ("-id", 'charge_supplier', 'supplied_percentage')
+    list_display = ["id", 'created', 'order_product', "supplied_percentage", "notes", "credit", "charge_supplier"]
+    ordering = ("-id", 'charge_supplier', 'supplied_percentage', 'created')
     list_filter = ("charge_supplier",)
     raw_id_fields = ('order_product',)
 
