@@ -130,6 +130,7 @@ class LogEntryAdmin(admin.ModelAdmin):
         'object_link',
         'action_flag',
         'action_description',
+        'object_id',
         'change_message',
     ]
 
