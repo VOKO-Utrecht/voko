@@ -7,6 +7,7 @@ from django.shortcuts import redirect
 from django.contrib.admin.utils import flatten_fieldsets
 from accounts.forms import VokoUserCreationForm, VokoUserChangeForm
 from accounts.models import VokoUser, UserProfile, ReadOnlyVokoUser, SleepingVokoUser
+from finance.models import Payment
 from mailing.helpers import get_template_by_id, render_mail_template
 from ordering.core import get_current_order_round
 from ordering.models import Order
@@ -93,7 +94,7 @@ class VokoUserAdmin(HijackUserAdminMixin, UserAdmin):
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
     list_display = ("first_name", "last_name", "email", phone, "email_confirmed", "can_activate", "is_active", "is_staff",
-                    "created", 'orders_round', 'debit', 'credit', 'total_orders', roles, 'hijack_field')
+                    "created", 'orders_round', 'debit', 'credit', 'total_orders', 'first_payment', roles, 'hijack_field')
     list_filter = ("is_staff", "is_superuser", "is_active", "can_activate", "groups")
     search_fields = ("email", 'first_name', 'last_name')
     ordering = ("-created", )
@@ -140,6 +141,13 @@ class VokoUserAdmin(HijackUserAdminMixin, UserAdmin):
 
     def total_orders(self, obj):
         return Order.objects.filter(user=obj, paid=True).count()
+
+    def first_payment(self, obj):
+        try:
+            return Payment.objects.filter(succeeded=True, order__user=obj)\
+                .first().created
+        except AttributeError:
+            return
 
 
 class ReadOnlyVokoUserAdmin(VokoUserAdmin):
