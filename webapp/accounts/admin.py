@@ -145,7 +145,7 @@ class VokoUserAdmin(HijackUserAdminMixin, UserAdmin):
     def first_payment(self, obj):
         try:
             return Payment.objects.filter(succeeded=True, order__user=obj)\
-                .first().created
+                .order_by('id').first().created
         except AttributeError:
             return
 
