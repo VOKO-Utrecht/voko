@@ -31,7 +31,7 @@ class VokoUserFinishForm(forms.ModelForm):
         fields = ()
 
     zip_code = forms.CharField(label="Postcode", widget=forms.TextInput, max_length=7)
-    phone_number = forms.CharField(label="Telefoonnummer (optioneel)", widget=forms.TextInput, required=False,
+    phone_number = forms.CharField(label="Telefoonnummer", widget=forms.TextInput, required=False,
                                    max_length=25)
 
     password1 = forms.CharField(label="Wachtwoord", widget=forms.PasswordInput)
@@ -126,7 +126,7 @@ class ChangeProfileForm(forms.ModelForm):
         fields = ('first_name', 'last_name')
 
     zip_code = forms.CharField(label="Postcode", widget=forms.TextInput)
-    phone_number = forms.CharField(label="Telefoonnummer (optioneel)", widget=forms.TextInput, required=False)
+    phone_number = forms.CharField(label="Telefoonnummer", widget=forms.TextInput, required=False)
 
     password1 = forms.CharField(label="Wachtwoord (alleen invullen als je deze wilt wijzigen)", widget=forms.PasswordInput, required=False)
     password2 = forms.CharField(label="Wachtwoord (bevestiging; alleen invullen als je deze wilt wijzigen)", widget=forms.PasswordInput, required=False)
