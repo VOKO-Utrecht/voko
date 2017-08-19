@@ -369,10 +369,10 @@ class OrderProductCorrection(TimeStampedModel):
         verbose_name = "Productbestelling-correctie"
         verbose_name_plural = "Productbestelling-correcties"
 
-    order_product = models.OneToOneField("OrderProduct", related_name="correction")
-    supplied_percentage = models.IntegerField()
+    order_product = models.OneToOneField("OrderProduct", related_name="correction", editable=False)
+    supplied_percentage = models.IntegerField(editable=False)
     notes = models.TextField(blank=True)
-    credit = models.OneToOneField(Balance, related_name="correction")
+    credit = models.OneToOneField(Balance, related_name="correction", editable=False)
     charge_supplier = models.BooleanField(default=True, verbose_name="Charge expenses to supplier")
 
     def __str__(self):
