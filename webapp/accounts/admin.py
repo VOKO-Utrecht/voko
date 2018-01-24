@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 import log
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.core.mail import send_mail
 from django.shortcuts import redirect
 from django.contrib.admin.utils import flatten_fieldsets
 from accounts.forms import VokoUserCreationForm, VokoUserChangeForm
-from accounts.models import VokoUser, UserProfile, ReadOnlyVokoUser, SleepingVokoUser
+from accounts.models import VokoUser, UserProfile, ReadOnlyVokoUser, \
+    SleepingVokoUser, Address
 from finance.models import Payment
 from mailing.helpers import get_template_by_id, render_mail_template
 from ordering.core import get_current_order_round
@@ -54,6 +55,7 @@ def force_confirm_email(modeladmin, request, queryset):
                       event="User's e-mail forcefully confirmed: %s" % user,
                       user=user)
 
+
 force_confirm_email.short_description = "Forceer e-mailadres bevestiging"
 
 
@@ -64,6 +66,49 @@ def send_email_to_selected_users(modeladmin, request, queryset):
 
 
 send_email_to_selected_users.short_description = "Verstuur E-mail"
+
+
+def anonymize_user(modeladmin, request, queryset):
+    """ Anonimize user to comply with GDPR regulations"""
+    for user in queryset:
+        # Set user to "sleeping mode"
+        user.is_asleep = True
+
+        # Anonymize email address
+        user.email = "{}@anon.vokoutrecht.nl".format(user.id)
+
+        # Anonymize name
+        user.first_name = 'account'
+        user.last_name = str(user.id)
+
+        user.save()
+
+        try:
+            # Anonymize user profile
+            profile = user.userprofile
+            profile.phone_number = ''
+            profile.notes = ''
+            profile.save()
+
+            # Anonymize address
+            address = profile.address
+            address.street_and_number = ''
+            address.zip_code = '0000'
+            address.city = ''
+            address.save()
+
+        except (UserProfile.DoesNotExist, Address.DoesNotExist):
+            # Can happen with inactive users
+            pass
+
+        messages.add_message(
+            request, messages.SUCCESS,
+            'Gebruiker {} is op slaapstand gezet en geanonimiseerd.'.format(
+                user.id)
+        )
+
+
+anonymize_user.short_description = 'Anonimiseer account'
 
 
 class UserProfileInline(admin.StackedInline):
@@ -117,7 +162,10 @@ class VokoUserAdmin(HijackUserAdminMixin, UserAdmin):
         UserProfileInline,
     ]
 
-    actions = (enable_user, force_confirm_email, send_email_to_selected_users)
+    actions = (enable_user,
+               force_confirm_email,
+               send_email_to_selected_users,
+               anonymize_user)
 
     def email_confirmed(self, obj):
         if obj.email_confirmation:
