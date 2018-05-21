@@ -7,7 +7,7 @@ import finance.urls
 import mailing.urls
 import ordering.urls
 import ordering.admin_urls
-from vokou.views import HomeView
+from vokou.views import HomeView, PrivacyStatementView
 
 urlpatterns = [
     url(r'^admin/mailing/', include(mailing.urls)),
@@ -19,6 +19,7 @@ urlpatterns = [
     url(r'^docs/', include(docs.urls)),
     url(r'^tinymce/', include('tinymce.urls')),
     url(r'^hijack/', include('hijack.urls')),
+    url(r'^privacy/', PrivacyStatementView.as_view(), name="privacy"),
     url(r'^$', HomeView.as_view(), name="home"),
 ]
 
