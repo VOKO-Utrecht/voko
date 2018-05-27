@@ -4,7 +4,7 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.mail import mail_admins
 from django.db import transaction
 import log
-from .models import VokoUser, Address, UserProfile
+from .models import VokoUser, UserProfile
 
 # Custom user forms based on examples from Two Scoops of Django.
 
@@ -124,7 +124,6 @@ class ChangeProfileForm(forms.ModelForm):
         model = VokoUser
         fields = ('first_name', 'last_name')
 
-    zip_code = forms.CharField(label="Postcode", widget=forms.TextInput)
     phone_number = forms.CharField(label="Telefoonnummer", widget=forms.TextInput, required=False)
 
     password1 = forms.CharField(label="Wachtwoord (alleen invullen als je deze wilt wijzigen)", widget=forms.PasswordInput, required=False)
@@ -134,7 +133,6 @@ class ChangeProfileForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ChangeProfileForm, self).__init__(*args, **kwargs)
-        self.fields['zip_code'].initial = self.instance.userprofile.address.zip_code
         self.fields['phone_number'].initial = self.instance.userprofile.phone_number
 
     def clean_password2(self):
@@ -148,7 +146,7 @@ class ChangeProfileForm(forms.ModelForm):
 
         return password2
 
-    # TODO: clean_zip_code and phone number
+    # TODO: clean phone number
 
     def save(self, commit=True):
         with transaction.atomic():
@@ -162,14 +160,9 @@ class ChangeProfileForm(forms.ModelForm):
             userprofile = user.userprofile
             userprofile.phone_number = self.cleaned_data['phone_number']
 
-            # And address
-            address = user.userprofile.address
-            address.zip_code = self.cleaned_data['zip_code']
-
             if commit:
                 user.save()
                 userprofile.save()
-                address.save()
 
             log.log_event(user=user, event="User changed profile")
 
