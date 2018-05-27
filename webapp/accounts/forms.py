@@ -30,7 +30,6 @@ class VokoUserFinishForm(forms.ModelForm):
         model = VokoUser
         fields = ()
 
-    zip_code = forms.CharField(label="Postcode", widget=forms.TextInput, max_length=7)
     phone_number = forms.CharField(label="Telefoonnummer", widget=forms.TextInput, required=False,
                                    max_length=25)
 
@@ -50,7 +49,7 @@ class VokoUserFinishForm(forms.ModelForm):
 
         return password2
 
-    # TODO: clean_zip_code and phone number
+    # TODO: clean phone number
 
     def _notify_admins_about_activated_user(self, user):
         # This is most likely temporary
@@ -63,9 +62,6 @@ Gebruiker %s heeft zojuist zijn/haar registratie afgerond..
 
     def save(self, commit=True):
         with transaction.atomic():
-            # Save zip code in address
-            address = Address.objects.create(zip_code=self.cleaned_data['zip_code'])
-
             # Create user
             user = super(VokoUserFinishForm, self).save(commit=False)
             user.set_password(self.cleaned_data["password1"])
@@ -74,8 +70,7 @@ Gebruiker %s heeft zojuist zijn/haar registratie afgerond..
             if commit:
                 user.save()
 
-            # Lastly, link the two
-            UserProfile.objects.create(user=user, address=address,
+            UserProfile.objects.create(user=user,
                                        notes=self.cleaned_data['notes'],
                                        phone_number=self.cleaned_data['phone_number'])
 
