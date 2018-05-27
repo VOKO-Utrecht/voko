@@ -35,7 +35,7 @@ class UserProfile(TimeStampedModel):
         verbose_name_plural = "ledenprofielen"
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="userprofile")
-    address = models.ForeignKey(Address)
+    address = models.ForeignKey(Address, null=True, blank=True)
     phone_number = models.CharField(max_length=25, blank=True)
     notes = models.TextField()
     
