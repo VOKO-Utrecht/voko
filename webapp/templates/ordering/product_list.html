@@ -13,6 +13,21 @@
     </div>
     {% endif %}
 
+    {% if current_order_round.id == 100 %}
+        <div class="alert alert-danger" role="alert">
+            <h2>Let op: 100ste bestelronde: uitje langs onze boeren</h2>
+            Deze feestelijke bestelronde verloopt iets anders dan normaal.<br/>
+            Het ophalen van de bestellingen doen we gezamenlijk in een fietstocht langs de boeren op <strong>zaterdag 25 augustus (dus deze keer niet op woensdag!)</strong>.<br/>
+            <br/>
+            We vertrekken op zaterdag 25 augustus om 10.00u bij Averechts en eindigen waarschijnlijk om 12.30 uur in de stad Utrecht.<br/>
+            De fietstocht zal ongeveer 19 km lang zijn. <strong>Houd er bij het bestellen rekening mee dat je je eigen bestelling mee zal nemen op de fiets.</strong><br/>
+            Wil je vrienden kennis laten maken met VOKO? - dit is de kans om te zien waar de VOKO-producten vandaan komen, dus neem ze vooral mee.<br/>
+            <br/>
+            Helaas zal het niet mogelijk zijn om producten te bestellen als je de producten niet zelf kunt ophalen.<br/>
+            De eerstvolgende reguliere bestelronde is op 5 september.
+        </div>
+    {% endif %}
+
 <form method="post" id="order-form">
   {% csrf_token %}
 
