@@ -139,7 +139,7 @@ class VokoUserAdmin(HijackUserAdminMixin, UserAdmin):
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
     list_display = ("first_name", "last_name", "email", phone, "email_confirmed", "can_activate", "is_active", "is_staff",
-                    "created", 'orders_round', 'debit', 'credit', 'total_orders', 'first_payment', roles, 'hijack_field')
+                    "created", 'has_drivers_license', 'orders_round', 'debit', 'credit', 'total_orders', 'first_payment', roles, 'hijack_field')
     list_filter = ("is_staff", "is_superuser", "is_active", "can_activate", "groups")
     search_fields = ("email", 'first_name', 'last_name')
     ordering = ("-created", )
@@ -196,6 +196,10 @@ class VokoUserAdmin(HijackUserAdminMixin, UserAdmin):
                 .order_by('id').first().created
         except AttributeError:
             return
+
+    def has_drivers_license(self, obj):
+        return obj.userprofile.has_drivers_license
+    has_drivers_license.boolean = True
 
 
 class ReadOnlyVokoUserAdmin(VokoUserAdmin):

@@ -38,6 +38,8 @@ class VokoUserFinishForm(forms.ModelForm):
 
     notes = forms.CharField(label="Antwoorden op bovenstaande vragen", widget=forms.Textarea)
 
+    has_drivers_license = forms.BooleanField(label='Ik heb een rijbewijs')
+
     accept_terms_and_privacy = forms.BooleanField(
         label="Ik heb het Reglement en het Privacy Statement van "
               "VOKO Utrecht gelezen en ga met beiden akkoord.", required=True)
@@ -122,9 +124,11 @@ class PasswordResetForm(forms.Form):
 class ChangeProfileForm(forms.ModelForm):
     class Meta:
         model = VokoUser
-        fields = ('first_name', 'last_name')
+        fields = ('first_name', 'last_name', )
 
     phone_number = forms.CharField(label="Telefoonnummer", widget=forms.TextInput, required=False)
+
+    has_drivers_license = forms.BooleanField(label='Ik heb een rijbewijs')
 
     password1 = forms.CharField(label="Wachtwoord (alleen invullen als je deze wilt wijzigen)", widget=forms.PasswordInput, required=False)
     password2 = forms.CharField(label="Wachtwoord (bevestiging; alleen invullen als je deze wilt wijzigen)", widget=forms.PasswordInput, required=False)
@@ -159,6 +163,8 @@ class ChangeProfileForm(forms.ModelForm):
             # Profile
             userprofile = user.userprofile
             userprofile.phone_number = self.cleaned_data['phone_number']
+            userprofile.has_drivers_license = (
+                self.cleaned_data['has_drivers_license'])
 
             if commit:
                 user.save()

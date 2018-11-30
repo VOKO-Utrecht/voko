@@ -38,6 +38,7 @@ class UserProfile(TimeStampedModel):
     address = models.ForeignKey(Address, null=True, blank=True)
     phone_number = models.CharField(max_length=25, blank=True)
     notes = models.TextField()
+    has_drivers_license = models.BooleanField(default=False)
     
     def __str__(self):
         return "Profile for user: %s" % self.user
