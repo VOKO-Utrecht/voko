@@ -9,19 +9,20 @@ Django based custom web application for food collective www.vokoutrecht.nl.
 
 ## Dev environment
 
-1. apt-get install virtualenvwrapper
+1. Run: `apt install virtualenvwrapper`
 2. restart shell
-3. mkvirtualenv vokou
-4. clone...
+3. Run: `git clone https://github.com/rikva/voko.git`
+4. Run: `cd voko`
+5. Run: `mkvirtualenv vokou --python=[path to pyton3 binary] -r ./requirements/development.txt`
 
 ### Run tests
     cd webapp
     ./runtests.sh
 
 ### Set up sqlite database
-    ./manage.py migrate --settings=vokou.settings.development 
+    ./manage.py migrate --settings=vokou.settings.development
     ./manage.py createsuperuser --settings=vokou.settings.development
-    
+
 ### Run development server
     cd webapp
     ./manage.py runserver --settings=vokou.settings.development
