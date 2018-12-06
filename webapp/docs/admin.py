@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from docs.models import Document
+from docs.models import Document, Link
 
 
 class DocumentAdmin(admin.ModelAdmin):
@@ -9,3 +9,9 @@ class DocumentAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Document, DocumentAdmin)
+
+class LinkAdmin(admin.ModelAdmin):
+    list_display = ["created", "name", "url"]
+    ordering = ("-id", )
+
+admin.site.register(Link, LinkAdmin)

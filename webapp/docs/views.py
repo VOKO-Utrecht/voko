@@ -4,13 +4,17 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.views.generic import ListView, DetailView
 
-from docs.models import Document
+from docs.models import Document, Link
 
 
 class DocumentOverview(LoginRequiredMixin, ListView):
     template_name = 'docs/document_overview.html'
     queryset = Document.objects.all().order_by("-id")
 
+    def get_context_data(self, **kwargs):
+        context = super(DocumentOverview, self).get_context_data(**kwargs)
+        context['links'] = Link.objects.all().order_by("-id")
+        return context
 
 class DocumentDownload(LoginRequiredMixin, DetailView):
     model = Document

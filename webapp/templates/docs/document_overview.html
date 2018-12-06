@@ -1,6 +1,14 @@
 {% extends 'base.html' %}
 {% block title %}Documenten{% endblock %}
 {% block content %}
+    {% if links %}
+        <h1>Links</h1>
+        <ul>
+        {% for link in links %}
+            <li><strong><a href="{{link.url}}" target="_blank" rel="noreferrer noopener">{{ link.name }}</a></strong></li>
+        {% endfor %}
+        </ul>
+    {% endif %}
     <h1>Documenten</h1>
     <ul>
     {% for d in object_list %}
