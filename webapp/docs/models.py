@@ -19,6 +19,7 @@ class Document(TimeStampedModel):
     def __str__(self):
         return self.name
 
+
 class Link(TimeStampedModel):
     class Meta:
         verbose_name = 'Link'
