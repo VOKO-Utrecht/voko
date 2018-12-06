@@ -1,6 +1,6 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
-from docs.tests.factories import DocumentFactory
+from docs.tests.factories import DocumentFactory, LinkFactory
 from vokou.testing import VokoTestCase
 
 
@@ -19,6 +19,10 @@ class TestDocumentOverview(VokoTestCase):
         ret = self.client.get(self.url)
         self.assertCountEqual(ret.context['object_list'], docs)
 
+    def test_context_data_links(self):
+        links = LinkFactory.create_batch(5)
+        ret = self.client.get(self.url)
+        self.assertCountEqual(ret.context['links'], links)
 
 class TestDocumentDownload(VokoTestCase):
     def setUp(self):
