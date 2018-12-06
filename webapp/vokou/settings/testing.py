@@ -8,12 +8,12 @@ PASSWORD_HASHERS = (
 DEBUG = False
 
 
-# https://stackoverflow.com/questions/25161425/disable-migrations-when-running-unit-tests-in-django-1-7 
+# https://stackoverflow.com/questions/25161425/disable-migrations-when-running-unit-tests-in-django-1-7
 class DisableMigrations(object):
     def __contains__(self, item):
         return True
  
     def __getitem__(self, item):
-        return "notmigrations"
+        return
  
 MIGRATION_MODULES = DisableMigrations()
