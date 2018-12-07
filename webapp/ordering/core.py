@@ -40,18 +40,24 @@ def get_or_create_order(user):
     if current_order_round is None:
         raise RuntimeError("Nog geen bestelronde aangemaakt!")
 
-    order = models.Order.objects.filter(paid=False,
-                                        user=user,
-                                        order_round=get_current_order_round()).order_by('id').last()
+    order = models.Order.objects.filter(
+        paid=False,
+        user=user,
+        order_round=get_current_order_round()
+    ).order_by('id').last()
+
     if order is None:
-        order = models.Order.objects.create(paid=False,
-                                            user=user,
-                                            order_round=get_current_order_round())
+        order = models.Order.objects.create(
+            paid=False,
+            user=user,
+            order_round=get_current_order_round()
+        )
     return order
 
 
 def get_order_product(product, order):
-    existing_ops = models.OrderProduct.objects.filter(product=product, order=order)
+    existing_ops = models.OrderProduct.objects.filter(product=product,
+                                                      order=order)
     if existing_ops:
         return existing_ops[0]
 
@@ -100,7 +106,8 @@ def find_unit(unit):
     """
 
     unit = unit.strip() if unit else unit
-    regex = "^(\d*)\s?([a-zA-Z0-9() ]+)"  # optional amount, optional whitespace, 1+ sentence
+    # optional amount, optional whitespace, 1+ sentence
+    regex = r"^(\d*)\s?([a-zA-Z0-9() ]+)"
     match = re.match(regex, unit)
 
     if not match:

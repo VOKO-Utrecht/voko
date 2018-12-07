@@ -10,6 +10,7 @@ class DocumentFactory(DjangoModelFactory):
     file = FuzzyText()
     slug = FuzzyText()
 
+
 class LinkFactory(DjangoModelFactory):
     class Meta:
         model = "docs.Link"

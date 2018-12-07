@@ -20,22 +20,26 @@ class PreviewMailView(StaffuserRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(PreviewMailView, self).get_context_data(**kwargs)
 
-        users = [VokoUser.objects.get(pk=uid) for uid in self.request.session.get('mailing_user_ids')]
+        users = [VokoUser.objects.get(pk=uid)
+                 for uid in self.request.session.get('mailing_user_ids')]
         context['mailing_users'] = users
 
         template = MailTemplate.objects.get(pk=self.kwargs.get('pk'))
         context['template'] = template
 
-        context['example'] = render_mail_template(template,
-                                                  user=self.request.user,
-                                                  order_round=self.request.current_order_round)
+        context['example'] = render_mail_template(
+            template,
+            user=self.request.user,
+            order_round=self.request.current_order_round
+        )
 
         return context
 
 
 class SendMailView(StaffuserRequiredMixin, View):
     def dispatch(self, request, *args, **kwargs):
-        self.users = [VokoUser.objects.get(pk=uid) for uid in self.request.session.get('mailing_user_ids')]
+        self.users = [VokoUser.objects.get(pk=uid)
+                      for uid in self.request.session.get('mailing_user_ids')]
         self.template = MailTemplate.objects.get(pk=self.kwargs.get('pk'))
         self.current_order_round = self.request.current_order_round
 
@@ -50,18 +54,19 @@ class SendMailView(StaffuserRequiredMixin, View):
 
     def _send_mails(self):
         for user in self.users:
-            subject, html_message, plain_message = render_mail_template(self.template,
-                                                                        user=user,
-                                                                        order_round=self.current_order_round)
+            subject, html_message, plain_message = render_mail_template(
+                self.template,
+                user=user,
+                order_round=self.current_order_round)
 
             send_mail(subject=subject,
                       message=plain_message,
                       from_email="VOKO Utrecht <info@vokoutrecht.nl>",
-                      recipient_list=["%s <%s>" % (user.get_full_name(), user.email)],
+                      recipient_list=["%s <%s>" %
+                                      (user.get_full_name(), user.email)],
                       html_message=html_message)
 
             log_event(operator=self.request.user,
                       user=user,
                       event="Mail verstuurd met onderwerp '%s'" % subject,
                       extra=html_message)
-

@@ -47,9 +47,11 @@ class MollieMixin(object):
         return self.mollie.payments.create({
             'amount': amount,
             'description': description,
-            'redirectUrl': settings.BASE_URL +
-                           reverse("finance.confirmtransaction") +
-                           "?order=%s" % order_id,
+            'redirectUrl': (
+                    settings.BASE_URL +
+                    reverse("finance.confirmtransaction") +
+                    "?order=%s" % order_id
+            ),
             'webhookUrl': settings.BASE_URL + reverse("finance.callback"),
             'method': Mollie.API.Object.Method.IDEAL,
             'issuer': issuer_id,
@@ -257,8 +259,9 @@ class PaymentWebHook(MollieMixin, View):
                 log_event(
                     event="Order round %s is closed, so not finishing "
                           "order %s via callback!" % (
-                        payment.order.order_round.id, payment.order.id
-                    ), user=payment.order.user)
+                              payment.order.order_round.id,
+                              payment.order.id),
+                    user=payment.order.user)
 
                 payment.order.mail_failure_notification()
 
@@ -273,7 +276,7 @@ class CancelPaymentView(View):
     def get(self, request, *args, **kwargs):
         order_to_pay = get_order_to_pay(request.user)
         if not order_to_pay:
-            messages.error(request,"Geen bestelling gevonden")
+            messages.error(request, "Geen bestelling gevonden")
             return redirect(reverse('view_products'))
 
         # Sanity checks

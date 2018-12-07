@@ -8,4 +8,5 @@ class EventLogAdmin(DeleteDisabledMixin, admin.ModelAdmin):
     ordering = ("-id", )
     search_fields = ['event', 'operator__email', 'user__email']
 
+
 admin.site.register(EventLog, EventLogAdmin)

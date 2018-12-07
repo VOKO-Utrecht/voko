@@ -12,9 +12,9 @@ class Document(TimeStampedModel):
     file = models.FileField(upload_to='docs/%Y/%m/%d')
     slug = models.SlugField(unique=True, editable=False, max_length=100)
 
-    def save(self, *args, **kwargs):
+    def save(self, **kwargs):
         self.slug = slugify(self.name)
-        return super(Document, self).save(*args, **kwargs)
+        return super(Document, self).save(**kwargs)
 
     def __str__(self):
         return self.name

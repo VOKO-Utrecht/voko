@@ -6,5 +6,5 @@ class MailTemplateAdmin(admin.ModelAdmin):
     list_display = ["id", "title", "subject", "created", "modified"]
     ordering = ("-id", "modified")
 
-admin.site.register(MailTemplate, MailTemplateAdmin)
 
+admin.site.register(MailTemplate, MailTemplateAdmin)

@@ -16,13 +16,14 @@ class DocumentOverview(LoginRequiredMixin, ListView):
         context['links'] = Link.objects.all().order_by("-id")
         return context
 
+
 class DocumentDownload(LoginRequiredMixin, DetailView):
     model = Document
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
             if self.raise_exception:
-                raise PermissionDenied  # return a forbidden response
+                raise PermissionDenied
             else:
                 return redirect_to_login(request.get_full_path(),
                                          self.get_login_url(),
@@ -30,7 +31,8 @@ class DocumentDownload(LoginRequiredMixin, DetailView):
 
         doc = self.get_object()
         filename = doc.file.name.split('/')[-1]
-        response = HttpResponse(doc.file, content_type='application/octet-stream')
+        response = HttpResponse(doc.file,
+                                content_type='application/octet-stream')
         response['Content-Disposition'] = 'attachment; filename=%s' % filename
 
         return response

@@ -13,12 +13,15 @@ class Payment(TimeStampedModel):
     order = models.ForeignKey("ordering.Order", related_name="payments")
 
     # Credit Balance, for successful payment
-    balance = models.OneToOneField("finance.Balance", null=True, related_name="payment")
+    balance = models.OneToOneField("finance.Balance",
+                                   null=True,
+                                   related_name="payment")
 
     # null=True because field did not exist for Qantani payments
     mollie_id = models.CharField(max_length=255, null=True)
 
-    succeeded = models.BooleanField(default=False, help_text="Payment was validated by PSP")
+    succeeded = models.BooleanField(default=False,
+                                    help_text="Payment was validated by PSP")
 
     # Obsolete but contain possible relevant information
     qantani_transaction_id = models.IntegerField(null=True)
@@ -30,14 +33,17 @@ class Payment(TimeStampedModel):
         Returns newly created Balance object
         """
         if not self.balance:
-            self.balance = Balance.objects.create(user=self.order.user, type="CR", amount=self.amount,
-                                                  notes="iDeal betaling voor bestelling #%d" % self.order.pk)
+            self.balance = Balance.objects.create(
+                user=self.order.user, type="CR", amount=self.amount,
+                notes="iDeal betaling voor bestelling #%d" % self.order.pk)
             self.save()
         return self.balance
 
     def __str__(self):
         status = "Succeeded" if self.succeeded else "Failed"
-        return "%s payment of E%s by %s" % (status, self.amount, self.order.user)
+        return "%s payment of E%s by %s" % (status,
+                                            self.amount,
+                                            self.order.user)
 
 
 class BalanceManager(models.Manager):
@@ -70,8 +76,10 @@ class BalanceManager(models.Manager):
 
 class Balance(TimeStampedModel):
     """
-    Represents a transaction. Perhaps 'Transaction' would be a better name for this class (FIXME)
-    Examples of transactions: iDeal payment, order debit, gas compensation, order correction, etc.
+    Represents a transaction. Perhaps 'Transaction' would be a better name
+    for this class (FIXME).
+    Examples of transactions: iDeal payment, order debit,
+    gas compensation, order correction, etc.
     A transaction is either debit (DR) or credit (CR).
     """
     TYPES = (
@@ -86,15 +94,16 @@ class Balance(TimeStampedModel):
     def __str__(self):
         return "[%s] %s: %s" % (self.user, self.type, self.amount)
 
-    def save(self, *args, **kwargs):
+    def save(self, **kwargs):
         """ Sanity check, the amount may not be zero or less. """
         if self.amount <= 0:
-            raise ValueError("Amount may not be zero or negative. Amount was: %s" % self.amount)
-        super(Balance, self).save(*args, **kwargs)
+            raise ValueError("Amount may not be zero or negative. "
+                             "Amount was: %s" % self.amount)
+        super(Balance, self).save(**kwargs)
 
     objects = BalanceManager()
 
-    """ next functions are used for csv export """
+    # The following functions are used for csv export
 
     def _is_correction(self):
         try:

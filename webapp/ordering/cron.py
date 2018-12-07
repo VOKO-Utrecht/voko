@@ -36,8 +36,9 @@ class SendOrderReminders(CronJobBase):
         hours_before_closing = int(closing_delta.total_seconds() / 60 / 60)
         print("Hours before closing (rounded): %s" % hours_before_closing)
 
-        if (hours_before_closing <= order_round.reminder_hours_before_closing) \
-                and order_round.reminder_sent is False:
+        if ((hours_before_closing <=
+             order_round.reminder_hours_before_closing)
+                and order_round.reminder_sent is False):
             print("Sending reminders!")
             order_round.send_reminder_mails()
 
@@ -71,7 +72,7 @@ class MailOrderLists(CronJobBase):
             if not supplier.has_orders_in_current_order_round():
                 print(("No orders for supplier %s" % supplier))
                 log_event(event="Supplier %s has no orders in current round, "
-                          "so not sending order list." % supplier)
+                                "so not sending order list." % supplier)
                 continue
 
             print(("Generating lists for supplier %s" % supplier))
@@ -81,12 +82,14 @@ class MailOrderLists(CronJobBase):
             csv_writer = csv.writer(in_mem_file, delimiter=';', quotechar='|')
 
             # Write header row
-            csv_writer.writerow(["Aantal", "Eenheid", "Product", "Omschrijving", "Inkoopprijs Euro", "Subtotaal"])
+            csv_writer.writerow(
+                ["Aantal", "Eenheid", "Product", "Omschrijving",
+                 "Inkoopprijs Euro", "Subtotaal"])
 
-            ordered_products = supplier.products.\
-                exclude(orderproducts=None).\
-                filter(orderproducts__order__paid=True).\
-                filter(order_round=order_round).\
+            ordered_products = supplier.products. \
+                exclude(orderproducts=None). \
+                filter(orderproducts__order__paid=True). \
+                filter(order_round=order_round). \
                 annotate(amount_sum=Sum('orderproducts__amount'))
 
             if not ordered_products:
@@ -101,14 +104,16 @@ class MailOrderLists(CronJobBase):
                     fix_decimal_separator(obj.amount_sum),
                     obj.unit_of_measurement,
                     obj.name,
-                    obj.description.replace("\n", " ").replace("\r", " "),  # TODO make sure newlines aren't stored
-                                                                            # in our products
+                    obj.description.replace("\n", " ").replace("\r", " "),
+                    # TODO make sure newlines aren't stored
+                    # in our products
                     fix_decimal_separator(obj.base_price),
                     fix_decimal_separator(obj.amount_sum * obj.base_price)
                 ])
 
             # Write 'total' row
-            total = fix_decimal_separator(sum([obj.amount_sum * obj.base_price for obj in ordered_products]))
+            total = fix_decimal_separator(sum(
+                [obj.amount_sum * obj.base_price for obj in ordered_products]))
             csv_writer.writerow([])
             csv_writer.writerow(["TOTAAL", "", "", "", "", total])
 
@@ -116,7 +121,8 @@ class MailOrderLists(CronJobBase):
             in_mem_file.seek(0)  # Why is this here twice?
 
             # Generate mail
-            subject = 'VOKO Utrecht - Bestellijst voor %s' % order_round.collect_datetime.strftime("%d %B %Y")
+            subject = ('VOKO Utrecht - Bestellijst voor %s' %
+                       order_round.collect_datetime.strftime("%d %B %Y"))
             from_email = 'VOKO Utrecht Boerencontact <boeren@vokoutrecht.nl>'
             to = '%s <%s>' % (supplier.name, supplier.email)
 
@@ -132,9 +138,20 @@ Dit is een geautomatiseerd bericht, maar reageren is gewoon mogelijk.
 
 Vriendelijke groeten,
 VOKO Utrecht
-""" % (supplier, order_round.pk,  order_round.collect_datetime.strftime("%d %B %Y"))
+""" % (
+                supplier,
+                order_round.pk,
+                order_round.collect_datetime.strftime("%d %B %Y")
+            )
 
-            msg = EmailMultiAlternatives(subject, text_content, from_email,
-                                         [to], cc=["VOKO Utrecht Boerencontact <boeren@vokoutrecht.nl>"])
-            msg.attach('voko_utrecht_bestelling_ronde_%d.csv' % order_round.pk, in_mem_file.read().decode("utf-8"), 'text/csv')
+            msg = EmailMultiAlternatives(
+                subject,
+                text_content,
+                from_email,
+                [to],
+                cc=["VOKO Utrecht Boerencontact <boeren@vokoutrecht.nl>"]
+            )
+
+            msg.attach('voko_utrecht_bestelling_ronde_%d.csv' % order_round.pk,
+                       in_mem_file.read().decode("utf-8"), 'text/csv')
             msg.send()

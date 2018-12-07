@@ -30,22 +30,37 @@ class VokoUserFinishForm(forms.ModelForm):
         model = VokoUser
         fields = ()
 
-    phone_number = forms.CharField(label="Telefoonnummer", widget=forms.TextInput, required=False,
-                                   max_length=25)
+    phone_number = forms.CharField(
+        label="Telefoonnummer",
+        widget=forms.TextInput,
+        required=False,
+        max_length=25
+    )
 
-    password1 = forms.CharField(label="Wachtwoord", widget=forms.PasswordInput)
-    password2 = forms.CharField(label="Wachtwoord (bevestiging)", widget=forms.PasswordInput)
+    password1 = forms.CharField(
+        label="Wachtwoord",
+        widget=forms.PasswordInput
+    )
+    password2 = forms.CharField(
+        label="Wachtwoord (bevestiging)",
+        widget=forms.PasswordInput
+    )
 
-    notes = forms.CharField(label="Antwoorden op bovenstaande vragen", widget=forms.Textarea)
+    notes = forms.CharField(
+        label="Antwoorden op bovenstaande vragen",
+        widget=forms.Textarea
+    )
 
     has_drivers_license = forms.BooleanField(label='Ik heb een rijbewijs')
 
     accept_terms_and_privacy = forms.BooleanField(
         label="Ik heb het Reglement en het Privacy Statement van "
-              "VOKO Utrecht gelezen en ga met beiden akkoord.", required=True)
+              "VOKO Utrecht gelezen en ga met beiden akkoord.",
+        required=True
+    )
 
     def clean_password2(self):
-        # Check that the two password entries match
+        """ Check that the two password entries match """
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
 
@@ -57,14 +72,16 @@ class VokoUserFinishForm(forms.ModelForm):
 
     # TODO: clean phone number
 
-    def _notify_admins_about_activated_user(self, user):
+    @staticmethod
+    def _notify_admins_about_activated_user(user):
         # This is most likely temporary
         message = """Hoi!
 
 Gebruiker %s heeft zojuist zijn/haar registratie afgerond..
 """ % user
 
-        mail_admins("Gebruiker %s is geactiveerd" % user, message, fail_silently=True)
+        mail_admins("Gebruiker %s is geactiveerd" % user, message,
+                    fail_silently=True)
 
     def save(self, commit=True):
         with transaction.atomic():
@@ -76,9 +93,11 @@ Gebruiker %s heeft zojuist zijn/haar registratie afgerond..
             if commit:
                 user.save()
 
-            UserProfile.objects.create(user=user,
-                                       notes=self.cleaned_data['notes'],
-                                       phone_number=self.cleaned_data['phone_number'])
+            UserProfile.objects.create(
+                user=user,
+                notes=self.cleaned_data['notes'],
+                phone_number=self.cleaned_data['phone_number']
+            )
 
             self._notify_admins_about_activated_user(user)
             log.log_event(user=user, event="User finished registration")
@@ -106,8 +125,14 @@ class RequestPasswordResetForm(forms.Form):
 
 
 class PasswordResetForm(forms.Form):
-    password1 = forms.CharField(label="Wachtwoord", widget=forms.PasswordInput)
-    password2 = forms.CharField(label="Wachtwoord (bevestiging)", widget=forms.PasswordInput)
+    password1 = forms.CharField(
+        label="Wachtwoord",
+        widget=forms.PasswordInput
+    )
+    password2 = forms.CharField(
+        label="Wachtwoord (bevestiging)",
+        widget=forms.PasswordInput
+    )
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -126,18 +151,32 @@ class ChangeProfileForm(forms.ModelForm):
         model = VokoUser
         fields = ('first_name', 'last_name', )
 
-    phone_number = forms.CharField(label="Telefoonnummer", widget=forms.TextInput, required=False)
+    phone_number = forms.CharField(
+        label="Telefoonnummer",
+        widget=forms.TextInput,
+        required=False
+    )
 
     has_drivers_license = forms.BooleanField(label='Ik heb een rijbewijs')
 
-    password1 = forms.CharField(label="Wachtwoord (alleen invullen als je deze wilt wijzigen)", widget=forms.PasswordInput, required=False)
-    password2 = forms.CharField(label="Wachtwoord (bevestiging; alleen invullen als je deze wilt wijzigen)", widget=forms.PasswordInput, required=False)
+    password1 = forms.CharField(
+        label="Wachtwoord (alleen invullen als je deze wilt wijzigen)",
+        widget=forms.PasswordInput,
+        required=False
+    )
+    password2 = forms.CharField(
+        label=("Wachtwoord (bevestiging; alleen invullen "
+               "als je deze wilt wijzigen)"),
+        widget=forms.PasswordInput,
+        required=False
+    )
 
     # TODO: Notes and e-mail address cannot be changed atm.
 
     def __init__(self, *args, **kwargs):
         super(ChangeProfileForm, self).__init__(*args, **kwargs)
-        self.fields['phone_number'].initial = self.instance.userprofile.phone_number
+        self.fields['phone_number'].initial = (
+            self.instance.userprofile.phone_number)
 
     def clean_password2(self):
         # Check that the two password entries match

@@ -10,28 +10,35 @@ class JsonRoundOverview(GroupRequiredMixin, View):
     group_required = "Admin"
 
     def get(self, request, round_id):
-        round = OrderRound.objects.get(id=round_id)
-        data = self.gather_data(round)
+        order_round = OrderRound.objects.get(id=round_id)
+        data = self.gather_data(order_round)
         return HttpResponse(json.dumps(data), content_type="application/json")
 
-    def gather_data(self, round):
+    @staticmethod
+    def gather_data(order_round):
         ret = {'suppliers': OrderedDict()}
 
-        for supplier in round.suppliers():
+        for supplier in order_round.suppliers():
             d = dict()
-            d['total_amount'] = round.supplier_total_order_sum(supplier)
+            d['total_amount'] = order_round.supplier_total_order_sum(supplier)
 
-            corrections = OrderProductCorrection.objects.filter(order_product__order__order_round=round,
-                                                                order_product__product__supplier=supplier)
-            d['supplier_corrections_exc'] = sum([c.calculate_supplier_refund()
-                                                 for c in corrections.filter(charge_supplier=True)])
-            d['voko_corrections_inc'] = sum([c.calculate_refund()
-                                            for c in corrections.filter(charge_supplier=False)])
+            corrections = OrderProductCorrection.objects.filter(
+                order_product__order__order_round=order_round,
+                order_product__product__supplier=supplier
+            )
+            d['supplier_corrections_exc'] = sum(
+                [c.calculate_supplier_refund()
+                 for c in corrections.filter(charge_supplier=True)]
+            )
+            d['voko_corrections_inc'] = sum(
+                [c.calculate_refund()
+                 for c in corrections.filter(charge_supplier=False)]
+            )
 
             d['to_pay'] = d['total_amount'] - d['supplier_corrections_exc']
             ret['suppliers'][supplier.name] = d
 
-        ret['total_profit'] = round.total_profit()
+        ret['total_profit'] = order_round.total_profit()
 
         return ret
 
@@ -53,7 +60,8 @@ class YearOverview(GroupRequiredMixin, TemplateView):
     def get_context_data(self, year, **kwargs):
         ctx = super(YearOverview, self).get_context_data(**kwargs)
         ctx['year'] = year
+        # Rounds that opened in :year:
         ctx['rounds'] = OrderRound.objects.filter(
-            open_for_orders__year=self.kwargs['year']).order_by('-id')  # Rounds that opened in :year:
+            open_for_orders__year=self.kwargs['year']).order_by('-id')
 
         return ctx

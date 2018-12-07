@@ -1,9 +1,10 @@
 from django.core.urlresolvers import reverse
 
 from ordering.models import ProductStock, Product
-from ordering.tests.factories import ProductFactory, ProductStockFactory, \
-    OrderRoundFactory, SupplierFactory, ProductCategoryFactory, \
-    ProductUnitFactory
+from ordering.tests.factories import (
+    ProductFactory, ProductStockFactory,
+    OrderRoundFactory, SupplierFactory, ProductCategoryFactory,
+    ProductUnitFactory)
 from vokou.testing import VokoTestCase
 
 

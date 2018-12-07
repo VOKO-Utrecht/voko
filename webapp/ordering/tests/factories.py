@@ -1,5 +1,7 @@
 import datetime
-from factory import DjangoModelFactory, SubFactory, LazyAttribute, SelfAttribute
+from factory import (
+    DjangoModelFactory, SubFactory, LazyAttribute, SelfAttribute
+)
 from factory.fuzzy import FuzzyText, FuzzyDecimal, FuzzyInteger
 from pytz import UTC
 from accounts.tests.factories import AddressFactory, VokoUserFactory
@@ -82,10 +84,12 @@ class OrderProductCorrectionFactory(DjangoModelFactory):
     class Meta:
         model = "ordering.OrderProductCorrection"
 
-    order_product = SubFactory("ordering.tests.factories.OrderProductFactory", order__paid=True, order__finalized=True)
+    order_product = SubFactory("ordering.tests.factories.OrderProductFactory",
+                               order__paid=True, order__finalized=True)
     supplied_percentage = FuzzyInteger(low=0, high=90)
     notes = FuzzyText()
-    # credit = SubFactory("finance.tests.factories.BalanceFactory")  # TODO: amount should not be random
+    # TODO: amount should not be random
+    # credit = SubFactory("finance.tests.factories.BalanceFactory")
     # Credit is created by save() function on model
     # charge_supplier = FuzzyChoice(True, False)
 
@@ -103,4 +107,3 @@ class ProductCategoryFactory(DjangoModelFactory):
             model = "ordering.ProductCategory"
 
     name = FuzzyText()
-

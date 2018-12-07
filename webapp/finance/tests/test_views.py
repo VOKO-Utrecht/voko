@@ -7,7 +7,8 @@ from accounts.tests.factories import VokoUserFactory
 from finance.models import Payment, Balance
 from finance.tests.factories import PaymentFactory
 from ordering.models import Order
-from ordering.tests.factories import OrderRoundFactory, OrderProductFactory, OrderFactory
+from ordering.tests.factories import (OrderRoundFactory, OrderProductFactory,
+                                      OrderFactory)
 from vokou.testing import VokoTestCase
 
 
@@ -23,7 +24,9 @@ class FinanceTestCase(VokoTestCase):
         issuers = {"data": [
             {'id': 'EXAMPLE_BANK', 'name': "Example Bank", 'method': 'ideal'},
             {'id': 'ANOTHER_BANK', 'name': "Another Bank", 'method': 'ideal'},
-            {'id': 'NON_IDEAL_BANK', 'name': "Non iDeal Bank", 'method': 'bla'},
+            {'id': 'NON_IDEAL_BANK',
+             'name': "Non iDeal Bank",
+             'method': 'bla'},
         ]}
         self.mollie_client.return_value.issuers.all.return_value = issuers
 
@@ -33,9 +36,12 @@ class FinanceTestCase(VokoTestCase):
         self.user.save()
         self.client.login(username=self.user.email, password='secret')
 
-        self.mock_create_credit = self.patch("finance.models.Payment.create_and_link_credit")
-        self.mock_mail_confirmation = self.patch("ordering.models.Order.mail_confirmation")
-        self.mock_failure_notification = self.patch("ordering.models.Order.mail_failure_notification")
+        self.mock_create_credit = self.patch(
+            "finance.models.Payment.create_and_link_credit")
+        self.mock_mail_confirmation = self.patch(
+            "ordering.models.Order.mail_confirmation")
+        self.mock_failure_notification = self.patch(
+            "ordering.models.Order.mail_failure_notification")
         # TODO figure out why this mock breaks all ConfirmTransaction tests
         # self.mock_complete_after_payment = self.patch(
         #     "ordering.models.Order.complete_after_payment")
@@ -48,7 +54,8 @@ class FinanceTestCase(VokoTestCase):
             def getPaymentUrl(self):
                 return "http://bank.url"
 
-        self.mollie_client.return_value.payments.create.return_value = FakePaymentResult()
+        self.mollie_client.return_value.payments.create.return_value = (
+            FakePaymentResult())
 
 
 class TestChooseBank(FinanceTestCase):
@@ -69,7 +76,8 @@ class TestChooseBank(FinanceTestCase):
     def test_that_qantani_api_client_is_initiated(self):
         self.client.get(self.url)
         self.mollie_client.assert_called_once_with()
-        self.mollie_client.return_value.setApiKey.assert_called_once_with(settings.MOLLIE_API_KEY)
+        self.mollie_client.return_value.setApiKey.assert_called_once_with(
+            settings.MOLLIE_API_KEY)
 
     def test_that_list_of_banks_is_requested(self):
         self.client.get(self.url)
@@ -105,11 +113,13 @@ class TestCreateTransaction(FinanceTestCase):
 
     def test_that_transaction_is_created(self):
         self.client.post(self.url, {'bank': 'EXAMPLE_BANK'})
-        self.mollie_client.return_value.payments.create.assert_called_once_with(
+        self.mollie_client.return_value.payments.create.assert_called_once_with(  # noqa
             {'description': 'VOKO Utrecht %d' % self.order.id,
              'webhookUrl': settings.BASE_URL + reverse('finance.callback'),
-             'amount': float(self.order.total_price_to_pay_with_balances_taken_into_account()),
-             'redirectUrl': settings.BASE_URL + '/finance/pay/transaction/confirm/?order=%d' % self.order.id,
+             'amount': float(self.order.total_price_to_pay_with_balances_taken_into_account()),  # noqa
+             'redirectUrl': (settings.BASE_URL +
+                             '/finance/pay/transaction/confirm/?order=%d'
+                             % self.order.id),
              'metadata': {'order_id': self.order.id},
              'method': 'ideal',
              'issuer': 'EXAMPLE_BANK'}
@@ -121,7 +131,10 @@ class TestCreateTransaction(FinanceTestCase):
         self.client.post(self.url, {'bank': "EXAMPLE_BANK"})
         payment = Payment.objects.get()
 
-        self.assertEqual(payment.amount, self.order.total_price_to_pay_with_balances_taken_into_account())
+        self.assertEqual(
+            payment.amount,
+            self.order.total_price_to_pay_with_balances_taken_into_account()
+        )
         self.assertEqual(payment.order, self.order)
         self.assertEqual(payment.mollie_id, "transaction_id")
         self.assertEqual(payment.balance, None)
@@ -177,7 +190,8 @@ class TestConfirmTransaction(FinanceTestCase):
 
     def test_mollie_payment_is_obtained(self):
         self.client.get(self.url, {"order": self.order.id})
-        self.mollie_client.return_value.payments.get.assert_called_once_with(self.payment.mollie_id)
+        self.mollie_client.return_value.payments.get.assert_called_once_with(
+            self.payment.mollie_id)
 
     def test_ispaid_is_called_on_mollie_payment(self):
         self.client.get(self.url, {"order": self.order.id})
@@ -232,8 +246,8 @@ class TestConfirmTransaction(FinanceTestCase):
         self.assertEqual(debit.user, payment.order.user)
         self.assertEqual(debit.type, 'DR')
         self.assertEqual(debit.amount, payment.order.total_price)
-        self.assertEqual(debit.notes, 'Debit van %s voor bestelling #%s' % (payment.order.total_price,
-                                                                            payment.order.id))
+        self.assertEqual(debit.notes, 'Debit van %s voor bestelling #%s' %
+                         (payment.order.total_price, payment.order.id))
         self.mock_mail_confirmation.assert_called_once_with()
 
     def test_nothing_is_changed_when_payment_already_confirmed(self):
@@ -244,7 +258,7 @@ class TestConfirmTransaction(FinanceTestCase):
         ret = self.client.get(self.url, {"order": self.order.id})
         self.assertEqual(ret.context[0]['payment_succeeded'], True)
 
-        self.assertFalse(self.mollie_client.return_value.payments.get. \
+        self.assertFalse(self.mollie_client.return_value.payments.get.
                          return_value.isPaid.called)
 
         self.assertFalse(self.mock_create_credit.called)
@@ -306,11 +320,11 @@ class TestPaymentWebhook(FinanceTestCase):
         assert self.order.paid is False
         self.mollie_client.return_value.payments.get. \
             return_value.isPaid.return_value = True
-        ret = self.client.post(self.url, {"id": self.payment.mollie_id})
+        self.client.post(self.url, {"id": self.payment.mollie_id})
 
         # self.mock_complete_after_payment.assert_called_once_with()
 
-    def test_order_is_not_completed_when_round_is_closed_and_notification_is_sent(self):
+    def test_order_is_not_completed_when_round_is_closed_and_notification_is_sent(self):  # noqa
         month_ago = datetime.now(tz=UTC) - timedelta(days=30)
         order_round = OrderRoundFactory(closed_for_orders=month_ago)
         assert order_round.is_open is False
@@ -321,7 +335,7 @@ class TestPaymentWebhook(FinanceTestCase):
 
         self.mollie_client.return_value.payments.get. \
             return_value.isPaid.return_value = True
-        ret = self.client.post(self.url, {"id": self.payment.mollie_id})
+        self.client.post(self.url, {"id": self.payment.mollie_id})
 
         payment = Payment.objects.get()
         self.assertFalse(payment.order.paid)

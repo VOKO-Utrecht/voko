@@ -23,4 +23,3 @@ class PaymentFactory(DjangoModelFactory):
 
     qantani_transaction_id = FuzzyInteger(low=1, high=999)
     qantani_transaction_code = FuzzyText()
-

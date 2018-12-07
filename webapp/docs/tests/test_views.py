@@ -24,6 +24,7 @@ class TestDocumentOverview(VokoTestCase):
         ret = self.client.get(self.url)
         self.assertCountEqual(ret.context['links'], links)
 
+
 class TestDocumentDownload(VokoTestCase):
     def setUp(self):
         self.tmpfile = SimpleUploadedFile('filename.pdf', b'file contents')
@@ -37,9 +38,7 @@ class TestDocumentDownload(VokoTestCase):
         self.assertEqual(ret.status_code, 302)
 
     def test_response(self):
-
         ret = self.client.get(self.url)
         self.assertEqual(ret.status_code, 200)
         self.assertEqual(ret.content, b"file contents")
         self.assertEqual(ret['content-type'], "application/octet-stream")
-        # self.assertEqual(ret['content-disposition'], "attachment; filename=%s" % ?)

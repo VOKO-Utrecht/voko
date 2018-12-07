@@ -18,7 +18,8 @@ class OrderProductForm(forms.ModelForm):
         # When called from product detail view, check for max amount
         if 'product' in self.cleaned_data:
             product = cleaned_data.get('product')
-            if product.amount_available is not None and amount > product.amount_available:
+            if (product.amount_available is not None
+                    and amount > product.amount_available):
                 raise forms.ValidationError("Dit aantal is niet beschikbaar.")
 
         return cleaned_data

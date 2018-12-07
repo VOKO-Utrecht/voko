@@ -14,7 +14,8 @@ class DeleteDisabledMixin(object):
         del actions['delete_selected']
         return actions
 
-    def has_delete_permission(self, request, obj=None):
+    @staticmethod
+    def has_delete_permission(request, obj=None):
         return False
 
 
@@ -85,8 +86,8 @@ class UserFilter(FilterBase):
 
     def lookups(self, request, model_admin):
         return tuple((u.id, u.email)
-            for u in VokoUser.objects.filter(pk__in =
-                LogEntry.objects.values_list('user_id').distinct())
+                     for u in VokoUser.objects.filter(
+            pk__in=LogEntry.objects.values_list('user_id').distinct())
         )
 
 
@@ -147,7 +148,10 @@ class LogEntryAdmin(admin.ModelAdmin):
         repr_ = escape(obj.object_repr)
 
         try:
-            href = reverse('admin:%s_%s_change' % (obj._meta.app_label, obj.__class__.__name__.lower()), args=[obj.object_id])
+            href = reverse('admin:%s_%s_change' % (
+                obj._meta.app_label,
+                obj.__class__.__name__.lower()
+            ), args=[obj.object_id])
             link = '<a href="%s">%s</a>' % (href, repr_)
         except NoReverseMatch:
             link = repr_

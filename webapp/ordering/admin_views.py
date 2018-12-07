@@ -15,12 +15,14 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.utils.datastructures import MultiValueDictKeyError
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import ListView, DetailView, TemplateView, View, FormView
+from django.views.generic import ListView, DetailView, TemplateView, View, \
+    FormView
 import sys
 from accounts.models import VokoUser
 from .core import get_current_order_round
 from .forms import UploadProductListForm
-from .models import OrderProduct, Order, OrderRound, Supplier, OrderProductCorrection, Product, DraftProduct, \
+from .models import OrderProduct, Order, OrderRound, Supplier, \
+    OrderProductCorrection, Product, DraftProduct, \
     ProductCategory, ProductStock, ProductUnit
 
 
@@ -37,14 +39,15 @@ class OrderAdminOrderLists(GroupRequiredMixin, DetailView):
     template_name = "ordering/admin/orderround.html"
     group_required = ('Uitdeelcoordinatoren', 'Transport', 'Admin')
 
-
     def _get_orders_per_supplier(self):
         data = {}
         order_round = self.get_object()
         for supplier in Supplier.objects.all():
-            suppliers_products_this_round = supplier.products.filter(order_round=order_round)
+            suppliers_products_this_round = supplier.products.filter(
+                order_round=order_round)
             data[supplier] = {'orderproducts': [],
-                              'sum': self._get_total_prices_per_supplier(supplier, order_round)}
+                              'sum': self._get_total_prices_per_supplier(
+                                  supplier, order_round)}
 
             for product in suppliers_products_this_round:
                 order_products = product.orderproducts.filter(order__paid=True)
@@ -52,9 +55,11 @@ class OrderAdminOrderLists(GroupRequiredMixin, DetailView):
                 if product_sum == 0:
                     continue
 
-                data[supplier]['orderproducts'].append({'product': product,
-                                                        'amount': product_sum,
-                                                        'sub_total': product_sum * product.base_price})
+                data[supplier]['orderproducts'].append(
+                    {'product': product,
+                     'amount': product_sum,
+                     'sub_total': product_sum * product.base_price}
+                )
 
         return data
 
@@ -78,10 +83,10 @@ class OrderAdminSupplierOrderCSV(GroupRequiredMixin, ListView):
         supplier = Supplier.objects.get(pk=self.kwargs.get('supplier_pk'))
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
 
-        return supplier.products.\
-            exclude(orderproducts=None).\
-            filter(orderproducts__order__paid=True).\
-            filter(order_round=order_round).\
+        return supplier.products. \
+            exclude(orderproducts=None). \
+            filter(orderproducts__order__paid=True). \
+            filter(order_round=order_round). \
             annotate(amount_sum=Sum('orderproducts__amount'))
 
     content_type = "text/csv"
@@ -93,7 +98,8 @@ class OrderAdminUserOrdersPerProduct(GroupRequiredMixin, ListView):
 
     def get_queryset(self):
         return OrderProduct.objects.filter(product__pk=self.kwargs.get('pk'),
-                                           order__paid=True).order_by("order__user")
+                                           order__paid=True).order_by(
+            "order__user")
 
 
 class OrderAdminUserOrders(GroupRequiredMixin, ListView):
@@ -102,7 +108,8 @@ class OrderAdminUserOrders(GroupRequiredMixin, ListView):
 
     def get_queryset(self):
         self.order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
-        return Order.objects.filter(order_round=self.order_round, paid=True).order_by("user__first_name")
+        return Order.objects.filter(order_round=self.order_round,
+                                    paid=True).order_by("user__first_name")
 
     def get_context_data(self, **kwargs):
         context = super(OrderAdminUserOrders, self).get_context_data(**kwargs)
@@ -117,16 +124,19 @@ class OrderAdminUserOrderProductsPerOrderRound(GroupRequiredMixin, ListView):
 
     def get_queryset(self):
         self.order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
-        return OrderProduct.objects.select_related().filter(order__order_round_id=self.kwargs.get('pk'), order__paid=True)
+        return OrderProduct.objects.select_related().filter(
+            order__order_round_id=self.kwargs.get('pk'), order__paid=True)
 
     def get_context_data(self, **kwargs):
-        context = super(OrderAdminUserOrderProductsPerOrderRound, self).get_context_data(**kwargs)
+        context = super(OrderAdminUserOrderProductsPerOrderRound,
+                        self).get_context_data(**kwargs)
 
         # this is one way to nest defaultdicts
         data = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
 
         for orderprod in self.get_queryset():
-            data[orderprod.product.supplier][orderprod.product.category][orderprod.product].append(orderprod)
+            data[orderprod.product.supplier][orderprod.product.category][
+                orderprod.product].append(orderprod)
 
         # convert to regular dicts so Django templating can handle it
         data = dict(data)
@@ -157,12 +167,17 @@ class OrderAdminCorrectionJson(GroupRequiredMixin, View):
 
         for user in users:
             orders = []
-            for order in user.orders.filter(order_round=order_round, paid=True).select_related():
+            for order in user.orders.filter(order_round=order_round,
+                                            paid=True).select_related():
                 order_products = []
-                for order_product in order.orderproducts.filter(correction__isnull=True):
+                for order_product in order.orderproducts.filter(
+                        correction__isnull=True):
                     order_products.append({
                         "id": order_product.id,
-                        "name": "%s (%s)" % (order_product.product.name, order_product.product.supplier.name),
+                        "name": "%s (%s)" % (
+                            order_product.product.name,
+                            order_product.product.supplier.name
+                        ),
                         "amount": order_product.amount
                     })
 
@@ -210,13 +225,17 @@ class OrderAdminCorrection(GroupRequiredMixin, TemplateView):
             charge_supplier=charge_supplier
         )
 
-        messages.add_message(request, messages.SUCCESS, "De correctie is succesvol aangemaakt.")
+        messages.add_message(request, messages.SUCCESS,
+                             "De correctie is succesvol aangemaakt.")
 
-        return redirect(reverse('orderadmin_correction', args=args, kwargs=kwargs))
+        return redirect(
+            reverse('orderadmin_correction', args=args, kwargs=kwargs))
 
     def corrections(self):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
-        return OrderProductCorrection.objects.filter(order_product__order__order_round=order_round).order_by("order_product__order__user")
+        return OrderProductCorrection.objects.filter(
+            order_product__order__order_round=order_round).order_by(
+            "order_product__order__user")
 
     def products(self):
         # TODO also return stock products
@@ -237,9 +256,11 @@ class OrderAdminMassCorrection(GroupRequiredMixin, View):
                                       id=product_id)
         product.create_corrections()
 
-        messages.add_message(request, messages.SUCCESS, "De correcties zijn succesvol aangemaakt.")
+        messages.add_message(request, messages.SUCCESS,
+                             "De correcties zijn succesvol aangemaakt.")
 
-        return redirect(reverse('orderadmin_correction', args=args, kwargs=kwargs))
+        return redirect(
+            reverse('orderadmin_correction', args=args, kwargs=kwargs))
 
 
 class ProductAdminMixin(GroupRequiredMixin):
@@ -271,13 +292,17 @@ class UploadProductList(FormView, ProductAdminMixin):
     form_class = UploadProductListForm
 
     def get(self, request, *args, **kwargs):
-        return HttpResponseRedirect(reverse('create_draft_products', args=args, kwargs=kwargs))
+        return HttpResponseRedirect(
+            reverse('create_draft_products', args=args, kwargs=kwargs))
 
     def form_valid(self, form):
         try:
-            self.create_draft_products_from_spreadsheet(self.request.FILES['product_list'])
+            self.create_draft_products_from_spreadsheet(
+                self.request.FILES['product_list'])
         except Exception as e:
-            messages.add_message(self.request, messages.ERROR, "Bestand kon niet worden ingelezen. Error: %s" % e)
+            messages.add_message(
+                self.request, messages.ERROR,
+                "Bestand kon niet worden ingelezen. Error: %s" % e)
 
         return redirect(reverse('create_draft_products', kwargs=self.kwargs))
 
@@ -288,15 +313,18 @@ class UploadProductList(FormView, ProductAdminMixin):
 
         workbook = openpyxl.load_workbook(f.name, read_only=True)
         sheet = workbook.get_active_sheet()
-        PRODUCT_NAME, DESCRIPTION, UNIT, PRICE, MAX, CATEGORY = list(range(0, 6))
+        PRODUCT_NAME, DESCRIPTION, UNIT, PRICE, MAX, CATEGORY = list(
+            range(0, 6))
 
         for idx, row in enumerate(sheet.rows):
-            name, description, unit, price, maximum, category = (row[PRODUCT_NAME].value,
-                                                                 row[DESCRIPTION].value,
-                                                                 row[UNIT].value,
-                                                                 row[PRICE].value,
-                                                                 row[MAX].value,
-                                                                 row[CATEGORY].value)
+            name, description, unit, price, maximum, category = (
+                row[PRODUCT_NAME].value,
+                row[DESCRIPTION].value,
+                row[UNIT].value,
+                row[PRICE].value,
+                row[MAX].value,
+                row[CATEGORY].value
+            )
 
             if not name or idx == 0:
                 continue  # skips header and empty rows
@@ -325,8 +353,9 @@ class CreateDraftProducts(TemplateView, ProductAdminMixin):
         return UploadProductListForm()
 
     def draft_products(self):
-        for dp in DraftProduct.objects.filter(order_round=self.current_order_round,
-                                              supplier=self.supplier).order_by('is_valid', 'id'):
+        for dp in DraftProduct.objects.filter(
+                order_round=self.current_order_round,
+                supplier=self.supplier).order_by('is_valid', 'id'):
             dp.validate()
             yield dp
 
@@ -339,7 +368,7 @@ class CreateDraftProducts(TemplateView, ProductAdminMixin):
         """
         for key in self.request.POST:
             try:
-                regex_match = re.match("^product_([a-z_]+)_(\d+)$", key)
+                regex_match = re.match(r"^product_([a-z_]+)_(\d+)$", key)
                 if not regex_match:
                     continue
 
@@ -379,8 +408,9 @@ class CreateDraftProducts(TemplateView, ProductAdminMixin):
             )
 
     def post(self, *args, **kwargs):
-        old_draft_products = DraftProduct.objects.filter(order_round=self.current_order_round,
-                                                         supplier=self.supplier)
+        old_draft_products = DraftProduct.objects.filter(
+            order_round=self.current_order_round,
+            supplier=self.supplier)
         old_draft_products.delete()
         self.create_draft_products()
 
@@ -395,8 +425,9 @@ class CreateRealProducts(TemplateView, ProductAdminMixin):
         return super(CreateRealProducts, self).get(*args, **kwargs)
 
     def create_products(self):
-        for dp in DraftProduct.objects.filter(supplier=self.supplier,
-                                              order_round=self.current_order_round):
+        for dp in DraftProduct.objects.filter(
+                supplier=self.supplier,
+                order_round=self.current_order_round):
             prod = dp.create_product()
             dp.delete()
             prod.determine_if_product_is_new_and_set_label()
@@ -408,12 +439,15 @@ class ProductAdminMain(GroupRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         ctx = super(ProductAdminMain, self).get_context_data()
         ctx['current_order_round'] = get_current_order_round()
-        ctx['last_ten_orders_with_notes'] = Order.objects.filter(user_notes__isnull=False).order_by('-id')[:10]
-        ctx['last_ten_orders_with_notes'] = Order.objects.filter(user_notes__isnull=False).order_by('-id')[:10]
+        ctx['last_ten_orders_with_notes'] = Order.objects.filter(
+            user_notes__isnull=False).order_by('-id')[:10]
+        ctx['last_ten_orders_with_notes'] = Order.objects.filter(
+            user_notes__isnull=False).order_by('-id')[:10]
         return ctx
 
     def get_queryset(self):
         return Supplier.objects.all().order_by("id")
+
     template_name = "ordering/admin/suppliers.html"
 
 
@@ -437,7 +471,8 @@ class RedirectToMailingView(GroupRequiredMixin, DetailView):
         user_ids = [user.pk for user in queryset]
         request.session['mailing_user_ids'] = user_ids
 
-        return HttpResponseRedirect(reverse("admin_preview_mail", args=(mailing_id,)))
+        return HttpResponseRedirect(
+            reverse("admin_preview_mail", args=(mailing_id,)))
 
 
 class StockAdminView(GroupRequiredMixin, ListView):
@@ -463,7 +498,8 @@ class ProductStockApiView(GroupRequiredMixin, View):
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
-        return super(ProductStockApiView, self).dispatch(request, *args, **kwargs)
+        return super(ProductStockApiView, self).dispatch(request, *args,
+                                                         **kwargs)
 
     def post(self, request, *args, **kwargs):
         try:

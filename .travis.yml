@@ -6,4 +6,4 @@ python:
 install:
   - "pip3 install -r requirements/development.txt"
 # command to run tests
-script: cd webapp && ./runtests.sh
+script: cd webapp && ./runtests.sh && flake8 --exclude migrations,settings

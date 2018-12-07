@@ -5,10 +5,11 @@ import sys
 
 from django.http import HttpResponse
 
-from finance.models import Balance, Payment
+from finance.models import Balance
 from vokou.admin import DeleteDisabledMixin
-from .models import Order, OrderProduct, Product, OrderRound, ProductCategory, \
-    OrderProductCorrection, ProductStock, Supplier, ProductUnit, DraftProduct
+from .models import (Order, OrderProduct, Product, OrderRound, ProductCategory,
+                     OrderProductCorrection, ProductStock, Supplier,
+                     ProductUnit, DraftProduct)
 
 
 class OrderProductInline(admin.TabularInline):
@@ -20,7 +21,10 @@ def create_credit_for_order(modeladmin, request, queryset):
         Balance.objects.create(user=order.user,
                                type="CR",
                                amount=order.total_price,
-                               notes="Bestelling #%d contant betaald" % order.pk)
+                               notes="Bestelling #%d contant betaald"
+                                     % order.pk)
+
+
 create_credit_for_order.short_description = "Contant betaald"
 
 
@@ -72,18 +76,18 @@ def export_orders_for_financial_admin(modeladmin, request, queryset):
 
     return response
 
-export_orders_for_financial_admin.short_description = "Exporteer voor " \
-                                                      "financiële admin"
+
+export_orders_for_financial_admin.short_description = (
+    "Exporteer voor financiële admin")
 
 
 class OrderAdmin(DeleteDisabledMixin, admin.ModelAdmin):
-    list_display = ["id", "created", "order_round", "user", "finalized", "paid", "total_price", "user_notes"]
+    list_display = ["id", "created", "order_round", "user", "finalized",
+                    "paid", "total_price", "user_notes"]
     ordering = ("-id", )
     # inlines = [OrderProductInline]  ## causes timeout
     list_filter = ("paid", "finalized", "order_round")
     actions = (create_credit_for_order, export_orders_for_financial_admin)
-
-admin.site.register(Order, OrderAdmin)
 
 
 # Generate actions for categories
@@ -93,6 +97,7 @@ def generate_action(category):
             product.category = category
             product.save()
     return fn
+
 
 thismodule = sys.modules[__name__]
 
@@ -117,14 +122,13 @@ except OperationalError:
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ["name", 'description', "order_round", "supplier", "category", "base_price", "maximum_total_order",
+    list_display = ["name", 'description', "order_round", "supplier",
+                    "category", "base_price", "maximum_total_order",
                     "new"]
     ordering = ("-id", )
     list_filter = ("order_round", "supplier", "category", "new")
     actions = prod_cat_actions
     list_per_page = 500
-
-admin.site.register(Product, ProductAdmin)
 
 
 class ProductStockAdmin(DeleteDisabledMixin, admin.ModelAdmin):
@@ -133,49 +137,26 @@ class ProductStockAdmin(DeleteDisabledMixin, admin.ModelAdmin):
     list_filter = ("type",)
     raw_id_fields = ('product',)
 
-admin.site.register(ProductStock, ProductStockAdmin)
-
-
-class SupplierAdmin(DeleteDisabledMixin, admin.ModelAdmin):
-    pass
-admin.site.register(Supplier, SupplierAdmin)
-
-
-class CategoryAdmin(DeleteDisabledMixin, admin.ModelAdmin):
-    pass
-admin.site.register(ProductCategory, CategoryAdmin)
-
-
-class ProductUnitAdmin(DeleteDisabledMixin, admin.ModelAdmin):
-    pass
-admin.site.register(ProductUnit, ProductUnitAdmin)
-
-
-class DraftProductAdmin(admin.ModelAdmin):
-    pass
-admin.site.register(DraftProduct, DraftProductAdmin)
-
 
 class OrderRoundAdmin(DeleteDisabledMixin, admin.ModelAdmin):
-    list_display = ["id", "open_for_orders", "closed_for_orders", "collect_datetime",
-                    "markup_percentage", "transaction_costs", "reminder_hours_before_closing",
+    list_display = ["id", "open_for_orders", "closed_for_orders",
+                    "collect_datetime", "markup_percentage",
+                    "transaction_costs", "reminder_hours_before_closing",
                     "order_placed", "reminder_sent"]
     ordering = ("-id", )
 
-admin.site.register(OrderRound, OrderRoundAdmin)
-
 
 class OrderProductCorrectionAdmin(DeleteDisabledMixin, admin.ModelAdmin):
-    list_display = ["id", 'created', 'order_product', "supplied_percentage", "notes", "credit", "charge_supplier"]
+    list_display = ["id", 'created', 'order_product', "supplied_percentage",
+                    "notes", "credit", "charge_supplier"]
     ordering = ("-id", 'charge_supplier', 'supplied_percentage', 'created')
     list_filter = ("charge_supplier",)
     raw_id_fields = ('order_product',)
 
-admin.site.register(OrderProductCorrection, OrderProductCorrectionAdmin)
-
 
 class OrderProductAdmin(DeleteDisabledMixin, admin.ModelAdmin):
-    list_display = ["id", 'order', 'order_paid', "product", "amount", "stock_product", "base_price", "retail_price"]
+    list_display = ["id", 'order', 'order_paid', "product", "amount",
+                    "stock_product", "base_price", "retail_price"]
     ordering = ("-id", 'order', 'product')
     list_filter = ("order__paid", "product__order_round")
     raw_id_fields = ('order', 'product')
@@ -188,5 +169,30 @@ class OrderProductAdmin(DeleteDisabledMixin, admin.ModelAdmin):
         return obj.product.is_stock_product()
     stock_product.boolean = True
 
-admin.site.register(OrderProduct, OrderProductAdmin)
 
+class SupplierAdmin(DeleteDisabledMixin, admin.ModelAdmin):
+    pass
+
+
+class CategoryAdmin(DeleteDisabledMixin, admin.ModelAdmin):
+    pass
+
+
+class ProductUnitAdmin(DeleteDisabledMixin, admin.ModelAdmin):
+    pass
+
+
+class DraftProductAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(Order, OrderAdmin)
+admin.site.register(OrderProduct, OrderProductAdmin)
+admin.site.register(OrderProductCorrection, OrderProductCorrectionAdmin)
+admin.site.register(OrderRound, OrderRoundAdmin)
+admin.site.register(DraftProduct, DraftProductAdmin)
+admin.site.register(ProductUnit, ProductUnitAdmin)
+admin.site.register(ProductCategory, CategoryAdmin)
+admin.site.register(ProductStock, ProductStockAdmin)
+admin.site.register(Product, ProductAdmin)
+admin.site.register(Supplier, SupplierAdmin)

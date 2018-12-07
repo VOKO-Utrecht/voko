@@ -8,10 +8,10 @@ class DocumentAdmin(admin.ModelAdmin):
     ordering = ("-id", )
 
 
-admin.site.register(Document, DocumentAdmin)
-
 class LinkAdmin(admin.ModelAdmin):
     list_display = ["created", "name", "url"]
     ordering = ("-id", )
 
+
+admin.site.register(Document, DocumentAdmin)
 admin.site.register(Link, LinkAdmin)

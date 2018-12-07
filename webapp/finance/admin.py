@@ -6,7 +6,8 @@ from vokou.admin import DeleteDisabledMixin, export_as_csv_action
 class BalanceFilterMixin(object):
     default_value = None
 
-    def lookups(self, request, model_admin):
+    @staticmethod
+    def lookups(request, model_admin):
         return (('1', 'True'),
                 ('0', 'False'))
 
@@ -54,14 +55,19 @@ class DebetListFilter(BalanceFilterMixin, admin.SimpleListFilter):
 
 
 class BalanceAdmin(DeleteDisabledMixin, admin.ModelAdmin):
-    list_display = ["id", "created", "modified", "user", "type", "amount", "notes", "_is_correction", "_is_payment", '_is_order_debit']
+    list_display = [
+        "id", "created", "modified", "user", "type", "amount", "notes",
+        "_is_correction", "_is_payment", '_is_order_debit'
+    ]
     ordering = ("-id", )
-    list_filter = ("type", PaymentListFilter, CorrectionListFilter, DebetListFilter)
+    list_filter = ("type", PaymentListFilter,
+                   CorrectionListFilter, DebetListFilter)
     search_fields = ['notes']
 
-    actions = [export_as_csv_action("CSV Export",
-                                    fields=('id', 'created', 'user', 'type',
-                                            'formatted_amount', 'notes', 'balance_type'))]
+    actions = [export_as_csv_action(
+        "CSV Export",
+        fields=('id', 'created', 'user', 'type',
+                'formatted_amount', 'notes', 'balance_type'))]
 
     def is_correction(self, obj):
         return obj.correction is not None
@@ -77,11 +83,11 @@ class BalanceAdmin(DeleteDisabledMixin, admin.ModelAdmin):
 
 
 class PaymentAdmin(DeleteDisabledMixin, admin.ModelAdmin):
-    list_display = ["id", "created", "amount", "order",  "qantani_transaction_id", "succeeded"]
+    list_display = ["id", "created", "amount", "order",
+                    "qantani_transaction_id", "succeeded"]
     ordering = ("-id", )
     list_filter = ("succeeded",)
 
 
 admin.site.register(Balance, BalanceAdmin)
 admin.site.register(Payment, PaymentAdmin)
-

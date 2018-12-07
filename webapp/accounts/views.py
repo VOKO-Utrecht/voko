@@ -2,11 +2,15 @@ from braces.views import AnonymousRequiredMixin, LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
+from django.db import transaction
 from django.http import Http404
 from django.shortcuts import redirect
-from django.views.generic import FormView, DetailView, UpdateView, TemplateView, View
-from accounts.forms import VokoUserCreationForm, VokoUserFinishForm, RequestPasswordResetForm, PasswordResetForm, \
-    ChangeProfileForm
+from django.urls import reverse
+from django.views.generic import (FormView, DetailView, UpdateView,
+                                  TemplateView, View)
+from accounts.forms import (VokoUserCreationForm, VokoUserFinishForm,
+                            RequestPasswordResetForm, PasswordResetForm,
+                            ChangeProfileForm)
 from accounts.models import EmailConfirmation, VokoUser, PasswordResetRequest
 from django.conf import settings
 import log
@@ -34,8 +38,6 @@ class RegisterView(AnonymousRequiredMixin, FormView):
     success_url = "/accounts/register/thanks"  # TODO: Reverse url
 
     def form_valid(self, form):
-        # This method is called when valid form data has been POSTed.
-        # It should return an HttpResponse.
         user = form.save()
         user.email_confirmation.send_confirmation_mail()
         return super(RegisterView, self).form_valid(form)
@@ -62,8 +64,12 @@ class FinishRegistration(AnonymousRequiredMixin, UpdateView):
 
     def get_queryset(self):
         # We re-use the email confirmation token.
-        return EmailConfirmation.objects.filter(is_confirmed=True, user__can_activate=True,
-                                                user__is_active=False, token=self.kwargs['pk'])
+        return EmailConfirmation.objects.filter(
+            is_confirmed=True,
+            user__can_activate=True,
+            user__is_active=False,
+            token=self.kwargs['pk']
+        )
 
     def get_object(self, queryset=None):
         try:
@@ -91,9 +97,11 @@ class OverView(LoginRequiredMixin, TemplateView):
         ctx = super(OverView, self).get_context_data(**kwargs)
 
         if self.request.user.id:
-            order = get_or_create_order(self.request.user)  # TODO: check if this is obsolete
+            # TODO: this line might be obsolete
+            get_or_create_order(self.request.user)
 
-        ctx['orders'] = self.request.user.orders.filter(paid=True).order_by("-pk")
+        ctx['orders'] = self.request.user.orders.filter(
+            paid=True).order_by("-pk")
         ctx['balances'] = self.request.user.balance.all().order_by('-pk')
         return ctx
 
@@ -110,14 +118,19 @@ class RequestPasswordResetView(AnonymousRequiredMixin, FormView):
 
     def form_valid(self, form):
         try:
-            user = VokoUser.objects.get(email=form.cleaned_data['email'].lower())
+            user = VokoUser.objects.get(
+                email=form.cleaned_data['email'].lower()
+            )
             request = PasswordResetRequest(user=user)
             request.save()
             request.send_email()
 
         except VokoUser.DoesNotExist:
             # Do not notify user
-            log.log_event(event="Password reset requested for unknown email address: %s" % form.cleaned_data['email'])
+            log.log_event(
+                event="Password reset requested for unknown email address: %s"
+                      % form.cleaned_data['email']
+            )
 
         return super(RequestPasswordResetView, self).form_valid(form)
 
@@ -149,10 +162,11 @@ class PasswordResetView(AnonymousRequiredMixin, FormView, DetailView):
         form = self.form_class(request.POST)
 
         if form.is_valid():
-            self.object.is_used = True
-            self.object.save()
-            self.object.user.set_password(form.cleaned_data['password1'])
-            self.object.user.save()
+            with transaction.atomic():
+                self.object.is_used = True
+                self.object.save()
+                self.object.user.set_password(form.cleaned_data['password1'])
+                self.object.user.save()
             return self.form_valid(form)
 
         else:

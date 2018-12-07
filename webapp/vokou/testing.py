@@ -33,5 +33,7 @@ class VokoTestCase(TransactionTestCase):
         if any([str(m) == msg for m in messages]):
             return True
 
-        raise AssertionError("Message '%s' not found in response. Messages found: '%s'" %
-                             (msg, ', '.join([str(m) for m in messages])))
+        raise AssertionError(
+            "Message '%s' not found in response. Messages found: '%s'" %
+            (msg, ', '.join([str(m) for m in messages]))
+        )

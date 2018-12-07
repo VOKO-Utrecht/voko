@@ -2,7 +2,8 @@
 import pytz
 from datetime import datetime, timedelta
 from uuid import uuid4
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import (BaseUserManager, AbstractBaseUser,
+                                        PermissionsMixin)
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db import models
@@ -12,6 +13,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.mail import mail_admins
 from mailing.helpers import get_template_by_id, render_mail_template, mail_user
 
+# TODO: move to django_constance settings
 CONFIRM_MAILTEMPLATE_ID = 2
 PASSWORD_RESET_MAILTEMPLATE_ID = 9
 
@@ -26,7 +28,9 @@ class Address(TimeStampedModel):
     city = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
-        return "%s - %s, %s" % (self.street_and_number, self.zip_code, self.city)
+        return "%s - %s, %s" % (self.street_and_number,
+                                self.zip_code,
+                                self.city)
 
 
 class UserProfile(TimeStampedModel):
@@ -34,12 +38,13 @@ class UserProfile(TimeStampedModel):
         verbose_name = "ledenprofiel"
         verbose_name_plural = "ledenprofielen"
 
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="userprofile")
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,
+                                related_name="userprofile")
     address = models.ForeignKey(Address, null=True, blank=True)
     phone_number = models.CharField(max_length=25, blank=True)
     notes = models.TextField()
     has_drivers_license = models.BooleanField(default=False)
-    
+
     def __str__(self):
         return "Profile for user: %s" % self.user
 
@@ -57,7 +62,10 @@ class VokoUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, first_name, last_name, password):
-        user = self.create_user(email, first_name, last_name, password=password)
+        user = self.create_user(email,
+                                first_name,
+                                last_name,
+                                password=password)
         user.is_active = True
         user.is_admin = True
         user.is_staff = True
@@ -65,9 +73,12 @@ class VokoUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    # NOTE: Remove following lines when doing a 'loaddata' management command (FIXME)
+    # NOTE: Remove following lines when executing a
+    # 'loaddata' management command (FIXME)
     def get_queryset(self):
-        return super(VokoUserManager, self).get_queryset().filter(is_asleep=False)
+        return super(VokoUserManager, self).get_queryset().filter(
+            is_asleep=False
+        )
 
 
 class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
@@ -92,7 +103,8 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-    is_asleep = models.BooleanField(default=False, verbose_name="Sleeping (inactive) member")
+    is_asleep = models.BooleanField(default=False,
+                                    verbose_name="Sleeping (inactive) member")
     objects = VokoUserManager()
 
     def get_full_name(self):
@@ -109,13 +121,14 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
         # if self.is_active and not self.email_confirmation.is_confirmed:
         #     raise RuntimeError("Email address is not confirmed!")
         if self.pk is None:
-            message = """Hoi! We hebben een nieuwe gebruiker (poti-lid) :  %s""" % self
-            mail_admins("Nieuwe gebruiker: %s" % self, message, fail_silently=True)
+            message = """Hoi! We hebben een nieuwe gebruiker: %s""" % self
+            mail_admins("Nieuwe gebruiker: %s" % self, message,
+                        fail_silently=True)
 
         super(VokoUser, self).save(*args, **kwargs)
 
         try:
-            _ = self.email_confirmation
+            _ = self.email_confirmation  # noqa
         except ObjectDoesNotExist:
             EmailConfirmation.objects.create(user=self)
 
@@ -129,13 +142,14 @@ class EmailConfirmation(TimeStampedModel):
         verbose_name_plural = "emailbevestigingen"
 
     token = models.CharField(max_length=100, primary_key=True)
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="email_confirmation")
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,
+                                related_name="email_confirmation")
     is_confirmed = models.BooleanField(default=False)
 
-    def save(self, *args, **kwargs):
+    def save(self, **kwargs):
         if not self.token:
             self.token = str(uuid4())
-        super(EmailConfirmation, self).save(*args, **kwargs)
+        super(EmailConfirmation, self).save(**kwargs)
 
     def confirm(self):
         self.is_confirmed = True
@@ -143,11 +157,16 @@ class EmailConfirmation(TimeStampedModel):
 
     def send_confirmation_mail(self):
         mail_template = get_template_by_id(CONFIRM_MAILTEMPLATE_ID)
-        rendered_template_vars = render_mail_template(mail_template, user=self.user)
+        rendered_template_vars = render_mail_template(mail_template,
+                                                      user=self.user)
         mail_user(self.user, *rendered_template_vars)
 
     def __str__(self):
-        return "Confirmed: %s | user: %s | email: %s" % (self.is_confirmed, self.user.get_full_name(), self.user.email)
+        return "Confirmed: %s | user: %s | email: %s" % (
+            self.is_confirmed,
+            self.user.get_full_name(),
+            self.user.email
+        )
 
 
 class PasswordResetRequest(TimeStampedModel):
@@ -156,18 +175,22 @@ class PasswordResetRequest(TimeStampedModel):
         verbose_name_plural = "wachtwoordreset-aanvragen"
 
     token = models.CharField(max_length=100, primary_key=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="password_reset_requests")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             related_name="password_reset_requests")
     is_used = models.BooleanField(default=False)
 
-    def save(self, *args, **kwargs):
+    def save(self, **kwargs):
         if not self.token:
             self.token = str(uuid4())
-        super(PasswordResetRequest, self).save(*args, **kwargs)
+        super(PasswordResetRequest, self).save(**kwargs)
 
     def send_email(self):
         mail_template = get_template_by_id(PASSWORD_RESET_MAILTEMPLATE_ID)
-        rendered_template_vars = render_mail_template(mail_template, user=self.user,
-                                                      url=settings.BASE_URL + reverse('reset_pass', args=(self.pk,)))
+        rendered_template_vars = render_mail_template(
+            mail_template,
+            user=self.user,
+            url=settings.BASE_URL + reverse('reset_pass', args=(self.pk,))
+        )
         mail_user(self.user, *rendered_template_vars)
 
     @property
@@ -178,10 +201,14 @@ class PasswordResetRequest(TimeStampedModel):
         # Time window of 24 hours to reset
         if (datetime.now(pytz.utc) - self.created) > timedelta(hours=24):
             return False
+
         return True
 
     def __str__(self):
-        return "User: %s | Used: %s | Usable: %s" % (self.user, self.is_used, self.is_usable)
+        return "User: %s | Used: %s | Usable: %s" % (
+            self.user,
+            self.is_used,
+            self.is_usable)
 
 
 class ReadOnlyVokoUser(VokoUser):
@@ -193,7 +220,9 @@ class ReadOnlyVokoUser(VokoUser):
 
 class SleepingVokoUserManager(VokoUserManager):
     def get_queryset(self):
-        return super(BaseUserManager, self).get_queryset().filter(is_asleep=True)
+        return super(BaseUserManager, self).get_queryset().filter(
+            is_asleep=True
+        )
 
 
 class SleepingVokoUser(VokoUser):

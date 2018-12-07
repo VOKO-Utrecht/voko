@@ -26,16 +26,3 @@ Django based custom web application for food collective www.vokoutrecht.nl.
 ### Run development server
     cd webapp
     ./manage.py runserver --settings=vokou.settings.development
-
-## Supervisor config
-```yaml
-[program:gunicorn]
-environment=
-    DJANGO_SETTINGS_MODULE=vokou.settings.production
-command=/home/voko/vokou/webapp/gunicorn.sh
-directory=/home/voko/vokou/webapp
-user=voko
-autostart=true
-autorestart=true
-redirect_stderr=true
-```
