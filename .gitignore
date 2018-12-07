@@ -3,3 +3,4 @@
 .idea/*
 *.sqlite*
 local.py
+webapp/media
