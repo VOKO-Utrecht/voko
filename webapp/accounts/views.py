@@ -5,7 +5,6 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.db import transaction
 from django.http import Http404
 from django.shortcuts import redirect
-from django.urls import reverse
 from django.views.generic import (FormView, DetailView, UpdateView,
                                   TemplateView, View)
 from accounts.forms import (VokoUserCreationForm, VokoUserFinishForm,
