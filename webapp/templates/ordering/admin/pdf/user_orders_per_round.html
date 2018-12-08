@@ -1,0 +1,82 @@
+<html lang="nl">
+    <head>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        {% block content %}
+            <style>
+                @page {
+                    size: a4 portrait;
+                    margin: 0.5cm;
+                }
+
+                .panel {
+                    page-break-inside: avoid;
+                    font-size: 16px;
+                }
+
+                h1 { font-size: 200%; }
+
+                table {
+                    border: 1px dotted grey;
+                    padding: 2px;
+                    border-spacing: 2px;
+                    border-collapse: collapse;
+                    width: 100%;
+                }
+
+            </style>
+
+            {% for order in object_list %}
+            <div class="panel">
+                <div>
+                    <h1>{{ forloop.counter }}/{{ object_list|length }}: {{ order.user.get_full_name }}</h1>
+                </div>
+
+                {% if order_round.is_open %}
+                    <div>
+                        <h1>
+                            Let op! Deze bestelronde is nog open. Er kunnen nog nieuwe bestellingen worden gedaan!
+                        </h1>
+                    </div>
+                {% endif %}
+
+                <div>
+                    Bestelling #{{ order.pk }}
+                    | bestelregels: {{ order.orderproducts.all|length }}
+                    | bestelronde {{ order.order_round.id }}
+                    | e-mail: {{ order.user.email }}
+                    | telefoon: {{ order.user.userprofile.phone_number|default:"onbekend" }}
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="10%">Aantal</th>
+                            <th width="20%">Eenheid</th>
+                            <th width="45%">Product</th>
+                            <th width="35%">Leverancier</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for o in order.orderproducts.all|dictsort:"product.name" %}
+                            <tr {% if o.product == object %}class="success"{% endif %}>
+                                <td width="10%">{{ o.amount }}</td>
+                                <td width="20%">{{ o.product.unit_of_measurement }}</td>
+                                <td width="40%"><b>{{ o.product.name }}</b> {% if o.product.is_stock_product %}<b><u>uit voorraad</u></b>{% endif %}</td>
+                                <td width="40%">{{ o.product.supplier }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {# Ensure page break before next supplier, but avoid final blank page #}
+            {% if not forloop.last %}
+                <p style="page-break-after:always;"></p>
+            {% endif %}
+
+        {% endfor %}
+        {% endblock %}
+    </body>
+</html>

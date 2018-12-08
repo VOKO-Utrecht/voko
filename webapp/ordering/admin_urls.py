@@ -5,7 +5,8 @@ from .admin_views import OrderAdminMain, OrderAdminOrderLists, \
     OrderAdminCorrection, OrderAdminMassCorrection, \
     OrderAdminCorrectionJson, UploadProductList, CreateDraftProducts, \
     CreateRealProducts, ProductAdminMain, \
-    RedirectToMailingView, StockAdminView, ProductStockApiView, ProductApiView
+    RedirectToMailingView, StockAdminView, ProductStockApiView, \
+    ProductApiView, OrderAdminUserOrdersPdf
 
 urlpatterns = (
     url(r'^rounds/$', OrderAdminMain.as_view(), name="orderadmin_main"),
@@ -22,6 +23,9 @@ urlpatterns = (
     url(r'^round/(?P<pk>[0-9]+)/order_lists/(?P<supplier_pk>[0-9]+).csv',
         OrderAdminSupplierOrderCSV.as_view(),
         name="orderadmin_supplier_order_csv"),
+    url(r'^round/(?P<pk>[0-9]+)/user_orders/pdf/$',
+        OrderAdminUserOrdersPdf.as_view(),
+        name="orderadmin_userorders_pdf"),
     url(r'^round/(?P<pk>[0-9]+)/user_orders/$', OrderAdminUserOrders.as_view(),
         name="orderadmin_userorders"),
     url(r'^round/(?P<pk>[0-9]+)/product_orders/$',

@@ -5,6 +5,8 @@ from decimal import Decimal
 import openpyxl
 import re
 from collections import defaultdict
+
+from django.template.loader import get_template
 from tempfile import NamedTemporaryFile
 from braces.views import GroupRequiredMixin
 from django.contrib import messages
@@ -18,6 +20,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, TemplateView, View, \
     FormView
 import sys
+
+from xhtml2pdf import pisa
+
 from accounts.models import VokoUser
 from .core import get_current_order_round
 from .forms import UploadProductListForm
@@ -115,6 +120,30 @@ class OrderAdminUserOrders(GroupRequiredMixin, ListView):
         context = super(OrderAdminUserOrders, self).get_context_data(**kwargs)
         context['order_round'] = self.order_round
         return context
+
+
+# Might replace OrderAdminUserOrders
+class OrderAdminUserOrdersPdf(OrderAdminUserOrders):
+    template_name = "ordering/admin/pdf/user_orders_per_round.html"
+
+    def get(self, request, *args, **kwargs):
+        self.object_list = self.get_queryset()
+        context = self.get_context_data()
+
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = (
+            'attachment; filename="bestellingen ronde {}.pdf"'.format(
+                self.kwargs.get('pk'))
+        )
+
+        template = get_template(self.template_name)
+        html = template.render(context)
+
+        pisa_status = pisa.CreatePDF(html, dest=response)
+
+        if pisa_status.err:
+            return RuntimeError(html)
+        return response
 
 
 # Bestellingen per product

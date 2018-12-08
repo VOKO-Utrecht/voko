@@ -26,7 +26,10 @@
             <td>{{ orderround.open_for_orders }}</td>
             <td>{{ orderround.closed_for_orders }}</td>
             <td><a href="{% url 'orderadmin_orderlists' orderround.pk %}">Bestellijsten</a></td>
-            <td><a href="{% url 'orderadmin_userorders' orderround.pk %}">{{ orderround.number_of_orders }}</a></td>
+              <td>{{ orderround.number_of_orders }}
+                  <a href="{% url 'orderadmin_userorders_pdf' orderround.pk %}">pdf</a> /
+                  <a href="{% url 'orderadmin_userorders' orderround.pk %}">html</a>
+              </td>
             <td><a href="{% url 'orderadmin_orders_per_product' orderround.pk %}">Per product</a></td>
             <td><a href="{% url 'orderadmin_correction' orderround.pk %}">Correcties</a></td>
           </tr>
