@@ -19,6 +19,10 @@ class VokoUserCreationForm(forms.ModelForm):
     def save(self, commit=True):
         # Create user
         user = super(VokoUserCreationForm, self).save(commit=False)
+
+        # Standardize on lowercase email address.
+        user.email = user.email.lower()
+
         if commit:
             user.save()
 
