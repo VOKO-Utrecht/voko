@@ -6,7 +6,7 @@ from django.db import transaction
 from django.http import Http404
 from django.shortcuts import redirect
 from django.views.generic import (FormView, DetailView, UpdateView,
-                                  TemplateView, View)
+                                  TemplateView, ListView, View)
 from accounts.forms import (VokoUserCreationForm, VokoUserFinishForm,
                             RequestPasswordResetForm, PasswordResetForm,
                             ChangeProfileForm)
@@ -14,7 +14,6 @@ from accounts.models import EmailConfirmation, VokoUser, PasswordResetRequest
 from django.conf import settings
 import log
 from ordering.core import get_or_create_order
-
 
 class LoginView(AnonymousRequiredMixin, FormView):
     template_name = "accounts/login.html"
@@ -188,3 +187,7 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
         messages.add_message(self.request, messages.SUCCESS,
                              "Je profiel is aangepast.")
         return super(EditProfileView, self).form_valid(form)
+
+class List(LoginRequiredMixin, ListView):
+    model = VokoUser
+    template_name = "accounts/list.html"

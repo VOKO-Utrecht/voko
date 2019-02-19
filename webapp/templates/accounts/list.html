@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% block title %}Leden{% endblock %}
+{% block content %}
+    <h1 class="page-header">Leden</h1>
+
+    <!-- Table -->
+    <table class="table table-hover" id="accounts-table">
+        <thead>
+        <tr>
+            <th>Naam</th>
+            <th>Rijbewijs</th>
+            <th>E-mail</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for account in object_list %}
+        <tr class="account">
+            <td class="col-md-2">{{ account.get_full_name }}</td>
+            <td class="col-md-1">{% if account.has_drivers_license %}Ja{% else %}Nee{% endif %}</a></td>
+            <td class="col-md-2">{{ account.email }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function() {
+            $('#accounts-table').DataTable({
+                "searching": true,
+                "lengthChange": false,
+                "ordering": true,
+                "info": false,
+                "pagingType": "numbers",
+            });
+        });
+    </script>
+{% endblock %}
