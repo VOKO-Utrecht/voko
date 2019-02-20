@@ -4,3 +4,4 @@
 *.sqlite*
 local.py
 webapp/media
+.vscode/
