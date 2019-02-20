@@ -1,5 +1,6 @@
 from captcha.fields import ReCaptchaField
 from django import forms
+from django.conf import settings
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.mail import mail_admins
 from django.db import transaction
@@ -14,7 +15,8 @@ class VokoUserCreationForm(forms.ModelForm):
         model = VokoUser
         fields = ("email", "first_name", "last_name")
 
-    captcha = ReCaptchaField()
+    if settings.CAPTCHA_ENABLED:
+        captcha = ReCaptchaField()
 
     def save(self, commit=True):
         # Create user
@@ -55,7 +57,10 @@ class VokoUserFinishForm(forms.ModelForm):
         widget=forms.Textarea
     )
 
-    has_drivers_license = forms.BooleanField(label='Ik heb een rijbewijs')
+    has_drivers_license = forms.BooleanField(
+        label='Ik heb een rijbewijs',
+        required=False
+    )
 
     share_contact_info = forms.BooleanField(
         label='Ik ga ermee akkoord dat mijn contactinformatie binnen de VOKO gedeelt wordt. Dit is bijv. zeer handig bij het organiseren van Transport.',
@@ -166,7 +171,10 @@ class ChangeProfileForm(forms.ModelForm):
         required=False
     )
 
-    has_drivers_license = forms.BooleanField(label='Ik heb een rijbewijs')
+    has_drivers_license = forms.BooleanField(
+        label='Ik heb een rijbewijs',
+        required=False
+    )
 
     password1 = forms.CharField(
         label="Wachtwoord (alleen invullen als je deze wilt wijzigen)",
