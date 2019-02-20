@@ -55,7 +55,10 @@ class VokoUserFinishForm(forms.ModelForm):
         widget=forms.Textarea
     )
 
-    has_drivers_license = forms.BooleanField(label='Ik heb een rijbewijs')
+    has_drivers_license = forms.BooleanField(
+        label='Ik heb een rijbewijs',
+        required=False
+    )
 
     accept_terms_and_privacy = forms.BooleanField(
         label="Ik heb het Reglement en het Privacy Statement van "
@@ -161,7 +164,10 @@ class ChangeProfileForm(forms.ModelForm):
         required=False
     )
 
-    has_drivers_license = forms.BooleanField(label='Ik heb een rijbewijs')
+    has_drivers_license = forms.BooleanField(
+        label='Ik heb een rijbewijs',
+        required=False
+    )
 
     password1 = forms.CharField(
         label="Wachtwoord (alleen invullen als je deze wilt wijzigen)",
