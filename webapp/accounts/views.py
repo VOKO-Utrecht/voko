@@ -188,6 +188,6 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
                              "Je profiel is aangepast.")
         return super(EditProfileView, self).form_valid(form)
 
-class List(LoginRequiredMixin, ListView):
+class MemberList(LoginRequiredMixin, ListView):
     model = VokoUser
-    template_name = "accounts/list.html"
+    template_name = "accounts/member_list.html"
