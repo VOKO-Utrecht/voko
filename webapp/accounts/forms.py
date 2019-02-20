@@ -1,5 +1,6 @@
 from captcha.fields import ReCaptchaField
 from django import forms
+from django.conf import settings
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.mail import mail_admins
 from django.db import transaction
@@ -14,7 +15,8 @@ class VokoUserCreationForm(forms.ModelForm):
         model = VokoUser
         fields = ("email", "first_name", "last_name")
 
-    captcha = ReCaptchaField()
+    if settings.CAPTCHA_ENABLED:
+        captcha = ReCaptchaField()
 
     def save(self, commit=True):
         # Create user

@@ -127,6 +127,7 @@ HIJACK_DISPLAY_ADMIN_BUTTON = False  # Because of custom user model
 RECAPTCHA_PUBLIC_KEY = os.getenv("RECAPTCHA_SITE_KEY")
 RECAPTCHA_PRIVATE_KEY = os.getenv("RECAPTCHA_SECRET_KEY")
 NOCAPTCHA = True
+CAPTCHA_ENABLED = True
 
 
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
