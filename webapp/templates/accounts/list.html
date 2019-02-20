@@ -17,7 +17,7 @@
         {% for account in object_list %}
         <tr class="account">
             <td class="col-md-2">{{ account.get_full_name }}</td>
-            <td class="col-md-1">{% if account.has_drivers_license %}Ja{% else %}Nee{% endif %}</a></td>
+            <td class="col-md-1">{{account.has_drivers_license|yesno:"Ja,Nee"}}</a></td>
             <td class="col-md-2">{{ account.email }}</td>
         </tr>
         {% endfor %}
