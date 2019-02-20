@@ -11,6 +11,7 @@
             <th>Naam</th>
             <th>Rijbewijs</th>
             <th>E-mail</th>
+            <th>Telefoon</th>
         </tr>
         </thead>
         <tbody>
@@ -19,6 +20,7 @@
             <td class="col-md-2">{{ account.get_full_name }}</td>
             <td class="col-md-1">{{ account.userprofile.has_drivers_license|yesno:"Ja,Nee" }}</a></td>
             <td class="col-md-2">{% if account.userprofile.share_contact_info %}{{ account.email }}{% endif %}</td>
+            <td class="col-md-2">{% if account.userprofile.share_contact_info %}{{ account.userprofile.phone_number }}{% endif %}</td>
         </tr>
         {% endfor %}
         </tbody>
