@@ -189,5 +189,5 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
         return super(EditProfileView, self).form_valid(form)
 
 class MemberList(LoginRequiredMixin, ListView):
-    queryset = VokoUser.objects.filter(is_active=True)
+    queryset = VokoUser.objects.filter(is_active=True, userprofile__share_contact_info=True)
     template_name = "accounts/member_list.html"

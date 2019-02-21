@@ -19,13 +19,8 @@
         <tr class="account">
             <td class="col-md-2">{{ account.get_full_name }}</td>
             <td class="col-md-1">{{ account.userprofile.has_drivers_license|yesno:"Ja,Nee" }}</a></td>
-            {% if account.userprofile.share_contact_info %}
-                <td class="col-md-2">{{ account.email }}</td>
-                <td class="col-md-2">{{ account.userprofile.phone_number }}</td>
-            {% else %}
-                <td class="col-md-2">Niet gedeeld</td>
-                <td class="col-md-2">Niet gedeeld</td>
-            {% endif %}
+            <td class="col-md-2">{{ account.email }}</td>
+            <td class="col-md-2">{{ account.userprofile.phone_number }}</td>
         </tr>
         {% endfor %}
         </tbody>
