@@ -15,6 +15,7 @@ from django.conf import settings
 import log
 from ordering.core import get_or_create_order
 
+
 class LoginView(AnonymousRequiredMixin, FormView):
     template_name = "accounts/login.html"
     form_class = AuthenticationForm
@@ -188,6 +189,10 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
                              "Je profiel is aangepast.")
         return super(EditProfileView, self).form_valid(form)
 
+
 class MemberList(LoginRequiredMixin, ListView):
-    queryset = VokoUser.objects.filter(is_active=True, userprofile__share_contact_info=True)
+    queryset = VokoUser.objects.filter(
+        is_active=True, 
+        userprofile__share_contact_info=True
+    )
     template_name = "accounts/member_list.html"
