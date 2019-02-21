@@ -64,8 +64,8 @@ class VokoUserFinishForm(forms.ModelForm):
 
     share_contact_info = forms.BooleanField(
         label=("Ik ga ermee akkoord dat mijn contactinformatie binnen de VOKO "
-                "gedeeld wordt. Dit is bijv. zeer handig bij het organiseren "
-                "van Transport."),
+               "gedeeld wordt. Dit is bijv. zeer handig bij het organiseren "
+               "van Transport."),
         initial=True,
         required=False
     )
@@ -193,8 +193,8 @@ class ChangeProfileForm(forms.ModelForm):
 
     share_contact_info = forms.BooleanField(
         label=("Ik ga ermee akkoord dat mijn contactinformatie binnen de VOKO "
-                "gedeeld wordt. Dit is bijv. zeer handig bij het organiseren "
-                "van Transport."),
+               "gedeeld wordt. Dit is bijv. zeer handig bij het organiseren "
+               "van Transport."),
         required=False
     )
 
