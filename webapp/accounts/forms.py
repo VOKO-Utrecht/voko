@@ -202,8 +202,13 @@ class ChangeProfileForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ChangeProfileForm, self).__init__(*args, **kwargs)
+        # This is hacky. Should use Inline Formset.
         self.fields['phone_number'].initial = (
             self.instance.userprofile.phone_number)
+        self.fields['has_drivers_license'].initial = (
+            self.instance.userprofile.has_drivers_license)
+        self.fields['share_contact_info'].initial = (
+            self.instance.userprofile.share_contact_info)
 
     def clean_password2(self):
         # Check that the two password entries match
