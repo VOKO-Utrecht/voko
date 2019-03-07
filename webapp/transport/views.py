@@ -6,6 +6,7 @@ import log
 from ordering.core import get_or_create_order
 from django.db.models import Q
 import datetime
+from transport.mixins import UserIsDrivingMixin
 
 class Schedule(LoginRequiredMixin, ListView):
     template_name = "transport/schedule.html"
@@ -18,6 +19,6 @@ class Schedule(LoginRequiredMixin, ListView):
             order_round__collect_datetime__gte=datetime.date.today()
         ).order_by("-id")
 
-class Ride(LoginRequiredMixin, DetailView):
+class Ride(LoginRequiredMixin, UserIsDrivingMixin, DetailView):
     template_name = "transport/ride.html"
     model = models.Ride
