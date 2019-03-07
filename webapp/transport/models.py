@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 from django_extensions.db.models import TimeStampedModel
 from django.conf import settings
-from ordering.models import Supplier
+from ordering.models import Supplier, OrderRound
 
 class Route(TimeStampedModel):
     class Meta:
@@ -29,12 +29,15 @@ class Ride(TimeStampedModel):
         verbose_name = 'Ride'
         verbose_name_plural = 'Rides'
 
-    date = models.DateField()
-    # order_round = models.ForeignKey("OrderRound", related_name="ride")
+    order_round = models.ForeignKey(OrderRound, models.SET_NULL, null=True, related_name="ride")
     route = models.ForeignKey(Route, models.SET_NULL, null=True, related_name="rides");
     driver = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="rides_as_driver")
     codriver = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="rides_as_codriver")
     slug = models.SlugField(unique=True, editable=False, max_length=100)
+
+    @property
+    def date(self):
+        return self.order_round.collect_datetime;
 
     def save(self, **kwargs):
         self.slug = slugify(self.date.isoformat()+'-'+str(self.route))
