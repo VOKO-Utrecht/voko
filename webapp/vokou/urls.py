@@ -3,6 +3,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 import accounts.urls
 import docs.urls
+import transport.urls
 import finance.urls
 import mailing.urls
 import ordering.urls
@@ -17,6 +18,7 @@ urlpatterns = [
     url(r'^ordering/', include(ordering.urls)),
     url(r'^finance/', include(finance.urls)),
     url(r'^docs/', include(docs.urls)),
+    url(r'^transport/', include(transport.urls)),
     url(r'^tinymce/', include('tinymce.urls')),
     url(r'^hijack/', include('hijack.urls')),
     url(r'^regulations/', RegulationsView.as_view(), name="regulations"),
