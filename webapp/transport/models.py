@@ -39,10 +39,18 @@ class Ride(TimeStampedModel):
     def date(self):
         return self.order_round.collect_datetime;
 
+    @property
+    def date_str(self):
+        return self.date.strftime("%Y-%m-%d")
+
+    @property
+    def suppliers(self):
+        return self.order_round.suppliers
+
     def save(self, **kwargs):
-        self.slug = slugify(self.date.isoformat()+'-'+str(self.route))
+        self.slug = slugify(self.date_str+'-'+str(self.route))
         return super(Ride, self).save(**kwargs)
 
     def __str__(self):
-        return self.date.isoformat()+'-'+str(self.route)
+        return self.date_str+'-'+str(self.route)
 

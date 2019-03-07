@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% block title %}{{ object.date_str }} {{ object.route }}{% endblock %}
+{% block content %}
+<h1>Rit op {{ object.date_str }}</h1>
+<div class="panel panel-default">
+  <table class="table">
+    <tbody>
+      <tr>
+        <td><strong>Datum</strong></td>
+        <td>{{ object.date_str }}</td>
+      </tr>
+      <tr>
+        <td><strong>Route</strong></td>
+        <td>{{ object.route }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<h2>Rijder: {{ object.driver }}</h2>
+<div class="panel panel-default">
+  <table class="table">
+    <tbody>
+      <tr>
+        <td><strong>Email</strong></td>
+        <td>{{ object.driver.email }}</td>
+      </tr>
+      <tr>
+        <td><strong>Telefoon</strong></td>
+        <td>{{ object.driver.userprofile.phone_number }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<h2>Bijrijder: {{ object.codriver }}</h2>
+<div class="panel panel-default">
+  <table class="table">
+    <tbody>
+      <tr>
+        <td><strong>Email</strong></td>
+        <td>{{ object.codriver.email }}</td>
+      </tr>
+      <tr>
+        <td><strong>Telefoon</strong></td>
+        <td>{{ object.codriver.userprofile.phone_number }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<h2>Suppliers</h2>
+<div class="panel panel-default">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Naam</th>
+        <th>Adres</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for supplier in suppliers %}
+        <tr>
+            <td class="col-md-1">{{ supplier.name }}</td>
+            <td class="col-md-2">{{ supplier.address }}</td>
+            <td class="col-md-2">{{ supplier.email }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
