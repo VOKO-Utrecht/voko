@@ -78,6 +78,30 @@
     </tbody>
   </table>
 </div>
+
+<h2>Coordinatoren</h2>
+<div class="panel panel-default">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Naam</th>
+        <th>Email</th>
+        <th>Telefoon</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for coordinator in object.coordinators.all %}
+        <tr>
+            <td class="col-md-1">{{ coordinator }}</td>
+            <td class="col-md-2">{{ coordinator.email }}</td>
+            <td class="col-md-2">{{ coordinator.userprofile.phone_number }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
 {% block javascript %}
     <script>
         $(document).ready(function() {

@@ -33,6 +33,7 @@ class Ride(TimeStampedModel):
     route = models.ForeignKey(Route, models.SET_NULL, null=True, related_name="rides")
     driver = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="rides_as_driver")
     codriver = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="rides_as_codriver")
+    coordinators = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="coordinating")
     slug = models.SlugField(unique=True, editable=False, max_length=100)
 
     @property
