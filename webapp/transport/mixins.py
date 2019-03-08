@@ -2,11 +2,13 @@ from braces.views._access import AccessMixin
 from django.core.exceptions import PermissionDenied
 
 
-class UserIsDrivingMixin(AccessMixin):
+class UserIsInvolvedMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
         ride = self.get_object()
-        if request.user != ride.driver and request.user != ride.codriver:
+        if (request.user != ride.driver and
+            request.user != ride.codriver and
+            request.user not in ride.coordinators.all()):
             raise PermissionDenied
 
-        return super(UserIsDrivingMixin, self).dispatch(
+        return super(UserIsInvolvedMixin, self).dispatch(
             request, *args, **kwargs)
