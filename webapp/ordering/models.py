@@ -27,8 +27,11 @@ class Supplier(TimeStampedModel):
 
     name = models.CharField(max_length=50, unique=True)
     address = models.ForeignKey(Address)
+    contactperson = models.CharField(max_length=50, blank=True)
     email = models.EmailField()
+    phone_number = models.CharField(max_length=25, blank=True)
     biography = models.TextField(blank=True, null=True)
+    transport_info = models.TextField(blank=True, null=True)
     website = models.URLField(blank=True, null=True)
     facebook_url = models.URLField(blank=True, null=True)
 
