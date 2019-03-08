@@ -4,6 +4,7 @@ from django_extensions.db.models import TimeStampedModel
 from django.conf import settings
 from ordering.models import Supplier, OrderRound
 
+
 class Route(TimeStampedModel):
     class Meta:
         verbose_name = 'Route'
@@ -22,19 +23,26 @@ class Route(TimeStampedModel):
 
     @property
     def suppliers_names(self):
-        return  list(map(lambda s: s.name, self.suppliers.all()))
+        return list(map(lambda s: s.name, self.suppliers.all()))
+
 
 class Ride(TimeStampedModel):
     class Meta:
         verbose_name = 'Ride'
         verbose_name_plural = 'Rides'
 
-    order_round = models.ForeignKey(OrderRound, models.SET_NULL, null=True, related_name="ride")
-    route = models.ForeignKey(Route, models.SET_NULL, null=True, related_name="rides")
-    driver = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="rides_as_driver")
-    codriver = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="rides_as_codriver")
-    coordinators = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="coordinating")
-    slug = models.SlugField(unique=True, editable=False, max_length=100)
+    order_round = models.ForeignKey(
+        OrderRound, models.SET_NULL, null=True, related_name="ride")
+    route = models.ForeignKey(
+        Route, models.SET_NULL, null=True, related_name="rides")
+    driver = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="rides_as_driver")
+    codriver = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="rides_as_codriver")
+    coordinators = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name="coordinating")
+    slug = models.SlugField(
+        unique=True, editable=False, max_length=100)
 
     @property
     def date(self):
@@ -54,4 +62,3 @@ class Ride(TimeStampedModel):
 
     def __str__(self):
         return self.date_str+'-'+str(self.route)
-
