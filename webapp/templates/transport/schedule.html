@@ -17,7 +17,7 @@
         <tbody>
         {% for ride in object_list %}
         <tr class="ride">
-            <td class="col-md-2"><a href="{% url 'ride' ride.slug %}">{{ ride.date }}</a></td>
+            <td class="col-md-2"><a href="{% url 'ride' ride.slug %}">{{ ride.date|date:"j F Y" }}</a></td>
             <td class="col-md-1">{{ ride.route }}</td>
             <td class="col-md-2">{{ ride.driver }}</td>
             <td class="col-md-2">{{ ride.codriver }}</td>
