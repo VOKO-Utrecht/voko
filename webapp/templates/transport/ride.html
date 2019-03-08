@@ -57,9 +57,9 @@
     </tbody>
   </table>
 </div>
-<h2>Suppliers</h2>
-<div class="panel panel-default">
-  <table class="table">
+<h2>Leveranciers op route {{ object.route }}</h2>
+<div class="panel" >
+  <table class="table" id="suppliers-table">
     <thead>
       <tr>
         <th>Naam</th>
@@ -78,4 +78,21 @@
     </tbody>
   </table>
 </div>
+{% block javascript %}
+    <script>
+        $(document).ready(function() {
+            $('#suppliers-table').DataTable({
+                "searching": true,
+                "lengthChange": false,
+                "ordering": true,
+                "info": false,
+                "paging": false,
+                "language": {
+                    "search": "Zoeken:",
+                    "emptyTable": "Geen leveranciers met bestellingen gevonden",
+                    "zeroRecords": "Geen leveranciers met bestellingen gevonden"
+                }
+            });
+        });
+    </script>
 {% endblock %}
