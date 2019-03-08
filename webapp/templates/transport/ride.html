@@ -20,6 +20,10 @@
         <td><strong>Route</strong></td>
         <td>{{ object.route }}</td>
       </tr>
+      <tr>
+        <td><strong>Bestellijst</strong></td>
+        <td><a href="{% url 'orderadmin_orderlists' object.order_round.pk %}">Bestelronde #{{ object.order_round.pk }}</a></td>
+      </tr>
     </tbody>
   </table>
 </div>
