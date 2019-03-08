@@ -30,14 +30,14 @@ class Ride(TimeStampedModel):
         verbose_name_plural = 'Rides'
 
     order_round = models.ForeignKey(OrderRound, models.SET_NULL, null=True, related_name="ride")
-    route = models.ForeignKey(Route, models.SET_NULL, null=True, related_name="rides");
+    route = models.ForeignKey(Route, models.SET_NULL, null=True, related_name="rides")
     driver = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="rides_as_driver")
     codriver = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="rides_as_codriver")
     slug = models.SlugField(unique=True, editable=False, max_length=100)
 
     @property
     def date(self):
-        return self.order_round.collect_datetime;
+        return self.order_round.collect_datetime
 
     @property
     def date_str(self):
