@@ -57,8 +57,8 @@ class Ride(TimeStampedModel):
         return self.order_round.suppliers
 
     def save(self, **kwargs):
-        self.slug = slugify(self.date_str+'-'+str(self.route))
+        self.slug = slugify('{}-{}'.format(self.date_str, self.route))
         return super(Ride, self).save(**kwargs)
 
     def __str__(self):
-        return self.date_str+'-'+str(self.route)
+        return '{}-{}'.format(self.date_str, self.route)
