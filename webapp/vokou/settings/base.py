@@ -58,10 +58,11 @@ INSTALLED_APPS = [
     'finance',
     'ordering',
     'docs',
+    'transport',
 
     'constance.backends.database',
     'constance',
-    
+
     'hijack',
     'compat',  # Requirement of hijack
 ]

@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% block title %}{{ object.date|date:"j F Y" }} {{ object.route }}{% endblock %}
+{% block content %}
+<h1>Rit op {{ object.date|date:"j F Y" }}</h1>
+<p>
+  Hieronder staat zoveel mogelijk informatie voor deze rit.<br />
+  Voor meer algemene informatie zie de <a href="http://vokoutrecht.nl/transport/">Transporthandleiding</a>.<br />
+  Bedankt voor het meedoen aan transport.
+</p>
+
+<div class="panel panel-default">
+  <table class="table">
+    <tbody>
+      <tr>
+        <td><strong>Datum</strong></td>
+        <td>{{ object.date|date:"j F Y" }}</td>
+      </tr>
+      <tr>
+        <td><strong>Route</strong></td>
+        <td>{{ object.route }}</td>
+      </tr>
+      <tr>
+        <td><strong>Bestellijst</strong></td>
+        <td><a href="{% url 'orderadmin_orderlists' object.order_round.pk %}">Bestelronde #{{ object.order_round.pk }}</a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<h2>Rijder: {{ object.driver }}</h2>
+<div class="panel panel-default">
+  <table class="table">
+    <tbody>
+      <tr>
+        <td><strong>Email</strong></td>
+        <td>{{ object.driver.email }}</td>
+      </tr>
+      <tr>
+        <td><strong>Telefoon</strong></td>
+        <td>{{ object.driver.userprofile.phone_number }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<h2>Bijrijder: {{ object.codriver }}</h2>
+<div class="panel panel-default">
+  <table class="table">
+    <tbody>
+      <tr>
+        <td><strong>Email</strong></td>
+        <td>{{ object.codriver.email }}</td>
+      </tr>
+      <tr>
+        <td><strong>Telefoon</strong></td>
+        <td>{{ object.codriver.userprofile.phone_number }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<h2>Leveranciers op route {{ object.route }}</h2>
+<div class="panel" >
+  <table class="table" id="suppliers-table">
+    <thead>
+      <tr>
+        <th>Naam</th>
+        <th>Adres</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for supplier in object.suppliers %}
+        <tr>
+            <td class="col-md-1">{{ supplier.name }}</td>
+            <td class="col-md-2">{{ supplier.address }}</td>
+            <td class="col-md-2">{{ supplier.email }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2>Coördinatoren</h2>
+<div class="panel panel-default">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Naam</th>
+        <th>Email</th>
+        <th>Telefoon</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for coordinator in object.coordinators.all %}
+        <tr>
+            <td class="col-md-1">{{ coordinator }}</td>
+            <td class="col-md-2">{{ coordinator.email }}</td>
+            <td class="col-md-2">{{ coordinator.userprofile.phone_number }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function() {
+            $('#suppliers-table').DataTable({
+                "searching": true,
+                "lengthChange": false,
+                "ordering": true,
+                "info": false,
+                "paging": false,
+                "language": {
+                    "search": "Zoeken:",
+                    "emptyTable": "Geen leveranciers met bestellingen gevonden",
+                    "zeroRecords": "Geen leveranciers met bestellingen gevonden"
+                }
+            });
+        });
+    </script>
+{% endblock %}

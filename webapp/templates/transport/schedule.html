@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% block title %}Transport rooster{% endblock %}
+{% block content %}
+    <h1 class="page-header">Transport rooster</h1>
+    <p>
+        Overzicht van ritten waarbij jij betrokken bent als rijder, bijrijder of coördinator.
+    </p>
+    <!-- Table -->
+    <table class="table table-hover" id="schedule-table">
+        <thead>
+        <tr>
+            <th>Datum</th>
+            <th>Route</th>
+            <th>Rijder</th>
+            <th>Bijrijder</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for ride in object_list %}
+        <tr class="ride">
+            <td class="col-md-2"><a href="{% url 'ride' ride.slug %}">{{ ride.date|date:"j F Y" }}</a></td>
+            <td class="col-md-1">{{ ride.route }}</td>
+            <td class="col-md-2">{{ ride.driver }}</td>
+            <td class="col-md-2">{{ ride.codriver }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function() {
+            $('#schedule-table').DataTable({
+                "searching": true,
+                "lengthChange": false,
+                "ordering": true,
+                "info": false,
+                "pagingType": "numbers",
+                "pageLength": 50,
+                "language": {
+                    "search": "Zoeken:",
+                    "emptyTable": "Geen ritten gevonden",
+                    "zeroRecords": "Geen ritten gevonden"
+                }
+            });
+        });
+    </script>
+{% endblock %}
