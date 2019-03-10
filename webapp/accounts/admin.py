@@ -148,18 +148,17 @@ def phone(self):
     return self.userprofile.phone_number
 
 
-class VokoUserAdmin(HijackUserAdminMixin, UserAdmin):
+class VokoUserBaseAdmin(UserAdmin):
     # Set the add/modify forms
     add_form = VokoUserCreationForm
     form = VokoUserChangeForm
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ("first_name", "last_name", "email", phone,
+    list_display = ["first_name", "last_name", "email", phone,
                     "email_confirmed", "can_activate", "is_active", "is_staff",
                     "created", 'has_drivers_license', 'orders_round', 'debit',
-                    'credit', 'total_orders', 'first_payment', roles,
-                    'hijack_field')
+                    'credit', 'total_orders', 'first_payment', roles]
     list_filter = ("is_staff", "is_superuser", "is_active",
                    "can_activate", "groups")
     search_fields = ("email", 'first_name', 'last_name')
@@ -186,11 +185,6 @@ class VokoUserAdmin(HijackUserAdminMixin, UserAdmin):
     inlines = [
         UserProfileInline,
     ]
-
-    actions = (enable_user,
-               force_confirm_email,
-               send_email_to_selected_users,
-               anonymize_user)
 
     def email_confirmed(self, obj):
         if obj.email_confirmation:
@@ -233,26 +227,37 @@ class VokoUserAdmin(HijackUserAdminMixin, UserAdmin):
     has_drivers_license.boolean = True
 
 
-class ReadOnlyVokoUserAdmin(VokoUserAdmin):
-    # Source: https://code.djangoproject.com/ticket/17295
+class VokoUserAdmin(HijackUserAdminMixin, VokoUserBaseAdmin):
+    list_display = VokoUserBaseAdmin.list_display + ['hijack_field']
+
+    actions = (enable_user,
+               force_confirm_email,
+               send_email_to_selected_users,
+               anonymize_user)
+
+
+class ReadOnlyUserProfileInline(UserProfileInline):
+    # See: https://code.djangoproject.com/ticket/17295
     def get_readonly_fields(self, request, obj=None):
-        # untested, this could do:
-        # readonly_fields = self.model._meta.get_all_field_names()
-        # borrowed from ModelAdmin:
-        if self.declared_fieldsets:
-            fields = flatten_fieldsets(self.declared_fieldsets)
-        else:
-            form = self.get_formset(request, obj).form
-            fields = list(form.base_fields.keys())
+        fields = [f.name for f in self.model._meta.get_fields()]
+        return fields
+
+
+class ReadOnlyVokoUserAdmin(VokoUserBaseAdmin):
+    # See: https://code.djangoproject.com/ticket/17295
+    def get_readonly_fields(self, request, obj=None):
+        fields = [f.name for f in self.model._meta.get_fields()]
         return fields
 
     def has_add_permission(self, request):
-        # Nobody is allowed to add
         return False
 
     def has_delete_permission(self, request, obj=None):
-        # Nobody is allowed to delete
         return False
+
+    inlines = [
+        ReadOnlyUserProfileInline,
+    ]
 
 
 admin.site.register(VokoUser, VokoUserAdmin)
