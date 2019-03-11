@@ -11,11 +11,17 @@ class Schedule(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         user = self.request.user
-        return models.Ride.objects.filter(
-            Q(driver=user) |
-            Q(codriver=user) |
-            Q(coordinators__id__exact=user.id)
-        ).filter(
+
+        if (user.groups.filter(name='Transportcoordinatoren').exists()):
+            rides = models.Ride.objects.all()
+        else:
+            rides = models.Ride.objects.filter(
+                Q(driver=user) |
+                Q(codriver=user) |
+                Q(coordinators__id__exact=user.id)
+            )
+
+        return rides.filter(
             order_round__collect_datetime__gte=datetime.date.today()
         ).order_by("-id")
 
