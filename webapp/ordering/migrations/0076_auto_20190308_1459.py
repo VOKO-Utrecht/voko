@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='supplier',
-            name='contactperson',
+            name='contact_person',
             field=models.CharField(blank=True, max_length=50),
         ),
         migrations.AddField(
