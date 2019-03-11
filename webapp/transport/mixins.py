@@ -9,7 +9,9 @@ class UserIsInvolvedMixin(AccessMixin):
             request.user != ride.driver and
             request.user != ride.codriver and
             request.user not in ride.coordinators.all() and
-            not request.user.groups.filter(name='Transportcoordinatoren').exists()
+            not request.user.groups.filter(
+                name='Transportcoordinatoren'
+            ).exists()
         ):
             raise PermissionDenied
 

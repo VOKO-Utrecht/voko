@@ -4,7 +4,6 @@ from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.core.mail import send_mail
 from django.shortcuts import redirect
-from django.contrib.admin.utils import flatten_fieldsets
 from accounts.forms import VokoUserCreationForm, VokoUserChangeForm
 from accounts.models import (VokoUser, UserProfile, ReadOnlyVokoUser,
                              SleepingVokoUser, Address)
