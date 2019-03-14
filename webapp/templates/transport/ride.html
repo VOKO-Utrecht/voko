@@ -64,7 +64,8 @@
       <tr>
         <th>Naam</th>
         <th>Adres</th>
-        <th>Email</th>
+        <th>Contact info</th>
+        <th>Info</th>
       </tr>
     </thead>
     <tbody>
@@ -72,7 +73,12 @@
         <tr>
             <td class="col-md-1">{{ supplier.name }}</td>
             <td class="col-md-2">{{ supplier.address }}</td>
-            <td class="col-md-2">{{ supplier.email }}</td>
+            <td class="col-md-2">
+              {{ supplier.contact_person }}<br />
+              {{ supplier.email }}<br />
+              {{ supplier.phone_number }}
+            </td>
+            <td class="col-md-2">{{ supplier.transport_info }}</td>
         </tr>
         {% endfor %}
     </tbody>
