@@ -40,27 +40,27 @@
     </thead>
     <tbody>
       <tr>
-        <td class="col-md-1"><strong>Rijder</strong></td>
+        <th class="col-md-1">Rijder</th>
         <td class="col-md-1">{{ object.driver }}</td>
         <td class="col-md-1">{{ object.driver.email }}</td>
         <td class="col-md-1">{{ object.driver.userprofile.phone_number }}</td>
       </tr>
       <tr>
-        <td class="col-md-1"><strong>Bijrijder</strong></td>
+        <th class="col-md-1">Bijrijder</th>
         <td class="col-md-1">{{ object.codriver }}</td>
         <td class="col-md-1">{{ object.codriver.email }}</td>
         <td class="col-md-1">{{ object.codriver.userprofile.phone_number }}</td>
       </tr>
       {% for coordinator in object.coordinators.all %}
         <tr>
-          <td class="col-md-1"><strong>Transport coördinator</strong></td>
+          <th class="col-md-1">Transport coördinator</th>
           <td class="col-md-1">{{ coordinator }}</td>
           <td class="col-md-1">{{ coordinator.email }}</td>
           <td class="col-md-1">{{ coordinator.userprofile.phone_number }}</td>
         </tr>
       {% endfor %}
       <tr>
-        <td class="col-md-1"><strong>Uitdeel coördinator</strong></td>
+        <th class="col-md-1">Uitdeel coördinator</th>
         <td class="col-md-1">{{ object.distribution_coordinator }}</td>
         <td class="col-md-1">{{ object.distribution_coordinator.email }}</td>
         <td class="col-md-1">{{ object.distribution_coordinator.userprofile.phone_number }}</td>
