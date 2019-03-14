@@ -1,7 +1,7 @@
 from braces.views import LoginRequiredMixin
 from django.views.generic import (DetailView, ListView)
 from transport import models
-from ordering.models import OrderRound, Supplier
+from ordering.models import Supplier
 from django.db.models import Q
 import datetime
 from transport.mixins import UserIsInvolvedMixin
@@ -50,10 +50,10 @@ class Ride(LoginRequiredMixin, UserIsInvolvedMixin, DetailView):
                 if product_sum == 0:
                     continue
 
-                data[supplier].append(
-                    {'product': product,
-                    'amount': product_sum}
-                )
+                data[supplier].append({
+                    'product': product,
+                    'amount': product_sum
+                })
 
         return data
 
