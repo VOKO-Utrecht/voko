@@ -8,6 +8,7 @@ class UserIsInvolvedMixin(AccessMixin):
         if (
             request.user != ride.driver and
             request.user != ride.codriver and
+            request.user != ride.distribution_coordinator and
             request.user not in ride.coordinators.all() and
             not request.user.groups.filter(
                 name='Transportcoordinatoren'
