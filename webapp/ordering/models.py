@@ -83,7 +83,7 @@ class OrderRound(TimeStampedModel):
         settings.AUTH_USER_MODEL,
         models.SET_NULL,
         null=True,
-        related_name="coordinating_distribution"
+        related_name="coordinating_distribution_orderrounds"
     )
 
     def is_not_open_yet(self):
