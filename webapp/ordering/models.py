@@ -55,11 +55,14 @@ class OrderRound(TimeStampedModel):
         verbose_name_plural = "Bestelronden"
 
     open_for_orders = models.DateTimeField(
-        help_text="When this order round will open")
+        help_text="When this order round will open",
+        unique=True)
     closed_for_orders = models.DateTimeField(
-        help_text="When this order round will close")
+        help_text="When this order round will close",
+        unique=True)
     collect_datetime = models.DateTimeField(
-        help_text="When the products can be collected")
+        help_text="When the products can be collected",
+        unique=True)
     markup_percentage = models.DecimalField(
         decimal_places=2, max_digits=5, default=7.0)
     transaction_costs = models.DecimalField(
