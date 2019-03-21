@@ -60,7 +60,7 @@
 
 <h2>Leveranciers op route {{ object.route }}</h2>
 <div class="panel panel-default table-container">
-  {% if orders_per_supplier.items %}
+  {% if object.order_round.orders_per_supplier.items %}
     <table class="table">
       <thead>
         <tr>
@@ -71,41 +71,43 @@
         </tr>
       </thead>
       <tbody>
-        {% for supplier, items in orders_per_supplier.items %}
-          <tr class="success">
-              <td>{{ supplier.name }}</td>
-              <td>{{ supplier.address }}</td>
-              <td>
-                {{ supplier.contact_person }}<br />
-                {{ supplier.email }}<br />
-                {{ supplier.phone_number }}
-              </td>
-              <td>{{ supplier.transport_info }}</td>
-          </tr>
-          <tr>
-            <td colspan="4">
-                <table class="table">
-                  <thead>
-                    <tr>
-                      <th>Aantal</th>
-                      <th>Eenheid</th>
-                      <th>Product</th>
-                      <th>Omschrijving</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for item in items %}
-                        <tr>
-                          <td>{{ item.amount }}</td>
-                          <td>{{ item.product.unit_of_measurement }}</td>
-                          <td>{{ item.product.name }}</td>
-                          <td>{{ item.product.description }}</td>
-                        </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </td>
-          </tr>
+        {% for supplier, items in object.order_round.orders_per_supplier.items %}
+          {% if items.orderproducts %}
+            <tr class="success">
+                <td>{{ supplier.name }}</td>
+                <td>{{ supplier.address }}</td>
+                <td>
+                  {{ supplier.contact_person }}<br />
+                  {{ supplier.email }}<br />
+                  {{ supplier.phone_number }}
+                </td>
+                <td>{{ supplier.transport_info }}</td>
+            </tr>
+            <tr>
+              <td colspan="4">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Aantal</th>
+                        <th>Eenheid</th>
+                        <th>Product</th>
+                        <th>Omschrijving</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for item in items.orderproducts %}
+                          <tr>
+                            <td>{{ item.amount }}</td>
+                            <td>{{ item.product.unit_of_measurement }}</td>
+                            <td>{{ item.product.name }}</td>
+                            <td>{{ item.product.description }}</td>
+                          </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </td>
+            </tr>
+          {% endif %}
         {% endfor %}
       </tbody>
     </table>

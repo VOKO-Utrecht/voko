@@ -171,6 +171,29 @@ class OrderRound(TimeStampedModel):
         """
         return self.orders.filter(paid=True).count()
 
+    @property
+    def orders_per_supplier(self):
+        data = {}
+        for supplier in Supplier.objects.all():
+            suppliers_products_this_round = supplier.products.filter(
+                order_round=self)
+            data[supplier] = {'orderproducts': [],
+                              'sum': self.supplier_total_order_sum(
+                                  supplier)}
+
+            for product in suppliers_products_this_round:
+                order_products = product.orderproducts.filter(order__paid=True)
+                product_sum = sum([op.amount for op in order_products])
+                if product_sum == 0:
+                    continue
+                data[supplier]['orderproducts'].append(
+                    {'product': product,
+                     'amount': product_sum,
+                     'sub_total': product_sum * product.base_price}
+                )
+
+        return data
+
     def days_since_collection(self):
         """
         Return days sincs collection date
