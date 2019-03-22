@@ -19,7 +19,8 @@ class Schedule(LoginRequiredMixin, ListView):
             rides = models.Ride.objects.filter(
                 Q(driver=user) |
                 Q(codriver=user) |
-                Q(coordinators__id__exact=user.id)
+                Q(coordinators__id__exact=user.id) |
+                Q(order_round__distribution_coordinator=user)
             )
 
         return rides.filter(

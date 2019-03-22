@@ -27,33 +27,46 @@
     </tbody>
   </table>
 </div>
-<h2>Rijder: {{ object.driver }}</h2>
+<h2>Contact info</h2>
 <div class="panel panel-default">
   <table class="table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Naam</th>
+        <th>Email</th>
+        <th>Telefoon</th>
+      </tr>
+    </thead>
     <tbody>
       <tr>
-        <td><strong>Email</strong></td>
-        <td>{{ object.driver.email }}</td>
+        <th class="col-md-1">Rijder</th>
+        <td class="col-md-1">{{ object.driver }}</td>
+        <td class="col-md-1">{{ object.driver.email }}</td>
+        <td class="col-md-1">{{ object.driver.userprofile.phone_number }}</td>
       </tr>
       <tr>
-        <td><strong>Telefoon</strong></td>
-        <td>{{ object.driver.userprofile.phone_number }}</td>
+        <th class="col-md-1">Bijrijder</th>
+        <td class="col-md-1">{{ object.codriver }}</td>
+        <td class="col-md-1">{{ object.codriver.email }}</td>
+        <td class="col-md-1">{{ object.codriver.userprofile.phone_number }}</td>
       </tr>
-    </tbody>
-  </table>
-</div>
-<h2>Bijrijder: {{ object.codriver }}</h2>
-<div class="panel panel-default">
-  <table class="table">
-    <tbody>
-      <tr>
-        <td><strong>Email</strong></td>
-        <td>{{ object.codriver.email }}</td>
-      </tr>
-      <tr>
-        <td><strong>Telefoon</strong></td>
-        <td>{{ object.codriver.userprofile.phone_number }}</td>
-      </tr>
+      {% for coordinator in object.coordinators.all %}
+        <tr>
+          <th class="col-md-1">Transport coördinator</th>
+          <td class="col-md-1">{{ coordinator }}</td>
+          <td class="col-md-1">{{ coordinator.email }}</td>
+          <td class="col-md-1">{{ coordinator.userprofile.phone_number }}</td>
+        </tr>
+      {% endfor %}
+      {% if object.distribution_coordinator %}
+        <tr>
+          <th class="col-md-1">Uitdeel coördinator</th>
+          <td class="col-md-1">{{ object.distribution_coordinator }}</td>
+          <td class="col-md-1">{{ object.distribution_coordinator.email }}</td>
+          <td class="col-md-1">{{ object.distribution_coordinator.userprofile.phone_number }}</td>
+        </tr>
+      {% endif %}
     </tbody>
   </table>
 </div>
@@ -116,27 +129,5 @@
       Geen leveranciers met bestellingen gevonden
     </div>
   {% endif %}
-  </div>
-
-  <h2>Coördinatoren</h2>
-  <div class="panel panel-default">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Naam</th>
-          <th>Email</th>
-          <th>Telefoon</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for coordinator in object.coordinators.all %}
-          <tr>
-              <td class="col-md-1">{{ coordinator }}</td>
-              <td class="col-md-2">{{ coordinator.email }}</td>
-              <td class="col-md-2">{{ coordinator.userprofile.phone_number }}</td>
-          </tr>
-          {% endfor %}
-      </tbody>
-    </table>
 </div>
 {% endblock %}

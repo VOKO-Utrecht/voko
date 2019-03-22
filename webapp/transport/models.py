@@ -56,6 +56,10 @@ class Ride(TimeStampedModel):
     def suppliers(self):
         return self.order_round.suppliers
 
+    @property
+    def distribution_coordinator(self):
+        return self.order_round.distribution_coordinator
+
     def save(self, **kwargs):
         self.slug = slugify('{}-{}'.format(self.date_str, self.route))
         return super(Ride, self).save(**kwargs)
