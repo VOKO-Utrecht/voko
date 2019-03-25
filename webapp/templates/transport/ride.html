@@ -73,7 +73,7 @@
 
 <h2>Leveranciers op route {{ object.route }}</h2>
 <div class="panel panel-default table-container">
-  {% if object.order_round.orders_per_supplier.items %}
+  {% if object.orders_per_supplier.items %}
     <table class="table">
       <thead>
         <tr>
@@ -84,7 +84,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for supplier, items in object.order_round.orders_per_supplier.items %}
+        {% for supplier, items in object.orders_per_supplier.items %}
           {% if items.orderproducts %}
             <tr class="success">
                 <td>{{ supplier.name }}</td>
