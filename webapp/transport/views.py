@@ -1,7 +1,6 @@
 from braces.views import LoginRequiredMixin
 from django.views.generic import (DetailView, ListView)
 from transport import models
-from ordering.models import Supplier
 from django.db.models import Q
 import datetime
 from transport.mixins import UserIsInvolvedMixin
@@ -31,4 +30,3 @@ class Schedule(LoginRequiredMixin, ListView):
 class Ride(LoginRequiredMixin, UserIsInvolvedMixin, DetailView):
     template_name = "transport/ride.html"
     model = models.Ride
-
