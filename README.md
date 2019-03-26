@@ -33,5 +33,5 @@ Django based custom web application for food collective www.vokoutrecht.nl.
 3. Visit (replace TOKEN with copied token): http://localhost:8000/accounts/register/confirm/TOKEN
 4. Log in as superuser and go to user admin: http://localhost:8000/admin/accounts/vokouser/
 5. Select your user, choose in dropdown: "Gebruikersactivatie na bezoek info-avond", click "Uitvoeren" button
-6. Log out as superuser, or visit the next link incognito (replace TOKEN with copied token): http://localhost:8000/register/finish/TOKEN
+6. Log out as superuser, or visit the next link incognito (replace TOKEN with copied token): http://localhost:8000/accounts/register/finish/TOKEN
 7. Fill in fields and submit
