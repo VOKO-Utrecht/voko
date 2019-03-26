@@ -44,4 +44,6 @@ Django based custom web application for food collective www.vokoutrecht.nl.
 
 ## Re-activating sleeping member
 1. Go to http://localhost:8000/admin/accounts/sleepingvokouser/
-2. ...
+2. Open user
+3. De-tick "Sleeping (inactive) member"
+4. click "OPSLAAN" button
