@@ -59,54 +59,75 @@
           <td class="col-md-1">{{ coordinator.userprofile.phone_number }}</td>
         </tr>
       {% endfor %}
-      <tr>
-        <th class="col-md-1">Uitdeel coördinator</th>
-        <td class="col-md-1">{{ object.distribution_coordinator }}</td>
-        <td class="col-md-1">{{ object.distribution_coordinator.email }}</td>
-        <td class="col-md-1">{{ object.distribution_coordinator.userprofile.phone_number }}</td>
-      </tr>
+      {% if object.distribution_coordinator %}
+        <tr>
+          <th class="col-md-1">Uitdeel coördinator</th>
+          <td class="col-md-1">{{ object.distribution_coordinator }}</td>
+          <td class="col-md-1">{{ object.distribution_coordinator.email }}</td>
+          <td class="col-md-1">{{ object.distribution_coordinator.userprofile.phone_number }}</td>
+        </tr>
+      {% endif %}
     </tbody>
   </table>
 </div>
 
 <h2>Leveranciers op route {{ object.route }}</h2>
-<div class="panel" >
-  <table class="table" id="suppliers-table">
-    <thead>
-      <tr>
-        <th>Naam</th>
-        <th>Adres</th>
-        <th>Email</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for supplier in object.suppliers %}
+<div class="panel panel-default table-container">
+  {% if object.orders_per_supplier.items %}
+    <table class="table">
+      <thead>
         <tr>
-            <td class="col-md-1">{{ supplier.name }}</td>
-            <td class="col-md-2">{{ supplier.address }}</td>
-            <td class="col-md-2">{{ supplier.email }}</td>
+          <th>Naam</th>
+          <th>Adres</th>
+          <th>Contact info</th>
+          <th>Info</th>
         </tr>
+      </thead>
+      <tbody>
+        {% for supplier, items in object.orders_per_supplier.items %}
+          {% if items.orderproducts %}
+            <tr class="success">
+                <td>{{ supplier.name }}</td>
+                <td>{{ supplier.address }}</td>
+                <td>
+                  {{ supplier.contact_person }}<br />
+                  {{ supplier.email }}<br />
+                  {{ supplier.phone_number }}
+                </td>
+                <td>{{ supplier.transport_info }}</td>
+            </tr>
+            <tr>
+              <td colspan="4">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Aantal</th>
+                        <th>Eenheid</th>
+                        <th>Product</th>
+                        <th>Omschrijving</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for item in items.orderproducts %}
+                          <tr>
+                            <td>{{ item.amount }}</td>
+                            <td>{{ item.product.unit_of_measurement }}</td>
+                            <td>{{ item.product.name }}</td>
+                            <td>{{ item.product.description }}</td>
+                          </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </td>
+            </tr>
+          {% endif %}
         {% endfor %}
-    </tbody>
-  </table>
+      </tbody>
+    </table>
+  {% else %}
+    <div class="panel-body">
+      Geen leveranciers met bestellingen gevonden
+    </div>
+  {% endif %}
 </div>
-{% endblock %}
-
-{% block javascript %}
-    <script>
-        $(document).ready(function() {
-            $('#suppliers-table').DataTable({
-                "searching": true,
-                "lengthChange": false,
-                "ordering": true,
-                "info": false,
-                "paging": false,
-                "language": {
-                    "search": "Zoeken:",
-                    "emptyTable": "Geen leveranciers met bestellingen gevonden",
-                    "zeroRecords": "Geen leveranciers met bestellingen gevonden"
-                }
-            });
-        });
-    </script>
 {% endblock %}

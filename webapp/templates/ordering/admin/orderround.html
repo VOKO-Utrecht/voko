@@ -6,7 +6,7 @@
     <div class="alert alert-danger" role="alert"><strong>Let op!</strong> Deze bestelronde is nog open. Er kunnen nog nieuwe bestellingen worden gedaan!</div>
 {% endif %}
 
-{% for supplier, items in orders_per_supplier.items %}
+{% for supplier, items in object.orders_per_supplier.items %}
 <h2><a href="{% url 'orderadmin_supplier_order_csv' object.pk supplier.pk %}">{{ supplier }}</a></h2>
 <div class="panel panel-default">
   <table class="table">

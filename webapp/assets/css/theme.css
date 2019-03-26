@@ -16,3 +16,11 @@ body {
 .theme-showcase .navbar .container {
   width: auto;
 }
+
+.table .table {
+  margin: 0 2em;
+  width: calc(100% - 4em);
+}
+.table-container {
+  overflow-x: auto;
+}
