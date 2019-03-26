@@ -18,8 +18,10 @@ class RideAdmin(admin.ModelAdmin):
         order_round_field.label_from_instance = format_order_round
         return form
 
-def format_order_round (obj):
+
+def format_order_round(obj):
     return "%s %s" % (obj, obj.collect_datetime.strftime("%Y-%m-%d"))
+
 
 admin.site.register(Route, RouteAdmin)
 admin.site.register(Ride, RideAdmin)
