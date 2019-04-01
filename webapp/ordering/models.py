@@ -15,6 +15,7 @@ from ordering.core import (get_or_create_order, get_current_order_round,
                            find_unit)
 from django.conf import settings
 from constance import config
+from constance import config
 
 # TODO move to settings/production.py
 ORDER_CONFIRM_MAIL_ID = 12
@@ -78,6 +79,11 @@ class OrderRound(TimeStampedModel):
         editable=False,
         help_text="Whether we've sent order reminders to our members"
     )
+    rides_mails_sent = models.BooleanField(
+        default=False,
+        editable=False,
+        help_text="Whether we've sent ride info mails"
+    )
 
     distribution_coordinator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -90,6 +96,7 @@ class OrderRound(TimeStampedModel):
         current_datetime = datetime.now(pytz.utc)
         return current_datetime < self.open_for_orders
 
+    @property
     def is_over(self):
         # Over, past, expired
         current_datetime = datetime.now(pytz.utc)
@@ -233,6 +240,33 @@ class OrderRound(TimeStampedModel):
             rendered_template_vars = render_mail_template(
                 mail_template, user=user, order_round=self)
             mail_user(user, *rendered_template_vars)
+
+    def get_rides(self):
+        from transport.models import Ride
+        return Ride.objects.filter(
+                order_round=self)
+
+    def send_ride_mails(self):
+        if self.rides_mails_sent is True:
+            log_event(event="Not sending ride mails for round %d because "
+                            "rides_mails_sent is True" % self.pk)
+            return
+
+        log_event(event="Sending ride mails for round %d" % self.pk)
+
+        mail_template = get_template_by_id(config.RIDE_MAIL)
+        base_url = "https://leden.vokoutrecht.nl"
+
+        self.rides_mails_sent = True
+        self.save()
+
+        rides = self.get_rides()
+        for ride in rides:
+            drivers = [ride.driver, ride.codriver]
+            for user in drivers:
+                rendered_template_vars = render_mail_template(
+                    mail_template, user=user, ride=ride, base_url=base_url)
+                mail_user(user, *rendered_template_vars)
 
     def __str__(self):
         return "Bestelronde #%s" % self.pk

@@ -155,3 +155,18 @@ VOKO Utrecht
             msg.attach('voko_utrecht_bestelling_ronde_%d.csv' % order_round.pk,
                        in_mem_file.read().decode("utf-8"), 'text/csv')
             msg.send()
+
+class SendRideMails(CronJobBase):
+    RUN_EVERY_MINS = 30
+
+    schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
+    code = 'ordering.send_ride_mails'
+
+    def do(self):
+        order_round = get_current_order_round()
+        print(("Order round: %s" % order_round))
+
+        if order_round.is_over and order_round.rides_mails_sent is False:
+            print("Sending ride mails!")
+            order_round.send_ride_mails()
+
