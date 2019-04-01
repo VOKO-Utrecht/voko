@@ -156,6 +156,7 @@ VOKO Utrecht
                        in_mem_file.read().decode("utf-8"), 'text/csv')
             msg.send()
 
+
 class SendRideMails(CronJobBase):
     RUN_EVERY_MINS = 30
 
@@ -169,4 +170,3 @@ class SendRideMails(CronJobBase):
         if order_round.is_over and order_round.rides_mails_sent is False:
             print("Sending ride mails!")
             order_round.send_ride_mails()
-

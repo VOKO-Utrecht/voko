@@ -15,7 +15,6 @@ from ordering.core import (get_or_create_order, get_current_order_round,
                            find_unit)
 from django.conf import settings
 from constance import config
-from constance import config
 
 # TODO move to settings/production.py
 ORDER_CONFIRM_MAIL_ID = 12
