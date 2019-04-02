@@ -6,7 +6,7 @@ from django.db import transaction
 from django.http import Http404
 from django.shortcuts import redirect
 from django.views.generic import (FormView, DetailView, UpdateView,
-                                  TemplateView, ListView, View)
+                                  TemplateView, View)
 from accounts.forms import (VokoUserCreationForm, VokoUserFinishForm,
                             RequestPasswordResetForm, PasswordResetForm,
                             ChangeProfileForm)
