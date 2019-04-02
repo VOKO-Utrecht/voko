@@ -30,5 +30,4 @@ urlpatterns = (
     url(r'^welcome/$', views.WelcomeView.as_view()),
     url(r'^overview/$', views.OverView.as_view(), name='overview'),
     url(r'^profile/$', views.EditProfileView.as_view(), name='profile'),
-    url(r'^list/$', views.MemberList.as_view(), name='member_list'),
 )

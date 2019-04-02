@@ -188,11 +188,3 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
         messages.add_message(self.request, messages.SUCCESS,
                              "Je profiel is aangepast.")
         return super(EditProfileView, self).form_valid(form)
-
-
-class MemberList(LoginRequiredMixin, ListView):
-    queryset = VokoUser.objects.filter(
-        is_active=True,
-        userprofile__share_contact_info=True
-    )
-    template_name = "accounts/member_list.html"
