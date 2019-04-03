@@ -136,7 +136,7 @@ CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 
 CONSTANCE_CONFIG = {
     'ORDER_REMINDER_MAIL': (4, "Order reminder mail", int),
-    'RIDE_MAIL': (38, "Ride info mail", int),
+    'RIDE_MAIL': (84, "Ride info mail", int),
 }
 
 
