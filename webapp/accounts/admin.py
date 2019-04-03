@@ -161,7 +161,7 @@ class VokoUserBaseAdmin(UserAdmin):
     list_filter = ("is_staff", "is_superuser", "is_active",
                    "can_activate", "groups")
     search_fields = ("email", 'first_name', 'last_name')
-    ordering = ("-created", )
+    ordering = ("first_name", "last_name")
     filter_horizontal = ("groups", "user_permissions",)
     fieldsets = (
         (None, {"fields": ("email", "password", "first_name",
