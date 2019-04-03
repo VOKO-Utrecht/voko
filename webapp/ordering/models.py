@@ -254,7 +254,6 @@ class OrderRound(TimeStampedModel):
         log_event(event="Sending ride mails for round %d" % self.pk)
 
         mail_template = get_template_by_id(config.RIDE_MAIL)
-        base_url = "https://leden.vokoutrecht.nl"
 
         self.rides_mails_sent = True
         self.save()
@@ -264,7 +263,11 @@ class OrderRound(TimeStampedModel):
             drivers = [ride.driver, ride.codriver]
             for user in drivers:
                 rendered_template_vars = render_mail_template(
-                    mail_template, user=user, ride=ride, base_url=base_url)
+                    mail_template,
+                    user=user,
+                    ride=ride,
+                    base_url=settings.BASE_URL
+                )
                 mail_user(user, *rendered_template_vars)
 
     def __str__(self):
