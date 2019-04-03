@@ -165,7 +165,7 @@ class SendRideMails(CronJobBase):
 
     def do(self):
         order_round = get_current_order_round()
-        print(("Order round: %s" % order_round))
+        print("Order round: %s" % order_round)
 
         if order_round.is_over and order_round.rides_mails_sent is False:
             print("Sending ride mails!")
