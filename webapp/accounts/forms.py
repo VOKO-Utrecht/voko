@@ -62,14 +62,6 @@ class VokoUserFinishForm(forms.ModelForm):
         required=False
     )
 
-    share_contact_info = forms.BooleanField(
-        label=("Ik ga ermee akkoord dat mijn contactinformatie binnen de VOKO "
-               "gedeeld wordt. Dit is bijv. zeer handig bij het organiseren "
-               "van Transport."),
-        initial=True,
-        required=False
-    )
-
     accept_terms_and_privacy = forms.BooleanField(
         label="Ik heb het Reglement en het Privacy Statement van "
               "VOKO Utrecht gelezen en ga met beiden akkoord.",
@@ -191,13 +183,6 @@ class ChangeProfileForm(forms.ModelForm):
         required=False
     )
 
-    share_contact_info = forms.BooleanField(
-        label=("Ik ga ermee akkoord dat mijn contactinformatie binnen de VOKO "
-               "gedeeld wordt. Dit is bijv. zeer handig bij het organiseren "
-               "van Transport."),
-        required=False
-    )
-
     # TODO: Notes and e-mail address cannot be changed atm.
 
     def __init__(self, *args, **kwargs):
@@ -207,8 +192,6 @@ class ChangeProfileForm(forms.ModelForm):
             self.instance.userprofile.phone_number)
         self.fields['has_drivers_license'].initial = (
             self.instance.userprofile.has_drivers_license)
-        self.fields['share_contact_info'].initial = (
-            self.instance.userprofile.share_contact_info)
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -236,8 +219,6 @@ class ChangeProfileForm(forms.ModelForm):
             userprofile.phone_number = self.cleaned_data['phone_number']
             userprofile.has_drivers_license = (
                 self.cleaned_data['has_drivers_license'])
-            userprofile.share_contact_info = (
-                self.cleaned_data['share_contact_info'])
 
             if commit:
                 user.save()

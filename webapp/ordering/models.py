@@ -88,6 +88,7 @@ class OrderRound(TimeStampedModel):
         settings.AUTH_USER_MODEL,
         models.SET_NULL,
         null=True,
+        blank=True,
         related_name="coordinating_distribution_orderrounds"
     )
 
