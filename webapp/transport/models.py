@@ -32,7 +32,7 @@ class Ride(TimeStampedModel):
         verbose_name_plural = 'Rides'
 
     order_round = models.ForeignKey(
-        OrderRound, models.SET_NULL, null=True, related_name="ride")
+        OrderRound, models.SET_NULL, null=True, related_name="rides")
     route = models.ForeignKey(
         Route, models.SET_NULL, null=True, related_name="rides")
     driver = models.ForeignKey(

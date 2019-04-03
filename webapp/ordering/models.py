@@ -241,11 +241,6 @@ class OrderRound(TimeStampedModel):
                 mail_template, user=user, order_round=self)
             mail_user(user, *rendered_template_vars)
 
-    def get_rides(self):
-        from transport.models import Ride
-        return Ride.objects.filter(
-                order_round=self)
-
     def send_ride_mails(self):
         if self.rides_mails_sent is True:
             log_event(event="Not sending ride mails for round %d because "
@@ -259,7 +254,7 @@ class OrderRound(TimeStampedModel):
         self.rides_mails_sent = True
         self.save()
 
-        rides = self.get_rides()
+        rides = self.rides.all()
         for ride in rides:
             drivers = [ride.driver, ride.codriver]
             for user in drivers:
