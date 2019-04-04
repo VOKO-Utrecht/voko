@@ -382,7 +382,9 @@ class TestOrderModel(VokoTestCase):
         order = OrderFactory()
         order.mail_confirmation()
 
-        self.get_template_by_id.assert_called_once_with(config.ORDER_CONFIRM_MAIL)
+        self.get_template_by_id.assert_called_once_with(
+            config.ORDER_CONFIRM_MAIL
+        )
         self.render_mail_template.assert_called_once_with(
             self.get_template_by_id.return_value,
             user=order.user,
@@ -393,7 +395,9 @@ class TestOrderModel(VokoTestCase):
         order = OrderFactory()
         order.mail_failure_notification()
 
-        self.get_template_by_id.assert_called_once_with(config.ORDER_FAILED_MAIL)
+        self.get_template_by_id.assert_called_once_with(
+            config.ORDER_FAILED_MAIL
+        )
         self.render_mail_template.assert_called_once_with(
             self.get_template_by_id.return_value,
             user=order.user,
