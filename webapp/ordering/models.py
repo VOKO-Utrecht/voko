@@ -16,10 +16,6 @@ from ordering.core import (get_or_create_order, get_current_order_round,
 from django.conf import settings
 from constance import config
 
-# TODO move to settings/production.py
-ORDER_CONFIRM_MAIL_ID = 12
-ORDER_FAILED_ID = 37
-
 
 class Supplier(TimeStampedModel):
     class Meta:
@@ -422,7 +418,7 @@ class Order(TimeStampedModel):
         """
         Send confirmation mail to user about successful order placement
         """
-        mail_template = get_template_by_id(ORDER_CONFIRM_MAIL_ID)
+        mail_template = get_template_by_id(config.ORDER_CONFIRM_MAIL)
         rendered_template_vars = render_mail_template(mail_template,
                                                       user=self.user,
                                                       order=self)
@@ -432,7 +428,7 @@ class Order(TimeStampedModel):
         """
         Use when order was paid after round has been closed (corner case)
         """
-        mail_template = get_template_by_id(ORDER_FAILED_ID)
+        mail_template = get_template_by_id(config.ORDER_FAILED_MAIL)
         rendered_template_vars = render_mail_template(mail_template,
                                                       user=self.user,
                                                       order=self)

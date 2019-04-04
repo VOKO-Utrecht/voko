@@ -12,6 +12,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.mail import mail_admins
 from mailing.helpers import get_template_by_id, render_mail_template, mail_user
+from constance import config
 
 # TODO: move to django_constance settings
 CONFIRM_MAILTEMPLATE_ID = 2
@@ -156,7 +157,7 @@ class EmailConfirmation(TimeStampedModel):
         self.save()
 
     def send_confirmation_mail(self):
-        mail_template = get_template_by_id(CONFIRM_MAILTEMPLATE_ID)
+        mail_template = get_template_by_id(config.CONFIRM_MAIL)
         rendered_template_vars = render_mail_template(mail_template,
                                                       user=self.user)
         mail_user(self.user, *rendered_template_vars)
@@ -185,7 +186,7 @@ class PasswordResetRequest(TimeStampedModel):
         super(PasswordResetRequest, self).save(**kwargs)
 
     def send_email(self):
-        mail_template = get_template_by_id(PASSWORD_RESET_MAILTEMPLATE_ID)
+        mail_template = get_template_by_id(config.PASSWORD_RESET_MAIL)
         rendered_template_vars = render_mail_template(
             mail_template,
             user=self.user,
