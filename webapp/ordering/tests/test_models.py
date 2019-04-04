@@ -75,9 +75,9 @@ class TestOrderRoundModel(VokoTestCase):
         self.assertTrue(self.next_order_round.is_not_open_yet())
 
     def test_is_over(self):
-        self.assertTrue(self.prev_order_round.is_over())
-        self.assertFalse(self.cur_order_round.is_over())
-        self.assertFalse(self.next_order_round.is_over())
+        self.assertTrue(self.prev_order_round.is_over)
+        self.assertFalse(self.cur_order_round.is_over)
+        self.assertFalse(self.next_order_round.is_over)
 
     def test_is_open_property(self):
         self.assertFalse(self.prev_order_round.is_open)
