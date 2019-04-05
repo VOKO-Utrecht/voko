@@ -186,6 +186,6 @@ class SendPrepareRideMails(CronJobBase):
             next_order_round = get_next_order_round()
             print("Next order round: %s" % next_order_round)
             if (next_order_round is not None and
-                next_order_round.prepare_ride_mails_sent is False):
-                    print("Sending prepare ride mails!")
-                    next_order_round.send_prepare_ride_mails()
+                    next_order_round.prepare_ride_mails_sent is False):
+                print("Sending prepare ride mails!")
+                next_order_round.send_prepare_ride_mails()
