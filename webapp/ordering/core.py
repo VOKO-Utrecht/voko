@@ -33,6 +33,7 @@ def get_current_order_round():
     if filtered.count() > 0:
         return filtered.order_by("-open_for_orders")[0]
 
+
 def get_next_order_round():
     """
     Return the order round after the current round.

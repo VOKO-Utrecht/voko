@@ -271,13 +271,11 @@ class OrderRound(TimeStampedModel):
                 )
                 mail_user(user, *rendered_template_vars)
 
-    def __str__(self):
-        return "Bestelronde #%s" % self.pk
-
     def send_prepare_ride_mails(self):
         if self.prepare_ride_mails_sent is True:
-            log_event(event="Not sending prepare ride mails for round %d because "
-                            "prepare_ride_mails_sent is True" % self.pk)
+            log_event(event="Not sending prepare ride mails for round %d "
+                            "because prepare_ride_mails_sent is True" %
+                            self.pk)
             return
 
         log_event(event="Sending prepare ride mails for round %d" % self.pk)
