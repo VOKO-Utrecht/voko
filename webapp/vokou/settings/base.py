@@ -82,7 +82,8 @@ MIDDLEWARE_CLASSES = [
 CRON_CLASSES = [
     "ordering.cron.MailOrderLists",
     "ordering.cron.SendOrderReminders",
-    "ordering.cron.SendRideMails"
+    "ordering.cron.SendRideMails",
+    "ordering.cron.SendPrepareRideMails"
 ]
 
 ROOT_URLCONF = 'vokou.urls'
@@ -137,6 +138,7 @@ CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 CONSTANCE_CONFIG = {
     'ORDER_REMINDER_MAIL': (4, "Order reminder mail", int),
     'RIDE_MAIL': (84, "Ride info mail", int),
+    'PREPARE_RIDE_MAIL': (85, "Prepare ride info mail", int),
 }
 
 
