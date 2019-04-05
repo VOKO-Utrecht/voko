@@ -135,7 +135,12 @@ CAPTCHA_ENABLED = True
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 
 CONSTANCE_CONFIG = {
+    'ACTIVATE_ACCOUNT_MAIL': (1, "Activate account mail", int),
+    'CONFIRM_MAIL': (2, "Confirm account mail", int),
     'ORDER_REMINDER_MAIL': (4, "Order reminder mail", int),
+    'PASSWORD_RESET_MAIL': (9, "Password reset mail", int),
+    'ORDER_CONFIRM_MAIL': (12, "Order confirm mail", int),
+    'ORDER_FAILED_MAIL': (37, "Order failed mail", int),
     'RIDE_MAIL': (84, "Ride info mail", int),
 }
 

@@ -8,13 +8,14 @@ from accounts.tests.factories import VokoUserFactory
 from finance.models import Balance
 from finance.tests.factories import BalanceFactory
 from ordering.models import (
-    Order, OrderProduct, ORDER_CONFIRM_MAIL_ID, ORDER_FAILED_ID,
+    Order, OrderProduct,
     OrderProductCorrection, OrderRound, Product, ProductStock)
 from ordering.tests.factories import (
     SupplierFactory, OrderFactory, OrderProductFactory, OrderRoundFactory,
     OrderProductCorrectionFactory, ProductFactory, UnitFactory,
     ProductStockFactory)
 from vokou.testing import VokoTestCase
+from constance import config
 
 
 class TestSupplierModel(VokoTestCase):
@@ -381,7 +382,9 @@ class TestOrderModel(VokoTestCase):
         order = OrderFactory()
         order.mail_confirmation()
 
-        self.get_template_by_id.assert_called_once_with(ORDER_CONFIRM_MAIL_ID)
+        self.get_template_by_id.assert_called_once_with(
+            config.ORDER_CONFIRM_MAIL
+        )
         self.render_mail_template.assert_called_once_with(
             self.get_template_by_id.return_value,
             user=order.user,
@@ -392,7 +395,9 @@ class TestOrderModel(VokoTestCase):
         order = OrderFactory()
         order.mail_failure_notification()
 
-        self.get_template_by_id.assert_called_once_with(ORDER_FAILED_ID)
+        self.get_template_by_id.assert_called_once_with(
+            config.ORDER_FAILED_MAIL
+        )
         self.render_mail_template.assert_called_once_with(
             self.get_template_by_id.return_value,
             user=order.user,

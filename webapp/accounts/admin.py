@@ -14,9 +14,7 @@ from ordering.models import Order
 from django.utils.safestring import mark_safe
 from hijack.admin import HijackUserAdminMixin
 from django.apps import apps
-
-# TODO move to django-constance setting
-ACTIVATE_ACCOUNT_MAILTEMPLATE_ID = 1
+from constance import config
 
 
 for model in apps.get_app_config('accounts').get_models():
@@ -34,7 +32,7 @@ def enable_user(modeladmin, request, queryset):
 
     for user in queryset:
         # send mail
-        mail_template = get_template_by_id(ACTIVATE_ACCOUNT_MAILTEMPLATE_ID)
+        mail_template = get_template_by_id(config.ACTIVATE_ACCOUNT_MAIL)
         subject, html_message, plain_message = render_mail_template(
             mail_template, user=user
         )
