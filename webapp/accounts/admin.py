@@ -16,9 +16,6 @@ from hijack.admin import HijackUserAdminMixin
 from django.apps import apps
 from constance import config
 
-# TODO move to django-constance setting
-ACTIVATE_ACCOUNT_MAILTEMPLATE_ID = 1
-
 
 for model in apps.get_app_config('accounts').get_models():
     if model in (VokoUser, ReadOnlyVokoUser, SleepingVokoUser):

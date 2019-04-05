@@ -14,10 +14,6 @@ from django.core.mail import mail_admins
 from mailing.helpers import get_template_by_id, render_mail_template, mail_user
 from constance import config
 
-# TODO: move to django_constance settings
-CONFIRM_MAILTEMPLATE_ID = 2
-PASSWORD_RESET_MAILTEMPLATE_ID = 9
-
 
 class Address(TimeStampedModel):
     class Meta:
