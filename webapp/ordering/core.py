@@ -34,6 +34,18 @@ def get_current_order_round():
         return filtered.order_by("-open_for_orders")[0]
 
 
+def get_next_order_round():
+    """
+    Return the order round after the current round.
+
+    :return: OrderRound object || None
+    """
+    order_rounds = models.OrderRound.objects.all()
+    return order_rounds.filter(
+        open_for_orders__gt=get_current_order_round().open_for_orders
+    ).order_by("open_for_orders").first()
+
+
 def get_or_create_order(user):
     current_order_round = get_current_order_round()
 

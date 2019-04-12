@@ -7,7 +7,7 @@ from django.db.models.aggregates import Sum
 from django_cron import CronJobBase, Schedule
 
 from log import log_event
-from .core import get_current_order_round
+from .core import get_current_order_round, get_next_order_round
 from ordering.models import Supplier
 import unicodecsv as csv
 
@@ -170,3 +170,22 @@ class SendRideMails(CronJobBase):
         if order_round.is_over and order_round.rides_mails_sent is False:
             print("Sending ride mails!")
             order_round.send_ride_mails()
+
+
+class SendPrepareRideMails(CronJobBase):
+    RUN_EVERY_MINS = 30
+
+    schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
+    code = 'ordering.send_prepare_ride_mails'
+
+    def do(self):
+        print("SendPrepareRideMails")
+        order_round = get_current_order_round()
+        print("Order round: %s" % order_round)
+        if order_round.is_open:
+            next_order_round = get_next_order_round()
+            print("Next order round: %s" % next_order_round)
+            if (next_order_round is not None and
+                    next_order_round.prepare_ride_mails_sent is False):
+                print("Sending prepare ride mails!")
+                next_order_round.send_prepare_ride_mails()

@@ -79,6 +79,11 @@ class OrderRound(TimeStampedModel):
         editable=False,
         help_text="Whether we've sent ride info mails"
     )
+    prepare_ride_mails_sent = models.BooleanField(
+        default=False,
+        editable=False,
+        help_text="Whether we've sent prepare ride info mails"
+    )
 
     distribution_coordinator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -248,6 +253,32 @@ class OrderRound(TimeStampedModel):
         mail_template = get_template_by_id(config.RIDE_MAIL)
 
         self.rides_mails_sent = True
+        self.save()
+
+        rides = self.rides.all()
+        for ride in rides:
+            drivers = [ride.driver, ride.codriver]
+            for user in drivers:
+                rendered_template_vars = render_mail_template(
+                    mail_template,
+                    user=user,
+                    ride=ride,
+                    base_url=settings.BASE_URL
+                )
+                mail_user(user, *rendered_template_vars)
+
+    def send_prepare_ride_mails(self):
+        if self.prepare_ride_mails_sent is True:
+            log_event(event="Not sending prepare ride mails for round %d "
+                            "because prepare_ride_mails_sent is True" %
+                            self.pk)
+            return
+
+        log_event(event="Sending prepare ride mails for round %d" % self.pk)
+
+        mail_template = get_template_by_id(config.PREPARE_RIDE_MAIL)
+
+        self.prepare_ride_mails_sent = True
         self.save()
 
         rides = self.rides.all()

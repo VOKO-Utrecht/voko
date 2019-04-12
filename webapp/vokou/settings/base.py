@@ -82,7 +82,8 @@ MIDDLEWARE_CLASSES = [
 CRON_CLASSES = [
     "ordering.cron.MailOrderLists",
     "ordering.cron.SendOrderReminders",
-    "ordering.cron.SendRideMails"
+    "ordering.cron.SendRideMails",
+    "ordering.cron.SendPrepareRideMails"
 ]
 
 ROOT_URLCONF = 'vokou.urls'
@@ -142,6 +143,7 @@ CONSTANCE_CONFIG = {
     'ORDER_CONFIRM_MAIL': (12, "Order confirm mail", int),
     'ORDER_FAILED_MAIL': (37, "Order failed mail", int),
     'RIDE_MAIL': (84, "Ride info mail", int),
+    'PREPARE_RIDE_MAIL': (85, "Prepare ride info mail", int),
 }
 
 
