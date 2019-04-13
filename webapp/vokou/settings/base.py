@@ -113,6 +113,7 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 MOLLIE_API_KEY = "SETME"
 
 BASE_URL = "https://leden.vokoutrecht.nl"
+DEFAULT_FROM_EMAIL = "VOKO Utrecht <info@vokoutrecht.nl>"
 
 TINYMCE_DEFAULT_CONFIG = {
     'plugins': "table,xhtmlxtras,paste,searchreplace",
