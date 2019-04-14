@@ -20,7 +20,12 @@ def render_mail_template(template, **kwargs):
     h2t.body_width = 0
     rendered_plain_body = h2t.handle(rendered_html_body)
 
-    return rendered_subject, rendered_html_body, rendered_plain_body, rendered_from_email
+    return (
+        rendered_subject,
+        rendered_html_body,
+        rendered_plain_body,
+        rendered_from_email
+    )
 
 
 def get_template_by_id(template_id):
@@ -32,9 +37,10 @@ def get_template_by_id(template_id):
 
 
 def mail_user(user, subject, html_body, plain_body, from_email):
+    default_from_email = "VOKO Utrecht <info@vokoutrecht.nl>"
     send_mail(subject=subject,
               message=plain_body,
-              from_email=from_email if from_email else "VOKO Utrecht <info@vokoutrecht.nl>",
+              from_email=from_email if from_email else default_from_email,
               recipient_list=["%s <%s>" % (user.get_full_name(), user.email)],
               html_message=html_body)
     log.log_event(user=user, event="Mail sent: %s" % subject, extra=html_body)
