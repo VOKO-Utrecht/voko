@@ -37,7 +37,7 @@ def get_template_by_id(template_id):
 
 
 def mail_user(user, subject, html_body, plain_body, from_email):
-    default_from_email = "VOKO Utrecht <info@vokoutrecht.nl>"
+    default_from_email = settings.DEFAULT_FROM_EMAIL
     send_mail(subject=subject,
               message=plain_body,
               from_email=from_email if from_email else default_from_email,
