@@ -257,8 +257,12 @@ class OrderRound(TimeStampedModel):
 
         rides = self.rides.all()
         for ride in rides:
-            drivers = [ride.driver, ride.codriver]
-            for user in drivers:
+            involved = [
+                ride.driver,
+                ride.codriver,
+                self.distribution_coordinator
+            ]
+            for user in involved:
                 rendered_template_vars = render_mail_template(
                     mail_template,
                     user=user,
