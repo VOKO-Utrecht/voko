@@ -15,6 +15,7 @@ from django.utils.safestring import mark_safe
 from hijack.admin import HijackUserAdminMixin
 from django.apps import apps
 from constance import config
+from django.conf import settings
 
 
 for model in apps.get_app_config('accounts').get_models():
@@ -38,7 +39,7 @@ def enable_user(modeladmin, request, queryset):
         )
         send_mail(subject=subject,
                   message=plain_message,
-                  from_email="VOKO Utrecht <info@vokoutrecht.nl>",
+                  from_email=settings.DEFAULT_FROM_EMAIL,
                   recipient_list=["%s <%s>" % (
                       user.get_full_name(),
                       user.email

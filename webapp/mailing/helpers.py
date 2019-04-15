@@ -32,7 +32,7 @@ def get_template_by_id(template_id):
 def mail_user(user, subject, html_body, plain_body):
     send_mail(subject=subject,
               message=plain_body,
-              from_email="VOKO Utrecht <info@vokoutrecht.nl>",
+              from_email=settings.DEFAULT_FROM_EMAIL,
               recipient_list=["%s <%s>" % (user.get_full_name(), user.email)],
               html_message=html_body)
     log.log_event(user=user, event="Mail sent: %s" % subject, extra=html_body)

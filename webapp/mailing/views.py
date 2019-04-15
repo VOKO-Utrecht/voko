@@ -7,6 +7,7 @@ from accounts.models import VokoUser
 from log import log_event
 from mailing.helpers import render_mail_template
 from mailing.models import MailTemplate
+from django.conf import settings
 
 
 class ChooseTemplateView(StaffuserRequiredMixin, ListView):
@@ -61,7 +62,7 @@ class SendMailView(StaffuserRequiredMixin, View):
 
             send_mail(subject=subject,
                       message=plain_message,
-                      from_email="VOKO Utrecht <info@vokoutrecht.nl>",
+                      from_email=settings.DEFAULT_FROM_EMAIL,
                       recipient_list=["%s <%s>" %
                                       (user.get_full_name(), user.email)],
                       html_message=html_message)
