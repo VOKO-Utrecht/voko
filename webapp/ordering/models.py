@@ -263,6 +263,8 @@ class OrderRound(TimeStampedModel):
                 self.distribution_coordinator
             ]
             for user in involved:
+                if user is None:
+                    continue
                 rendered_template_vars = render_mail_template(
                     mail_template,
                     user=user,
