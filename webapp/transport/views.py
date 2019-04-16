@@ -24,7 +24,7 @@ class Schedule(LoginRequiredMixin, ListView):
 
         return rides.filter(
             order_round__collect_datetime__gte=datetime.date.today()
-        ).order_by("-id")
+        ).order_by("order_round__collect_datetime", "route")
 
 
 class Ride(LoginRequiredMixin, UserIsInvolvedMixin, DetailView):
