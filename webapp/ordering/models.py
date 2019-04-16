@@ -257,11 +257,11 @@ class OrderRound(TimeStampedModel):
 
         rides = self.rides.all()
         for ride in rides:
-            involved = [
+            involved = {
                 ride.driver,
                 ride.codriver,
                 self.distribution_coordinator
-            ]
+            }
             for user in involved:
                 if user is None:
                     continue
