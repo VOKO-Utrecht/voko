@@ -10,7 +10,7 @@ class RouteAdmin(admin.ModelAdmin):
 
 class RideAdmin(admin.ModelAdmin):
     list_display = ["date", "route", "driver", "codriver"]
-    ordering = ("-id", )
+    ordering = ("order_round__collect_datetime", "route")
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(RideAdmin, self).get_form(request, obj, **kwargs)
