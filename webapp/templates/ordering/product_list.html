@@ -13,6 +13,10 @@
     </div>
     {% endif %}
 
+<div class="alert alert-info" role="alert">
+  We zijn een nieuwe bestel pagina aan het ontwikkelen, <a href="{% url 'view_products_new' %}">probeer het hier</a>.
+</div>
+
 <form method="post" id="order-form">
   {% csrf_token %}
 

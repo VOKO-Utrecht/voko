@@ -24,3 +24,39 @@ body {
 .table-container {
   overflow-x: auto;
 }
+
+.pl-0 {
+  padding-left: 0;
+}
+
+/* ordering products page */
+.categories {
+  padding: 15px 15px 0 15px;
+}
+
+.product-list {
+  padding-top: 15px;
+}
+
+.product {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+.product:last-child {
+  margin-bottom: 0;
+  border-bottom: 0;
+}
+
+.product .product-name {
+  margin-top: 0;
+}
+
+.product .progress {
+  margin: 0;
+}
+
+.product .order .row {
+  margin-bottom: 15px;
+}

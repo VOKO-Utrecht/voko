@@ -194,6 +194,10 @@ class ProductsView(LoginRequiredMixin, ListView):
         return set([p.supplier for p in self.get_queryset()])
 
 
+class ProductsViewNew(ProductsView):
+    template_name = 'ordering/product_list_new.html'
+
+
 class ProductDetail(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         view = ProductDisplay.as_view()
