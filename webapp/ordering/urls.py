@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from .views import ProductsView, ProductDetail, FinishOrder, OrdersDisplay, \
-    OrderSummary, SupplierView
+    OrderSummary, SupplierView, OrdersAPIView
 
 urlpatterns = (
     url(r'^supplier/(?P<pk>[0-9]+)/$', SupplierView.as_view(),
@@ -13,4 +13,6 @@ urlpatterns = (
     url(r'^order/(?P<pk>[0-9]+)/summary/$', OrderSummary.as_view(),
         name="order_summary"),
     url(r'^orders/$', OrdersDisplay.as_view(), name="view_orders"),
+
+    url(r'^api/orders/$', OrdersAPIView.as_view()),
 )

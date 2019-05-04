@@ -14,6 +14,9 @@ from accounts.models import EmailConfirmation, VokoUser, PasswordResetRequest
 from django.conf import settings
 import log
 from ordering.core import get_or_create_order
+import simplejson as json
+from django.http import HttpResponse
+import datetime
 
 
 class LoginView(AnonymousRequiredMixin, FormView):
@@ -188,3 +191,39 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
         messages.add_message(self.request, messages.SUCCESS,
                              "Je profiel is aangepast.")
         return super(EditProfileView, self).form_valid(form)
+
+
+class AccountsAPIView(LoginRequiredMixin, View):
+    def get(self, request):
+        data = []
+        users = VokoUser.objects.all()
+        for user in users:
+            field = {
+                'created_date': user.created.date(),  # rounded to day
+                'is_active': user.is_active,
+                'is_asleep': user.is_asleep,
+            }
+
+            email_confirmation = user.email_confirmation
+            if email_confirmation.is_confirmed:
+                field['confirmed_date'] = email_confirmation.modified.date()
+
+            paid_orders = user.orders.filter(paid=True).order_by("modified")
+            first_paid_order = paid_orders.first()
+            if first_paid_order:
+                field['first_order_date'] = first_paid_order.modified.date()
+
+            data.append(field)
+
+        def default(o):
+            if isinstance(o, (datetime.date, datetime.datetime)):
+                return o.isoformat()
+
+        response_data = json.dumps(
+            data,
+            sort_keys=True,
+            indent=1,
+            default=default
+        )
+
+        return HttpResponse(response_data, content_type="application/json")

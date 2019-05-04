@@ -18,6 +18,10 @@ from ordering.forms import OrderProductForm
 from ordering.mixins import UserOwnsObjectMixin
 from ordering.models import (Product, OrderProduct, Order, Supplier,
                              OrderRound, ProductCategory)
+from pytz import UTC
+from datetime import datetime
+import simplejson as json
+from django.http import HttpResponse
 
 
 class ProductsView(LoginRequiredMixin, ListView):
@@ -337,3 +341,26 @@ class OrderSummary(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
 
 class SupplierView(LoginRequiredMixin, DetailView):
     model = Supplier
+
+
+class OrdersAPIView(LoginRequiredMixin, View):
+    def get(self, request):
+        now = datetime.now(UTC)
+        data = []
+        order_rounds = OrderRound.objects.all() \
+            .filter(closed_for_orders__lt=now) \
+            .order_by("open_for_orders")
+        for order_round in order_rounds:
+            products = order_round.products.all()
+            suppliers = set()
+            for product in products:
+                suppliers.add(product.supplier.name)
+            data.append({
+                'number_of_orders': order_round.number_of_orders(),
+                'total_corrections': order_round.total_corrections(),
+                'total_revenue': order_round.total_revenue(),
+                'number_of_products': products.count(),
+                'numbers_of_suppliers': len(suppliers),
+                'markup_percentage': order_round.markup_percentage
+            })
+        return HttpResponse(json.dumps(data), content_type="application/json")

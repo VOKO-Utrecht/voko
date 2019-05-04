@@ -180,6 +180,17 @@ class OrderRound(TimeStampedModel):
         return sum([orderprod.product.profit * orderprod.amount
                     for orderprod in orderproducts])
 
+    def total_revenue(self):
+        """
+        Total revenue on products for this round
+        """
+        order_products = OrderProduct.objects.filter(
+            order__order_round=self, order__paid=True)
+
+        total = sum([o_p.total_retail_price for o_p in order_products])
+        print("  total_revenue: %f" % total)
+        return total
+
     def number_of_orders(self):
         """
         Return the total number of paid orders
