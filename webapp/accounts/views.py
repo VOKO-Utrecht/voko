@@ -14,10 +14,7 @@ from accounts.models import EmailConfirmation, VokoUser, PasswordResetRequest
 from django.conf import settings
 import log
 from ordering.core import get_or_create_order
-import simplejson as json
-from django.http import HttpResponse
-import datetime
-import unicodecsv
+from utils import CSVResponse, JSONResponse
 
 
 class LoginView(AnonymousRequiredMixin, FormView):
@@ -220,32 +217,9 @@ class AccountsAPIView(LoginRequiredMixin, View):
 
 class AccountsAPIJSONView(AccountsAPIView):
     def get(self, request, *args, **kwargs):
-        data = self.get_raw_data()
-
-        def default(o):
-            if isinstance(o, (datetime.date, datetime.datetime)):
-                return o.isoformat()
-
-        response_data = json.dumps(
-            data,
-            sort_keys=True,
-            indent=1,
-            default=default
-        )
-
-        return HttpResponse(response_data, content_type="application/json")
+        return JSONResponse(self.get_raw_data())
 
 
 class AccountsAPICSVView(AccountsAPIView):
     def get(self, request):
-        response = HttpResponse(content_type='text/csv')
-        writer = unicodecsv.writer(response, encoding='utf-8')
-
-        data = self.get_raw_data()
-        field_names = data[0].keys()
-        writer.writerow(field_names)
-        for order_round in data:
-            row = order_round.values()
-            writer.writerow(row)
-
-        return response
+        return CSVResponse(self.get_raw_data())

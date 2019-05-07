@@ -20,9 +20,7 @@ from ordering.models import (Product, OrderProduct, Order, Supplier,
                              OrderRound, ProductCategory)
 from pytz import UTC
 from datetime import datetime
-import simplejson as json
-from django.http import HttpResponse
-import unicodecsv
+from utils import CSVResponse, JSONResponse
 
 
 class ProductsView(LoginRequiredMixin, ListView):
@@ -369,20 +367,9 @@ class OrdersAPIView(LoginRequiredMixin, View):
 
 class OrdersAPIJSONView(OrdersAPIView):
     def get(self, request, *args, **kwargs):
-        data = self.get_raw_data()
-        return HttpResponse(json.dumps(data), content_type="application/json")
+        return JSONResponse(self.get_raw_data())
 
 
 class OrdersAPICSVView(OrdersAPIView):
     def get(self, request):
-        response = HttpResponse(content_type='text/csv')
-        writer = unicodecsv.writer(response, encoding='utf-8')
-
-        data = self.get_raw_data()
-        field_names = data[0].keys()
-        writer.writerow(field_names)
-        for order_round in data:
-            row = order_round.values()
-            writer.writerow(row)
-
-        return response
+        return CSVResponse(self.get_raw_data())
