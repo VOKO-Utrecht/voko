@@ -2,20 +2,18 @@
 import log
 from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
-from django.core.mail import send_mail
 from django.shortcuts import redirect
 from accounts.forms import VokoUserCreationForm, VokoUserChangeForm
 from accounts.models import (VokoUser, UserProfile, ReadOnlyVokoUser,
                              SleepingVokoUser, Address)
 from finance.models import Payment
-from mailing.helpers import get_template_by_id, render_mail_template
+from mailing.helpers import get_template_by_id, render_mail_template, mail_user
 from ordering.core import get_current_order_round
 from ordering.models import Order
 from django.utils.safestring import mark_safe
 from hijack.admin import HijackUserAdminMixin
 from django.apps import apps
 from constance import config
-from django.conf import settings
 
 
 for model in apps.get_app_config('accounts').get_models():
@@ -34,17 +32,15 @@ def enable_user(modeladmin, request, queryset):
     for user in queryset:
         # send mail
         mail_template = get_template_by_id(config.ACTIVATE_ACCOUNT_MAIL)
-        subject, html_message, plain_message = render_mail_template(
+        (
+            subject,
+            html_message,
+            plain_message,
+            from_email
+        ) = render_mail_template(
             mail_template, user=user
         )
-        send_mail(subject=subject,
-                  message=plain_message,
-                  from_email=settings.DEFAULT_FROM_EMAIL,
-                  recipient_list=["%s <%s>" % (
-                      user.get_full_name(),
-                      user.email
-                  )],
-                  html_message=html_message)
+        mail_user(user, subject, html_message, plain_message, from_email)
         log.log_event(
             user=user,
             event="User set to 'can_activate=True' and activation mail sent",
