@@ -29,6 +29,10 @@ body {
   padding-left: 0;
 }
 
+.pr-0 {
+  padding-right: 0;
+}
+
 /* ordering products page */
 .categories {
   padding: 15px 15px 0 15px;
