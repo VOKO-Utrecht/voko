@@ -17,6 +17,7 @@ from ordering.core import get_or_create_order
 import simplejson as json
 from django.http import HttpResponse
 import datetime
+import unicodecsv
 
 
 class LoginView(AnonymousRequiredMixin, FormView):
@@ -194,7 +195,7 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
 
 
 class AccountsAPIView(LoginRequiredMixin, View):
-    def get(self, request):
+    def get_raw_data(self):
         data = []
         users = VokoUser.objects.all()
         for user in users:
@@ -214,6 +215,12 @@ class AccountsAPIView(LoginRequiredMixin, View):
                 field['first_order_date'] = first_paid_order.modified.date()
 
             data.append(field)
+        return data
+
+
+class AccountsAPIJSONView(AccountsAPIView):
+    def get(self, request, *args, **kwargs):
+        data = self.get_raw_data()
 
         def default(o):
             if isinstance(o, (datetime.date, datetime.datetime)):
@@ -227,3 +234,18 @@ class AccountsAPIView(LoginRequiredMixin, View):
         )
 
         return HttpResponse(response_data, content_type="application/json")
+
+
+class AccountsAPICSVView(AccountsAPIView):
+    def get(self, request):
+        response = HttpResponse(content_type='text/csv')
+        writer = unicodecsv.writer(response, encoding='utf-8')
+
+        data = self.get_raw_data()
+        field_names = data[0].keys()
+        writer.writerow(field_names)
+        for order_round in data:
+            row = order_round.values()
+            writer.writerow(row)
+
+        return response

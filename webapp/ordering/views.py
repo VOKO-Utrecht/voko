@@ -22,6 +22,7 @@ from pytz import UTC
 from datetime import datetime
 import simplejson as json
 from django.http import HttpResponse
+import unicodecsv
 
 
 class ProductsView(LoginRequiredMixin, ListView):
@@ -344,7 +345,7 @@ class SupplierView(LoginRequiredMixin, DetailView):
 
 
 class OrdersAPIView(LoginRequiredMixin, View):
-    def get(self, request):
+    def get_raw_data(self):
         now = datetime.now(UTC)
         data = []
         order_rounds = OrderRound.objects.all() \
@@ -356,11 +357,32 @@ class OrdersAPIView(LoginRequiredMixin, View):
             for product in products:
                 suppliers.add(product.supplier.name)
             data.append({
+                'open_for_orders': order_round.open_for_orders.date(),
                 'number_of_orders': order_round.number_of_orders(),
-                'total_corrections': order_round.total_corrections(),
                 'total_revenue': order_round.total_revenue(),
                 'number_of_products': products.count(),
                 'numbers_of_suppliers': len(suppliers),
                 'markup_percentage': order_round.markup_percentage
             })
+        return data
+
+
+class OrdersAPIJSONView(OrdersAPIView):
+    def get(self, request, *args, **kwargs):
+        data = self.get_raw_data()
         return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+class OrdersAPICSVView(OrdersAPIView):
+    def get(self, request):
+        response = HttpResponse(content_type='text/csv')
+        writer = unicodecsv.writer(response, encoding='utf-8')
+
+        data = self.get_raw_data()
+        field_names = data[0].keys()
+        writer.writerow(field_names)
+        for order_round in data:
+            row = order_round.values()
+            writer.writerow(row)
+
+        return response

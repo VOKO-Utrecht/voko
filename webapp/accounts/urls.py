@@ -31,5 +31,6 @@ urlpatterns = (
     url(r'^overview/$', views.OverView.as_view(), name='overview'),
     url(r'^profile/$', views.EditProfileView.as_view(), name='profile'),
 
-    url(r'^api/accounts/$', views.AccountsAPIView.as_view()),
+    url(r'^api/accounts(.json)?$', views.AccountsAPIJSONView.as_view()),
+    url(r'^api/accounts.csv$', views.AccountsAPICSVView.as_view()),
 )

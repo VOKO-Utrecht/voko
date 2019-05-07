@@ -1,18 +1,18 @@
 from django.conf.urls import url
-from .views import ProductsView, ProductDetail, FinishOrder, OrdersDisplay, \
-    OrderSummary, SupplierView, OrdersAPIView
+from ordering import views
 
 urlpatterns = (
-    url(r'^supplier/(?P<pk>[0-9]+)/$', SupplierView.as_view(),
+    url(r'^supplier/(?P<pk>[0-9]+)/$', views.SupplierView.as_view(),
         name="view_supplier"),
-    url(r'^products/$', ProductsView.as_view(), name="view_products"),
-    url(r'^product/(?P<pk>[0-9]+)/$', ProductDetail.as_view(),
+    url(r'^products/$', views.ProductsView.as_view(), name="view_products"),
+    url(r'^product/(?P<pk>[0-9]+)/$', views.ProductDetail.as_view(),
         name="view_product"),
-    url(r'^order/(?P<pk>[0-9]+)/finish/$', FinishOrder.as_view(),
+    url(r'^order/(?P<pk>[0-9]+)/finish/$', views.FinishOrder.as_view(),
         name="finish_order"),
-    url(r'^order/(?P<pk>[0-9]+)/summary/$', OrderSummary.as_view(),
+    url(r'^order/(?P<pk>[0-9]+)/summary/$', views.OrderSummary.as_view(),
         name="order_summary"),
-    url(r'^orders/$', OrdersDisplay.as_view(), name="view_orders"),
+    url(r'^orders/$', views.OrdersDisplay.as_view(), name="view_orders"),
 
-    url(r'^api/orders/$', OrdersAPIView.as_view()),
+    url(r'^api/orders(.json)?$', views.OrdersAPIJSONView.as_view()),
+    url(r'^api/orders.csv$', views.OrdersAPICSVView.as_view()),
 )
