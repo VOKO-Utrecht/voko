@@ -354,9 +354,15 @@ class OrdersAPIView(LoginRequiredMixin, View):
             suppliers = set()
             for product in products:
                 suppliers.add(product.supplier.name)
+            paid_orders = order_round.orders.filter(paid=True)
+            ordering_members = set()
+            for order in paid_orders:
+                ordering_members.add(order.user.id)
+
             data.append({
                 'open_for_orders_date': order_round.open_for_orders.date(),
                 'number_of_orders': order_round.number_of_orders(),
+                'number_of_ordering_members': len(ordering_members),
                 'total_revenue': order_round.total_revenue(),
                 'number_of_products': products.count(),
                 'numbers_of_suppliers': len(suppliers),
