@@ -21,6 +21,7 @@ from ordering.models import (Product, OrderProduct, Order, Supplier,
 from pytz import UTC
 from datetime import datetime
 from utils import CSVResponse, JSONResponse
+from accounts.models import VokoUser
 
 
 class ProductsView(LoginRequiredMixin, ListView):
@@ -358,11 +359,14 @@ class OrdersAPIView(LoginRequiredMixin, View):
             ordering_members = set()
             for order in paid_orders:
                 ordering_members.add(order.user.id)
+            members = VokoUser.objects \
+                .filter(created__lt=order_round.open_for_orders)
 
             data.append({
                 'open_for_orders_date': order_round.open_for_orders.date(),
                 'number_of_orders': order_round.number_of_orders(),
                 'number_of_ordering_members': len(ordering_members),
+                'number_of_members': members.count(),
                 'total_revenue': order_round.total_revenue(),
                 'number_of_products': products.count(),
                 'numbers_of_suppliers': len(suppliers),
