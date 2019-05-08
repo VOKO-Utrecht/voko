@@ -355,7 +355,7 @@ class OrdersAPIView(LoginRequiredMixin, View):
             for product in products:
                 suppliers.add(product.supplier.name)
             data.append({
-                'open_for_orders': order_round.open_for_orders.date(),
+                'open_for_orders_date': order_round.open_for_orders.date(),
                 'number_of_orders': order_round.number_of_orders(),
                 'total_revenue': order_round.total_revenue(),
                 'number_of_products': products.count(),
