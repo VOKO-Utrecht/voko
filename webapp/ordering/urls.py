@@ -12,7 +12,4 @@ urlpatterns = (
     url(r'^order/(?P<pk>[0-9]+)/summary/$', views.OrderSummary.as_view(),
         name="order_summary"),
     url(r'^orders/$', views.OrdersDisplay.as_view(), name="view_orders"),
-
-    url(r'^api/orders(.json)?$', views.OrdersAPIJSONView.as_view()),
-    url(r'^api/orders.csv$', views.OrdersAPICSVView.as_view()),
 )

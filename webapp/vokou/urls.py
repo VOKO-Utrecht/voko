@@ -8,6 +8,7 @@ import finance.urls
 import mailing.urls
 import ordering.urls
 import ordering.admin_urls
+import api.urls
 from vokou.views import HomeView, PrivacyStatementView, RegulationsView
 
 urlpatterns = [
@@ -19,6 +20,7 @@ urlpatterns = [
     url(r'^finance/', include(finance.urls)),
     url(r'^docs/', include(docs.urls)),
     url(r'^transport/', include(transport.urls)),
+    url(r'^api/', include(api.urls)),
     url(r'^tinymce/', include('tinymce.urls')),
     url(r'^hijack/', include('hijack.urls')),
     url(r'^regulations/', RegulationsView.as_view(), name="regulations"),
