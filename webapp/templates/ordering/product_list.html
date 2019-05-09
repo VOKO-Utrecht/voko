@@ -1,117 +1,139 @@
 {% extends 'base.html' %}
 {% block title %}Producten{% endblock %}
 {% block content %}
+
 <h1 class="page-header">Producten in bestelronde {{ current_order_round.id }}</h1>
-    <p class="lead">
-        Deze ronde zijn er {{ view.product_count }} producten van {{ view.suppliers|length }} leveranciers.
-    </p>
+<p class="lead">
+  Deze ronde zijn er {{ view.product_count }} producten van {{ view.suppliers|length }} leveranciers.
+</p>
 {% if current_order_round.is_open or user.is_staff %}
 
-    {% if user.is_staff and not current_order_round.is_open %}
+  {% if user.is_staff and not current_order_round.is_open %}
     <div class="alert alert-warning" role="alert">
-        <strong>Let op!</strong> Je kunt de producten zien omdat je "staff user" bent. <strong>De bestelronde is niet open!</strong>
+      <strong>Let op!</strong> Je kunt de producten zien omdat je "staff user" bent. <strong>De bestelronde is niet open!</strong>
     </div>
-    {% endif %}
-
-<form method="post" id="order-form">
-  {% csrf_token %}
-
-<div class="panel panel-default">
-  <!-- Default panel contents -->
-  <div class="panel-heading">
-    <button type="submit" class="btn btn-success btn-save-order"><span class="glyphicon glyphicon-ok-sign"></span> Bestelling bevestigen</button>
+  {% endif %}
+  <div class="alert alert-info" role="alert">
+    We hebben deze pagina vernieuwd. Hij zou nu beter te gebruiken moeten zijn op kleinere schermen. Feedback is welkom op <a href="mailto:peter@peteruithoven.nl">peter@peteruithoven.nl</a>.<br />
+    De oude versie is <a href="{% url 'view_products_old' %}">hier beschikbaar</a>.
   </div>
 
-    <!-- Categories -->
-    <div role="tabpanel">
-        <ul id="myTab" class="nav nav-tabs nav-justified" role="tablist">
-          <li role="presentation" class="active"><a href="#" id="all-products" role="tab" data-toggle="tab">Alle producten</a></li>
+  <form method="post" id="order-form">
+    {% csrf_token %}
+
+    <div class="panel panel-default">
+      <!-- Heading -->
+      <div class="panel-heading clearfix">
+        <button type="submit" class="btn btn-success btn-save-order">
+          <span class="glyphicon glyphicon-ok-sign"></span> Bestelling bevestigen
+        </button>
+        <div class="dropdown pull-right visible-xs-block">
+          <button class="btn btn-default dropdown-toggle" type="button" id="category-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            Categorie
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="category-dropdown">
+            <li><a href="#" id="all-products">Alle producten</a></li>
             {% for category in view.categories %}
-              <li role="presentation"><a href="#" role="tab" id="category-{{ category.id }}" data-toggle="tab">{{ category.name }}</a></li>
+                <li><a href="#" id="category-{{ category.id }}">{{ category.name }}</a></li>
             {% endfor %}
-          <li role="presentation"><a href="#" id="no-category" role="tab" data-toggle="tab">Overig</a></li>
-         </ul>
-    </div>
+            <li><a href="#" id="no-category">Overig</a></li>
+          </ul>
+        </div>
+      </div>
 
-  <!-- Table -->
-  <table class="table table-hover" id="products-table">
-    <thead>
-      <tr>
-        <th>Product</th>
-        <th>Leverancier</th>
-        <th>Omschrijving</th>
-        <th>Prijs</th>
-        <th>Beschikbaarheid</th>
-        <th>Bestellen</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for product in view.products %}
-      <tr class="product {% if product.category %}category-{{ product.category.id }}{% else %}no-category{% endif %}">
-        <td class="col-md-1"><a href="{% url 'view_product' product.pk %}">{{ product.name|title }}</a>{% if product.new %} <span class="label label-primary">Nieuw!</span>{% endif %}</td>
-        <td class="col-md-2"><a class="supplier-{{ product.supplier.pk }}" href="{% url 'view_supplier' product.supplier.pk %}">{{ product.supplier }}</a></td>
-        <td class="col-md-5">{{ product.description|urlize }}</td>
-        <td class="col-md-2">&euro; {{ product.retail_price }} per {{ product.unit_of_measurement|lower }}</td>
-        <td class="col-md-1">
-            {% if not product.is_available %}Uitverkocht{% else %}
-            <div class="progress">
-                <div class="progress-bar" role="progressbar" aria-valuenow="{{ product.percentage_available }}"
-                     aria-valuemin="0" aria-valuemax="100" style="width: {{ product.percentage_available }}%;">
-                    {{ product.verbose_availability }}
-            {% endif %}
+      <!-- Categories -->
+      <div role="tabpanel" class="hidden-xs">
+        <ul id="myTab" class="nav nav-tabs categories" role="tablist">
+          <li role="presentation" class="active"><a href="#" id="all-products-tab" role="tab" data-toggle="tab">Alle producten</a></li>
+          {% for category in view.categories %}
+            <li role="presentation"><a href="#" role="tab" id="category-{{ category.id }}-tab" data-toggle="tab">{{ category.name }}</a></li>
+          {% endfor %}
+          <li role="presentation"><a href="#" id="no-category-tab" role="tab" data-toggle="tab">Overig</a></li>
+        </ul>
+      </div>
+
+      <!-- product list -->
+      <div class="product-list container-fluid">
+        {% for product in view.products %}
+          <div class="product {% if product.category %}category-{{ product.category.id }}{% else %}no-category{% endif %} row">
+            <div class="info col-sm-7">
+              <div class="row">
+                <div class="info col-md-6">
+                  <h4 class="product-name">
+                    <a href="{% url 'view_product' product.pk %}">
+                      {{ product.name|title }}
+                    </a>
+                    {% if product.new %} <span class="label label-primary">Nieuw!</span>{% endif %}
+                  </h4>
+                  <p>
+                    Van: <a class="supplier-{{ product.supplier.pk }}" href="{% url 'view_supplier' product.supplier.pk %}">{{ product.supplier }}</a>
+                    </p>
                 </div>
+                <div class="info col-md-6">
+                  <p>{{ product.description|urlize }}</p>
+                </div>
+              </div>
             </div>
-        </td>
-        <td class="col-md-2">
-            <input type="number" step="1" min="0" class="form-control" name="order-product-{{ product.id }}" size="2" placeholder="" value="{% if product.is_available %}{{ product.ordered_amount }}{% endif %}" {% if not product.is_available %}disabled{% endif %}>
-        </td>
-      {% endfor %}
-    </tbody>
-  </table>
-
-<div class="panel-footer">
-  <button type="submit" class="btn btn-success btn-save-order"><span class="glyphicon glyphicon-ok-sign"></span> Bestelling bevestigen</button>
-</div>
-
-</div>
-</form>
+            <div class="order col-sm-5 pl-0 pr-0">
+              <div class="container-fluid">
+                <div class="row">
+                  <div class="order col-xs-8">
+                    &euro; {{ product.retail_price }} per {{ product.unit_of_measurement|lower }}
+                  </div>
+                  <div class="order col-xs-4 pl-0">
+                    {% if not product.is_available %}
+                      Uitverkocht
+                    {% else %}
+                      <div class="progress">
+                          <div class="progress-bar" role="progressbar" aria-valuenow="{{ product.percentage_available }}"
+                                aria-valuemin="0" aria-valuemax="100" style="width: {{ product.percentage_available }}%;">
+                              {{ product.verbose_availability }}
+                          </div>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+                <input type="number" step="1" min="0" class="form-control" name="order-product-{{ product.id }}" size="2" placeholder="" value="{% if product.is_available %}{{ product.ordered_amount }}{% endif %}" {% if not product.is_available %}disabled{% endif %}>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      <!-- Footer -->
+      <div class="panel-footer">
+        <button type="submit" class="btn btn-success btn-save-order"><span class="glyphicon glyphicon-ok-sign"></span> Bestelling bevestigen</button>
+      </div>
+    </div>
+  </form>
 {% else %}
-<div class="alert alert-danger" role="alert">
+  <div class="alert alert-danger" role="alert">
     <strong>Helaas!</strong> De bestelronde is gesloten. Kom binnenkort terug!
-</div>
+  </div>
 {% endif %}
 {% endblock %}
 {% block javascript %}
 <script language="javascript">
-    {# Let's generate some JS for the categories #}
-    $("#all-products").click(function(event) {
-            show_all_products();
-    }) ;
+  {# categories filtering #}
+  $("#all-products, #all-products-tab").click(function(event) {
+    $(".product").fadeIn();
+  });
 
-    $("#no-category").click(function(event) {
-            show_uncategorized_products();
-    }) ;
+  $("#no-category, #no-category-tab").click(function(event) {
+    $(".product").fadeOut();
+    $(".product.no-category").fadeIn();
+  });
 
-    {% for category in view.categories %}
-        $("#category-{{ category.id }}").click(function(event) {
-            show_products_of_category("{{ category.id }}");
-        }) ;
-    {% endfor %}
+  {% for category in view.categories %}
+    $("#category-{{ category.id }}, #category-{{ category.id }}-tab").click(function(event) {
+      show_products_of_category("{{ category.id }}");
+    });
+  {% endfor %}
 
-    function show_all_products() {
-        $(".product").fadeIn();
-    }
-
-    function show_products_of_category(category) {
-        $(".product").fadeOut();
-        $(".product.category-"+ category).fadeIn();
-    }
-
-    function show_uncategorized_products() {
-        $(".product").fadeOut();
-        $(".product.no-category").fadeIn();
-    }
-
+  function show_products_of_category(category) {
+    $(".product").fadeOut();
+    $(".product.category-"+ category).fadeIn();
+  }
 </script>
 
 <script>
@@ -119,26 +141,10 @@
 {% for supplier in view.suppliers %}
     $(".supplier-{{ supplier.pk }}").popover({
         trigger: "hover",
-        title: "{{ supplier.name }}",
+        title: "{{ supplier.name|escapejs }}",
         content: "{{ supplier.biography|truncatechars:400|escapejs }}"
     });
 {% endfor %}
 </script>
-
-<script>
-    $(document).ready(function() {
-        $('#products-table').DataTable({
-            "lengthChange": false,
-            "info": false,
-            "paging": false,
-            "language": {
-                "search": "Zoeken:",
-                "emptyTable": "Geen producten gevonden",
-                "zeroRecords": "Geen producten gevonden"
-            }
-        });
-    });
-</script>
-
 
 {% endblock %}
