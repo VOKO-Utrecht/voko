@@ -33,23 +33,23 @@
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu" aria-labelledby="category-dropdown">
-            <li><a href="#" id="all-products">Alle producten</a></li>
+            <li><a href="#" class="category-option" data-category="all">Alle producten</a></li>
             {% for category in view.categories %}
-                <li><a href="#" id="category-{{ category.id }}">{{ category.name }}</a></li>
+                <li><a href="#" class="category-option" data-category="{{ category.id }}">{{ category.name }}</a></li>
             {% endfor %}
-            <li><a href="#" id="no-category">Overig</a></li>
+            <li><a href="#" class="category-option" data-category="no-category">Overig</a></li>
           </ul>
         </div>
       </div>
 
       <!-- Categories -->
       <div role="tabpanel" class="hidden-xs">
-        <ul id="myTab" class="nav nav-tabs categories" role="tablist">
-          <li role="presentation" class="active"><a href="#" id="all-products-tab" role="tab" data-toggle="tab">Alle producten</a></li>
+        <ul id="categories-tabs" class="nav nav-tabs categories" role="tablist">
+          <li role="presentation" class="active"><a href="#" class="category-option" data-category="all" role="tab" data-toggle="tab">Alle producten</a></li>
           {% for category in view.categories %}
-            <li role="presentation"><a href="#" role="tab" id="category-{{ category.id }}-tab" data-toggle="tab">{{ category.name }}</a></li>
+            <li role="presentation"><a href="#" role="tab" class="category-option" data-category="{{ category.id }}" data-toggle="tab">{{ category.name }}</a></li>
           {% endfor %}
-          <li role="presentation"><a href="#" id="no-category-tab" role="tab" data-toggle="tab">Overig</a></li>
+          <li role="presentation"><a href="#" class="category-option" role="tab" data-category="no-category" data-toggle="tab">Overig</a></li>
         </ul>
       </div>
 
@@ -115,25 +115,26 @@
 {% block javascript %}
 <script language="javascript">
   {# categories filtering #}
-  $("#all-products, #all-products-tab").click(function(event) {
-    $(".product").fadeIn();
+  $(".category-option").click(function(event) {
+    var category = event.target.dataset.category;
+    if (category != "all") $(".product").fadeOut();
+    $(".product").removeClass("last");
+    var targets;
+    switch (category) {
+      case "all":
+        targets = $(".product");
+        break;
+      case "no-category":
+        targets = $(".product.no-category");
+        break;
+      default:
+        targets = $(".product.category-"+ category);
+        break;
+    }
+    targets.fadeIn();
+    targets.last().addClass("last");
   });
 
-  $("#no-category, #no-category-tab").click(function(event) {
-    $(".product").fadeOut();
-    $(".product.no-category").fadeIn();
-  });
-
-  {% for category in view.categories %}
-    $("#category-{{ category.id }}, #category-{{ category.id }}-tab").click(function(event) {
-      show_products_of_category("{{ category.id }}");
-    });
-  {% endfor %}
-
-  function show_products_of_category(category) {
-    $(".product").fadeOut();
-    $(".product.category-"+ category).fadeIn();
-  }
 </script>
 
 <script>
