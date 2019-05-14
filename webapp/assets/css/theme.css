@@ -48,7 +48,7 @@ body {
   border-bottom: 1px solid #ddd;
 }
 
-.product:last-child {
+.product:last-child, .product.last {
   margin-bottom: 0;
   border-bottom: 0;
 }
@@ -59,6 +59,10 @@ body {
 
 .product .progress {
   margin: 0;
+}
+
+.product .info p:last-child {
+  margin-bottom: 0;
 }
 
 .product .order .row {
