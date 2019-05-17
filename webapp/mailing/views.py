@@ -1,13 +1,11 @@
 from braces.views import StaffuserRequiredMixin
 from django.contrib import messages
-from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView, ListView, View
 from accounts.models import VokoUser
 from log import log_event
-from mailing.helpers import render_mail_template
+from mailing.helpers import render_mail_template, mail_user
 from mailing.models import MailTemplate
-from django.conf import settings
 
 
 class ChooseTemplateView(StaffuserRequiredMixin, ListView):
@@ -55,17 +53,18 @@ class SendMailView(StaffuserRequiredMixin, View):
 
     def _send_mails(self):
         for user in self.users:
-            subject, html_message, plain_message = render_mail_template(
+            (
+                subject,
+                html_message,
+                plain_message,
+                from_email
+            ) = render_mail_template(
                 self.template,
                 user=user,
-                order_round=self.current_order_round)
+                order_round=self.current_order_round
+            )
 
-            send_mail(subject=subject,
-                      message=plain_message,
-                      from_email=settings.DEFAULT_FROM_EMAIL,
-                      recipient_list=["%s <%s>" %
-                                      (user.get_full_name(), user.email)],
-                      html_message=html_message)
+            mail_user(user, subject, html_message, plain_message, from_email)
 
             log_event(operator=self.request.user,
                       user=user,

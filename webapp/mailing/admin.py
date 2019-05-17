@@ -3,7 +3,9 @@ from mailing.models import MailTemplate
 
 
 class MailTemplateAdmin(admin.ModelAdmin):
-    list_display = ["id", "title", "subject", "created", "modified"]
+    list_display = [
+        "id", "title", "subject", "from_email", "created", "modified"
+    ]
     ordering = ("-id", "modified")
 
 
