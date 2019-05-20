@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'ordering',
     'docs',
     'transport',
+    'api',
 
     'constance.backends.database',
     'constance',
