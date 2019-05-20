@@ -6,12 +6,14 @@ from datetime import datetime
 from .utils import CSVResponse, JSONResponse
 from accounts.models import VokoUser
 
+
 def hasAccess(user):
     allowedGroups = ["IT", "Promo"]
     for allowedGroup in allowedGroups:
         if user.groups.filter(name=allowedGroup).exists():
             return True
     return False
+
 
 class OrdersAPIView(UserPassesTestMixin, View):
     def test_func(self, user):
