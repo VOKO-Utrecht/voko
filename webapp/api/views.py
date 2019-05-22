@@ -64,7 +64,7 @@ class AccountsAPIView(UserPassesTestMixin, View):
     def test_func(self, user):
         return hasAccess(user)
 
-    def get_raw_data(self):
+    def get_raw_data(self, include_empty_fields):
         data = []
         users = VokoUser.objects.all()
         for user in users:
@@ -77,11 +77,15 @@ class AccountsAPIView(UserPassesTestMixin, View):
             email_confirmation = user.email_confirmation
             if email_confirmation.is_confirmed:
                 field['confirmed_date'] = email_confirmation.modified.date()
+            elif include_empty_fields:
+                field['confirmed_date'] = None
 
             paid_orders = user.orders.filter(paid=True).order_by("modified")
             first_paid_order = paid_orders.first()
             if first_paid_order:
                 field['first_order_date'] = first_paid_order.modified.date()
+            elif include_empty_fields:
+                field['first_order_date'] = None
 
             data.append(field)
         return data
@@ -89,9 +93,9 @@ class AccountsAPIView(UserPassesTestMixin, View):
 
 class AccountsJSONView(AccountsAPIView):
     def get(self, request, *args, **kwargs):
-        return JSONResponse(self.get_raw_data())
+        return JSONResponse(self.get_raw_data(False))
 
 
 class AccountsCSVView(AccountsAPIView):
     def get(self, request):
-        return CSVResponse(self.get_raw_data())
+        return CSVResponse(self.get_raw_data(True))
