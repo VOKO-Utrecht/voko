@@ -1,4 +1,4 @@
-from braces.views import UserPassesTestMixin
+from braces.views import GroupRequiredMixin
 from django.views.generic import View
 from ordering.models import OrderRound
 from pytz import UTC
@@ -7,17 +7,8 @@ from .utils import CSVResponse, JSONResponse
 from accounts.models import VokoUser
 
 
-def hasAccess(user):
-    allowedGroups = ["IT", "Promo"]
-    for allowedGroup in allowedGroups:
-        if user.groups.filter(name=allowedGroup).exists():
-            return True
-    return False
-
-
-class OrdersAPIView(UserPassesTestMixin, View):
-    def test_func(self, user):
-        return hasAccess(user)
+class OrdersAPIView(GroupRequiredMixin, View):
+    group_required = ('IT', 'Promo')
 
     def get_raw_data(self):
         now = datetime.now(UTC)
@@ -60,9 +51,8 @@ class OrdersCSVView(OrdersAPIView):
         return CSVResponse(self.get_raw_data())
 
 
-class AccountsAPIView(UserPassesTestMixin, View):
-    def test_func(self, user):
-        return hasAccess(user)
+class AccountsAPIView(GroupRequiredMixin, View):
+    group_required = ('IT', 'Promo')
 
     def get_raw_data(self):
         data = []
