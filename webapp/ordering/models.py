@@ -93,6 +93,14 @@ class OrderRound(TimeStampedModel):
         related_name="coordinating_distribution_orderrounds"
     )
 
+    transport_coordinator = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="coordinating_transport_orderrounds"
+    )
+
     def is_not_open_yet(self):
         current_datetime = datetime.now(pytz.utc)
         return current_datetime < self.open_for_orders

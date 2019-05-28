@@ -39,8 +39,6 @@ class Ride(TimeStampedModel):
         settings.AUTH_USER_MODEL, related_name="rides_as_driver")
     codriver = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name="rides_as_codriver")
-    coordinators = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name="coordinating")
     slug = models.SlugField(
         unique=True, editable=False, max_length=100)
 
@@ -59,6 +57,10 @@ class Ride(TimeStampedModel):
     @property
     def distribution_coordinator(self):
         return self.order_round.distribution_coordinator
+
+    @property
+    def transport_coordinator(self):
+        return self.order_round.transport_coordinator
 
     @property
     def orders_per_supplier(self):

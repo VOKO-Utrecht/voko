@@ -51,14 +51,14 @@
         <td class="col-md-1">{{ object.codriver.email }}</td>
         <td class="col-md-1">{{ object.codriver.userprofile.phone_number }}</td>
       </tr>
-      {% for coordinator in object.coordinators.all %}
+      {% if object.transport_coordinator %}
         <tr>
           <th class="col-md-1">Transport coördinator</th>
-          <td class="col-md-1">{{ coordinator }}</td>
-          <td class="col-md-1">{{ coordinator.email }}</td>
-          <td class="col-md-1">{{ coordinator.userprofile.phone_number }}</td>
+          <td class="col-md-1">{{ object.transport_coordinator }}</td>
+          <td class="col-md-1">{{ object.transport_coordinator.email }}</td>
+          <td class="col-md-1">{{ object.transport_coordinator.userprofile.phone_number }}</td>
         </tr>
-      {% endfor %}
+      {% endif %}
       {% if object.distribution_coordinator %}
         <tr>
           <th class="col-md-1">Uitdeel coördinator</th>
