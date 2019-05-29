@@ -70,6 +70,11 @@ class AccountsAPIView(GroupRequiredMixin, View):
             elif include_empty_fields:
                 field['confirmed_date'] = None
 
+            if user.is_active and user.activated is not None:
+                field['activated_date'] = user.activated.date()
+            elif include_empty_fields:
+                field['activated_date'] = None
+
             paid_orders = user.orders.filter(paid=True).order_by("modified")
             first_paid_order = paid_orders.first()
             if first_paid_order:

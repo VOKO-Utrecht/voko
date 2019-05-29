@@ -67,6 +67,7 @@ class VokoUserManager(BaseUserManager):
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
+        user.activated = datetime.now(pytz.UTC)
         user.save(using=self._db)
         return user
 
@@ -102,6 +103,12 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_asleep = models.BooleanField(default=False,
                                     verbose_name="Sleeping (inactive) member")
+
+    activated = models.DateTimeField(
+        null=True,
+        editable=False,
+        help_text="When account was activated")
+
     objects = VokoUserManager()
 
     def get_full_name(self):
