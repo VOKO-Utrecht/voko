@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytz
 from datetime import datetime, timedelta
+from django.utils import timezone
 from uuid import uuid4
 from django.contrib.auth.models import (BaseUserManager, AbstractBaseUser,
                                         PermissionsMixin)
@@ -67,7 +68,7 @@ class VokoUserManager(BaseUserManager):
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
-        user.activated = datetime.now(pytz.UTC)
+        user.activated = timezone.now()
         user.save(using=self._db)
         return user
 
