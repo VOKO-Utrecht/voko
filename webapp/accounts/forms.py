@@ -6,6 +6,8 @@ from django.core.mail import mail_admins
 from django.db import transaction
 import log
 from .models import VokoUser, UserProfile
+from pytz import UTC
+from datetime import datetime
 
 # Custom user forms based on examples from Two Scoops of Django.
 
@@ -98,6 +100,7 @@ Gebruiker %s heeft zojuist zijn/haar registratie afgerond..
             user = super(VokoUserFinishForm, self).save(commit=False)
             user.set_password(self.cleaned_data["password1"])
             user.is_active = True
+            user.activated = datetime.now(UTC)
 
             if commit:
                 user.save()

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytz
 from datetime import datetime, timedelta
+from django.utils import timezone
 from uuid import uuid4
 from django.contrib.auth.models import (BaseUserManager, AbstractBaseUser,
                                         PermissionsMixin)
@@ -67,6 +68,7 @@ class VokoUserManager(BaseUserManager):
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
+        user.activated = timezone.now()
         user.save(using=self._db)
         return user
 
@@ -102,6 +104,12 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_asleep = models.BooleanField(default=False,
                                     verbose_name="Sleeping (inactive) member")
+
+    activated = models.DateTimeField(
+        null=True,
+        editable=False,
+        help_text="When account was activated")
+
     objects = VokoUserManager()
 
     def get_full_name(self):
