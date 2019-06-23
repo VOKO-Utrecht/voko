@@ -7,4 +7,7 @@ urlpatterns = (
 
     url(r'^accounts(.json)?$', views.AccountsJSONView.as_view()),
     url(r'^accounts.csv$', views.AccountsCSVView.as_view()),
+
+    url(r'^accounts-admin(.json)?$', views.AccountsAdminJSONView.as_view()),
+    url(r'^accounts-admin.csv$', views.AccountsAdminCSVView.as_view()),
 )

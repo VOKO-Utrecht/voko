@@ -94,3 +94,80 @@ class AccountsJSONView(AccountsAPIView):
 class AccountsCSVView(AccountsAPIView):
     def get(self, request):
         return CSVResponse(self.get_raw_data(True))
+
+
+class AccountsAdminAPIView(GroupRequiredMixin, View):
+    group_required = ('Admin')
+
+    def get_raw_data(self, include_empty_fields):
+        data = []
+        users = VokoUser.objects.all()
+        for user in users:
+            item = {
+                'created_date': user.created.date(),  # rounded to day
+            }
+
+            # copy user fields
+            user_fields = {
+                "first_name",
+                "last_name",
+                "email",
+                "can_activate",
+                "is_active",
+                "is_staff",
+                "is_asleep"
+            }
+            for field in user_fields:
+                item[field] = getattr(user, field, "")
+
+            # copy user profile fields
+            profile_fields = {
+                "phone_number",
+                "has_drivers_license"
+            }
+            if include_empty_fields:
+                for field in profile_fields:
+                    item[field] = ""
+            try:
+                for field in profile_fields:
+                    item[field] = getattr(user.userprofile, field)
+            except user._meta.model.userprofile.RelatedObjectDoesNotExist:
+                pass
+
+            # email confirmation
+            email_confirmation = user.email_confirmation
+            item['is_confirmed'] = email_confirmation.is_confirmed
+            if email_confirmation.is_confirmed:
+                item['confirmed_date'] = email_confirmation.modified.date()
+            elif include_empty_fields:
+                item['confirmed_date'] = None
+
+            # activated
+            if user.is_active and user.activated is not None:
+                item['activated_date'] = user.activated.date()
+            elif include_empty_fields:
+                item['activated_date'] = None
+
+            # first_paid_order
+            paid_orders = user.orders.filter(paid=True).order_by("modified")
+            first_paid_order = paid_orders.first()
+            if first_paid_order:
+                item['first_order_date'] = first_paid_order.modified.date()
+            elif include_empty_fields:
+                item['first_order_date'] = None
+
+            # groups
+            item['groups'] = ",".join(user.flat_groups())
+
+            data.append(item)
+        return data
+
+
+class AccountsAdminJSONView(AccountsAdminAPIView):
+    def get(self, request, *args, **kwargs):
+        return JSONResponse(self.get_raw_data(False))
+
+
+class AccountsAdminCSVView(AccountsAdminAPIView):
+    def get(self, request):
+        return CSVResponse(self.get_raw_data(True))
