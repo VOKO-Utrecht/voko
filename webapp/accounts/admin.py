@@ -14,6 +14,7 @@ from django.utils.safestring import mark_safe
 from hijack.admin import HijackUserAdminMixin
 from django.apps import apps
 from constance import config
+from vokou.admin import export_as_csv_action
 
 
 for model in apps.get_app_config('accounts').get_models():
@@ -114,6 +115,45 @@ def anonymize_user(modeladmin, request, queryset):
 
 
 anonymize_user.short_description = 'Anonimiseer account'
+
+
+export_action = export_as_csv_action(
+    "Export selectie",
+    fields=(
+        "first_name",
+        "last_name",
+        "email",
+        "phone_number",
+        "has_drivers_license",
+        "is_confirmed",
+        "can_activate",
+        "is_active",
+        "is_staff",
+        "is_asleep",
+        "created",
+        "confirmed",
+        "activated",
+        "first_order",
+        "groups_str"
+    ),
+    headers=(
+        "first_name",
+        "last_name",
+        "email",
+        "phone_number",
+        "has_drivers_license",
+        "is_confirmed",
+        "can_activate",
+        "is_active",
+        "is_staff",
+        "is_asleep",
+        "created date",
+        "confirmed date",
+        "activated date",
+        "first_order date",
+        "groups"
+    )
+)
 
 
 class UserProfileInline(admin.StackedInline):
@@ -227,7 +267,8 @@ class VokoUserAdmin(HijackUserAdminMixin, VokoUserBaseAdmin):
     actions = (enable_user,
                force_confirm_email,
                send_email_to_selected_users,
-               anonymize_user)
+               anonymize_user,
+               export_action)
 
 
 class ReadOnlyUserProfileInline(UserProfileInline):

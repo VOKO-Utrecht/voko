@@ -21,7 +21,7 @@ class DeleteDisabledMixin(object):
 
 # copied from https://gist.github.com/mgerring/3645889
 def export_as_csv_action(description="Export selected objects as CSV file",
-                         fields=None, exclude=None, header=True):
+                         fields=None, exclude=None, header=True, headers=None):
     """
     This function returns an export csv action
     'fields' and 'exclude' work like in django ModelForm
@@ -43,7 +43,10 @@ def export_as_csv_action(description="Export selected objects as CSV file",
 
         writer = unicodecsv.writer(response, encoding='utf-8')
         if header:
-            writer.writerow(field_names)
+            if headers:
+                writer.writerow(headers)
+            else:
+                writer.writerow(field_names)
         for obj in queryset:
             row = [getattr(obj, field)() if callable(
                 getattr(obj, field)) else getattr(obj, field) for field in

@@ -118,6 +118,41 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.email
 
+    @property
+    def phone_number(self):
+        try:
+            return self.userprofile.phone_number
+        except VokoUser.userprofile.RelatedObjectDoesNotExist:
+            return None
+
+    @property
+    def has_drivers_license(self):
+        try:
+            return self.userprofile.has_drivers_license
+        except VokoUser.userprofile.RelatedObjectDoesNotExist:
+            return None
+
+    @property
+    def is_confirmed(self):
+        return self.email_confirmation.is_confirmed
+
+    @property
+    def confirmed(self):
+        return self.email_confirmation.modified
+
+    @property
+    def first_order(self):
+        paid_orders = self.orders.filter(paid=True).order_by("modified")
+        first_paid_order = paid_orders.first()
+        if first_paid_order:
+            return first_paid_order.modified
+        else:
+            return None
+
+    @property
+    def groups_str(self):
+        return ",".join(self.flat_groups())
+
     def __str__(self):
         return self.get_full_name()
 
