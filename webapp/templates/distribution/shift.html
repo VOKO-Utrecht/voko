@@ -66,7 +66,33 @@ TODO {% block title %}{{ object.date|date:"j F Y" }} {{ object.start_str }} - {{
           <td class="col-md-1">{{ object.transport_coordinator.userprofile.phone_number }}</td>
         </tr>
       {% endif %}
-      {% comment %} TODO: co-drivers next round {% endcomment %}
+    </tbody>
+  </table>
+</div>
+
+<h2>Sleutel ophalers</h2>
+<p>
+  De volgende bijrijders moeten voor de volgende ronde de sleutel ophalen.
+</p>
+<div class="panel panel-default table-container">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Route</th>
+        <th>Naam</th>
+        <th>Email</th>
+        <th>Telefoon</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for key_collector in object.key_collectors %}
+        <tr>
+          <th class="col-md-1">{{ key_collector.route.name }}</th>
+          <td class="col-md-1">{{ key_collector.codriver }}</td>
+          <td class="col-md-1">{{ key_collector.codriver.email }}</td>
+          <td class="col-md-1">{{ key_collector.codriver.userprofile.phone_number }}</td>
+        </tr>
+      {% endfor %}
     </tbody>
   </table>
 </div>

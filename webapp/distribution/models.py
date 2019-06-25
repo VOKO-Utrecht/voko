@@ -57,6 +57,19 @@ class Shift(TimeStampedModel):
     def members_names(self):
         return list(map(lambda s: s.get_full_name(), self.members.all()))
 
+    @property
+    def key_collectors(self):
+        next_order_round = self.order_round.get_next_order_round()
+        if next_order_round == None:
+            return None
+        key_collectors = []
+        for ride in next_order_round.rides.all():
+            key_collectors.append({
+                'route': ride.route,
+                'codriver': ride.codriver
+            })
+        return key_collectors
+
     def save(self, **kwargs):
         self.slug = slugify(self)
         return super(Shift, self).save(**kwargs)

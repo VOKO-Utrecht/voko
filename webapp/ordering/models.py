@@ -120,6 +120,12 @@ class OrderRound(TimeStampedModel):
     def is_current(self):
         return self == get_current_order_round()
 
+    def get_next_order_round(self):
+        order_rounds = OrderRound.objects.all()
+        return order_rounds.filter(
+            open_for_orders__gt=self.open_for_orders
+        ).order_by("open_for_orders").first()
+
     def suppliers(self):
         """
         Return suppliers with at least one paid order in this round
