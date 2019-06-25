@@ -189,3 +189,18 @@ class SendPrepareRideMails(CronJobBase):
                     next_order_round.prepare_ride_mails_sent is False):
                 print("Sending prepare ride mails!")
                 next_order_round.send_prepare_ride_mails()
+
+
+class SendDistributionMails(CronJobBase):
+    RUN_EVERY_MINS = 30
+
+    schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
+    code = 'ordering.send_distribution_mails'
+
+    def do(self):
+        print("SendDistributionMails")
+        order_round = get_current_order_round()
+        print("Order round: %s" % order_round)
+        if order_round.is_open and order_round.distribution_mails_sent is False:
+            print("Sending distribution mails!")
+            order_round.send_distribution_mails()

@@ -84,6 +84,11 @@ class OrderRound(TimeStampedModel):
         editable=False,
         help_text="Whether we've sent prepare ride info mails"
     )
+    distribution_mails_sent = models.BooleanField(
+        default=False,
+        editable=False,
+        help_text="Whether we've sent distribution info mails"
+    )
 
     distribution_coordinator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -320,6 +325,32 @@ class OrderRound(TimeStampedModel):
                     mail_template,
                     user=user,
                     ride=ride,
+                    base_url=settings.BASE_URL
+                )
+                mail_user(user, *rendered_template_vars)
+
+
+    def send_distribution_mails(self):
+        if self.distribution_mails_sent is True:
+            log_event(event="Not sending distribution mails for round %d "
+                            "because distribution_mails_sent is True" %
+                            self.pk)
+            return
+
+        log_event(event="Sending distribution mails for round %d" % self.pk)
+
+        mail_template = get_template_by_id(config.DISTRIBUTION_MAIL)
+
+        self.distribution_mails_sent = True
+        self.save()
+
+        shifts = self.distribution_shifts.all()
+        for shift in shifts:
+            for user in shift.members.all():
+                rendered_template_vars = render_mail_template(
+                    mail_template,
+                    user=user,
+                    shift=shift,
                     base_url=settings.BASE_URL
                 )
                 mail_user(user, *rendered_template_vars)
