@@ -42,13 +42,15 @@ TODO {% block title %}{{ object.date|date:"j F Y" }} {{ object.start_str }} - {{
       </tr>
     </thead>
     <tbody>
-      {% for member in object.members.all %}
-        <tr>
-          <td class="col-md-1"></td>
-          <td class="col-md-1">{{ member.get_full_name }}</td>
-          <td class="col-md-1">{{ member.email }}</td>
-          <td class="col-md-1">{{ member.userprofile.phone_number }}</td>
-        </tr>
+      {% for shift in object.order_round.distribution_shifts.all %}
+        {% for member in shift.members.all %}
+          <tr>
+            <th class="col-md-1">{{ shift.start_str}} - {{ shift.end_str }}</th>
+            <td class="col-md-1">{{ member.get_full_name }}</td>
+            <td class="col-md-1">{{ member.email }}</td>
+            <td class="col-md-1">{{ member.userprofile.phone_number }}</td>
+          </tr>
+        {% endfor %}
       {% endfor %}
       {% if object.distribution_coordinator %}
         <tr>

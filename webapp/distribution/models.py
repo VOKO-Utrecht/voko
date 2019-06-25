@@ -9,6 +9,7 @@ class Shift(TimeStampedModel):
     class Meta:
         verbose_name = 'Shift'
         verbose_name_plural = 'Shifts'
+        ordering = ['start']
 
     order_round = models.ForeignKey(
         OrderRound,
