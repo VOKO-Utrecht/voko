@@ -61,7 +61,7 @@ class Shift(TimeStampedModel):
     @property
     def key_collectors(self):
         next_order_round = self.order_round.get_next_order_round()
-        if next_order_round == None:
+        if next_order_round is None:
             return None
         key_collectors = []
         for ride in next_order_round.rides.all():

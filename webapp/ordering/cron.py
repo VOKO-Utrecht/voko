@@ -201,6 +201,7 @@ class SendDistributionMails(CronJobBase):
         print("SendDistributionMails")
         order_round = get_current_order_round()
         print("Order round: %s" % order_round)
-        if order_round.is_open and order_round.distribution_mails_sent is False:
+        if (order_round.is_open and
+                order_round.distribution_mails_sent is False):
             print("Sending distribution mails!")
             order_round.send_distribution_mails()

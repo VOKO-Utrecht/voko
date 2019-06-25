@@ -329,7 +329,6 @@ class OrderRound(TimeStampedModel):
                 )
                 mail_user(user, *rendered_template_vars)
 
-
     def send_distribution_mails(self):
         if self.distribution_mails_sent is True:
             log_event(event="Not sending distribution mails for round %d "
