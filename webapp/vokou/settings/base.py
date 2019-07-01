@@ -68,7 +68,7 @@ INSTALLED_APPS = [
     'compat',  # Requirement of hijack
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE_CLASSES = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
