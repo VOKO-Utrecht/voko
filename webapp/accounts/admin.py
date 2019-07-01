@@ -122,8 +122,13 @@ class UserProfileInline(admin.StackedInline):
 
 def roles(self):
     # https://djangosnippets.org/snippets/1650/
+    def short_name_part(name):
+        return name[:2].upper()
+
     def short_name(name):
-        return str(name)[:3].upper()
+        name_parts = str(name).split(" ")
+        short_name_parts = map(short_name_part, name_parts)
+        return "_".join(short_name_parts)
 
     p = sorted(["<a title='%s'>%s</a>" % (
         x, short_name(x)) for x in self.groups.all()]
