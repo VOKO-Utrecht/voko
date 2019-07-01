@@ -2,7 +2,7 @@ from braces.views import LoginRequiredMixin
 from django.views.generic import (DetailView, ListView)
 from distribution import models
 import datetime
-from distribution.mixins import UserIsInvolvedMixin
+from distribution.mixins import UserIsInvolvedWithShiftMixin
 
 
 class Schedule(LoginRequiredMixin, ListView):
@@ -21,6 +21,6 @@ class Schedule(LoginRequiredMixin, ListView):
         ).order_by("order_round__collect_datetime", "start")
 
 
-class Shift(LoginRequiredMixin, UserIsInvolvedMixin, DetailView):
+class Shift(LoginRequiredMixin, UserIsInvolvedWithShiftMixin, DetailView):
     template_name = "distribution/shift.html"
     model = models.Shift

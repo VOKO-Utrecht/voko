@@ -2,7 +2,7 @@ from braces.views._access import AccessMixin
 from django.core.exceptions import PermissionDenied
 
 
-class UserIsInvolvedMixin(AccessMixin):
+class UserIsInvolvedWithShiftMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
         shift = self.get_object()
         if (
@@ -13,5 +13,5 @@ class UserIsInvolvedMixin(AccessMixin):
         ):
             raise PermissionDenied
 
-        return super(UserIsInvolvedMixin, self).dispatch(
+        return super(UserIsInvolvedWithShiftMixin, self).dispatch(
             request, *args, **kwargs)
