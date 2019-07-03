@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+TODO {% block title %}{{ object.date|date:"j F Y" }} {{ object.start_str }} - {{ object.end_str }}{% endblock %}
+{% block content %}
+<h1>Uitdeel dienst op {{ object.date|date:"j F Y" }}</h1>
+<p>
+  Hieronder staat zoveel mogelijk informatie over deze dienst.<br />
+  Bedankt voor het helpen met uitdelen.
+</p>
+
+<div class="panel panel-default">
+  <table class="table">
+    <tbody>
+      <tr>
+        <td><strong>Datum</strong></td>
+        <td>{{ object.date|date:"j F Y" }}</td>
+      </tr>
+      <tr>
+        <td><strong>Van</strong></td>
+        <td>{{ object.start_str }}</td>
+      </tr>
+      <tr>
+        <td><strong>Tot</strong></td>
+        <td>{{ object.end_str }}</td>
+      </tr>
+      <tr>
+        <td><strong>Bestellijst</strong></td>
+        <td><a href="{% url 'orderadmin_orderlists' object.order_round.pk %}">Bestelronde #{{ object.order_round.pk }}</a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<h2>Contact info</h2>
+<div class="panel panel-default">
+  <table class="table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Naam</th>
+        <th>Email</th>
+        <th>Telefoon</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for shift in object.order_round.distribution_shifts.all %}
+        {% for member in shift.members.all %}
+          <tr>
+            <th class="col-md-1">{{ shift.start_str}} - {{ shift.end_str }}</th>
+            <td class="col-md-1">{{ member.get_full_name }}</td>
+            <td class="col-md-1">{{ member.email }}</td>
+            <td class="col-md-1">{{ member.userprofile.phone_number }}</td>
+          </tr>
+        {% endfor %}
+      {% endfor %}
+      {% if object.distribution_coordinator %}
+        <tr>
+          <th class="col-md-1">Uitdeel coördinator</th>
+          <td class="col-md-1">{{ object.distribution_coordinator }}</td>
+          <td class="col-md-1">{{ object.distribution_coordinator.email }}</td>
+          <td class="col-md-1">{{ object.distribution_coordinator.userprofile.phone_number }}</td>
+        </tr>
+      {% endif %}
+      {% if object.transport_coordinator %}
+        <tr>
+          <th class="col-md-1">Transport coördinator</th>
+          <td class="col-md-1">{{ object.transport_coordinator }}</td>
+          <td class="col-md-1">{{ object.transport_coordinator.email }}</td>
+          <td class="col-md-1">{{ object.transport_coordinator.userprofile.phone_number }}</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+<h2>Sleutel ophalers</h2>
+<p>
+  De volgende bijrijders moeten voor de volgende ronde de sleutel ophalen.
+</p>
+<div class="panel panel-default table-container">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Route</th>
+        <th>Naam</th>
+        <th>Email</th>
+        <th>Telefoon</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for key_collector in object.key_collectors %}
+        <tr>
+          <th class="col-md-1">{{ key_collector.route.name }}</th>
+          <td class="col-md-1">{{ key_collector.codriver }}</td>
+          <td class="col-md-1">{{ key_collector.codriver.email }}</td>
+          <td class="col-md-1">{{ key_collector.codriver.userprofile.phone_number }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

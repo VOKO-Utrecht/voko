@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% block title %}Uitdeel rooster{% endblock %}
+{% block content %}
+    <h1 class="page-header">Uitdeel rooster</h1>
+    <p>
+        Overzicht van uitdeel diensten waarbij jij helpt.
+    </p>
+    <!-- Table -->
+    <table class="table table-hover" id="schedule-table">
+        <thead>
+        <tr>
+            <th>Datum</th>
+            <th>Van</th>
+            <th>Tot</th>
+            <th>Deelnemers</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for shift in object_list %}
+        <tr class="shift">
+            <td class="col-md-1"><a href="{% url 'shift' shift.slug %}">{{ shift.date|date:"j F Y" }}</a></td>
+            <td class="col-md-1">{{ shift.start_str }}</td>
+            <td class="col-md-1">{{ shift.end_str }}</td>
+            <td class="col-md-4">{{ shift.members_names|join:", " }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function() {
+            $('#schedule-table').DataTable({
+                "searching": true,
+                "lengthChange": false,
+                "ordering": false,
+                "info": false,
+                "pagingType": "numbers",
+                "pageLength": 50,
+                "language": {
+                    "search": "Zoeken:",
+                    "emptyTable": "Geen diensten gevonden",
+                    "zeroRecords": "Geen diensten gevonden"
+                }
+            });
+        });
+    </script>
+{% endblock %}

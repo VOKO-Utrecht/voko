@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'docs',
     'transport',
     'api',
+    'distribution',
 
     'constance.backends.database',
     'constance',
@@ -84,7 +85,8 @@ CRON_CLASSES = [
     "ordering.cron.MailOrderLists",
     "ordering.cron.SendOrderReminders",
     "ordering.cron.SendRideMails",
-    "ordering.cron.SendPrepareRideMails"
+    "ordering.cron.SendPrepareRideMails",
+    "ordering.cron.SendDistributionMails"
 ]
 
 ROOT_URLCONF = 'vokou.urls'
@@ -146,6 +148,7 @@ CONSTANCE_CONFIG = {
     'ORDER_FAILED_MAIL': (37, "Order failed mail", int),
     'RIDE_MAIL': (84, "Ride info mail", int),
     'PREPARE_RIDE_MAIL': (85, "Prepare ride info mail", int),
+    'DISTRIBUTION_MAIL': (84, "Distribution info mail", int),
 }
 
 
