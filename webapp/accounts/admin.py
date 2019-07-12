@@ -146,6 +146,15 @@ roles.short_description = 'Groups'
 def phone(self):
     return self.userprofile.phone_number
 
+def has_first_payment(self):
+    try:
+        return Payment.objects.filter(succeeded=True, order__user=self)\
+            .order_by('id').first().created != None
+    except AttributeError:
+        return False
+
+has_first_payment.boolean = True
+has_first_payment.short_description = u"Has payed"
 
 class VokoUserBaseAdmin(UserAdmin):
     # Set the add/modify forms
@@ -156,6 +165,7 @@ class VokoUserBaseAdmin(UserAdmin):
     # that reference specific fields on auth.User.
     list_display = ["first_name", "last_name", "email", phone,
                     "email_confirmed", "can_activate", "is_active", "is_staff",
+                    has_first_payment,
                     "created", 'has_drivers_license', 'orders_round', 'debit',
                     'credit', 'total_orders', 'first_payment', roles]
     list_filter = ("is_staff", "is_superuser", "is_active",
