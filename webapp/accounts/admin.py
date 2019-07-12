@@ -141,15 +141,18 @@ roles.short_description = 'Groups'
 def phone(self):
     return self.userprofile.phone_number
 
+
 def has_first_payment(self):
     try:
         return Payment.objects.filter(succeeded=True, order__user=self)\
-            .order_by('id').first().created != None
+            .order_by('id').first().created is not None
     except AttributeError:
         return False
 
+
 has_first_payment.boolean = True
 has_first_payment.short_description = u"Has payed"
+
 
 class VokoUserBaseAdmin(UserAdmin):
     # Set the add/modify forms
