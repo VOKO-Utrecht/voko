@@ -150,7 +150,7 @@ def phone(self):
 def has_first_payment(self):
     try:
         return Payment.objects.filter(succeeded=True, order__user=self)\
-            .order_by('id').first().created is not None
+            .exists()
     except AttributeError:
         return False
 
