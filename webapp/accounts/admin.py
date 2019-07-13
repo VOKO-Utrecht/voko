@@ -156,7 +156,7 @@ def has_first_payment(self):
 
 
 has_first_payment.boolean = True
-has_first_payment.short_description = u"Has payed"
+has_first_payment.short_description = u"Has paid"
 
 
 class VokoUserBaseAdmin(UserAdmin):
