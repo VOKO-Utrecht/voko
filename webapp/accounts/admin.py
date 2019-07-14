@@ -147,6 +147,27 @@ def phone(self):
     return self.userprofile.phone_number
 
 
+class HasPaidFilter(admin.SimpleListFilter):
+    title = "has paid"
+    parameter_name = 'has_paid'
+
+    def lookups(self, request, model_admin):
+        return [
+            ("yes", "Ja"),
+            ("no", "Nee")
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == "yes":
+            return queryset.distinct().filter(
+                orders__payments__succeeded=True)
+        elif self.value() == "no":
+            return queryset.distinct().exclude(
+                orders__payments__succeeded=True)
+        else:
+            return queryset.all()
+
+
 class VokoUserBaseAdmin(UserAdmin):
     # Set the add/modify forms
     add_form = VokoUserCreationForm
@@ -159,7 +180,7 @@ class VokoUserBaseAdmin(UserAdmin):
                     "created", 'has_drivers_license', 'orders_round', 'debit',
                     'credit', 'total_orders', 'first_payment', roles]
     list_filter = ("is_staff", "is_superuser", "is_active",
-                   "can_activate", "groups")
+                   "can_activate", HasPaidFilter, "groups")
     search_fields = ("email", 'first_name', 'last_name')
     ordering = ("first_name", "last_name")
     filter_horizontal = ("groups", "user_permissions",)
