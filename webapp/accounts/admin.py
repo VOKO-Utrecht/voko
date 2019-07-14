@@ -147,7 +147,7 @@ def phone(self):
     return self.userprofile.phone_number
 
 
-def has_first_payment(self):
+def has_paid(self):
     try:
         return Payment.objects.filter(succeeded=True, order__user=self)\
             .exists()
@@ -155,8 +155,8 @@ def has_first_payment(self):
         return False
 
 
-has_first_payment.boolean = True
-has_first_payment.short_description = u"Has paid"
+has_paid.boolean = True
+has_paid.short_description = "Has paid"
 
 
 class VokoUserBaseAdmin(UserAdmin):
@@ -168,7 +168,7 @@ class VokoUserBaseAdmin(UserAdmin):
     # that reference specific fields on auth.User.
     list_display = ["first_name", "last_name", "email", phone,
                     "email_confirmed", "can_activate", "is_active", "is_staff",
-                    has_first_payment,
+                    has_paid,
                     "created", 'has_drivers_license', 'orders_round', 'debit',
                     'credit', 'total_orders', 'first_payment', roles]
     list_filter = ("is_staff", "is_superuser", "is_active",
