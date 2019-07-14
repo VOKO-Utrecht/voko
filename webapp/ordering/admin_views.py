@@ -211,6 +211,12 @@ class OrderAdminCorrection(GroupRequiredMixin, TemplateView):
         return OrderRound.objects.get(pk=self.kwargs.get('pk'))
 
 
+class OrderAccounts(GroupRequiredMixin, DetailView):
+    model = OrderRound
+    template_name = "ordering/admin/orderround_accounts.html"
+    group_required = ('Admin')
+
+
 class OrderAdminMassCorrection(GroupRequiredMixin, View):
     group_required = ('Uitdeelcoordinatoren', 'Admin')
 
