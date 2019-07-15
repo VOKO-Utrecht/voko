@@ -148,11 +148,7 @@ def phone(self):
 
 
 def has_paid(self):
-    try:
-        return Payment.objects.filter(succeeded=True, order__user=self)\
-            .exists()
-    except AttributeError:
-        return False
+    return Payment.objects.filter(succeeded=True, order__user=self).exists()
 
 
 has_paid.boolean = True
