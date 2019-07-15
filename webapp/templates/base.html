@@ -42,7 +42,7 @@
             <li><a href="/">Home</a></li>
             <li><a href="{% url 'view_products' %}">Producten</a></li>
             <li><a href="{% url 'docs.document_overview' %}">Documenten</a></li>
-            <li><a href="{% url 'schedule' %}">Rooster</a></li>
+            <li><a href="{% url 'schedule' %}">Transport</a></li>
             {% if 'Uitdeel' in user.flat_groups or 'Uitdeelcoordinatoren' in user.flat_groups %}
               <li><a href="{% url 'distribution-schedule' %}">Uitdeel</a></li>
             {% endif %}
