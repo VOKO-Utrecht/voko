@@ -20,8 +20,8 @@ from ordering.models import (Product, OrderProduct, Order, Supplier,
                              OrderRound, ProductCategory)
 
 
-class ProductsViewOld(LoginRequiredMixin, ListView):
-    template_name = 'ordering/product_list_old.html'
+class ProductsView(LoginRequiredMixin, ListView):
+    template_name = 'ordering/product_list.html'
 
     def get_queryset(self):
         order_round = self.request.current_order_round
@@ -39,7 +39,7 @@ class ProductsViewOld(LoginRequiredMixin, ListView):
         ).prefetch_related('orderproducts')
 
     def get(self, *args, **kwargs):
-        ret = super(ProductsViewOld, self).get(*args, **kwargs)
+        ret = super(ProductsView, self).get(*args, **kwargs)
         order = get_or_create_order(self.request.user)
         if order.finalized is True:
             messages.warning(
@@ -146,7 +146,7 @@ class ProductsViewOld(LoginRequiredMixin, ListView):
         )
 
     def get_context_data(self, **kwargs):
-        context = super(ProductsViewOld, self).get_context_data(**kwargs)
+        context = super(ProductsView, self).get_context_data(**kwargs)
         context['current_order_round'] = self.request.current_order_round
 
         # Manual override to show product list of specific round
@@ -194,10 +194,6 @@ class ProductsViewOld(LoginRequiredMixin, ListView):
         Return all suppliers
         """
         return set([p.supplier for p in self.get_queryset()])
-
-
-class ProductsView(ProductsViewOld):
-    template_name = 'ordering/product_list.html'
 
 
 class ProductDetail(LoginRequiredMixin, View):

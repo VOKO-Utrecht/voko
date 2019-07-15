@@ -6,8 +6,6 @@ urlpatterns = (
         name="view_supplier"),
     url(r'^products/$', views.ProductsView.as_view(),
         name="view_products"),
-    url(r'^products_old/$', views.ProductsViewOld.as_view(),
-        name="view_products_old"),
     url(r'^product/(?P<pk>[0-9]+)/$', views.ProductDetail.as_view(),
         name="view_product"),
     url(r'^order/(?P<pk>[0-9]+)/finish/$', views.FinishOrder.as_view(),

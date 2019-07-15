@@ -13,10 +13,6 @@
       <strong>Let op!</strong> Je kunt de producten zien omdat je "staff user" bent. <strong>De bestelronde is niet open!</strong>
     </div>
   {% endif %}
-  <div class="alert alert-info" role="alert">
-    We hebben deze pagina vernieuwd. Hij zou nu beter te gebruiken moeten zijn op kleinere schermen. Feedback is welkom op <a href="mailto:peter@peteruithoven.nl">peter@peteruithoven.nl</a>.<br />
-    De oude versie is <a href="{% url 'view_products_old' %}">hier beschikbaar</a>.
-  </div>
 
   <form method="post" id="order-form">
     {% csrf_token %}
