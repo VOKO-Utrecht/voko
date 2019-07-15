@@ -147,6 +147,14 @@ def phone(self):
     return self.userprofile.phone_number
 
 
+def has_paid(self):
+    return Payment.objects.filter(succeeded=True, order__user=self).exists()
+
+
+has_paid.boolean = True
+has_paid.short_description = "Has paid"
+
+
 class HasPaidFilter(admin.SimpleListFilter):
     title = "has paid"
     parameter_name = 'has_paid'
@@ -177,6 +185,7 @@ class VokoUserBaseAdmin(UserAdmin):
     # that reference specific fields on auth.User.
     list_display = ["first_name", "last_name", "email", phone,
                     "email_confirmed", "can_activate", "is_active", "is_staff",
+                    has_paid,
                     "created", 'has_drivers_license', 'orders_round', 'debit',
                     'credit', 'total_orders', 'first_payment', roles]
     list_filter = ("is_staff", "is_superuser", "is_active",
