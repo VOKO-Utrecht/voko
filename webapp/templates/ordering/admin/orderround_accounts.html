@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Leden info bestelronde #{{ object.pk }}</h1>
+
+{% if object.is_open %}
+    <div class="alert alert-danger" role="alert"><strong>Let op!</strong> Deze bestelronde is nog open. Er kunnen nog nieuwe bestellingen worden gedaan!</div>
+{% endif %}
+
+<h2>Leden die voor het eerst besteld hebben</h2>
+<div class="panel panel-default">
+  {% for order in object.orders.all %}
+    <ul class="list-group">
+      {% if order.member_fee %}
+        <a href="{% url 'admin:accounts_vokouser_change' order.user.id %}"><li class="list-group-item">{{ order.user }}</li></a>
+      {% endif %}
+    </ul>
+  {% endfor %}
+</div>
+
+{% endblock %}
+
+
+
+

@@ -16,6 +16,9 @@
         <th>Unieke bestellingen</th>
         <th>Overzicht bestellingen per product</th>
         <th>Correcties</th>
+        {% if 'Admin' in user.flat_groups or user.is_superuser %}
+          <th>Leden</th>
+        {% endif %}
       </tr>
     </thead>
     <tbody>
@@ -29,6 +32,9 @@
             <td><a href="{% url 'orderadmin_userorders' orderround.pk %}">{{ orderround.number_of_orders }}</a></td>
             <td><a href="{% url 'orderadmin_orders_per_product' orderround.pk %}">Per product</a></td>
             <td><a href="{% url 'orderadmin_correction' orderround.pk %}">Correcties</a></td>
+            {% if 'Admin' in user.flat_groups or user.is_superuser %}
+              <td><a href="{% url 'orderadmin_accounts' orderround.pk %}">Leden</a></td>
+            {% endif %}
           </tr>
       {% endfor %}
     </tbody>

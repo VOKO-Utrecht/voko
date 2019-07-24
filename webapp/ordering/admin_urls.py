@@ -2,7 +2,7 @@ from django.conf.urls import url
 from .admin_views import OrderAdminMain, OrderAdminOrderLists, \
     OrderAdminUserOrdersPerProduct, OrderAdminUserOrders, \
     OrderAdminSupplierOrderCSV, OrderAdminUserOrderProductsPerOrderRound, \
-    OrderAdminCorrection, OrderAdminMassCorrection, \
+    OrderAdminCorrection, OrderAccounts, OrderAdminMassCorrection, \
     OrderAdminCorrectionJson, UploadProductList, CreateDraftProducts, \
     CreateRealProducts, ProductAdminMain, \
     RedirectToMailingView, StockAdminView, ProductStockApiView, ProductApiView
@@ -33,6 +33,8 @@ urlpatterns = (
         OrderAdminMassCorrection.as_view(), name="orderadmin_mass_correction"),
     url(r'^round/(?P<pk>[0-9]+)/correction/$', OrderAdminCorrection.as_view(),
         name="orderadmin_correction"),
+    url(r'^round/(?P<pk>[0-9]+)/accounts/$', OrderAccounts.as_view(),
+        name="orderadmin_accounts"),
     url(r'^round/(?P<pk>[0-9]+)/mailing/(?P<mailing_type>(round-open))/$',
         RedirectToMailingView.as_view(), name="productadmin_mailing"),
     url(r'^product/(?P<pk>[0-9]+)/$', OrderAdminUserOrdersPerProduct.as_view(),
