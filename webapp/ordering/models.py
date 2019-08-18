@@ -214,7 +214,11 @@ class OrderRound(TimeStampedModel):
         """
         Return the total number of paid orders
         """
-        return self.orders.filter(paid=True).count()
+        return self.paid_orders.count()
+
+    @property
+    def paid_orders(self):
+        return self.orders.filter(paid=True)
 
     @property
     def orders_per_supplier(self):

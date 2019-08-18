@@ -8,7 +8,7 @@
 
 <h2>Leden die voor het eerst besteld hebben</h2>
 <div class="panel panel-default">
-  {% for order in object.orders.all %}
+  {% for order in object.paid_orders.all %}
     <ul class="list-group">
       {% if order.member_fee %}
         <a href="{% url 'admin:accounts_vokouser_change' order.user.id %}"><li class="list-group-item">{{ order.user }}</li></a>
