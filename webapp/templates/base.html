@@ -46,6 +46,7 @@
             {% if 'Uitdeel' in user.flat_groups or 'Uitdeelcoordinatoren' in user.flat_groups %}
               <li><a href="{% url 'distribution-schedule' %}">Uitdeel</a></li>
             {% endif %}
+            <li><a href="{% url 'contact' %}">Contact</a></li>
           </ul>
           {% include 'header.html' %}
           {% endif %}

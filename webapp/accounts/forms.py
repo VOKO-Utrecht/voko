@@ -8,6 +8,7 @@ import log
 from .models import VokoUser, UserProfile
 from pytz import UTC
 from datetime import datetime
+from django.contrib.auth.models import Group
 
 # Custom user forms based on examples from Two Scoops of Django.
 
@@ -174,6 +175,13 @@ class ChangeProfileForm(forms.ModelForm):
         required=False
     )
 
+    contact_person = forms.ModelChoiceField(
+        queryset=Group.objects.all(),
+        label="Contact persoon voor",
+        help_text=("Dit zet je contact gegevens op contact pagina van leden"
+                   "site.")
+    )
+
     password1 = forms.CharField(
         label="Wachtwoord (alleen invullen als je deze wilt wijzigen)",
         widget=forms.PasswordInput,
@@ -195,6 +203,8 @@ class ChangeProfileForm(forms.ModelForm):
             self.instance.userprofile.phone_number)
         self.fields['has_drivers_license'].initial = (
             self.instance.userprofile.has_drivers_license)
+        self.fields['contact_person'].initial = (
+            self.instance.userprofile.contact_person)
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -222,6 +232,7 @@ class ChangeProfileForm(forms.ModelForm):
             userprofile.phone_number = self.cleaned_data['phone_number']
             userprofile.has_drivers_license = (
                 self.cleaned_data['has_drivers_license'])
+            userprofile.contact_person = self.cleaned_data['contact_person']
 
             if commit:
                 user.save()

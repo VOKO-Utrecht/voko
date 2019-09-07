@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% block title %}Contact{% endblock %}
+{% block content %}
+    <h1 class="page-header">Contact</h1>
+    <p>
+    Contact persoon per team
+    </p>
+    <!-- Table -->
+    <div class="panel panel-default">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Team</th>
+                <th>Naam</th>
+                <th>E-mail</th>
+                <th>Telefoon</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for account in object_list %}
+            <tr class="account">
+                <td class="col-md-2">{{ account.userprofile.contact_person }}</td>
+                <td class="col-md-2">{{ account.get_full_name }}</td>
+                <td class="col-md-2">{{ account.email }}</td>
+                <td class="col-md-2">{{ account.userprofile.phone_number }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
