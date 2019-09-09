@@ -19,6 +19,10 @@ from ordering.mixins import UserOwnsObjectMixin
 from ordering.models import (Product, OrderProduct, Order, Supplier,
                              OrderRound, ProductCategory)
 
+common_required_groups = ('Uitdeelcoordinatoren', 'Boeren', 'Admin')
+
+class OrderAdminUserOrders(GroupRequiredMixin, ListView):
+    group_required = common_required_groups
 
 class ProductsView(LoginRequiredMixin, ListView):
     template_name = 'ordering/product_list.html'
