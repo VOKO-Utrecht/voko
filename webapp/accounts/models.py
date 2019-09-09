@@ -44,8 +44,8 @@ class UserProfile(TimeStampedModel):
     has_drivers_license = models.BooleanField(default=False)
     contact_person = models.OneToOneField(
         "auth.Group",
-        verbose_name="Contact persoon voor",
-        help_text="Zet contact gegevens op contact pagina van leden site",
+        verbose_name="Contactpersoon voor",
+        help_text="Zet contactgegevens op contactpagina van leden site",
         blank=True,
         null=True
     )
