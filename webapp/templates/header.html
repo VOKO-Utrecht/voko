@@ -15,7 +15,7 @@
     </li>
 {% endif %}
 
-{% if 'Transport' in user.flat_groups or 'Uitdeelcoordinatoren' in user.flat_groups or 'Boeren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+{% if 'Uitdeelcoordinatoren' in user.flat_groups or 'Boeren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
     <li><a href="{% url 'orderadmin_main' %}">Besteloverzichten</a></li>
 {% endif %}
 
