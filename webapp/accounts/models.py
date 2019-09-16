@@ -42,6 +42,13 @@ class UserProfile(TimeStampedModel):
     phone_number = models.CharField(max_length=25, blank=True)
     notes = models.TextField()
     has_drivers_license = models.BooleanField(default=False)
+    contact_person = models.OneToOneField(
+        "auth.Group",
+        verbose_name="Contactpersoon voor",
+        help_text="Zet contactgegevens op contactpagina van leden site",
+        blank=True,
+        null=True
+    )
 
     def __str__(self):
         return "Profile for user: %s" % self.user
