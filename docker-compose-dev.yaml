@@ -1,0 +1,32 @@
+version: '3.4'
+services:
+  voko:
+    depends_on:
+      - postgresql
+    stdin_open: true
+    tty: true
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DJANGO_SETTINGS_MODULE=vokou.settings.development
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+     - "8000:8000"
+    volumes:
+      - ./webapp:/app
+      - ./entrypoint.sh:/app/entrypoint.sh
+      - ./wait-for:/app/wait-for
+      - ./static:/static
+    command: devserver
+  postgresql:
+    image: postgres:9.5
+    ports:
+    - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=voko
+      - POSTGRES_USER=voko
+      - POSTGRES_DB=voko
+    volumes:
+      - ./postgres-data:/var/lib/postgresql
+

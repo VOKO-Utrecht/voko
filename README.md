@@ -9,23 +9,12 @@ Django based custom web application for food collective www.vokoutrecht.nl.
 
 ## Dev environment
 
-1. Run: `apt install virtualenvwrapper`
-2. restart shell
-3. Run: `git clone https://github.com/rikva/voko.git`
-4. Run: `cd voko`
-5. Run: `mkvirtualenv vokou --python=[path to pyton3 binary] -r ./requirements/development.txt`
+1. Install Docker Compose.
+1. Run `docker-compose -f docker-compose-dev.yaml up`
+1. After initialization, in second shell run `docker-compose -f docker-compose-dev.yaml exec voko ./manage.py createsuperuser` to create a user.
 
 ### Run tests
-    cd webapp
-    ./runtests.sh
-
-### Set up sqlite database
-    ./manage.py migrate --settings=vokou.settings.development
-    ./manage.py createsuperuser --settings=vokou.settings.development
-
-### Run development server
-    cd webapp
-    ./manage.py runserver --settings=vokou.settings.development
+    docker-compose -f docker-compose-dev.yaml run voko test
 
 ### Adding user
 1. Register as new user at: http://localhost:8000/accounts/register/

@@ -1,6 +1,7 @@
 import unicodecsv
 from django.contrib import admin
 from django.db import OperationalError
+from django.db.utils import ProgrammingError
 import sys
 
 from django.http import HttpResponse
@@ -117,7 +118,7 @@ try:
     remove_category.short_description = "Remove category from product"
     prod_cat_actions.append(remove_category)
 
-except OperationalError:
+except (OperationalError, ProgrammingError):
     pass  # This is to prevent failure during an initial migration run
 
 
