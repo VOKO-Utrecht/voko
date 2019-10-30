@@ -178,6 +178,7 @@ class ChangeProfileForm(forms.ModelForm):
     contact_person = forms.ModelChoiceField(
         queryset=Group.objects.all(),
         label="Contactpersoon voor",
+        required=False,
         help_text=("Dit zet je contactgegevens op contactpagina van leden"
                    "site.")
     )
