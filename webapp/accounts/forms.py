@@ -195,17 +195,44 @@ class ChangeProfileForm(forms.ModelForm):
         required=False
     )
 
+    shares_car = forms.BooleanField(
+        label=("Ik heb een redelijk grote auto die leden kunnen lenen voor "
+               "transport"),
+        required=False,
+        help_text=("Dit zet je contactgegevens op transport pagina's van de "
+                   "ledensite")
+    )
+    car_neighborhood = forms.CharField(
+        label="Buurt waar de auto staat",
+        widget=forms.TextInput,
+        required=False
+    )
+    car_type = forms.CharField(
+        label="Type auto",
+        widget=forms.TextInput,
+        required=False
+    )
+
     # TODO: Notes and e-mail address cannot be changed atm.
 
-    def __init__(self, *args, **kwargs):
-        super(ChangeProfileForm, self).__init__(*args, **kwargs)
+    def __init__(self, data=None, *args, **kwargs):
+        super(ChangeProfileForm, self).__init__(data=data, *args, **kwargs)
         # This is hacky. Should use Inline Formset.
         self.fields['phone_number'].initial = (
             self.instance.userprofile.phone_number)
         self.fields['has_drivers_license'].initial = (
             self.instance.userprofile.has_drivers_license)
-        self.fields['contact_person'].initial = (
-            self.instance.userprofile.contact_person)
+        self.fields['shares_car'].initial = (
+            self.instance.userprofile.shares_car)
+        self.fields['car_neighborhood'].initial = (
+            self.instance.userprofile.car_neighborhood)
+        self.fields['car_type'].initial = (
+            self.instance.userprofile.car_type)
+
+        # If shares car, set more fields as required
+        if data and data.get('shares_car', None) is not None:
+            self.fields['car_neighborhood'].required = True
+            self.fields['car_type'].required = True
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -234,6 +261,10 @@ class ChangeProfileForm(forms.ModelForm):
             userprofile.has_drivers_license = (
                 self.cleaned_data['has_drivers_license'])
             userprofile.contact_person = self.cleaned_data['contact_person']
+            userprofile.shares_car = self.cleaned_data['shares_car']
+            userprofile.car_neighborhood = (
+                self.cleaned_data['car_neighborhood'])
+            userprofile.car_type = self.cleaned_data['car_type']
 
             if commit:
                 user.save()

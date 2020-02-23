@@ -4,6 +4,7 @@ from transport import models
 from django.db.models import Q
 import datetime
 from transport.mixins import UserIsInvolvedMixin
+from accounts.models import VokoUser
 
 
 class Schedule(LoginRequiredMixin, ListView):
@@ -30,3 +31,11 @@ class Schedule(LoginRequiredMixin, ListView):
 class Ride(LoginRequiredMixin, UserIsInvolvedMixin, DetailView):
     template_name = "transport/ride.html"
     model = models.Ride
+
+
+class Cars(LoginRequiredMixin, ListView):
+    queryset = VokoUser.objects.filter(
+        is_active=True,
+        userprofile__shares_car__exact=True
+    )
+    template_name = "transport/cars.html"

@@ -49,6 +49,15 @@ class UserProfile(TimeStampedModel):
         blank=True,
         null=True
     )
+    shares_car = models.BooleanField(
+        default=False,
+        verbose_name=("Ik heb een redelijk grote auto die leden kunnen lenen "
+                      "voor transport"),
+        help_text=("Dit zet je contactgegevens op transport pagina's van de "
+                   "ledensite")
+    )
+    car_neighborhood = models.CharField(max_length=100, blank=True)
+    car_type = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
         return "Profile for user: %s" % self.user

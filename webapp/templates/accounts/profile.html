@@ -17,6 +17,18 @@
 </div>
 {% endblock %}
 
+{% block javascript %}
+    <script>
+        function updateForm(duration) {
+            var sharesCar = $("#id_shares_car").prop("checked");
+            var fields = $("#id_car_neighborhood, #id_car_type").parent();
+            if (sharesCar) fields.show(duration);
+            else fields.hide(duration);
+        }
+        updateForm(0);
+        $("#id_shares_car").change(updateForm);
+    </script>
+{% endblock %}
 
 
 
