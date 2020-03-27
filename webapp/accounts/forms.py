@@ -222,6 +222,8 @@ class ChangeProfileForm(forms.ModelForm):
             self.instance.userprofile.phone_number)
         self.fields['has_drivers_license'].initial = (
             self.instance.userprofile.has_drivers_license)
+        self.fields['contact_person'].initial = (
+            self.instance.userprofile.contact_person)
         self.fields['shares_car'].initial = (
             self.instance.userprofile.shares_car)
         self.fields['car_neighborhood'].initial = (
