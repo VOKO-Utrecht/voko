@@ -68,7 +68,7 @@ class OrderAdminUserOrdersPerProduct(GroupRequiredMixin, ListView):
 
 
 class OrderAdminUserOrders(GroupRequiredMixin, ListView):
-    group_required = ('Uitdeelcoordinatoren', 'Admin', 'Boeren')
+    group_required = ('Uitdeelcoordinatoren', 'Admin', 'Boeren', 'Uitdeel')
     template_name = "ordering/admin/user_orders_per_round.html"
 
     def get_queryset(self):
@@ -84,7 +84,7 @@ class OrderAdminUserOrders(GroupRequiredMixin, ListView):
 
 # Bestellingen per product
 class OrderAdminUserOrderProductsPerOrderRound(GroupRequiredMixin, ListView):
-    group_required = ('Uitdeelcoordinatoren', 'Admin', 'Boeren')
+    group_required = ('Uitdeelcoordinatoren', 'Admin', 'Boeren', 'Uitdeel')
     template_name = "ordering/admin/productsorders.html"
 
     def get_queryset(self):
