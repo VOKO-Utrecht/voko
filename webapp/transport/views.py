@@ -13,7 +13,7 @@ class Schedule(LoginRequiredMixin, ListView):
     def get_queryset(self):
         user = self.request.user
 
-        if (user.groups.filter(name='Transportcoordinatoren').exists()):
+        if (user.groups.filter(name__in=['Transportcoordinatoren','Admin']).exists()):
             rides = models.Ride.objects.all()
         else:
             rides = models.Ride.objects.filter(
@@ -23,9 +23,14 @@ class Schedule(LoginRequiredMixin, ListView):
                 Q(order_round__distribution_coordinator=user)
             )
 
-        return rides.filter(
-            order_round__collect_datetime__gte=datetime.date.today()
-        ).order_by("order_round__collect_datetime", "route")
+        rides = rides.order_by("order_round__collect_datetime", "route")
+
+        if (user.groups.filter(name='Admin').exists()):
+            return rides
+        else:
+            return rides.filter(
+                order_round__collect_datetime__gte=datetime.date.today()
+            )
 
 
 class Ride(LoginRequiredMixin, UserIsInvolvedMixin, DetailView):
