@@ -11,7 +11,7 @@ class UserIsInvolvedMixin(AccessMixin):
             request.user != ride.distribution_coordinator and
             request.user != ride.transport_coordinator and
             not request.user.groups.filter(
-                name__in=['Transportcoordinatoren','Admin']
+                name__in=['Transportcoordinatoren', 'Admin']
             ).exists()
         ):
             raise PermissionDenied

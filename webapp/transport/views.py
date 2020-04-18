@@ -13,7 +13,9 @@ class Schedule(LoginRequiredMixin, ListView):
     def get_queryset(self):
         user = self.request.user
 
-        if (user.groups.filter(name__in=['Transportcoordinatoren','Admin']).exists()):
+        if (user.groups.filter(
+            name__in=['Transportcoordinatoren', 'Admin']
+        ).exists()):
             rides = models.Ride.objects.all()
         else:
             rides = models.Ride.objects.filter(
