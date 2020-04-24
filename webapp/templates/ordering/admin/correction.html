@@ -114,7 +114,9 @@
 
     <hr>
     <h2>Correcties in deze bestelronde</h2>
-    <table class="table table-condensed">
+    {% for s, corrections in view.corrections.items %}
+    <h3>{{s}}</h3>
+    <table class="table">
         <thead>
             <tr>
                 <th>Lid</th>
@@ -128,11 +130,12 @@
             </tr>
         </thead>
         <tbody>
-        {% for c in view.corrections %}
+            
+        {% for c in corrections %}
             <tr>
                 <td>{{c.order_product.order.user.get_full_name}}</td>
                 <td>{{c.order_product.order.id}}</td>
-                <td>{{c.order_product.product.name}} ({{c.order_product.product.supplier.name}})</td>
+                <td>{{c.order_product.product.name}}</td>
                 <td>{{c.order_product.amount}}</td>
                 <td>{{c.supplied_percentage}}%</td>
                 <td>&euro; {{c.credit.amount}}</td>
@@ -142,7 +145,7 @@
         {% endfor %}
         </tbody>
     </table>
-
+    {% endfor %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script lang="javascript">
 

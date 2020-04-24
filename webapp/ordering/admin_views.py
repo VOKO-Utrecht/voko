@@ -198,9 +198,17 @@ class OrderAdminCorrection(GroupRequiredMixin, TemplateView):
 
     def corrections(self):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
-        return OrderProductCorrection.objects.filter(
+        corrections = OrderProductCorrection.objects.filter(
             order_product__order__order_round=order_round).order_by(
-            "order_product__order__user")
+            "order_product__product__supplier","order_product__order__user")
+        correction_per_supplier = {}
+        for correction in corrections:
+            supplier = correction.order_product.product.supplier.name 
+            if supplier in correction_per_supplier:
+                correction_per_supplier[supplier].append(correction)
+            else:
+                correction_per_supplier[supplier] = [correction]
+        return correction_per_supplier
 
     def products(self):
         # TODO also return stock products
