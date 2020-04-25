@@ -37,7 +37,7 @@ class OrderAdminMain(GroupRequiredMixin, ListView):
 class OrderAdminOrderLists(GroupRequiredMixin, DetailView):
     model = OrderRound
     template_name = "ordering/admin/orderround.html"
-    group_required = ('Uitdeelcoordinatoren', 'Admin')
+    group_required = ('Uitdeelcoordinatoren', 'Admin', 'Uitdeel')
 
 
 class OrderAdminSupplierOrderCSV(GroupRequiredMixin, ListView):

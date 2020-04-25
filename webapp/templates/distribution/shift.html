@@ -32,7 +32,7 @@ TODO {% block title %}{{ object.date|date:"j F Y" }} {{ object.start_str }} - {{
         <td><a href="{% url 'orderadmin_orders_per_product' object.order_round.pk %}">Bestelronde #{{ object.order_round.pk }}</a></td>
       </tr>
       <tr>
-        <td><strong>Bestellijst</strong></td>
+        <td><strong>Bestellijst per boer</strong></td>
         <td><a href="{% url 'orderadmin_orderlists' object.order_round.pk %}">Bestelronde #{{ object.order_round.pk }}</a></td>
       </tr>
     </tbody>
