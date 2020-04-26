@@ -200,7 +200,7 @@ class OrderAdminCorrection(GroupRequiredMixin, TemplateView):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
         corrections = OrderProductCorrection.objects.filter(
             order_product__order__order_round=order_round).order_by(
-            "order_product__product__supplier" ,"order_product__order__user")
+            "order_product__product__supplier", "order_product__order__user")
         correction_per_supplier = {}
         for correction in corrections:
             supplier = correction.order_product.product.supplier.name
