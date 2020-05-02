@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
-from decimal import Decimal
+from decimal import Decimal, ROUND_DOWN
 
 import openpyxl
 import re
@@ -24,8 +24,6 @@ from .forms import UploadProductListForm
 from .models import OrderProduct, Order, OrderRound, Supplier, \
     OrderProductCorrection, Product, DraftProduct, \
     ProductCategory, ProductStock, ProductUnit
-from _pydecimal import ROUND_DOWN
-
 
 class OrderAdminMain(GroupRequiredMixin, ListView):
     template_name = "ordering/admin/orderrounds.html"
@@ -223,12 +221,13 @@ class OrderAdminCorrection(GroupRequiredMixin, TemplateView):
         now we have all corrections per supplier per product,
         we can calculate totals
         """
-        for s, op in corr_sppl.items():
-            for p, prds in op.items():
-                prds['amount'] = self.calc_amount(prds['corrections'])
-                prds['perc_supplied'] = self.calc_supplied(prds['corrections'])
+        for s, prd in corr_sppl.items():
+            for p, tpp in prd.items():
+                # calculate totals per product
+                tpp['amount'] = self.calc_amount(tpp['corrections'])
+                tpp['perc_supplied'] = self.calc_supplied(tpp['corrections'])
                 # and convert defaultdict to normal dict for use in template
-                corr_sppl[s][p] = dict(prds)
+                corr_sppl[s][p] = dict(tpp)
 
         # convert defaultdict to dict for use in template
         for s, op in corr_sppl.items():
