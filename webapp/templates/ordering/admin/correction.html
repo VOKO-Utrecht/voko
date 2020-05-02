@@ -114,38 +114,57 @@
 
     <hr>
     <h2>Correcties in deze bestelronde</h2>
-    {% for s, corrections in view.corrections.items %}
-    <h3>{{s}}</h3>
+    <div class="panel panel-default table-container">
+    {% for supplier,products in view.corrections.items %}
+    
     <table class="table">
         <thead>
-            <tr>
-                <th>Lid</th>
-                <th>Bestelling</th>
-                <th>Product</th>
-                <th>Besteld</th>
-                <th>Geleverd</th>
-                <th>Compensatie</th>
-                <th>Leverancier belasten?</th>
-                <th>Notitie</th>
+            <tr class="bg-primary">
+                <th style="width: 20%" colspan="3"><h4>{{supplier.name}}</h4></th>
+            </tr>
+            <tr class="bg-primary">
+                <th style="width: 50%">Product</th>
+                <th style="width: 15%">Besteld</th>
+                <th style="width: 15%">Geleverd</th>
             </tr>
         </thead>
         <tbody>
-            
-        {% for c in corrections %}
-            <tr>
-                <td>{{c.order_product.order.user.get_full_name}}</td>
-                <td>{{c.order_product.order.id}}</td>
-                <td>{{c.order_product.product.name}}</td>
-                <td>{{c.order_product.amount}}</td>
-                <td>{{c.supplied_percentage}}%</td>
-                <td>&euro; {{c.credit.amount}}</td>
-                <td>{% if c.charge_supplier %}Ja{% else %}Nee{% endif %}</td>
-                <td>{{c.notes}}</td>
+            {% for product, producttotal in products.items %}
+            <tr class="bg-info">
+                <td>{{product.name}}</td>
+                <td>{{producttotal.amount}}</td>
+                <td>{{producttotal.perc_supplied}}%</td>
             </tr>
-        {% endfor %}
+            <tr>
+                <td colspan="3"><table class="table table-condensed">
+                <thead>
+                    <tr>
+                        <th>Lid</th>
+                        <th style="width: 15%">Bestelling</th>
+                        <th style="width: 15%">Besteld</th>
+                        <th style="width: 15%">Geleverd</th>
+                        <th style="width: 15%">Compensatie</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in producttotal.corrections %}
+                    <tr>
+                        <td>{{c.order_product.order.user.get_full_name}}</td>
+                        <td>{{c.order_product.order.id}}</td>
+                        <td>{{c.order_product.amount}}</td>
+                        <td>{{c.supplied_percentage}}%</td>
+                        <td>&euro; {{c.credit.amount}}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                </table>
+                </td>
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
     {% endfor %}
+    </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script lang="javascript">
 
