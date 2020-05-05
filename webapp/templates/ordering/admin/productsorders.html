@@ -42,7 +42,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for op in orderproducts|dictsort:"order.user.first_name" %}
+                                    {% for op in orderproducts|dictsort:"order.user.first_name.lower" %}
                                         <tr>
                                             <td>{{ op.amount }}</td>
                                             <td>{{ op.product.unit_of_measurement }}</td>
