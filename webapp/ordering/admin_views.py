@@ -25,6 +25,7 @@ from .models import OrderProduct, Order, OrderRound, Supplier, \
     OrderProductCorrection, Product, DraftProduct, \
     ProductCategory, ProductStock, ProductUnit
 
+
 class OrderAdminMain(GroupRequiredMixin, ListView):
     template_name = "ordering/admin/orderrounds.html"
     group_required = ('Uitdeelcoordinatoren', 'Admin')
@@ -195,7 +196,7 @@ class OrderAdminCorrection(GroupRequiredMixin, TemplateView):
         return redirect(
             reverse('orderadmin_correction', args=args, kwargs=kwargs))
 
-    def corrections(self):
+    def supplier_corrections(self):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
         """
         corrections[supplier][product]=
@@ -206,9 +207,10 @@ class OrderAdminCorrection(GroupRequiredMixin, TemplateView):
         """
         corr_sppl = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
 
-        # get all corrections for this order round
+        # get all corrections for suppliers in this order round
         corrections = OrderProductCorrection.objects.filter(
-            order_product__order__order_round=order_round).order_by(
+            order_product__order__order_round=order_round).filter(
+            charge_supplier=True).order_by(
             "order_product__product__supplier", "order_product__order__user")
 
         # build corrections per supplier per product
@@ -234,6 +236,14 @@ class OrderAdminCorrection(GroupRequiredMixin, TemplateView):
             corr_sppl[s] = dict(op)
 
         return dict(corr_sppl)
+
+    def voko_corrections(self):
+        order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
+        # get all corrections for VOKO in this order round
+        return OrderProductCorrection.objects.filter(
+            order_product__order__order_round=order_round).filter(
+                charge_supplier=False).order_by(
+                "order_product__order__user")
 
     def calc_amount(self, product_corrections):
         """
