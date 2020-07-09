@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
-from decimal import Decimal
+from decimal import Decimal, ROUND_DOWN
 
 import openpyxl
 import re
@@ -196,19 +196,77 @@ class OrderAdminCorrection(GroupRequiredMixin, TemplateView):
         return redirect(
             reverse('orderadmin_correction', args=args, kwargs=kwargs))
 
-    def corrections(self):
+    def supplier_corrections(self):
         order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
+        """
+        corrections[supplier][product]=
+                  {  'corrections'    : corrections[],
+                     'amount'         : int,
+                     'total_supplied' : precentage
+                  }
+        """
+        corr_sppl = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+
+        # get all corrections for suppliers in this order round
         corrections = OrderProductCorrection.objects.filter(
-            order_product__order__order_round=order_round).order_by(
-            "order_product__product__supplier","order_product__order__user")
-        correction_per_supplier = {}
+            order_product__order__order_round=order_round).filter(
+            charge_supplier=True).order_by(
+            "order_product__product__supplier", "order_product__order__user")
+
+        # build corrections per supplier per product
         for correction in corrections:
-            supplier = correction.order_product.product.supplier.name 
-            if supplier in correction_per_supplier:
-                correction_per_supplier[supplier].append(correction)
-            else:
-                correction_per_supplier[supplier] = [correction]
-        return correction_per_supplier
+            product = correction.order_product.product
+            supplier = product.supplier
+            corr_sppl[supplier][product]['corrections'].append(correction)
+
+        """
+        now we have all corrections per supplier per product,
+        we can calculate totals
+        """
+        for s, prd in corr_sppl.items():
+            for p, tpp in prd.items():
+                # calculate totals per product
+                tpp['amount'] = self.calc_amount(tpp['corrections'])
+                tpp['perc_supplied'] = self.calc_supplied(tpp['corrections'])
+                # and convert defaultdict to normal dict for use in template
+                corr_sppl[s][p] = dict(tpp)
+
+        # convert defaultdict to dict for use in template
+        for s, op in corr_sppl.items():
+            corr_sppl[s] = dict(op)
+
+        return dict(corr_sppl)
+
+    def voko_corrections(self):
+        order_round = OrderRound.objects.get(pk=self.kwargs.get('pk'))
+        # get all corrections for VOKO in this order round
+        return OrderProductCorrection.objects.filter(
+            order_product__order__order_round=order_round).filter(
+                charge_supplier=False).order_by(
+                "order_product__order__user")
+
+    def calc_amount(self, product_corrections):
+        """
+        helper function to calculate total amount ordered
+        """
+        total_ordered = 0
+        for correction in product_corrections:
+            total_ordered += correction.order_product.amount
+        return total_ordered
+
+    def calc_supplied(self, supplier_corrections):
+        """
+        helper function to calculate total percentage suppplied
+        """
+        total_suppl = 0
+        total_ordered = 0
+        for corr in supplier_corrections:
+            total_ordered += corr.order_product.amount
+            total_suppl += corr.order_product.amount * corr.supplied_percentage
+
+        corr_perc = Decimal(total_suppl/total_ordered).quantize(
+            Decimal('.01'), rounding=ROUND_DOWN)
+        return corr_perc
 
     def products(self):
         # TODO also return stock products
