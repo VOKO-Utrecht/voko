@@ -15,19 +15,21 @@
 
     {% for order in object_list %}
     <div class="panel panel-default">
-        <div class="panel-heading">
-            <h1>{{ forloop.counter }}/{{ object_list|length }}: {{ order.user.get_full_name }}</h1>
-        </div>
-
-        <div class="panel-body">
-            Bestelling-ID: {{ order.pk }}
-            | ronde {{ order.order_round.id }}
-            | e-mail: {{ order.user.email }}
-            | telefoon: {{ order.user.userprofile.phone_number|default:"onbekend" }}
-        </div>
-
         <table class="table table-condensed">
             <thead>
+                <tr>
+                    <th colspan="6">
+                        <div class="panel-heading">
+                            <h1>{{ forloop.counter }}/{{ object_list|length }}: {{ order.user.get_full_name }}</h1>
+                        </div>
+                        <div class="panel-body">
+                            Bestelling-ID: {{ order.pk }}
+                            | ronde {{ order.order_round.id }}
+                            | e-mail: {{ order.user.email }}
+                            | telefoon: {{ order.user.userprofile.phone_number|default:"onbekend" }}
+                        </div>
+                    </th>
+                </tr>
                 <tr>
                     <th>Aantal</th>
                     <th>Eenheid</th>
