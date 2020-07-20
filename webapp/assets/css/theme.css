@@ -68,3 +68,9 @@ body {
 .product .order .row {
   margin-bottom: 15px;
 }
+
+@media print {
+  a[href]::after {
+    content: none !important;
+  }
+}
