@@ -7,10 +7,15 @@
 {% endif %}
 
 {% for supplier, items in object.orders_per_supplier.items %}
-<h2><a href="{% url 'orderadmin_supplier_order_csv' object.pk supplier.pk %}">{{ supplier }}</a></h2>
+
 <div class="panel panel-default">
   <table class="table">
     <thead>
+      <tr>
+        <th colspan="6">
+        <h2><a href="{% url 'orderadmin_supplier_order_csv' object.pk supplier.pk %}">{{ supplier }}</a></h2>
+      </th>
+      </tr>
       <tr>
         <th>Aantal</th>
         <th>Eenheid</th>
