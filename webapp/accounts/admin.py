@@ -11,7 +11,7 @@ from mailing.helpers import get_template_by_id, render_mail_template, mail_user
 from ordering.core import get_current_order_round
 from ordering.models import Order
 from django.utils.safestring import mark_safe
-from hijack.admin import HijackUserAdminMixin
+from hijack_admin.admin import HijackUserAdminMixin
 from django.apps import apps
 from constance import config
 

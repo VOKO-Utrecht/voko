@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'constance',
 
     'hijack',
+    'hijack_admin',
     'compat',  # Requirement of hijack
 ]
 
@@ -129,7 +130,9 @@ TINYMCE_DEFAULT_CONFIG = {
     "height": "500px",
 }
 
+HIJACK_ALLOW_GET_REQUESTS = True
 HIJACK_DISPLAY_ADMIN_BUTTON = False  # Because of custom user model
+HIJACK_REGISTER_ADMIN = False  # Because of custom user model
 
 RECAPTCHA_PUBLIC_KEY = os.getenv("RECAPTCHA_SITE_KEY")
 RECAPTCHA_PRIVATE_KEY = os.getenv("RECAPTCHA_SECRET_KEY")
