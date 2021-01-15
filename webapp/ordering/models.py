@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from jsonfield import JSONField
 
-import log
 import pytz
 from datetime import datetime
 from decimal import Decimal, ROUND_UP, ROUND_DOWN
