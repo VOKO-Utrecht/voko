@@ -11,7 +11,7 @@ mollie-api-python==1.4.2
 django-hijack==2.1.10
 django-hijack-admin==2.1.10
 jsonfield==1.0.3
-openpyxl==2.1.4
+openpyxl==3.0.6
 simplejson==3.8.1
 unicodecsv==0.14.1
 django-nose==1.4.4
