@@ -6,6 +6,7 @@ from datetime import datetime
 from decimal import Decimal, ROUND_UP, ROUND_DOWN
 from django.db import models, transaction
 from django_extensions.db.models import TimeStampedModel
+from django.core.exceptions import ValidationError
 from accounts.models import Address, VokoUser
 from finance.models import Balance
 from log import log_event
@@ -105,6 +106,11 @@ class OrderRound(TimeStampedModel):
         blank=True,
         related_name="coordinating_transport_orderrounds"
     )
+
+    def clean(self):
+        if self.is_over:
+            raise ValidationError(
+                "Orderrounds which are in the past cannot be saved or changed")
 
     def is_not_open_yet(self):
         current_datetime = datetime.now(pytz.utc)
