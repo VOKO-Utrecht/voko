@@ -2,7 +2,7 @@ Django==1.11.29
 django-extensions==2.1.4
 Unipath==1.1
 django-bootstrap3==11.0.0
-django-braces==1.10.0
+django-braces==1.14.0
 pytz==2021.1
 django-cron==0.5.1
 html2text==2014.9.25
