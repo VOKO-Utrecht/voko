@@ -14,7 +14,17 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.mail import mail_admins
 from mailing.helpers import get_template_by_id, render_mail_template, mail_user
 from constance import config
+from django.contrib.auth.models import Group
 
+
+# add email adress to Group #
+if not hasattr(Group, 'email_address'):
+    field = models.EmailField(max_length=70, blank=True, default="")
+    field.contribute_to_class(Group, 'email_address')
+
+class Group(Group):
+    class Meta:
+        proxy = True
 
 class Address(TimeStampedModel):
     class Meta:
