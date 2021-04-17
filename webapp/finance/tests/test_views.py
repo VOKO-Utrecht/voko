@@ -20,6 +20,7 @@ class FinanceTestCase(VokoTestCase):
         self.mollie_client.return_value.issuers.all.return_value = \
             MagicMock()
         self.mollie.API.Object.Method.IDEAL = 'ideal'
+        self.mollie.API.Object.Method.MISTERCASH = 'mistercash'
 
         issuers = {"data": [
             {'id': 'EXAMPLE_BANK', 'name': "Example Bank", 'method': 'ideal'},
@@ -119,7 +120,7 @@ class TestCreateTransaction(FinanceTestCase):
                                   finalized=True,
                                   paid=False)
 
-    def test_that_transaction_is_created(self):
+    def test_that_ideal_transaction_is_created(self):
         self.client.post(self.url, {'bank': 'EXAMPLE_BANK', 'method': "ideal"})
         self.mollie_client.return_value.payments.create.assert_called_once_with(  # noqa
             {'description': 'VOKO Utrecht %d' % self.order.id,
@@ -133,11 +134,39 @@ class TestCreateTransaction(FinanceTestCase):
              'issuer': 'EXAMPLE_BANK'}
         )
 
-    def test_that_payment_object_is_created(self):
+    def test_that_bancontact_transaction_is_created(self):
+        # In Mollie lib < 2 'bancontact' is called 'mistercash'
+        self.client.post(self.url, {'method': "bancontact"})
+        self.mollie_client.return_value.payments.create.assert_called_once_with(  # noqa
+            {'description': 'VOKO Utrecht %d' % self.order.id,
+             'webhookUrl': settings.BASE_URL + reverse('finance.callback'),
+             'amount': float(self.order.total_price_to_pay_with_balances_taken_into_account()),  # noqa
+             'redirectUrl': (settings.BASE_URL +
+                             '/finance/pay/transaction/confirm/?order=%d'
+                             % self.order.id),
+             'metadata': {'order_id': self.order.id},
+             'method': 'mistercash'}
+        )
+
+    def test_that_payment_object_is_created_when_ideal(self):
         assert Payment.objects.count() == 0
 
         self.client.post(self.url, {'bank': "EXAMPLE_BANK",
                                     'method': "ideal"})
+        payment = Payment.objects.get()
+
+        self.assertEqual(
+            payment.amount,
+            self.order.total_price_to_pay_with_balances_taken_into_account()
+        )
+        self.assertEqual(payment.order, self.order)
+        self.assertEqual(payment.mollie_id, "transaction_id")
+        self.assertEqual(payment.balance, None)
+
+    def test_that_payment_object_is_created_when_bancontact(self):
+        assert Payment.objects.count() == 0
+
+        self.client.post(self.url, {'method': "bancontact"})
         payment = Payment.objects.get()
 
         self.assertEqual(
