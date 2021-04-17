@@ -222,7 +222,8 @@ class CreateTransactionView(LoginRequiredMixin, MollieMixin, FormView):
                                                     % order_to_pay.id,
                                         issuer_id=bank,
                                         order_id=order_to_pay.id)
-        elif (method == 'bancontact'):
+        elif (method == 'mistercash'):
+            # Internal ID of Bancontact is 'mistercash'
             results = self.create_bancontact_payment(
                                         amount=float(amount_to_pay),
                                         description="VOKO Utrecht %d"
