@@ -16,7 +16,7 @@
 
     <div class="row">
         <div class="col-md-4">
-            <form action="{% url 'finance.createtransaction' %}" method="post">{% csrf_token %}
+            <form action="{% url 'finance.choosebank' %}" method="post">{% csrf_token %}
                 {% bootstrap_form form %}
                 {% buttons %}
                 <button type="submit" class="btn btn-primary">

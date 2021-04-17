@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% block title %}Betalen{% endblock %}
+{% block content %}
+<h1>Kies een betaalwijze</h1>
+{% if not order %}
+<div class="alert alert-warning" role="alert">Je hebt geen bestelling om te betalen.</div>
+{% else %}
+<p>
+    Bedrag huidige bestelling: &euro; {{ order.total_price }}<br />
+    Totaal openstaande debet: &euro; {{ user.balance.debit }}<br />
+    Totaal credit: &euro; {{ user.balance.credit }}
+    <br /><br />
+    <strong>Te betalen: &euro; {{ order.total_price_to_pay_with_balances_taken_into_account }}</strong>
+</p>
+
+    <div class="row">
+        <div class="col-md-4">
+            <form action="{% url 'finance.choosepaymethod' %}" method="post">{% csrf_token %}
+                <div class="container">
+                    {% bootstrap_form form %}
+                    {% buttons %}
+                    <button type="submit" class="btn btn-primary">
+                        {% bootstrap_icon "star" %} Verder naar betalen
+                    </button>
+                    {% endbuttons %}
+                    <a class="btn btn-warning" href="{%  url 'finance.cancelpayment' %}" role="button"><span
+                            class="glyphicon glyphicon-remove"></span> Annuleren</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
+{% endblock %}

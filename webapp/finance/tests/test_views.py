@@ -30,6 +30,14 @@ class FinanceTestCase(VokoTestCase):
         ]}
         self.mollie_client.return_value.issuers.all.return_value = issuers
 
+        # we only support bancontact and iDeal payment methods, not any
+        methods = {"data": [
+            {'id': 'bancontact', 'description': 'Bancontact'},
+            {'id': 'ideal', 'description': 'iDeal'}
+
+        ]}
+        self.mollie_client.return_value.methods.all.return_value = methods
+
         self.user = VokoUserFactory.create()
         self.user.set_password('secret')
         self.user.is_active = True
@@ -112,7 +120,7 @@ class TestCreateTransaction(FinanceTestCase):
                                   paid=False)
 
     def test_that_transaction_is_created(self):
-        self.client.post(self.url, {'bank': 'EXAMPLE_BANK'})
+        self.client.post(self.url, {'bank': 'EXAMPLE_BANK', 'method': "ideal"})
         self.mollie_client.return_value.payments.create.assert_called_once_with(  # noqa
             {'description': 'VOKO Utrecht %d' % self.order.id,
              'webhookUrl': settings.BASE_URL + reverse('finance.callback'),
@@ -128,7 +136,8 @@ class TestCreateTransaction(FinanceTestCase):
     def test_that_payment_object_is_created(self):
         assert Payment.objects.count() == 0
 
-        self.client.post(self.url, {'bank': "EXAMPLE_BANK"})
+        self.client.post(self.url, {'bank': "EXAMPLE_BANK",
+                                    'method': "ideal"})
         payment = Payment.objects.get()
 
         self.assertEqual(
@@ -140,7 +149,8 @@ class TestCreateTransaction(FinanceTestCase):
         self.assertEqual(payment.balance, None)
 
     def test_that_user_is_redirected_to_bank_url(self):
-        ret = self.client.post(self.url, {'bank': "EXAMPLE_BANK"})
+        ret = self.client.post(self.url, {'bank': "EXAMPLE_BANK",
+                                          'method': "ideal"})
         self.assertEqual(ret.status_code, 302)
         self.assertEqual(ret.url, "http://bank.url")
 
@@ -149,12 +159,13 @@ class TestCreateTransaction(FinanceTestCase):
         self.order.finalized = False
         self.order.save()
 
-        ret = self.client.post(self.url, {'bank': "EXAMPLE_BANK"})
+        ret = self.client.post(self.url, {'bank': "EXAMPLE_BANK",
+                                          'method': "ideal"})
         self.assertRedirects(ret, reverse('view_products'))
 
     def test_redirect_on_invalid_form(self):
         ret = self.client.post(self.url, {'bank': 'foo'})
-        self.assertRedirects(ret, reverse('finance.choosebank'))
+        self.assertRedirects(ret, reverse('finance.choosepaymethod'))
 
     def test_redirect_when_order_round_is_closed(self):
         # No order matches, so not found
@@ -164,7 +175,8 @@ class TestCreateTransaction(FinanceTestCase):
         self.order.order_round = order_round
         self.order.save()
 
-        ret = self.client.post(self.url, {'bank': "EXAMPLE_BANK"})
+        ret = self.client.post(self.url, {'bank': "EXAMPLE_BANK",
+                                          'method': "ideal"})
         self.assertRedirects(ret, reverse('view_products'))
 
 
