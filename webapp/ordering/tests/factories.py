@@ -96,7 +96,7 @@ class OrderProductCorrectionFactory(DjangoModelFactory):
 
 class UnitFactory(DjangoModelFactory):
     class Meta:
-            model = "ordering.ProductUnit"
+        model = "ordering.ProductUnit"
 
     name = FuzzyText()
     description = FuzzyText()
@@ -104,6 +104,6 @@ class UnitFactory(DjangoModelFactory):
 
 class ProductCategoryFactory(DjangoModelFactory):
     class Meta:
-            model = "ordering.ProductCategory"
+        model = "ordering.ProductCategory"
 
     name = FuzzyText()
