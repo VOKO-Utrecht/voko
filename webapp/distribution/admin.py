@@ -3,6 +3,7 @@ from distribution.models import Shift
 from django.utils.translation import ugettext_lazy as _
 import datetime
 
+
 # Creates filter for every shift since two months ago
 class RecentListFilter(admin.SimpleListFilter):
     title = _('Datum')
@@ -25,18 +26,21 @@ class RecentListFilter(admin.SimpleListFilter):
             }
 
     def queryset(self, request, queryset):
-        if self.value() == None:
+        if self.value() is None:
             return queryset.filter(
                 order_round__collect_datetime__gte=get_recent_date())
         elif self.value() == 'All':
             return queryset.filter()
 
+
 # get a date two months in the past
 def get_recent_date():
     return datetime.datetime.now() - datetime.timedelta(days=60)
 
+
 def format_order_round(obj):
     return "%s %s" % (obj, obj.collect_datetime.strftime("%Y-%m-%d"))
+
 
 class ShiftAdmin(admin.ModelAdmin):
     list_display = ["date_long_str", "start_str", "end_str", "members_names"]
@@ -49,5 +53,6 @@ class ShiftAdmin(admin.ModelAdmin):
         order_round_field = form.base_fields['order_round']
         order_round_field.label_from_instance = format_order_round
         return form
+
 
 admin.site.register(Shift, ShiftAdmin)
