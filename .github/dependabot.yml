@@ -1,0 +1,27 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: django-hijack
+    versions:
+    - 2.2.1
+  - dependency-name: django-tinymce
+    versions:
+    - 3.2.0
+  - dependency-name: django-debug-toolbar
+    versions:
+    - "3.2"
+  - dependency-name: openpyxl
+    versions:
+    - 3.0.6
+  - dependency-name: mollie-api-python
+    versions:
+    - 2.5.2
+  - dependency-name: pytz
+    versions:
+    - "2020.5"
