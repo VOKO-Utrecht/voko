@@ -192,10 +192,6 @@ class TestCreateTransaction(FinanceTestCase):
                                           'method': "ideal"})
         self.assertRedirects(ret, reverse('view_products'))
 
-    def test_redirect_on_invalid_form(self):
-        ret = self.client.post(self.url, {'bank': 'foo'})
-        self.assertRedirects(ret, reverse('finance.choosepaymethod'))
-
     def test_redirect_when_order_round_is_closed(self):
         # No order matches, so not found
         month_ago = datetime.now(tz=UTC) - timedelta(days=30)

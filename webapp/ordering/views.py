@@ -309,7 +309,7 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
             order.complete_after_payment()
             return redirect(reverse('order_summary', args=(order.pk,)))
 
-        return redirect('finance.choosepaymethod')
+        return redirect('finance.choosebank')
 
     def _message_payment_unnecessary(self):
         messages.add_message(

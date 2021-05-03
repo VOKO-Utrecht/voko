@@ -3,9 +3,6 @@ from django.views.generic import RedirectView
 from finance import views, admin_views
 
 urlpatterns = (
-    url(r'^pay/choosepaymethod/$',
-        views.ChoosePayMethodView.as_view(),
-        name="finance.choosepaymethod"),
     url(r'^pay/choosebank/$',
         views.ChooseBankView.as_view(),
         name="finance.choosebank"),
