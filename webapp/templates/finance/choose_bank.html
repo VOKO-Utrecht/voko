@@ -2,6 +2,16 @@
 {% load bootstrap3 %}
 {% block title %}Betalen{% endblock %}
 {% block content %}
+<script type="text/javascript">
+    window.onload = function() {
+        $("#id_method").change( function(){
+            if ($("#id_method input[name='method']:checked").val() == "ideal") {
+                $("#id_bank").parent().show();
+            }else
+                $("#id_bank").parent().hide();
+        });
+    }
+</script>
 <h1>Betalen via iDeal</h1>
     {% if not order %}
     <div class="alert alert-warning" role="alert">Je hebt geen bestelling om te betalen.</div>

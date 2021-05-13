@@ -33,6 +33,8 @@ INTERNAL_IPS = ['127.0.0.1']
 
 CAPTCHA_ENABLED = False
 
+# MOLLIE_API_KEY = 'test_'
+
 try:
     from .local import *
 except ImportError:
