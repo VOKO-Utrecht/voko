@@ -14,19 +14,16 @@ from ordering.core import get_current_order_round
 from ordering.models import Order
 
 
-from django.utils.safestring import mark_safe
-
 def choosebankform_factory(banks, methods):
     """
     Generate a Django Form used to choose your bank from a drop down
     Based on the up-to-date list of :banks: from our PSP
     """
     paymethods = [(method['id'], method['description'])
-            for method in methods['data']
-            ]
+                  for method in methods['data']]
     bankchoices = [(bank['id'], bank['name'])
-               for bank in banks['data']
-               if bank['method'] == Mollie.API.Object.Method.IDEAL]
+                   for bank in banks['data']
+                   if bank['method'] == Mollie.API.Object.Method.IDEAL]
 
     class ChooseBankForm(forms.Form):
         method = forms.ChoiceField(
@@ -56,38 +53,28 @@ class MollieMixin(object):
         self.methods = self.mollie.methods.all()
 
     def create_payment(self, amount, description, issuer_id, order_id, method):
-        if (method=='ideal'):
-            return self.mollie.payments.create({
-                'amount': amount,
-                'description': description,
-                'redirectUrl': (
-                        settings.BASE_URL +
-                        reverse("finance.confirmtransaction") +
-                        "?order=%s" % order_id
-                ),
-                'webhookUrl': settings.BASE_URL + reverse("finance.callback"),
-                'method': Mollie.API.Object.Method.IDEAL,
-                'issuer': issuer_id,
-                'metadata': {
-                    'order_id': order_id
-                },
-            })
+        if (method == 'ideal'):
+            mollieMethod = Mollie.API.Object.Method.IDEAL
         else:
-        # Bancontact used to be called MisterCash
-            return self.mollie.payments.create({
-                'amount': amount,
-                'description': description,
-                'redirectUrl': (
-                        settings.BASE_URL +
-                        reverse("finance.confirmtransaction") +
-                        "?order=%s" % order_id
-                ),
-                'webhookUrl': settings.BASE_URL + reverse("finance.callback"),
-                'method': Mollie.API.Object.Method.MISTERCASH,
-                'metadata': {
-                    'order_id': order_id
-                },
-            })
+            # Bancontact used to be called MisterCash
+            mollieMethod = Mollie.API.Object.Method.MISTERCASH
+
+        return self.mollie.payments.create({
+            'amount': amount,
+            'description': description,
+            'redirectUrl': (
+                    settings.BASE_URL +
+                    reverse("finance.confirmtransaction") +
+                    "?order=%s" % order_id
+            ),
+            'webhookUrl': settings.BASE_URL + reverse("finance.callback"),
+            'method': mollieMethod,
+            'issuer': issuer_id,
+            'metadata': {
+                'order_id': order_id
+            },
+        })
+
 
     def get_payment(self, payment_id):
         return self.mollie.payments.get(payment_id)
@@ -96,7 +83,6 @@ class MollieMixin(object):
 class ChooseBankView(LoginRequiredMixin, MollieMixin, FormView):
     """
     Let user choose a bank to use for iDeal payment
-    POSTs to Self.
     """
     template_name = "finance/choose_bank.html"
 
@@ -108,14 +94,6 @@ class ChooseBankView(LoginRequiredMixin, MollieMixin, FormView):
         context = super(ChooseBankView, self).get_context_data(**kwargs)
         context['order'] = get_order_to_pay(self.request.user)
         return context
-
-    def post(self, request, *args, **kwargs):
-        Form = self.get_form_class()
-        form = Form(data=request.POST)
-        form.full_clean()
-        if form.is_valid() is False:
-            return redirect(reverse('finance.choosebank'))
-        return CreateTransactionView.as_view()(request)
 
 
 class CreateTransactionView(LoginRequiredMixin, MollieMixin, FormView):
@@ -175,7 +153,6 @@ class CreateTransactionView(LoginRequiredMixin, MollieMixin, FormView):
             return redirect(reverse('finish_order', args=(order_to_pay.id,)))
 
         # Start the payment
-        # if (method == 'ideal'):
         results = self.create_payment(
                                     amount=float(amount_to_pay),
                                     description="VOKO Utrecht %d"
@@ -183,16 +160,6 @@ class CreateTransactionView(LoginRequiredMixin, MollieMixin, FormView):
                                     issuer_id=bank,
                                     order_id=order_to_pay.id,
                                     method=method)
-        # elif (method == 'mistercash'):
-            # Internal ID of Bancontact is 'mistercash'
-            # results = self.create_bancontact_payment(
-                                        # amount=float(amount_to_pay),
-                                        # description="VOKO Utrecht %d"
-                                        #             % order_to_pay.id,
-                                        # order_id=order_to_pay.id)
-        # else:
-            # unsupported payment method
-            # return redirect(reverse('finance.choosebank'))
 
         Payment.objects.create(amount=amount_to_pay,
                                order=order_to_pay,

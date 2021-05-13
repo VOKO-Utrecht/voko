@@ -145,7 +145,8 @@ class TestCreateTransaction(FinanceTestCase):
                              '/finance/pay/transaction/confirm/?order=%d'
                              % self.order.id),
              'metadata': {'order_id': self.order.id},
-             'method': 'mistercash'}
+             'method': 'mistercash',
+             'issuer': None}
         )
 
     def test_that_payment_object_is_created_when_ideal(self):
