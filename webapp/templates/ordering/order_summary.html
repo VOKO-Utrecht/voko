@@ -63,6 +63,12 @@
         <td>Ophaalmoment van deze bestelronde:</td>
         <td>{{ object.order_round.collect_datetime }}</td>
       </tr>
+      {% if object.order_round.get_pickup_location %}
+      <tr>
+        <td><strong>Ophaallocatie van deze bestelronde:</strong></td>
+        <td><strong>{{ object.order_round.get_pickup_location }}</strong></td>
+      </tr>
+      {% endif %}
     </tbody>
   </table>
 </div>
