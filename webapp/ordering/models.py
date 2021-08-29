@@ -165,6 +165,15 @@ class OrderRound(TimeStampedModel):
             open_for_orders__gt=self.open_for_orders
         ).order_by("open_for_orders").first()
 
+    def get_previous_order_round(self):
+        """
+        Returns the previous order round based on the ID
+        """
+        try:
+            return OrderRound.objects.get(id=self.id-1)
+        except OrderRound.DoesNotExist:
+            return
+
     def suppliers(self):
         """
         Return suppliers with at least one paid order in this round
@@ -392,7 +401,6 @@ class OrderRound(TimeStampedModel):
                 )
                 mail_user(user, *rendered_template_vars)
 
-    @property
     def get_pickup_location(self):
         if self.pickup_location is not None:
             return self.pickup_location
