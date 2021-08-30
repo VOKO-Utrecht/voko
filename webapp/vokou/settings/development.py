@@ -31,12 +31,7 @@ INSTALLED_APPS += ['debug_toolbar',]
 MIDDLEWARE_CLASSES = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE_CLASSES
 INTERNAL_IPS = ['127.0.0.1']
 
-NOCAPTCHA = True
-CAPTCHA_ENABLED = True
-
-RECAPTCHA_PRIVATE_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'
-RECAPTCHA_PUBLIC_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
-SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']
+CAPTCHA_ENABLED = False
 
 # MOLLIE_API_KEY = 'test_'
 
