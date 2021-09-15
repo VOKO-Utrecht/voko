@@ -40,11 +40,11 @@
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu" aria-labelledby="category-dropdown">
-            <li><a href="#" class="category-option" data-category="all">Alle producten</a></li>
+            <li><a href="" class="category-option" data-category="all">Alle producten</a></li>
             {% for category in view.categories %}
-                <li><a href="#" class="category-option" data-category="{{ category.id }}">{{ category.name }}</a></li>
+                <li><a href="" class="category-option" data-category="{{ category.id }}">{{ category.name }}</a></li>
             {% endfor %}
-            <li><a href="#" class="category-option" data-category="no-category">Overig</a></li>
+            <li><a href="" class="category-option" data-category="no-category">Overig</a></li>
           </ul>
         </div>
       </div>
@@ -52,11 +52,11 @@
       <!-- Categories -->
       <div role="tabpanel" class="hidden-xs">
         <ul id="categories-tabs" class="nav nav-tabs categories" role="tablist">
-          <li role="presentation" class="active"><a href="#" class="category-option" data-category="all" role="tab" data-toggle="tab">Alle producten</a></li>
+          <li role="presentation" class="active"><a href="" class="category-option" data-category="all" role="tab" data-toggle="tab">Alle producten</a></li>
           {% for category in view.categories %}
-            <li role="presentation"><a href="#" role="tab" class="category-option" data-category="{{ category.id }}" data-toggle="tab">{{ category.name }}</a></li>
+            <li role="presentation"><a href="" role="tab" class="category-option" data-category="{{ category.id }}" data-toggle="tab">{{ category.name }}</a></li>
           {% endfor %}
-          <li role="presentation"><a href="#" class="category-option" role="tab" data-category="no-category" data-toggle="tab">Overig</a></li>
+          <li role="presentation"><a href="" class="category-option" role="tab" data-category="no-category" data-toggle="tab">Overig</a></li>
         </ul>
       </div>
 
