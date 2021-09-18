@@ -95,6 +95,19 @@
                 </div>
             </div>
         </div>
+        {% if object.order_round.get_pickup_location %}
+            <div class="col-md-6">
+                <div class="panel panel-danger">
+                    <div class="panel-heading">Ophaallocatie</div>
+                        <div class="panel-body">
+                          <h4>Ophaallocatie voor deze bestelling is:</h4>
+                          <h2>{{ object.order_round.get_pickup_location }}</h2>
+                          {{ object.order_round.get_pickup_location.description }}<br/>
+                          {{ object.order_round.get_pickup_location.address.street_and_number }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     </div>
 
     <a class="btn btn-primary" href="{% url 'view_products' %}" role="button"><span class="glyphicon glyphicon-arrow-left"></span> Bestelling wijzigen</a>

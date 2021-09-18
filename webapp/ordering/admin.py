@@ -9,7 +9,7 @@ from finance.models import Balance
 from vokou.admin import DeleteDisabledMixin
 from .models import (Order, OrderProduct, Product, OrderRound, ProductCategory,
                      OrderProductCorrection, ProductStock, Supplier,
-                     ProductUnit, DraftProduct)
+                     ProductUnit, DraftProduct, PickupLocation)
 
 
 class OrderProductInline(admin.TabularInline):
@@ -186,6 +186,10 @@ class DraftProductAdmin(admin.ModelAdmin):
     pass
 
 
+class PickupLocationAdmin(admin.ModelAdmin):
+    list_display = ["name", "is_default"]
+
+
 admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderProduct, OrderProductAdmin)
 admin.site.register(OrderProductCorrection, OrderProductCorrectionAdmin)
@@ -196,3 +200,4 @@ admin.site.register(ProductCategory, CategoryAdmin)
 admin.site.register(ProductStock, ProductStockAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Supplier, SupplierAdmin)
+admin.site.register(PickupLocation, PickupLocationAdmin)
