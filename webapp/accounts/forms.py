@@ -1,5 +1,5 @@
 from captcha.fields import ReCaptchaField
-from captcha.widgets import ReCaptchaV2Invisible
+from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
@@ -20,7 +20,7 @@ class VokoUserCreationForm(forms.ModelForm):
         fields = ("email", "first_name", "last_name")
 
     if settings.CAPTCHA_ENABLED:
-        captcha = ReCaptchaField(widget=ReCaptchaV2Invisible)
+        captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox)
 
     def save(self, commit=True):
         # Create user
