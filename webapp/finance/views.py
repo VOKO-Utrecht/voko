@@ -58,8 +58,7 @@ class MollieMixin(object):
         if (method == 'ideal'):
             mollieMethod = MollieMethods.IDEAL
         else:
-            # Bancontact used to be called MisterCash
-            mollieMethod = MollieMethods.MISTERCASH
+            mollieMethod = MollieMethods.BANCONTACT
 
         # Mollie API wants exactly two decimals, always
         return self.mollie.payments.create({
@@ -209,7 +208,7 @@ class ConfirmTransactionView(LoginRequiredMixin, MollieMixin, TemplateView):
             raise Http404
 
         mollie_payment = self.get_payment(payment.mollie_id)
-        success = mollie_payment.isPaid()
+        success = mollie_payment.is_paid()
 
         if success:
             if (payment.order.finalized is True and
@@ -250,7 +249,7 @@ class PaymentWebHook(MollieMixin, View):
 
         payment = get_object_or_404(Payment, mollie_id=mollie_id)
         mollie_payment = self.get_payment(payment.mollie_id)
-        success = mollie_payment.isPaid()
+        success = mollie_payment.is_paid()
 
         if not success:
             log_event(
