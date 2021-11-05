@@ -46,6 +46,28 @@ class Supplier(TimeStampedModel):
         ).exists()
 
 
+class PickupLocation(TimeStampedModel):
+    """
+    Pickup Location for an order round
+    """
+    class Meta:
+        verbose_name = "Ophaallocatie"
+
+    name = models.CharField(max_length=100, unique=True)
+    description = models.CharField(max_length=255)
+    address = models.ForeignKey(Address, null=True, blank=True)
+    is_default = models.BooleanField(default=False)
+
+    def save(self, **kwargs):
+        if self.is_default:
+            # make all other locations non-default
+            PickupLocation.objects.update(is_default=False)
+        super(PickupLocation, self).save(**kwargs)
+
+    def __str__(self):
+        return self.name
+
+
 class OrderRound(TimeStampedModel):
     class Meta:
         verbose_name = "Bestelronde"
@@ -107,6 +129,12 @@ class OrderRound(TimeStampedModel):
         related_name="coordinating_transport_orderrounds"
     )
 
+    pickup_location = models.ForeignKey(
+        PickupLocation,
+        models.SET_NULL,
+        null=True,
+        blank=True)
+
     def clean(self):
         if self.is_over:
             raise ValidationError(
@@ -136,6 +164,15 @@ class OrderRound(TimeStampedModel):
         return order_rounds.filter(
             open_for_orders__gt=self.open_for_orders
         ).order_by("open_for_orders").first()
+
+    def get_previous_order_round(self):
+        """
+        Returns the previous order round based on the ID
+        """
+        try:
+            return OrderRound.objects.get(id=self.id-1)
+        except OrderRound.DoesNotExist:
+            return
 
     def suppliers(self):
         """
@@ -363,6 +400,11 @@ class OrderRound(TimeStampedModel):
                     base_url=settings.BASE_URL
                 )
                 mail_user(user, *rendered_template_vars)
+
+    def get_pickup_location(self):
+        if self.pickup_location is not None:
+            return self.pickup_location
+        return PickupLocation.objects.get(is_default=True)
 
     def __str__(self):
         return "Bestelronde #%s" % self.pk

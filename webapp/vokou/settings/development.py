@@ -31,6 +31,14 @@ INSTALLED_APPS += ['debug_toolbar',]
 MIDDLEWARE_CLASSES = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE_CLASSES
 INTERNAL_IPS = ['127.0.0.1']
 
+# RECAPTCHA Config
+# Below are official public test keys to use with RECAPTCHA V2
+# Using these keys will always result in success
+# https://developers.google.com/recaptcha/docs/faq
+RECAPTCHA_PUBLIC_KEY = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
+RECAPTCHA_PRIVATE_KEY = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'
+SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']
+
 CAPTCHA_ENABLED = False
 
 # MOLLIE_API_KEY = 'test_'
