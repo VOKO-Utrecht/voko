@@ -108,7 +108,6 @@ class TestChooseBank(FinanceTestCase):
         self.assertContains(ret, "Je hebt geen bestelling om te betalen.")
         self.assertNotContains(ret, "Te betalen")
 
-@skip()
 class TestCreateTransaction(FinanceTestCase):
     def setUp(self):
         super(TestCreateTransaction, self).setUp()
