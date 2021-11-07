@@ -62,7 +62,7 @@ class MollieMixin(object):
 
         # Mollie API wants exactly two decimals, always
         return self.mollie.payments.create({
-            'amount': {'currency':'EUR', 'value':"{0:.2f}".format(amount)},
+            'amount': {'currency': 'EUR', 'value': "{0:.2f}".format(amount)},
             'description': description,
             'redirectUrl': (
                     settings.BASE_URL +
