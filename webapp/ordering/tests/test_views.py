@@ -91,7 +91,7 @@ class TestProductsView(VokoTestCase):
         self.assertCountEqual(ret.context['view'].suppliers(), suppliers)
 
     def test_redirect_to_payment_page_when_current_order_is_finalized(self):
-        self.patch("finance.views.Mollie")
+        self.patch("finance.views.MollieClient")
 
         OrderFactory(order_round=self.round, user=self.user, finalized=True)
         ret = self.client.get(self.url, follow=True)
