@@ -3,7 +3,6 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from mock import MagicMock
 from pytz import UTC
-from unittest import skip
 from accounts.tests.factories import VokoUserFactory
 from finance.models import Payment, Balance
 from finance.tests.factories import PaymentFactory
@@ -108,6 +107,7 @@ class TestChooseBank(FinanceTestCase):
         self.assertContains(ret, "Je hebt geen bestelling om te betalen.")
         self.assertNotContains(ret, "Te betalen")
 
+
 class TestCreateTransaction(FinanceTestCase):
     def setUp(self):
         super(TestCreateTransaction, self).setUp()
@@ -127,8 +127,8 @@ class TestCreateTransaction(FinanceTestCase):
                 'description': 'VOKO Utrecht %d' % self.order.id,
                 'webhookUrl': settings.BASE_URL + reverse('finance.callback'),
                 'redirectUrl': (settings.BASE_URL +
-                                '/finance/pay/transaction/confirm/?order=%d'
-                                % self.order.id),
+                                reverse("finance.confirmtransaction") +
+                                "?order=%d" % self.order.id),
                 'metadata': {'order_id': self.order.id},
                 'method': 'ideal',
                 'issuer': 'EXAMPLE_BANK'}
@@ -143,8 +143,8 @@ class TestCreateTransaction(FinanceTestCase):
                 'description': 'VOKO Utrecht %d' % self.order.id,
                 'webhookUrl': settings.BASE_URL + reverse('finance.callback'),
                 'redirectUrl': (settings.BASE_URL +
-                                '/finance/pay/transaction/confirm/?order=%d'
-                                % self.order.id),
+                                reverse("finance.confirmtransaction") +
+                                "?order=%d" % self.order.id),
                 'metadata': {'order_id': self.order.id},
                 'method': 'bancontact',
                 'issuer': None}
