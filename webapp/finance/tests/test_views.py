@@ -21,17 +21,13 @@ class FinanceTestCase(VokoTestCase):
         self.mollie_methods.IDEAL = 'ideal'
         self.mollie_methods.BANCONTACT = 'bancontact'
 
-        issuers = {"issuers": [
-            {'id': 'EXAMPLE_BANK', 'name': "Example Bank", 'method': 'ideal'},
-            {'id': 'ANOTHER_BANK', 'name': "Another Bank", 'method': 'ideal'},
-        ]}
-        self.mollie_client.return_value.methods.get.return_value = issuers
-
         # we only support bancontact and iDeal payment methods
         methods = [
             {'id': 'bancontact', 'description': 'Bancontact',
              'status': 'activated'},
-            {'id': 'ideal', 'description': 'iDeal', 'status': 'activated'}
+            {'id': 'ideal', 'description': 'iDeal', 'status': 'activated',
+                'issuers': [{'id': 'EXAMPLE_BANK', 'name': "Example Bank"},
+                            {'id': 'ANOTHER_BANK', 'name': "Another Bank"}]}
         ]
         self.mollie_client.return_value.methods.all.return_value = methods
 
@@ -82,12 +78,6 @@ class TestChooseBank(FinanceTestCase):
         self.mollie_client.assert_called_once_with()
         self.mollie_client.return_value.set_api_key.assert_called_once_with(
             settings.MOLLIE_API_KEY)
-
-    def test_that_list_of_banks_is_requested(self):
-        self.client.get(self.url)
-        # methods.get('ideal', include='issuers')
-        self.mollie_client.return_value.methods.get.assert_called_once_with(
-            'ideal', include='issuers')
 
     def test_that_context_contains_form_with_bank_choices(self):
         ret = self.client.get(self.url)
