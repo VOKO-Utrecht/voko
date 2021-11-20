@@ -15,7 +15,7 @@ from ordering.core import get_current_order_round
 from ordering.models import Order
 
 
-def choosebankform_factory(banks, methods):
+def choosebankform_factory(methods):
     """
     Generate a Django Form used to choose your bank from a drop down
     Based on the up-to-date list of :banks: from our PSP
@@ -24,8 +24,11 @@ def choosebankform_factory(banks, methods):
                   for method in methods
                   if method['status'] == 'activated']
 
-    bankchoices = [(bank['id'], bank['name'])
-                   for bank in banks]
+    bankchoices = []
+    for method in methods:
+        if (method['id'] == 'ideal'):
+            bankchoices = [(issuer['id'], issuer['name'])
+            for issuer in method['issuers']]
 
     class ChooseBankForm(forms.Form):
         method = forms.ChoiceField(
@@ -51,7 +54,6 @@ class MollieMixin(object):
     def __init__(self):
         self.mollie = MollieClient()
         self.mollie.set_api_key(settings.MOLLIE_API_KEY)
-        self.issuers = self.get_ideal_issuers()
         self.methods = self.mollie.methods.all(include='issuers')
 
     def create_payment(self, amount, description, issuer_id, order_id, method):
@@ -77,10 +79,6 @@ class MollieMixin(object):
             },
         })
 
-    def get_ideal_issuers(self):
-        ideal_method = self.mollie.methods.get('ideal', include='issuers')
-        return ideal_method['issuers']
-
     def get_payment(self, payment_id):
         return self.mollie.payments.get(payment_id)
 
@@ -92,8 +90,7 @@ class ChooseBankView(LoginRequiredMixin, MollieMixin, FormView):
     template_name = "finance/choose_bank.html"
 
     def get_form_class(self):
-        return choosebankform_factory(banks=self.issuers,
-                                      methods=self.methods)
+        return choosebankform_factory(methods=self.methods)
 
     def get_context_data(self, **kwargs):
         context = super(ChooseBankView, self).get_context_data(**kwargs)
@@ -107,7 +104,7 @@ class CreateTransactionView(LoginRequiredMixin, MollieMixin, FormView):
     """
 
     def get_form_class(self):
-        return choosebankform_factory(banks=self.issuers, methods=self.methods)
+        return choosebankform_factory(methods=self.methods)
 
     def post(self, request, *args, **kwargs):
         Form = self.get_form_class()
