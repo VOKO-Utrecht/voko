@@ -28,7 +28,7 @@ def choosebankform_factory(methods):
     for method in methods:
         if (method['id'] == 'ideal'):
             bankchoices = [(issuer['id'], issuer['name'])
-            for issuer in method['issuers']]
+                           for issuer in method['issuers']]
 
     class ChooseBankForm(forms.Form):
         method = forms.ChoiceField(
