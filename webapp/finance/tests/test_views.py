@@ -14,29 +14,21 @@ from vokou.testing import VokoTestCase
 
 class FinanceTestCase(VokoTestCase):
     def setUp(self):
-        self.mollie = self.patch("finance.views.Mollie")
-        self.mollie_client = self.mollie. \
-            API.Client
+        self.mollie_client = self.patch("finance.views.MollieClient")
         self.mollie_client.return_value.issuers.all.return_value = \
             MagicMock()
-        self.mollie.API.Object.Method.IDEAL = 'ideal'
-        self.mollie.API.Object.Method.MISTERCASH = 'mistercash'
+        self.mollie_methods = self.patch("finance.views.MollieMethods")
+        self.mollie_methods.IDEAL = 'ideal'
+        self.mollie_methods.BANCONTACT = 'bancontact'
 
-        issuers = {"data": [
-            {'id': 'EXAMPLE_BANK', 'name': "Example Bank", 'method': 'ideal'},
-            {'id': 'ANOTHER_BANK', 'name': "Another Bank", 'method': 'ideal'},
-            {'id': 'NON_IDEAL_BANK',
-             'name': "Non iDeal Bank",
-             'method': 'bla'},
-        ]}
-        self.mollie_client.return_value.issuers.all.return_value = issuers
-
-        # we only support bancontact and iDeal payment methods, not any
-        methods = {"data": [
-            {'id': 'bancontact', 'description': 'Bancontact'},
-            {'id': 'ideal', 'description': 'iDeal'}
-
-        ]}
+        # we only support bancontact and iDeal payment methods
+        methods = [
+            {'id': 'bancontact', 'description': 'Bancontact',
+             'status': 'activated'},
+            {'id': 'ideal', 'description': 'iDeal', 'status': 'activated',
+                'issuers': [{'id': 'EXAMPLE_BANK', 'name': "Example Bank"},
+                            {'id': 'ANOTHER_BANK', 'name': "Another Bank"}]}
+        ]
         self.mollie_client.return_value.methods.all.return_value = methods
 
         self.user = VokoUserFactory.create()
@@ -56,12 +48,11 @@ class FinanceTestCase(VokoTestCase):
         #     "ordering.models.Order.complete_after_payment")
 
         class FakePaymentResult(object):
+            checkout_url = "http://bank.url"
+
             def __getitem__(self, item):
                 if item == "id":
                     return "transaction_id"
-
-            def getPaymentUrl(self):
-                return "http://bank.url"
 
         self.mollie_client.return_value.payments.create.return_value = (
             FakePaymentResult())
@@ -85,12 +76,8 @@ class TestChooseBank(FinanceTestCase):
     def test_that_qantani_api_client_is_initiated(self):
         self.client.get(self.url)
         self.mollie_client.assert_called_once_with()
-        self.mollie_client.return_value.setApiKey.assert_called_once_with(
+        self.mollie_client.return_value.set_api_key.assert_called_once_with(
             settings.MOLLIE_API_KEY)
-
-    def test_that_list_of_banks_is_requested(self):
-        self.client.get(self.url)
-        self.mollie_client.return_value.issuers.all.assert_called_once_with()
 
     def test_that_context_contains_form_with_bank_choices(self):
         ret = self.client.get(self.url)
@@ -123,30 +110,34 @@ class TestCreateTransaction(FinanceTestCase):
     def test_that_ideal_transaction_is_created(self):
         self.client.post(self.url, {'bank': 'EXAMPLE_BANK', 'method': "ideal"})
         self.mollie_client.return_value.payments.create.assert_called_once_with(  # noqa
-            {'description': 'VOKO Utrecht %d' % self.order.id,
-             'webhookUrl': settings.BASE_URL + reverse('finance.callback'),
-             'amount': float(self.order.total_price_to_pay_with_balances_taken_into_account()),  # noqa
-             'redirectUrl': (settings.BASE_URL +
-                             '/finance/pay/transaction/confirm/?order=%d'
-                             % self.order.id),
-             'metadata': {'order_id': self.order.id},
-             'method': 'ideal',
-             'issuer': 'EXAMPLE_BANK'}
+            {'amount': {
+                'currency': 'EUR',
+                'value': "{0:.2f}".format(
+                    self.order.total_price_to_pay_with_balances_taken_into_account())}, # noqa
+                'description': 'VOKO Utrecht %d' % self.order.id,
+                'webhookUrl': settings.BASE_URL + reverse('finance.callback'),
+                'redirectUrl': (settings.BASE_URL +
+                                reverse("finance.confirmtransaction") +
+                                "?order=%d" % self.order.id),
+                'metadata': {'order_id': self.order.id},
+                'method': 'ideal',
+                'issuer': 'EXAMPLE_BANK'}
         )
 
     def test_that_bancontact_transaction_is_created(self):
-        # In Mollie lib < 2 'bancontact' is called 'mistercash'
         self.client.post(self.url, {'method': "bancontact"})
         self.mollie_client.return_value.payments.create.assert_called_once_with(  # noqa
-            {'description': 'VOKO Utrecht %d' % self.order.id,
-             'webhookUrl': settings.BASE_URL + reverse('finance.callback'),
-             'amount': float(self.order.total_price_to_pay_with_balances_taken_into_account()),  # noqa
-             'redirectUrl': (settings.BASE_URL +
-                             '/finance/pay/transaction/confirm/?order=%d'
-                             % self.order.id),
-             'metadata': {'order_id': self.order.id},
-             'method': 'mistercash',
-             'issuer': None}
+            {'amount': {
+                'currency': 'EUR', 'value': "{0:.2f}".format( \
+                    self.order.total_price_to_pay_with_balances_taken_into_account())}, # noqa
+                'description': 'VOKO Utrecht %d' % self.order.id,
+                'webhookUrl': settings.BASE_URL + reverse('finance.callback'),
+                'redirectUrl': (settings.BASE_URL +
+                                reverse("finance.confirmtransaction") +
+                                "?order=%d" % self.order.id),
+                'metadata': {'order_id': self.order.id},
+                'method': 'bancontact',
+                'issuer': None}
         )
 
     def test_that_payment_object_is_created_when_ideal(self):
@@ -234,17 +225,17 @@ class TestConfirmTransaction(FinanceTestCase):
     def test_ispaid_is_called_on_mollie_payment(self):
         self.client.get(self.url, {"order": self.order.id})
         self.mollie_client.return_value.payments.get.\
-            return_value.isPaid.assert_called_once_with()
+            return_value.is_paid.assert_called_once_with()
 
     def test_context_when_payment_has_failed(self):
         self.mollie_client.return_value.payments.get.\
-            return_value.isPaid.return_value = False
+            return_value.is_paid.return_value = False
         ret = self.client.get(self.url, {"order": self.order.id})
         self.assertEqual(ret.context[0]['payment_succeeded'], False)
 
     def test_context_when_payment_has_succeeded(self):
         self.mollie_client.return_value.payments.get.\
-            return_value.isPaid.return_value = True
+            return_value.is_paid.return_value = True
         ret = self.client.get(self.url, {"order": self.order.id})
         self.assertEqual(ret.context[0]['payment_succeeded'], True)
 
@@ -252,7 +243,7 @@ class TestConfirmTransaction(FinanceTestCase):
         self.assertFalse(self.payment.succeeded)
 
         self.mollie_client.return_value.payments.get. \
-            return_value.isPaid.return_value = True
+            return_value.is_paid.return_value = True
         self.client.get(self.url, {"order": self.order.id})
 
         # get new object reference
@@ -263,7 +254,7 @@ class TestConfirmTransaction(FinanceTestCase):
         self.assertFalse(self.payment.succeeded)
 
         self.mollie_client.return_value.payments.get. \
-            return_value.isPaid.return_value = False
+            return_value.is_paid.return_value = False
         self.client.get(self.url, {"order": self.order.id})
 
         # get new object reference
@@ -272,7 +263,7 @@ class TestConfirmTransaction(FinanceTestCase):
 
     def test_payment_and_order_status_after_successful_payment(self):
         self.mollie_client.return_value.payments.get. \
-            return_value.isPaid.return_value = True
+            return_value.is_paid.return_value = True
         self.client.get(self.url, {"order": self.order.id})
 
         payment = Payment.objects.get()
@@ -297,7 +288,7 @@ class TestConfirmTransaction(FinanceTestCase):
         self.assertEqual(ret.context[0]['payment_succeeded'], True)
 
         self.assertFalse(self.mollie_client.return_value.payments.get.
-                         return_value.isPaid.called)
+                         return_value.is_paid.called)
 
         self.assertFalse(self.mock_create_credit.called)
         self.assertFalse(self.mock_mail_confirmation.called)
@@ -324,7 +315,7 @@ class TestPaymentWebhook(FinanceTestCase):
 
     def test_unsuccessful_payment(self):
         self.mollie_client.return_value.payments.get. \
-            return_value.isPaid.return_value = False
+            return_value.is_paid.return_value = False
         ret = self.client.post(self.url, {"id": self.payment.mollie_id})
 
         payment = Payment.objects.get(id=self.payment.id)
@@ -340,7 +331,7 @@ class TestPaymentWebhook(FinanceTestCase):
 
     def test_successful_payment(self):
         self.mollie_client.return_value.payments.get. \
-            return_value.isPaid.return_value = True
+            return_value.is_paid.return_value = True
         ret = self.client.post(self.url, {"id": self.payment.mollie_id})
 
         payment = Payment.objects.get(id=self.payment.id)
@@ -357,7 +348,7 @@ class TestPaymentWebhook(FinanceTestCase):
     def test_order_is_completed_when_order_paid_is_false(self):
         assert self.order.paid is False
         self.mollie_client.return_value.payments.get. \
-            return_value.isPaid.return_value = True
+            return_value.is_paid.return_value = True
         self.client.post(self.url, {"id": self.payment.mollie_id})
 
         # self.mock_complete_after_payment.assert_called_once_with()
@@ -372,7 +363,7 @@ class TestPaymentWebhook(FinanceTestCase):
         assert self.order.paid is False
 
         self.mollie_client.return_value.payments.get. \
-            return_value.isPaid.return_value = True
+            return_value.is_paid.return_value = True
         self.client.post(self.url, {"id": self.payment.mollie_id})
 
         payment = Payment.objects.get()
