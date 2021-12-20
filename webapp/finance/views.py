@@ -75,7 +75,6 @@ class MollieMixin(object):
             },
         })
 
-
     def get_payment(self, payment_id):
         return self.mollie.payments.get(payment_id)
 
