@@ -1,4 +1,5 @@
-import Mollie
+from mollie.api.client import Client as MollieClient
+from mollie.api.resources.methods import Method as MollieMethods
 from braces.views import LoginRequiredMixin
 from django import forms
 from django.conf import settings
@@ -14,16 +15,20 @@ from ordering.core import get_current_order_round
 from ordering.models import Order
 
 
-def choosebankform_factory(banks, methods):
+def choosebankform_factory(methods):
     """
     Generate a Django Form used to choose your bank from a drop down
     Based on the up-to-date list of :banks: from our PSP
     """
     paymethods = [(method['id'], method['description'])
-                  for method in methods['data']]
-    bankchoices = [(bank['id'], bank['name'])
-                   for bank in banks['data']
-                   if bank['method'] == Mollie.API.Object.Method.IDEAL]
+                  for method in methods
+                  if method['status'] == 'activated']
+
+    bankchoices = []
+    for method in methods:
+        if (method['id'] == 'ideal'):
+            bankchoices = [(issuer['id'], issuer['name'])
+                           for issuer in method['issuers']]
 
     class ChooseBankForm(forms.Form):
         method = forms.ChoiceField(
@@ -47,20 +52,19 @@ def get_order_to_pay(user):
 
 class MollieMixin(object):
     def __init__(self):
-        self.mollie = Mollie.API.Client()
-        self.mollie.setApiKey(settings.MOLLIE_API_KEY)
-        self.issuers = self.mollie.issuers.all()
-        self.methods = self.mollie.methods.all()
+        self.mollie = MollieClient()
+        self.mollie.set_api_key(settings.MOLLIE_API_KEY)
+        self.methods = self.mollie.methods.all(include='issuers')
 
     def create_payment(self, amount, description, issuer_id, order_id, method):
         if (method == 'ideal'):
-            mollieMethod = Mollie.API.Object.Method.IDEAL
+            mollieMethod = MollieMethods.IDEAL
         else:
-            # Bancontact used to be called MisterCash
-            mollieMethod = Mollie.API.Object.Method.MISTERCASH
+            mollieMethod = MollieMethods.BANCONTACT
 
+        # Mollie API wants exactly two decimals, always
         return self.mollie.payments.create({
-            'amount': amount,
+            'amount': {'currency': 'EUR', 'value': "{0:.2f}".format(amount)},
             'description': description,
             'redirectUrl': (
                     settings.BASE_URL +
@@ -86,8 +90,7 @@ class ChooseBankView(LoginRequiredMixin, MollieMixin, FormView):
     template_name = "finance/choose_bank.html"
 
     def get_form_class(self):
-        return choosebankform_factory(banks=self.issuers,
-                                      methods=self.methods)
+        return choosebankform_factory(methods=self.methods)
 
     def get_context_data(self, **kwargs):
         context = super(ChooseBankView, self).get_context_data(**kwargs)
@@ -101,7 +104,7 @@ class CreateTransactionView(LoginRequiredMixin, MollieMixin, FormView):
     """
 
     def get_form_class(self):
-        return choosebankform_factory(banks=self.issuers, methods=self.methods)
+        return choosebankform_factory(methods=self.methods)
 
     def post(self, request, *args, **kwargs):
         Form = self.get_form_class()
@@ -164,7 +167,7 @@ class CreateTransactionView(LoginRequiredMixin, MollieMixin, FormView):
                                order=order_to_pay,
                                mollie_id=results["id"])
 
-        redirect_url = results.getPaymentUrl()
+        redirect_url = results.checkout_url
         return redirect(redirect_url)
 
 
@@ -202,7 +205,7 @@ class ConfirmTransactionView(LoginRequiredMixin, MollieMixin, TemplateView):
             raise Http404
 
         mollie_payment = self.get_payment(payment.mollie_id)
-        success = mollie_payment.isPaid()
+        success = mollie_payment.is_paid()
 
         if success:
             if (payment.order.finalized is True and
@@ -243,7 +246,7 @@ class PaymentWebHook(MollieMixin, View):
 
         payment = get_object_or_404(Payment, mollie_id=mollie_id)
         mollie_payment = self.get_payment(payment.mollie_id)
-        success = mollie_payment.isPaid()
+        success = mollie_payment.is_paid()
 
         if not success:
             log_event(
