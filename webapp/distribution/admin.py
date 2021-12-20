@@ -45,6 +45,10 @@ def format_order_round(obj):
 
 
 class ShiftAdmin(admin.ModelAdmin):
+    class Media:
+        css = {
+            'all': ('css/shiftadmin.css',),
+        }
     list_display = ["date_long_str", "start_str", "end_str", "members_names"]
     ordering = ("-order_round__collect_datetime", "start")
     list_filter = (RecentListFilter,)
