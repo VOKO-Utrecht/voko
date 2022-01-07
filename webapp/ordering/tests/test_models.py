@@ -232,6 +232,7 @@ class TestOrderRoundModel(VokoTestCase):
         VokoUserFactory()
 
         order_round.send_pickup_reminder_mails()
+        # calling twice, mail should only be sent once
         order_round.send_pickup_reminder_mails()
 
         self.get_template_by_id.assert_called_once_with(
