@@ -60,15 +60,30 @@ class TestOrderRoundModel(VokoTestCase):
     def setUp(self):
         now = datetime.now(tz=UTC)
 
-        self.prev_order_round = OrderRoundFactory(
-            open_for_orders=now - timedelta(days=8),
-            closed_for_orders=now - timedelta(days=4))
-        self.cur_order_round = OrderRoundFactory(
-            open_for_orders=now - timedelta(days=1),
-            closed_for_orders=now + timedelta(days=3))
+        # Creating in non-chronical order, to prevent accidentely getting
+        # the correct next or previous order_round
+
+        # The next order round
         self.next_order_round = OrderRoundFactory(
             open_for_orders=now + timedelta(days=6),
             closed_for_orders=now + timedelta(days=9))
+        # An old order round, to check previous round logic
+        self.old_order_round = OrderRoundFactory(
+            open_for_orders=now - timedelta(days=18),
+            closed_for_orders=now - timedelta(days=14))            
+        # The current rouder round
+        self.cur_order_round = OrderRoundFactory(
+            open_for_orders=now - timedelta(days=1),
+            closed_for_orders=now + timedelta(days=3))
+        # A future order round, to check next round logic
+        self.future_order_round = OrderRoundFactory(
+            open_for_orders=now + timedelta(days=16),
+            closed_for_orders=now + timedelta(days=19))
+        # The previous order round
+        self.prev_order_round = OrderRoundFactory(
+            open_for_orders=now - timedelta(days=8),
+            closed_for_orders=now - timedelta(days=4))
+
 
     def test_is_not_open_yet(self):
         self.assertFalse(self.prev_order_round.is_not_open_yet())
@@ -215,6 +230,14 @@ class TestOrderRoundModel(VokoTestCase):
         OrderFactory(order_round=order_round, paid=False, finalized=True)
 
         self.assertEqual(order_round.number_of_orders(), 3)
+
+    def test_get_next_order_round(self):    
+        self.assertTrue(self.cur_order_round.get_next_order_round().id ==
+                        self.next_order_round.id)
+
+    def test_get_previous_order_round(self):
+        self.assertTrue(self.cur_order_round.get_previous_order_round().id ==
+                        self.prev_order_round.id)
 
 
 class TestOrderModel(VokoTestCase):

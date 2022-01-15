@@ -166,13 +166,10 @@ class OrderRound(TimeStampedModel):
         ).order_by("open_for_orders").first()
 
     def get_previous_order_round(self):
-        """
-        Returns the previous order round based on the ID
-        """
-        try:
-            return OrderRound.objects.get(id=self.id-1)
-        except OrderRound.DoesNotExist:
-            return
+        order_rounds = OrderRound.objects.all()
+        return order_rounds.filter(
+            open_for_orders__lt=self.open_for_orders
+        ).order_by("open_for_orders").reverse().first()
 
     def suppliers(self):
         """
