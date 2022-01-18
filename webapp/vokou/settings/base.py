@@ -86,6 +86,7 @@ MIDDLEWARE_CLASSES = [
 CRON_CLASSES = [
     "ordering.cron.MailOrderLists",
     "ordering.cron.SendOrderReminders",
+    "ordering.cron.SendPickupReminders",
     "ordering.cron.SendRideMails",
     "ordering.cron.SendPrepareRideMails",
     "ordering.cron.SendDistributionMails"
@@ -154,6 +155,7 @@ CONSTANCE_CONFIG = {
     'PREPARE_RIDE_MAIL': (85, "Prepare ride info mail", int),
     'DISTRIBUTION_MAIL': (84, "Distribution info mail", int),
     'DISTRIBUTION_GROUP': (3, "Distribution Group", int),
+    'PICKUP_REMINDER_MAIL': (107, "Order pickup reminder mail", int),
 }
 
 
