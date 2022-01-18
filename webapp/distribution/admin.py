@@ -2,6 +2,8 @@ from django.contrib import admin
 from distribution.models import Shift
 from django.utils.translation import ugettext_lazy as _
 import datetime
+from accounts.models import VokoUser
+from constance import config
 
 
 # Creates filter for every shift since two months ago
@@ -43,9 +45,20 @@ def format_order_round(obj):
 
 
 class ShiftAdmin(admin.ModelAdmin):
+    class Media:
+        css = {
+            'all': ('css/shiftadmin.css',),
+        }
     list_display = ["date_long_str", "start_str", "end_str", "members_names"]
     ordering = ("-order_round__collect_datetime", "start")
     list_filter = (RecentListFilter,)
+
+    # Show only members who are in the distribution group
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == "members":
+            kwargs["queryset"] = \
+                VokoUser.objects.filter(groups__id=config.DISTRIBUTION_GROUP)
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
 
     # Improve order round name in shift creation form
     def get_form(self, request, obj=None, **kwargs):
