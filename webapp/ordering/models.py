@@ -97,6 +97,16 @@ class OrderRound(TimeStampedModel):
         editable=False,
         help_text="Whether we've sent order reminders to our members"
     )
+    reminder_hours_before_pickup = models.IntegerField(
+        default=4,
+        help_text="Number of hours before collecting time when pickup "
+                  "reminder mail will be sent"
+    )
+    pickup_reminder_sent = models.BooleanField(
+        default=False,
+        editable=False,
+        help_text="Whether we've sent pickup order reminders to our members"
+    )
     rides_mails_sent = models.BooleanField(
         default=False,
         editable=False,
@@ -300,7 +310,18 @@ class OrderRound(TimeStampedModel):
         return list(filter(_users_without_orders_filter,
                            VokoUser.objects.filter(is_active=True)))
 
+    def get_users_with_orders(self):
+        def _users_with_orders_filter(voko_user):
+            return Order.objects.filter(
+                order_round=self, user=voko_user, paid=True).exists()
+
+        return list(filter(_users_with_orders_filter,
+                           VokoUser.objects.filter(is_active=True)))
+
     def send_reminder_mails(self):
+        """
+        Sends reminder mails for users not yet ordered this round
+        """
         if self.reminder_sent is True:
             log_event(event="Not sending order reminder for round %d because "
                             "reminder_sent is True" % self.pk)
@@ -315,6 +336,27 @@ class OrderRound(TimeStampedModel):
         self.save()
 
         for user in self.get_users_without_orders():
+            rendered_template_vars = render_mail_template(
+                mail_template, user=user, order_round=self)
+            mail_user(user, *rendered_template_vars)
+
+    def send_pickup_reminder_mails(self):
+        """
+        Sends pickup reminder mails for users who did order this round
+        """
+        if self.pickup_reminder_sent is True:
+            log_event(event="Not sending pickup reminder for round %d because "
+                            "pickup_reminder_sent is True" % self.pk)
+            return
+
+        log_event(event="Sending pickup reminder for round %d" % self.pk)
+
+        mail_template = get_template_by_id(config.PICKUP_REMINDER_MAIL)
+
+        self.pickup_reminder_sent = True
+        self.save()
+
+        for user in self.get_users_with_orders():
             rendered_template_vars = render_mail_template(
                 mail_template, user=user, order_round=self)
             mail_user(user, *rendered_template_vars)

@@ -216,6 +216,35 @@ class TestOrderRoundModel(VokoTestCase):
 
         self.assertEqual(order_round.number_of_orders(), 3)
 
+    def test_pickup_reminder_send_to_user_with_orders(self):
+        self.mail_user = self.patch("ordering.models.mail_user")
+        self.get_template_by_id = self.patch(
+            "ordering.models.get_template_by_id")
+        self.render_mail_template = self.patch(
+            "ordering.models.render_mail_template")
+
+        order_round = OrderRoundFactory()
+        user_with_order = VokoUserFactory()
+        OrderFactory(order_round=order_round, paid=True, finalized=True,
+                     user=user_with_order)
+
+        # create another user, without order
+        VokoUserFactory()
+
+        order_round.send_pickup_reminder_mails()
+        # calling twice, mail should only be sent once
+        order_round.send_pickup_reminder_mails()
+
+        self.get_template_by_id.assert_called_once_with(
+            config.PICKUP_REMINDER_MAIL
+        )
+        self.render_mail_template.assert_called_once_with(
+            self.get_template_by_id.return_value,
+            user=user_with_order,
+            order_round=order_round)
+        # only one user with an order, so mail_user is called only once
+        self.mail_user.assert_called_once_with(user_with_order)
+
 
 class TestOrderModel(VokoTestCase):
     def setUp(self):
