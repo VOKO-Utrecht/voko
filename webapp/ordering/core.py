@@ -34,6 +34,19 @@ def get_current_order_round():
         return filtered.order_by("-open_for_orders")[0]
 
 
+def get_last_order_round():
+    """
+    Return the most recent finished order round, after collecting time
+
+    :return: OrderRound object || None
+    """
+    now = datetime.now(UTC)
+    order_rounds = models.OrderRound.objects.all()
+    return order_rounds.filter(
+        collect_datetime__lt=now
+    ).order_by("collect_datetime").reverse().first()
+
+
 def get_next_order_round():
     """
     Return the order round after the current round.

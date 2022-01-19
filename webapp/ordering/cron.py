@@ -7,7 +7,8 @@ from django.db.models.aggregates import Sum
 from django_cron import CronJobBase, Schedule
 
 from log import log_event
-from .core import get_current_order_round, get_next_order_round
+from .core import get_current_order_round, get_next_order_round, \
+                  get_last_order_round
 from ordering.models import Supplier
 import unicodecsv as csv
 
@@ -189,6 +190,33 @@ class SendPrepareRideMails(CronJobBase):
                     next_order_round.prepare_ride_mails_sent is False):
                 print("Sending prepare ride mails!")
                 next_order_round.send_prepare_ride_mails()
+
+
+class SendRideCostsRequestMails(CronJobBase):
+    """
+    After the order_round is finished a mail is send to the riders,
+    to request the costs they made
+    """
+    RUN_EVERY_MINS = 30
+
+    schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
+    code = 'ordering.send_ride_costs_request_mails'
+
+    def do(self):
+        print("SendRideCostsRequestMails")
+        last_order_round = get_last_order_round()
+        print("Order round: %s" % order_round)
+
+        current_datetime = datetime.now(pytz.utc)
+        collect_delta = current_datetime - last_order_round.collect_datetime
+        hours_since_collecting = int(collect_delta.total_seconds() / 60 / 60)
+        print("Hours since closing (rounded): %s" % hours_since_collecting)
+
+        # Only send the mails if collecting time is less than 48 hours
+        if hours_since_collecting < 48 & \
+           last_order_round.ridecosts_mails_sent is False:
+                print("Sending ride costs request mails!")
+                last_order_round.send_ridecosts_request_mails()
 
 
 class SendDistributionMails(CronJobBase):

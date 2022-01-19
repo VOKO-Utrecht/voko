@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from pytz import UTC
-from ordering.core import get_current_order_round, \
+from ordering.core import get_current_order_round, get_last_order_round, \
     update_totals_for_products_with_max_order_amounts
 from ordering.models import OrderProduct
 from ordering.tests.factories import OrderRoundFactory, OrderFactory, \
@@ -222,3 +222,46 @@ class TestUpdateOrderTotals(VokoTestCase):
         # re-fetch, amount is decreased to remaining 2
         order2_product = OrderProduct.objects.get(pk=order2_product.pk)
         self.assertEqual(2, order2_product.amount)
+
+
+class TestGetLastOrderRound(VokoTestCase):
+    
+    def setUp(self):
+        now = datetime.now(tz=UTC)
+
+        # Creating in non-chronical order, to prevent accidentely getting
+        # the correct next or previous order_round
+
+        # The next order round
+        self.next_order_round = OrderRoundFactory(
+            open_for_orders=now + timedelta(days=6),
+            closed_for_orders=now + timedelta(days=9),
+            collect_datetime=now + timedelta(days=10))
+        # An old order round, to check previous round logic
+        self.old_order_round = OrderRoundFactory(
+            open_for_orders=now - timedelta(days=18),
+            closed_for_orders=now - timedelta(days=14),
+            collect_datetime=now - timedelta(days=13))            
+        # The current rouder round
+        self.cur_order_round = OrderRoundFactory(
+            open_for_orders=now - timedelta(days=1),
+            closed_for_orders=now + timedelta(days=3),
+            collect_datetime=now + timedelta(days=4))
+        # A future order round, to check next round logic
+        self.future_order_round = OrderRoundFactory(
+            open_for_orders=now + timedelta(days=16),
+            closed_for_orders=now + timedelta(days=19),
+            collect_datetime=now + timedelta(days=20))
+        # The previous order round
+        self.prev_order_round = OrderRoundFactory(
+            open_for_orders=now - timedelta(days=8),
+            closed_for_orders=now - timedelta(days=4),
+            collect_datetime=now - timedelta(days=3))
+
+    def test_latest_order_round_is_returned(self):
+        self.assertTrue(get_last_order_round() == self.prev_order_round)
+        self.assertFalse(get_last_order_round() == self.cur_order_round)
+        self.assertFalse(get_last_order_round() == self.next_order_round)
+        self.assertFalse(get_last_order_round() == self.old_order_round)
+        self.assertFalse(get_last_order_round() == self.future_order_round)
+
