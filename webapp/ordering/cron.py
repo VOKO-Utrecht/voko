@@ -44,6 +44,29 @@ class SendOrderReminders(CronJobBase):
             order_round.send_reminder_mails()
 
 
+class SendPickupReminders(CronJobBase):
+    RUN_EVERY_MINS = 30
+
+    schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
+    code = 'ordering.send_pickup_reminders'
+
+    def do(self):
+        order_round = get_current_order_round()
+        print(("Order round: %s" % order_round))
+
+        current_datetime = datetime.now(pytz.utc)
+        collect_delta = order_round.collect_datetime - current_datetime
+        hours_before_collecting = int(collect_delta.total_seconds() / 60 / 60)
+        print("Hours before collecting: %s" % hours_before_collecting)
+
+        if ((hours_before_collecting <=
+             order_round.reminder_hours_before_pickup
+                and hours_before_collecting > 0)
+                and order_round.pickup_reminder_sent is False):
+            print("Sending pickup reminders!")
+            order_round.send_pickup_reminder_mails()
+
+
 class MailOrderLists(CronJobBase):
     RUN_EVERY_MINS = 30
 
