@@ -429,7 +429,7 @@ class OrderRound(TimeStampedModel):
 
         log_event(event="Sending ridecosts reqst mails for round %d" % self.pk)
 
-        mail_template = get_template_by_id(config.PREPARE_RIDECOSTS_MAIL)
+        mail_template = get_template_by_id(config.RIDECOSTS_REQUEST_MAIL)
 
         self.ridecosts_request_mails_sent = True
         self.save()
