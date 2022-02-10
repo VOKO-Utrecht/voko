@@ -225,7 +225,7 @@ class TestUpdateOrderTotals(VokoTestCase):
 
 
 class TestGetLastOrderRound(VokoTestCase):
-    
+
     def setUp(self):
         now = datetime.now(tz=UTC)
 
@@ -241,7 +241,7 @@ class TestGetLastOrderRound(VokoTestCase):
         self.old_order_round = OrderRoundFactory(
             open_for_orders=now - timedelta(days=18),
             closed_for_orders=now - timedelta(days=14),
-            collect_datetime=now - timedelta(days=13))            
+            collect_datetime=now - timedelta(days=13))
         # The current rouder round
         self.cur_order_round = OrderRoundFactory(
             open_for_orders=now - timedelta(days=1),
@@ -264,4 +264,3 @@ class TestGetLastOrderRound(VokoTestCase):
         self.assertFalse(get_last_order_round() == self.next_order_round)
         self.assertFalse(get_last_order_round() == self.old_order_round)
         self.assertFalse(get_last_order_round() == self.future_order_round)
-

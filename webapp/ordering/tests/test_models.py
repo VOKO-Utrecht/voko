@@ -70,7 +70,7 @@ class TestOrderRoundModel(VokoTestCase):
         # An old order round, to check previous round logic
         self.old_order_round = OrderRoundFactory(
             open_for_orders=now - timedelta(days=18),
-            closed_for_orders=now - timedelta(days=14))            
+            closed_for_orders=now - timedelta(days=14))
         # The current rouder round
         self.cur_order_round = OrderRoundFactory(
             open_for_orders=now - timedelta(days=1),
@@ -83,7 +83,6 @@ class TestOrderRoundModel(VokoTestCase):
         self.prev_order_round = OrderRoundFactory(
             open_for_orders=now - timedelta(days=8),
             closed_for_orders=now - timedelta(days=4))
-
 
     def test_is_not_open_yet(self):
         self.assertFalse(self.prev_order_round.is_not_open_yet())
@@ -231,7 +230,7 @@ class TestOrderRoundModel(VokoTestCase):
 
         self.assertEqual(order_round.number_of_orders(), 3)
 
-    def test_get_next_order_round(self):    
+    def test_get_next_order_round(self):
         self.assertTrue(self.cur_order_round.get_next_order_round().id ==
                         self.next_order_round.id)
 

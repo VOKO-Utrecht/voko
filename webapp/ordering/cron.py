@@ -205,7 +205,7 @@ class SendRideCostsRequestMails(CronJobBase):
     def do(self):
         print("SendRideCostsRequestMails")
         last_order_round = get_last_order_round()
-        print("Order round: %s" % order_round)
+        print("Order round: %s" % last_order_round)
 
         current_datetime = datetime.now(pytz.utc)
         collect_delta = current_datetime - last_order_round.collect_datetime
@@ -215,8 +215,8 @@ class SendRideCostsRequestMails(CronJobBase):
         # Only send the mails if collecting time is less than 48 hours
         if hours_since_collecting < 48 & \
            last_order_round.ridecosts_mails_sent is False:
-                print("Sending ride costs request mails!")
-                last_order_round.send_ridecosts_request_mails()
+            print("Sending ride costs request mails!")
+            last_order_round.send_ridecosts_request_mails()
 
 
 class SendDistributionMails(CronJobBase):
