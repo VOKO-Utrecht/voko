@@ -275,12 +275,28 @@ class TestOrderRoundModel(VokoTestCase):
         self.render_mail_template = self.patch(
             "ordering.models.render_mail_template")
 
-        ride = RideFactory(order_round=self.cur_order_round)
+        RideFactory(order_round=self.cur_order_round)
         self.cur_order_round.send_ridecosts_request_mails()
         self.get_template_by_id.assert_called_once_with(
             config.RIDECOSTS_REQUEST_MAIL
         )
         self.mail_user.assert_called()
+
+    def test_ridecosts_mails_send_once(self):
+        self.mail_user = self.patch("ordering.models.mail_user")
+        self.get_template_by_id = self.patch(
+            "ordering.models.get_template_by_id")
+        self.render_mail_template = self.patch(
+            "ordering.models.render_mail_template")
+
+        RideFactory(order_round=self.cur_order_round)
+        self.cur_order_round.send_ridecosts_request_mails()
+        # called twice, but mails must only be send once
+        self.cur_order_round.send_ridecosts_request_mails()
+
+        self.get_template_by_id.assert_called_once_with(
+            config.RIDECOSTS_REQUEST_MAIL
+        )
 
 
 class TestOrderModel(VokoTestCase):
