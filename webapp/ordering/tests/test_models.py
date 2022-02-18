@@ -280,7 +280,7 @@ class TestOrderRoundModel(VokoTestCase):
         self.get_template_by_id.assert_called_once_with(
             config.RIDECOSTS_REQUEST_MAIL
         )
-        self.mail_user.assert_called_with(ride.driver)
+        self.mail_user.assert_called()
 
 
 class TestOrderModel(VokoTestCase):

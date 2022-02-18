@@ -236,7 +236,7 @@ class SendRideCostsRequestMails(CronJobBase):
         print("Hours since closing (rounded): %s" % hours_since_collecting)
 
         # Only send the mails if collecting time is less than 48 hours
-        if hours_since_collecting < 48 & \
+        if hours_since_collecting < 48 and \
            last_order_round.ridecosts_mails_sent is False:
             print("Sending ride costs request mails!")
             last_order_round.send_ridecosts_request_mails()
