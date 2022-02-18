@@ -14,6 +14,7 @@ from ordering.tests.factories import (
     SupplierFactory, OrderFactory, OrderProductFactory, OrderRoundFactory,
     OrderProductCorrectionFactory, ProductFactory, UnitFactory,
     ProductStockFactory)
+from transport.tests.factories import RideFactory
 from vokou.testing import VokoTestCase
 from constance import config
 
@@ -266,6 +267,20 @@ class TestOrderRoundModel(VokoTestCase):
             order_round=order_round)
         # only one user with an order, so mail_user is called only once
         self.mail_user.assert_called_once_with(user_with_order)
+
+    def test_send_ridecosts_request_mails(self):
+        self.mail_user = self.patch("ordering.models.mail_user")
+        self.get_template_by_id = self.patch(
+            "ordering.models.get_template_by_id")
+        self.render_mail_template = self.patch(
+            "ordering.models.render_mail_template")
+
+        ride = RideFactory(order_round=self.cur_order_round)
+        self.cur_order_round.send_ridecosts_request_mails()
+        self.get_template_by_id.assert_called_once_with(
+            config.RIDECOSTS_REQUEST_MAIL
+        )
+        self.mail_user.assert_called_with(ride.driver)
 
 
 class TestOrderModel(VokoTestCase):

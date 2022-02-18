@@ -120,7 +120,7 @@ class OrderRound(TimeStampedModel):
     ridecosts_request_mails_sent = models.BooleanField(
         default=False,
         editable=False,
-        help_text="Whether we've sent ridecosts request mails"        
+        help_text="Whether we've sent ridecosts request mails"
     )
     distribution_mails_sent = models.BooleanField(
         default=False,
@@ -438,6 +438,7 @@ class OrderRound(TimeStampedModel):
         for ride in rides:
             drivers = [ride.driver, ride.codriver]
             for user in drivers:
+                print(user)
                 rendered_template_vars = render_mail_template(
                     mail_template,
                     user=user,
