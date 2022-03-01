@@ -80,7 +80,7 @@ class OrderRound(TimeStampedModel):
     collect_datetime = models.DateTimeField(
         help_text="When the products can be collected")
     markup_percentage = models.DecimalField(
-        decimal_places=2, max_digits=5, default=7.0)
+        decimal_places=2, max_digits=5, default=config.MARKUP_PERCENTAGE)
     transaction_costs = models.DecimalField(
         decimal_places=2, max_digits=5, default=0.21)
     order_placed = models.BooleanField(
