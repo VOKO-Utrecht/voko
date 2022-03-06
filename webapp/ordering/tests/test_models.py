@@ -14,6 +14,7 @@ from ordering.tests.factories import (
     SupplierFactory, OrderFactory, OrderProductFactory, OrderRoundFactory,
     OrderProductCorrectionFactory, ProductFactory, UnitFactory,
     ProductStockFactory)
+from transport.tests.factories import RideFactory
 from vokou.testing import VokoTestCase
 from constance import config
 
@@ -60,15 +61,29 @@ class TestOrderRoundModel(VokoTestCase):
     def setUp(self):
         now = datetime.now(tz=UTC)
 
-        self.prev_order_round = OrderRoundFactory(
-            open_for_orders=now - timedelta(days=8),
-            closed_for_orders=now - timedelta(days=4))
-        self.cur_order_round = OrderRoundFactory(
-            open_for_orders=now - timedelta(days=1),
-            closed_for_orders=now + timedelta(days=3))
+        # Creating in non-chronical order, to prevent accidentely getting
+        # the correct next or previous order_round
+
+        # The next order round
         self.next_order_round = OrderRoundFactory(
             open_for_orders=now + timedelta(days=6),
             closed_for_orders=now + timedelta(days=9))
+        # An old order round, to check previous round logic
+        self.old_order_round = OrderRoundFactory(
+            open_for_orders=now - timedelta(days=18),
+            closed_for_orders=now - timedelta(days=14))
+        # The current rouder round
+        self.cur_order_round = OrderRoundFactory(
+            open_for_orders=now - timedelta(days=1),
+            closed_for_orders=now + timedelta(days=3))
+        # A future order round, to check next round logic
+        self.future_order_round = OrderRoundFactory(
+            open_for_orders=now + timedelta(days=16),
+            closed_for_orders=now + timedelta(days=19))
+        # The previous order round
+        self.prev_order_round = OrderRoundFactory(
+            open_for_orders=now - timedelta(days=8),
+            closed_for_orders=now - timedelta(days=4))
 
     def test_is_not_open_yet(self):
         self.assertFalse(self.prev_order_round.is_not_open_yet())
@@ -216,6 +231,14 @@ class TestOrderRoundModel(VokoTestCase):
 
         self.assertEqual(order_round.number_of_orders(), 3)
 
+    def test_get_next_order_round(self):
+        self.assertTrue(self.cur_order_round.get_next_order_round().id ==
+                        self.next_order_round.id)
+
+    def test_get_previous_order_round(self):
+        self.assertTrue(self.cur_order_round.get_previous_order_round().id ==
+                        self.prev_order_round.id)
+
     def test_pickup_reminder_send_to_user_with_orders(self):
         self.mail_user = self.patch("ordering.models.mail_user")
         self.get_template_by_id = self.patch(
@@ -244,6 +267,36 @@ class TestOrderRoundModel(VokoTestCase):
             order_round=order_round)
         # only one user with an order, so mail_user is called only once
         self.mail_user.assert_called_once_with(user_with_order)
+
+    def test_send_ridecosts_request_mails(self):
+        self.mail_user = self.patch("ordering.models.mail_user")
+        self.get_template_by_id = self.patch(
+            "ordering.models.get_template_by_id")
+        self.render_mail_template = self.patch(
+            "ordering.models.render_mail_template")
+
+        RideFactory(order_round=self.cur_order_round)
+        self.cur_order_round.send_ridecosts_request_mails()
+        self.get_template_by_id.assert_called_once_with(
+            config.RIDECOSTS_REQUEST_MAIL
+        )
+        self.mail_user.assert_called()
+
+    def test_ridecosts_mails_send_once(self):
+        self.mail_user = self.patch("ordering.models.mail_user")
+        self.get_template_by_id = self.patch(
+            "ordering.models.get_template_by_id")
+        self.render_mail_template = self.patch(
+            "ordering.models.render_mail_template")
+
+        RideFactory(order_round=self.cur_order_round)
+        self.cur_order_round.send_ridecosts_request_mails()
+        # called twice, but mails must only be send once
+        self.cur_order_round.send_ridecosts_request_mails()
+
+        self.get_template_by_id.assert_called_once_with(
+            config.RIDECOSTS_REQUEST_MAIL
+        )
 
 
 class TestOrderModel(VokoTestCase):

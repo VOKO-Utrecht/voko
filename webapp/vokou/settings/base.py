@@ -156,6 +156,7 @@ CONSTANCE_CONFIG = {
     'DISTRIBUTION_MAIL': (84, "Distribution info mail", int),
     'DISTRIBUTION_GROUP': (3, "Distribution Group", int),
     'PICKUP_REMINDER_MAIL': (107, "Order pickup reminder mail", int),
+    'RIDECOSTS_REQUEST_MAIL': (108, "Ride costs request mail", int),
 }
 
 
