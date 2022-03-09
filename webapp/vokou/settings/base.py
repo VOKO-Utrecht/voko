@@ -145,6 +145,7 @@ CAPTCHA_ENABLED = True
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 
 CONSTANCE_CONFIG = {
+    # templates
     'ACTIVATE_ACCOUNT_MAIL': (1, "Activate account mail", int),
     'CONFIRM_MAIL': (2, "Confirm account mail", int),
     'ORDER_REMINDER_MAIL': (4, "Order reminder mail", int),
@@ -154,10 +155,31 @@ CONSTANCE_CONFIG = {
     'RIDE_MAIL': (84, "Ride info mail", int),
     'PREPARE_RIDE_MAIL': (85, "Prepare ride info mail", int),
     'DISTRIBUTION_MAIL': (84, "Distribution info mail", int),
-    'DISTRIBUTION_GROUP': (3, "Distribution Group", int),
     'PICKUP_REMINDER_MAIL': (107, "Order pickup reminder mail", int),
     'RIDECOSTS_REQUEST_MAIL': (108, "Ride costs request mail", int),
+    # group ids
+    'DISTRIBUTION_GROUP': (3, "Distribution Group", int),
+    # other config values
+    'MARKUP_PERCENTAGE': (4.0, "Markup percentage", float)
+
 }
+
+CONSTANCE_CONFIG_FIELDSETS = {
+        'General Options': (
+            'ACTIVATE_ACCOUNT_MAIL',
+            'CONFIRM_MAIL',
+            'ORDER_REMINDER_MAIL',
+            'PASSWORD_RESET_MAIL',
+            'ORDER_CONFIRM_MAIL',
+            'ORDER_FAILED_MAIL',
+            'RIDE_MAIL',
+            'PREPARE_RIDE_MAIL',
+            'DISTRIBUTION_MAIL',
+            'PICKUP_REMINDER_MAIL',
+            'RIDECOSTS_REQUEST_MAIL'),
+        'Group Ids': ('DISTRIBUTION_GROUP',),
+        'Other options': ('MARKUP_PERCENTAGE',)
+    }    
 
 
 LOGGING = {
