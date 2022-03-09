@@ -156,10 +156,12 @@ CONSTANCE_CONFIG = {
     'PREPARE_RIDE_MAIL': (85, "Prepare ride info mail", int),
     'DISTRIBUTION_MAIL': (84, "Distribution info mail", int),
     'PICKUP_REMINDER_MAIL': (107, "Order pickup reminder mail", int),
+    'RIDECOSTS_REQUEST_MAIL': (108, "Ride costs request mail", int),
     # group ids
     'DISTRIBUTION_GROUP': (3, "Distribution Group", int),
     # other config values
     'MARKUP_PERCENTAGE': (4.0, "Markup percentage", float)
+
 }
 
 CONSTANCE_CONFIG_FIELDSETS = {
@@ -173,7 +175,8 @@ CONSTANCE_CONFIG_FIELDSETS = {
             'RIDE_MAIL',
             'PREPARE_RIDE_MAIL',
             'DISTRIBUTION_MAIL',
-            'PICKUP_REMINDER_MAIL'),
+            'PICKUP_REMINDER_MAIL',
+            'RIDECOSTS_REQUEST_MAIL'),
         'Group Ids': ('DISTRIBUTION_GROUP',),
         'Other options': ('MARKUP_PERCENTAGE',)
     }    

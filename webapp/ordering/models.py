@@ -117,6 +117,11 @@ class OrderRound(TimeStampedModel):
         editable=False,
         help_text="Whether we've sent prepare ride info mails"
     )
+    ridecosts_request_mails_sent = models.BooleanField(
+        default=False,
+        editable=False,
+        help_text="Whether we've sent ridecosts request mails"
+    )
     distribution_mails_sent = models.BooleanField(
         default=False,
         editable=False,
@@ -176,13 +181,10 @@ class OrderRound(TimeStampedModel):
         ).order_by("open_for_orders").first()
 
     def get_previous_order_round(self):
-        """
-        Returns the previous order round based on the ID
-        """
-        try:
-            return OrderRound.objects.get(id=self.id-1)
-        except OrderRound.DoesNotExist:
-            return
+        order_rounds = OrderRound.objects.all()
+        return order_rounds.filter(
+            open_for_orders__lt=self.open_for_orders
+        ).order_by("open_for_orders").reverse().first()
 
     def suppliers(self):
         """
@@ -404,6 +406,32 @@ class OrderRound(TimeStampedModel):
         mail_template = get_template_by_id(config.PREPARE_RIDE_MAIL)
 
         self.prepare_ride_mails_sent = True
+        self.save()
+
+        rides = self.rides.all()
+        for ride in rides:
+            drivers = [ride.driver, ride.codriver]
+            for user in drivers:
+                rendered_template_vars = render_mail_template(
+                    mail_template,
+                    user=user,
+                    ride=ride,
+                    base_url=settings.BASE_URL
+                )
+                mail_user(user, *rendered_template_vars)
+
+    def send_ridecosts_request_mails(self):
+        if self.ridecosts_request_mails_sent is True:
+            log_event(event="Not sending ridecosts mails for round %d "
+                            "because ridecosts_request_mails_sent is True" %
+                            self.pk)
+            return
+
+        log_event(event="Sending ridecosts reqst mails for round %d" % self.pk)
+
+        mail_template = get_template_by_id(config.RIDECOSTS_REQUEST_MAIL)
+
+        self.ridecosts_request_mails_sent = True
         self.save()
 
         rides = self.rides.all()
