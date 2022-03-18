@@ -89,7 +89,8 @@ CRON_CLASSES = [
     "ordering.cron.SendPickupReminders",
     "ordering.cron.SendRideMails",
     "ordering.cron.SendPrepareRideMails",
-    "ordering.cron.SendDistributionMails"
+    "ordering.cron.SendDistributionMails",
+    "ordering.cron.SendRideCostsRequestMails"
 ]
 
 ROOT_URLCONF = 'vokou.urls'
