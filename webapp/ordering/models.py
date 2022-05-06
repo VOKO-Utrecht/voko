@@ -390,6 +390,7 @@ class OrderRound(TimeStampedModel):
                     mail_template,
                     user=user,
                     ride=ride,
+                    order_round=self,
                     base_url=settings.BASE_URL
                 )
                 mail_user(user, *rendered_template_vars)

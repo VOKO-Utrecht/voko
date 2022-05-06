@@ -31,15 +31,6 @@
         <td><strong>Ophaallocatie bestelronde</strong></td>
         <td>{{ object.order_round.get_pickup_location }}</td>
       </tr>
-      <tr>
-        <td><strong>Ophaallocatie vorige ronde (kratjes)</strong></td>
-        <td>{% if object.order_round.get_previous_order_round %}
-              {{ object.order_round.get_previous_order_round.get_pickup_location }}
-            {% else %}
-              Onbekend
-            {% endif %}
-        </td>
-      </tr>
       {% endif %}
     </tbody>
   </table>
