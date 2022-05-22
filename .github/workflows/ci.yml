@@ -10,6 +10,7 @@ on:
 
 jobs:
   tests:
+    name: Run tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -25,5 +26,5 @@ jobs:
       - name: Run tests
         working-directory: webapp
         run: |
-          runtests.sh
+          ./runtests.sh
           flake8 --exclude migrations,settings
