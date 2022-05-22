@@ -9,8 +9,7 @@ on:
       - master
 
 jobs:
-  build:
-    name: Run tests
+  tests:
     runs-on: ubuntu-latest
     - name: Checkout
       uses: actions/checkout@v3
