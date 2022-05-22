@@ -1,7 +1,7 @@
 # VOKO
 Django based custom web application for food collective www.vokoutrecht.nl.
 
-[![Travis CI](https://api.travis-ci.org/rikva/voko.svg)](https://travis-ci.org/rikva/voko)
+![example workflow](https://github.com/VOKO-Utrecht/voko/actions/workflows/ci.yml/badge.svg)
 
 ## Some notes
 1. The code base needs cleaning up and adding of tests.

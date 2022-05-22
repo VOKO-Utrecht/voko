@@ -27,4 +27,3 @@ jobs:
         working-directory: webapp
         run: |
           ./runtests.sh
-          flake8 --exclude migrations,settings
