@@ -10,7 +10,7 @@ Django based custom web application for food collective www.vokoutrecht.nl.
 
 ## Development environment
 1. Run: pip install --user pipenv
-2. Run: `git clone https://github.com/rikva/voko.git`
+2. Run: `git clone https://github.com/VOKO-Utrecht/voko.git`
 3. Run: `cd voko`
 4. Run: `pipenv install --dev`
 5. Run: `pipenv shell`

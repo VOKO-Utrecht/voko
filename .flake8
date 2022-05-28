@@ -49,6 +49,8 @@ exclude =
     .pytest_cache,
     # mypy cache
     .mypy_cache
+    migrations
+    settings
 
 # Provide a comma-separate list of glob patterns to include for checks.
 filename =
