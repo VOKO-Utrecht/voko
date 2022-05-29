@@ -4,6 +4,3 @@
 *.sqlite*
 local.py
 webapp/media
-.vscode/
-Pipfile
-Pipfile.lock

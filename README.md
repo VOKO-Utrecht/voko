@@ -1,29 +1,19 @@
 # VOKO
 Django based custom web application for food collective www.vokoutrecht.nl.
 
-[![Travis CI](https://api.travis-ci.org/rikva/voko.svg)](https://travis-ci.org/rikva/voko)
+![example workflow](https://github.com/VOKO-Utrecht/voko/actions/workflows/ci.yml/badge.svg)
+
 ## Some notes
 1. The code base needs cleaning up and adding of tests.
-1. License: GNU GPLv3
-1. Use at your own risk, no support.
+2. License: GNU GPLv3
+3. Use at your own risk, no support.
 
-## Dev environment
-
-With virtualenvwrapper:
-
-1. Run: `apt install virtualenvwrapper`
-2. restart shell
-3. Run: `git clone https://github.com/rikva/voko.git`
-4. Run: `cd voko`
-5. Run: `mkvirtualenv vokou --python=[path to pyton3 binary] -r ./requirements/development.txt`
-
-With pipenv:
-
+## Development environment
 1. Run: pip install --user pipenv
-2. Run: `git clone https://github.com/rikva/voko.git`
-3. Run: `cd voko
-4. Run: pipenv install -r ./requirements/development.txt
-5. Run: pipenv shell
+2. Run: `git clone https://github.com/VOKO-Utrecht/voko.git`
+3. Run: `cd voko`
+4. Run: `pipenv install --dev`
+5. Run: `pipenv shell`
 
 ### Set up sqlite database
     cd webapp

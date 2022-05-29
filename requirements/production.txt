@@ -1,3 +1,0 @@
--r base.txt
-uwsgi==2.0.19.1
-psycopg2-binary==2.8.6
