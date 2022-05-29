@@ -1,7 +1,6 @@
 import datetime
-from factory import (
-    DjangoModelFactory, SubFactory, LazyAttribute, SelfAttribute
-)
+from factory import SubFactory, LazyAttribute, SelfAttribute
+from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyText, FuzzyDecimal, FuzzyInteger
 from pytz import UTC
 from accounts.tests.factories import AddressFactory, VokoUserFactory
