@@ -28,7 +28,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = '/tmp/app-messages'
 
 INSTALLED_APPS += ['debug_toolbar',]
-MIDDLEWARE_CLASSES = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE_CLASSES
+MIDDLEWARE = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE
 INTERNAL_IPS = ['127.0.0.1']
 
 # RECAPTCHA Config
