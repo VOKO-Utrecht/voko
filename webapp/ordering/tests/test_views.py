@@ -1,6 +1,6 @@
 from unittest import skip
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from ordering.models import Product, OrderProduct
 from ordering.tests.factories import (ProductFactory, OrderRoundFactory,
                                       OrderProductFactory, OrderFactory,

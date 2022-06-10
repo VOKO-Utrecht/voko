@@ -6,7 +6,7 @@ from uuid import uuid4
 from django.contrib.auth.models import (BaseUserManager, AbstractBaseUser,
                                         PermissionsMixin)
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 from django.conf import settings
