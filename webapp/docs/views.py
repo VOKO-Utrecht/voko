@@ -21,7 +21,7 @@ class DocumentDownload(LoginRequiredMixin, DetailView):
     model = Document
 
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             if self.raise_exception:
                 raise PermissionDenied
             else:
