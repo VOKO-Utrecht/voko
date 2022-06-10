@@ -15,37 +15,37 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='order',
             name='order_round',
-            field=models.ForeignKey(related_name='orders', to='ordering.OrderRound'),
+            field=models.ForeignKey(related_name='orders', to='ordering.OrderRound', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='order',
             name='user',
-            field=models.ForeignKey(related_name='orders', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(related_name='orders', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='orderproduct',
             name='order',
-            field=models.ForeignKey(related_name='orderproducts', to='ordering.Order'),
+            field=models.ForeignKey(related_name='orderproducts', to='ordering.Order', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='orderproduct',
             name='product',
-            field=models.ForeignKey(related_name='orderproducts', to='ordering.Product'),
+            field=models.ForeignKey(related_name='orderproducts', to='ordering.Product', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='product',
             name='order_round',
-            field=models.ForeignKey(related_name='products', to='ordering.OrderRound'),
+            field=models.ForeignKey(related_name='products', to='ordering.OrderRound', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='product',
             name='supplier',
-            field=models.ForeignKey(related_name='products', to='ordering.Supplier'),
+            field=models.ForeignKey(related_name='products', to='ordering.Supplier', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

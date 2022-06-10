@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='product',
             name='temp_unit',
-            field=models.ForeignKey(to='ordering.ProductUnit', null=True),
+            field=models.ForeignKey(to='ordering.ProductUnit', null=True, on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

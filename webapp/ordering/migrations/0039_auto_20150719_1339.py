@@ -14,13 +14,13 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='order',
             name='debit',
-            field=models.OneToOneField(related_name='order', null=True, blank=True, to='finance.Balance'),
+            field=models.OneToOneField(related_name='order', null=True, blank=True, to='finance.Balance', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='orderproductcorrection',
             name='credit',
-            field=models.OneToOneField(related_name='correction', to='finance.Balance'),
+            field=models.OneToOneField(related_name='correction', to='finance.Balance', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

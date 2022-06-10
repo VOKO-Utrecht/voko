@@ -21,8 +21,8 @@ class Migration(migrations.Migration):
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('data', jsonfield.fields.JSONField()),
-                ('order_round', models.ForeignKey(to='ordering.OrderRound')),
-                ('supplier', models.ForeignKey(to='ordering.Supplier')),
+                ('order_round', models.ForeignKey(to='ordering.OrderRound', on_delete=models.CASCADE)),
+                ('supplier', models.ForeignKey(to='ordering.Supplier', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('-modified', '-created'),
