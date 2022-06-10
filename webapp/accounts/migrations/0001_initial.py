@@ -65,7 +65,7 @@ class Migration(migrations.Migration):
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('token', models.CharField(max_length=100, serialize=False, primary_key=True)),
                 ('is_confirmed', models.BooleanField(default=False)),
-                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': (b'-modified', b'-created'),
@@ -81,8 +81,8 @@ class Migration(migrations.Migration):
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('notes', models.TextField()),
-                ('address', models.ForeignKey(to='accounts.Address')),
-                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+                ('address', models.ForeignKey(to='accounts.Address', on_delete=models.CASCADE)),
+                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': (b'-modified', b'-created'),
