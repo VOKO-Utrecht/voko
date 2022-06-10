@@ -13,7 +13,7 @@ class Shift(TimeStampedModel):
 
     order_round = models.ForeignKey(
         OrderRound,
-        models.SET_NULL,
+        on_delete=models.SET_NULL,
         null=True,
         related_name="distribution_shifts")
     members = models.ManyToManyField(

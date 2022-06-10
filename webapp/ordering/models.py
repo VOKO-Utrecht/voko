@@ -23,7 +23,7 @@ class Supplier(TimeStampedModel):
         verbose_name = "Leverancier"
 
     name = models.CharField(max_length=50, unique=True)
-    address = models.ForeignKey(Address)
+    address = models.ForeignKey(Address, on_delete=models.CASCADE)
     contact_person = models.CharField(max_length=50, blank=True)
     email = models.EmailField()
     phone_number = models.CharField(max_length=25, blank=True)
@@ -55,7 +55,10 @@ class PickupLocation(TimeStampedModel):
 
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=255)
-    address = models.ForeignKey(Address, null=True, blank=True)
+    address = models.ForeignKey(Address,
+                                null=True,
+                                blank=True,
+                                on_delete=models.CASCADE)
     is_default = models.BooleanField(default=False)
 
     def save(self, **kwargs):
@@ -130,7 +133,7 @@ class OrderRound(TimeStampedModel):
 
     distribution_coordinator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        models.SET_NULL,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="coordinating_distribution_orderrounds"
@@ -138,17 +141,18 @@ class OrderRound(TimeStampedModel):
 
     transport_coordinator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        models.SET_NULL,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="coordinating_transport_orderrounds"
+        related_name="coordinating_transport_orderrounds",
     )
 
     pickup_location = models.ForeignKey(
         PickupLocation,
-        models.SET_NULL,
+        on_delete=models.SET_NULL,
         null=True,
-        blank=True)
+        blank=True,
+    )
 
     def clean(self):
         if self.is_over:
@@ -521,8 +525,12 @@ class Order(TimeStampedModel):
     objects = OrderManager()
 
     products = models.ManyToManyField("Product", through="OrderProduct")
-    order_round = models.ForeignKey("OrderRound", related_name="orders")
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="orders")
+    order_round = models.ForeignKey("OrderRound",
+                                     related_name="orders",
+                                     on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             related_name="orders",
+                             on_delete=models.CASCADE)
     user_notes = models.TextField(null=True, blank=True)
 
     # To "freeze" order before payment
@@ -530,7 +538,8 @@ class Order(TimeStampedModel):
     paid = models.BooleanField(default=False)
     # Debit created when this order was finished (describes total order value)
     debit = models.OneToOneField(Balance, null=True, blank=True,
-                                 related_name="order")
+                                 related_name="order",
+                                 on_delete=models.CASCADE)
 
     # TODO: order cannot be 'paid' without having a 'debit'. Add sanity check.
 
@@ -659,8 +668,12 @@ class OrderProduct(TimeStampedModel):
         verbose_name_plural = "Productbestellingen"
         unique_together = ('order', 'product')
 
-    order = models.ForeignKey("Order", related_name="orderproducts")
-    product = models.ForeignKey("Product", related_name="orderproducts")
+    order = models.ForeignKey("Order",
+                               related_name="orderproducts",
+                               on_delete=models.CASCADE)
+    product = models.ForeignKey("Product",
+                                 related_name="orderproducts",
+                                 on_delete=models.CASCADE)
     amount = models.IntegerField(verbose_name="Aantal")
     retail_price = models.DecimalField(
         max_digits=6,
@@ -723,11 +736,13 @@ class OrderProductCorrection(TimeStampedModel):
 
     order_product = models.OneToOneField("OrderProduct",
                                          related_name="correction",
-                                         editable=False)
+                                         editable=False,
+                                         on_delete=models.CASCADE)
     supplied_percentage = models.IntegerField(editable=False)
     notes = models.TextField(blank=True)
     credit = models.OneToOneField(Balance, related_name="correction",
-                                  editable=False)
+                                  editable=False,
+                                  on_delete=models.CASCADE)
     charge_supplier = models.BooleanField(
         default=True,
         verbose_name="Charge expenses to supplier"
@@ -822,7 +837,9 @@ class ProductStock(TimeStampedModel):
     TYPE_ADDED = 'added'
     TYPE_LOST = 'lost'
 
-    product = models.ForeignKey("Product", related_name="stock")
+    product = models.ForeignKey("Product",
+                                 related_name="stock",
+                                 on_delete=models.CASCADE)
     amount = models.IntegerField()
 
     type = models.CharField(max_length=5, choices=(
@@ -854,17 +871,19 @@ class Product(TimeStampedModel):
 
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    unit = models.ForeignKey(ProductUnit, null=True)
+    unit = models.ForeignKey(ProductUnit, null=True, on_delete=models.CASCADE)
     unit_amount = models.IntegerField(default=1,
                                       help_text="e.g. if half a kilo: \"500\"")
     base_price = models.DecimalField(max_digits=6, decimal_places=2)
-    supplier = models.ForeignKey("Supplier", related_name="products")
+    supplier = models.ForeignKey("Supplier",
+                                  related_name="products",
+                                  on_delete=models.CASCADE)
     # order_round NULL means: recurring / stock product
     order_round = models.ForeignKey("OrderRound", related_name="products",
-                                    blank=True, null=True)
+                                    blank=True, null=True, on_delete=models.CASCADE)
     # No category means "Other"
     category = models.ForeignKey("ProductCategory", related_name="products",
-                                 null=True, blank=True)
+                                 null=True, blank=True, on_delete=models.CASCADE)
     new = models.BooleanField(default=False, verbose_name="Show 'new' label")
     maximum_total_order = models.IntegerField(null=True, blank=True)
     enabled = models.BooleanField(default=True)
@@ -1042,8 +1061,8 @@ class DraftProduct(TimeStampedModel):
     Product Draft, used to create new products in the backend
     """
     data = JSONField()
-    supplier = models.ForeignKey(Supplier)
-    order_round = models.ForeignKey(OrderRound)
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    order_round = models.ForeignKey(OrderRound, on_delete=models.CASCADE)
     is_valid = models.BooleanField(default=False)
     validation_error = models.CharField(max_length=255, blank=True, null=True)
 

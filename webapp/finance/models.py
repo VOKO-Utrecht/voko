@@ -10,12 +10,15 @@ class Payment(TimeStampedModel):
     amount = models.DecimalField(max_digits=6, decimal_places=2)
 
     # A Payment is always used to finish an order
-    order = models.ForeignKey("ordering.Order", related_name="payments")
+    order = models.ForeignKey("ordering.Order",
+                               related_name="payments",
+                               on_delete=models.CASCADE)
 
     # Credit Balance, for successful payment
     balance = models.OneToOneField("finance.Balance",
                                    null=True,
-                                   related_name="payment")
+                                   related_name="payment",
+                                   on_delete=models.CASCADE)
 
     # null=True because field did not exist for Qantani payments
     mollie_id = models.CharField(max_length=255, null=True)
@@ -86,7 +89,9 @@ class Balance(TimeStampedModel):
         ("CR", "Credit"),
         ("DR", "Debit"),
     )
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="balance")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             related_name="balance",
+                             on_delete=models.CASCADE)
     type = models.CharField(max_length=2, choices=TYPES, db_index=True)
     amount = models.DecimalField(max_digits=6, decimal_places=2)
     notes = models.TextField()
