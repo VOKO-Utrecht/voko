@@ -89,7 +89,7 @@ class VokoUserManager(BaseUserManager):
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
-        user.activated = timezone.now()
+        user.activated = timezone.now
         user.save(using=self._db)
         return user
 
