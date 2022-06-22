@@ -11,7 +11,8 @@ from accounts.models import VokoUser
 class DeleteDisabledMixin(object):
     def get_actions(self, request):
         actions = super(DeleteDisabledMixin, self).get_actions(request)
-        del actions['delete_selected']
+        if 'delete_selected' in actions:
+                del actions['delete_selected']
         return actions
 
     @staticmethod
