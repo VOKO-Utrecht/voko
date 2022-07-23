@@ -1,0 +1,5 @@
+*
+!*.sh
+!*.py
+!Pipfile
+!Pipfile.lock
