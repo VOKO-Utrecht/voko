@@ -89,7 +89,7 @@ class VokoUserManager(BaseUserManager):
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
-        user.activated = timezone.now
+        user.activated = timezone.now()
         user.save(using=self._db)
         return user
 
@@ -150,7 +150,6 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
             message = """Hoi! We hebben een nieuwe gebruiker: %s""" % self
             mail_admins("Nieuwe gebruiker: %s" % self, message,
                         fail_silently=True)
-
         super(VokoUser, self).save(*args, **kwargs)
 
         try:
