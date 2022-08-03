@@ -1,5 +1,5 @@
 <ul class="nav navbar-nav navbar-right">
-{% if user.orders %}
+{% if user.orders.all %}
     {% if user.orders.get_current_order.orderproducts.all %}
 <li><a href="{% url 'finish_order' user.orders.get_current_order.pk %}">Bestelling (&euro; {{ user.orders.get_current_order.total_price }})</a></li>
     {% endif %}
