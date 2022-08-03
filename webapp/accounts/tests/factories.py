@@ -1,18 +1,19 @@
-import factory
+from factory import Sequence, LazyAttribute
+from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyText
 
 
-class VokoUserFactory(factory.DjangoModelFactory):
+class VokoUserFactory(DjangoModelFactory):
     class Meta:
         model = "accounts.VokoUser"
 
-    first_name = factory.Sequence(lambda n: 'John%s' % n)
-    last_name = factory.Sequence(lambda n: 'Doe%s' % n)
-    email = factory.LazyAttribute(lambda o: '%s@example.org' % o.last_name)
+    first_name = Sequence(lambda n: 'John%s' % n)
+    last_name = Sequence(lambda n: 'Doe%s' % n)
+    email = LazyAttribute(lambda o: '%s@example.org' % o.last_name)
     is_active = True
 
 
-class AddressFactory(factory.DjangoModelFactory):
+class AddressFactory(DjangoModelFactory):
     class Meta:
         model = "accounts.Address"
 

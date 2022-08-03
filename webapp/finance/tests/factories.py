@@ -1,7 +1,8 @@
 from factory.fuzzy import FuzzyInteger, FuzzyText, FuzzyDecimal
+from factory.django import DjangoModelFactory
+from factory import SubFactory
 from accounts.tests.factories import VokoUserFactory
 from ordering.tests.factories import OrderFactory
-from factory import DjangoModelFactory, SubFactory
 
 
 class BalanceFactory(DjangoModelFactory):
