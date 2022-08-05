@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Django",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/webapp/manage.py",
+            "args": [
+                "createsuperuser",
+                "--settings=vokou.settings.development",
+                // "0.0.0.0:8000"
+            ],
+            "django": true,
+            "cwd": "${workspaceFolder}/webapp"
+        }
+    ]
+ }
+ 
