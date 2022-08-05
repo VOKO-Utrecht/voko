@@ -264,7 +264,7 @@ class OrderAdminCorrection(GroupRequiredMixin, TemplateView):
             total_ordered += corr.order_product.amount
             total_suppl += corr.order_product.amount * corr.supplied_percentage
 
-        corr_perc = Decimal(total_suppl/total_ordered).quantize(
+        corr_perc = Decimal(total_suppl / total_ordered).quantize(
             Decimal('.01'), rounding=ROUND_DOWN)
         return corr_perc
 

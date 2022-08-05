@@ -47,8 +47,8 @@ def export_as_csv_action(description="Export selected objects as CSV file",
             writer.writerow(field_names)
         for obj in queryset:
             row = [getattr(obj, field)() if callable(
-                getattr(obj, field)) else getattr(obj, field) for field in
-                   field_names]
+                getattr(obj, field)) else getattr(obj, field)
+                for field in field_names]
             writer.writerow(row)
         return response
 
@@ -60,7 +60,7 @@ def export_as_csv_action(description="Export selected objects as CSV file",
 
 action_names = {
     ADDITION: 'Addition',
-    CHANGE:   'Change',
+    CHANGE: 'Change',
     DELETION: 'Deletion',
 }
 

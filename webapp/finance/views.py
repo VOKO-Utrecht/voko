@@ -67,9 +67,9 @@ class MollieMixin(object):
             'amount': {'currency': 'EUR', 'value': "{0:.2f}".format(amount)},
             'description': description,
             'redirectUrl': (
-                    settings.BASE_URL +
-                    reverse("finance.confirmtransaction") +
-                    "?order=%s" % order_id
+                settings.BASE_URL
+                + reverse("finance.confirmtransaction")
+                + "?order=%s" % order_id
             ),
             'webhookUrl': settings.BASE_URL + reverse("finance.callback"),
             'method': mollieMethod,
@@ -156,12 +156,12 @@ class CreateTransactionView(LoginRequiredMixin, MollieMixin, FormView):
 
         # Start the payment
         results = self.create_payment(
-                                    amount=float(amount_to_pay),
-                                    description="VOKO Utrecht %d"
-                                                % order_to_pay.id,
-                                    issuer_id=bank,
-                                    order_id=order_to_pay.id,
-                                    method=method)
+            amount=float(amount_to_pay),
+            description="VOKO Utrecht %d"
+                        % order_to_pay.id,
+            issuer_id=bank,
+            order_id=order_to_pay.id,
+            method=method)
 
         Payment.objects.create(amount=amount_to_pay,
                                order=order_to_pay,
@@ -208,9 +208,9 @@ class ConfirmTransactionView(LoginRequiredMixin, MollieMixin, TemplateView):
         success = mollie_payment.is_paid()
 
         if success:
-            if (payment.order.finalized is True and
-                    payment.order.paid is False and
-                    payment.order.order_round.is_open is True):
+            if (payment.order.finalized is True
+               and payment.order.paid is False
+               and payment.order.order_round.is_open is True):
 
                 payment.succeeded = True
                 payment.save()

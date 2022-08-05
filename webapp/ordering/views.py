@@ -49,7 +49,7 @@ class ProductsView(LoginRequiredMixin, ListView):
             return HttpResponseRedirect(reverse('finance.choosebank'))
         return ret
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # noqa: C901
         """
         Handling complex forms using Django's forms framework is nearly
         impossible without all kinds of trickery that don't necessarily
@@ -254,8 +254,8 @@ class ProductOrder(LoginRequiredMixin, SingleObjectMixin, FormView):
 
             if order_product.product.order_round:
                 # TODO: nicer error, or just disable ordering.
-                assert (order_product.product.order_round ==
-                        self.request.current_order_round)
+                assert (order_product.product.order_round
+                        == self.request.current_order_round)
 
             # Remove product from order when amount is zero
             if order_product.amount < 1:

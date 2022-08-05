@@ -562,9 +562,9 @@ class Order(TimeStampedModel):
         """
         product_sum = sum([odp.total_retail_price
                            for odp in self.orderproducts.all()])
-        return (product_sum +
-                self.order_round.transaction_costs +
-                self.member_fee)
+        return (product_sum
+                + self.order_round.transaction_costs
+                + self.member_fee)
 
     def total_price_to_pay_with_balances_taken_into_account(self):
         """
@@ -749,7 +749,7 @@ class OrderProductCorrection(TimeStampedModel):
     )
 
     def __str__(self):
-        return "Correctie van %s%%: %s" % (100-self.supplied_percentage,
+        return "Correctie van %s%%: %s" % (100 - self.supplied_percentage,
                                            self.order_product)
 
     def calculate_refund(self):
@@ -758,9 +758,9 @@ class OrderProductCorrection(TimeStampedModel):
         This is the amount which the member should be compensated for.
         """
         return Decimal(
-            (self.order_product.total_retail_price / Decimal("100.0")) *
-            (100 - self.supplied_percentage)).quantize(Decimal('.01'),
-                                                       rounding=ROUND_DOWN)
+            (self.order_product.total_retail_price / Decimal("100.0"))
+            * (100 - self.supplied_percentage)).quantize(Decimal('.01'),
+                                                         rounding=ROUND_DOWN)
 
     def calculate_supplier_refund(self):
         """
@@ -772,8 +772,8 @@ class OrderProductCorrection(TimeStampedModel):
         if self.charge_supplier is False:
             return Decimal('0')
         return Decimal(
-            (self.order_product.total_cost_price() / Decimal('100')) *
-            (Decimal('100') - self.supplied_percentage)).quantize(
+            (self.order_product.total_cost_price() / Decimal('100'))
+            * (Decimal('100') - self.supplied_percentage)).quantize(
             Decimal('.01'),
             rounding=ROUND_DOWN
         )
@@ -995,8 +995,8 @@ class Product(TimeStampedModel):
 
         if self.maximum_total_order is None:
             return 100
-        return int((float(self.amount_available) /
-                    float(self.maximum_total_order)) * 100)
+        return int((float(self.amount_available)
+                    / float(self.maximum_total_order)) * 100)
 
     @property
     def is_available(self):
@@ -1037,7 +1037,7 @@ class Product(TimeStampedModel):
         'new' attribute is used to show 'New' label in product list.
         """
         try:
-            prev_round = OrderRound.objects.get(id=self.order_round.id-1)
+            prev_round = OrderRound.objects.get(id=self.order_round.id - 1)
         except OrderRound.DoesNotExist:
             return
 
