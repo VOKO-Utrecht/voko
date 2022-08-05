@@ -133,8 +133,8 @@ class TestOrderRoundModel(VokoTestCase):
         self.assertCountEqual(order_round.suppliers(), [supplier1])
 
         self.assertEqual(order_round.supplier_total_order_sum(supplier1),
-                         supplier1_orderproduct.product.base_price *
-                         supplier1_orderproduct.amount)
+                         supplier1_orderproduct.product.base_price
+                         * supplier1_orderproduct.amount)
 
     def test_supplier_total_order_sum_with_multiple_orders(self):
         order_round = OrderRoundFactory()
@@ -147,11 +147,10 @@ class TestOrderRoundModel(VokoTestCase):
             order__paid=True, order__finalized=True)
 
         expected_sum = (
-            (supplier1_orderproduct1.product.base_price *
-             supplier1_orderproduct1.amount)
-            +
-            (supplier1_orderproduct2.product.base_price *
-             supplier1_orderproduct2.amount)
+            (supplier1_orderproduct1.product.base_price
+             * supplier1_orderproduct1.amount)
+            + (supplier1_orderproduct2.product.base_price
+               * supplier1_orderproduct2.amount)
         )
 
         self.assertEqual(order_round.supplier_total_order_sum(supplier1),
@@ -172,8 +171,7 @@ class TestOrderRoundModel(VokoTestCase):
 
         expected_sum = (
             (orderproduct1.product.base_price * orderproduct1.amount)
-            +
-            (orderproduct2.product.base_price * orderproduct2.amount)
+            + (orderproduct2.product.base_price * orderproduct2.amount)
         )
 
         self.assertEqual(order_round.total_order_sum(), expected_sum)
@@ -232,12 +230,12 @@ class TestOrderRoundModel(VokoTestCase):
         self.assertEqual(order_round.number_of_orders(), 3)
 
     def test_get_next_order_round(self):
-        self.assertTrue(self.cur_order_round.get_next_order_round().id ==
-                        self.next_order_round.id)
+        self.assertTrue(self.cur_order_round.get_next_order_round().id
+                        == self.next_order_round.id)
 
     def test_get_previous_order_round(self):
-        self.assertTrue(self.cur_order_round.get_previous_order_round().id ==
-                        self.prev_order_round.id)
+        self.assertTrue(self.cur_order_round.get_previous_order_round().id
+                        == self.prev_order_round.id)
 
     def test_pickup_reminder_send_to_user_with_orders(self):
         self.mail_user = self.patch("ordering.models.mail_user")
@@ -368,23 +366,23 @@ class TestOrderModel(VokoTestCase):
     def test_total_price_with_no_products(self):
         order = OrderFactory()
         self.assertEqual(order.total_price,
-                         order.member_fee +
-                         order.order_round.transaction_costs)
+                         order.member_fee
+                         + order.order_round.transaction_costs)
 
     def test_total_order_price_with_one_orderproduct(self):
         order = OrderFactory()
         odp1 = OrderProductFactory(order=order)
         self.assertEqual(order.total_price, (
-                    order.member_fee + order.order_round.transaction_costs) +
-                         odp1.total_retail_price)
+            order.member_fee + order.order_round.transaction_costs)
+            + odp1.total_retail_price)
 
     def test_total_order_price_with_two_orderproducts(self):
         order = OrderFactory()
         odp1 = OrderProductFactory(order=order)
         odp2 = OrderProductFactory(order=order)
         self.assertEqual(order.total_price, (
-                    order.member_fee + order.order_round.transaction_costs) +
-                         odp1.total_retail_price + odp2.total_retail_price)
+            order.member_fee + order.order_round.transaction_costs)
+            + odp1.total_retail_price + odp2.total_retail_price)
 
     def test_total_price_to_pay_with_no_balance(self):
         order = OrderFactory()
@@ -745,7 +743,7 @@ class TestProductModel(VokoTestCase):
         odp1 = OrderProductFactory(product=product, amount=1, order__paid=True)
 
         self.assertEqual(product.verbose_availability(), "%s in voorraad" % (
-                    (stock1.amount + stock2.amount) - odp1.amount))
+            (stock1.amount + stock2.amount) - odp1.amount))
 
     def test_verbose_availability_with_stock_4(self):
         OrderRoundFactory()

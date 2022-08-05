@@ -6,8 +6,8 @@ class UserIsInvolvedWithShiftMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
         shift = self.get_object()
         if (
-            request.user not in shift.members.all() and
-            not request.user.groups.filter(
+            request.user not in shift.members.all()
+            and not request.user.groups.filter(
                 name='Uitdeelcoordinatoren'
             ).exists()
         ):

@@ -19,10 +19,10 @@ class Schedule(LoginRequiredMixin, ListView):
             rides = models.Ride.objects.all()
         else:
             rides = models.Ride.objects.filter(
-                Q(driver=user) |
-                Q(codriver=user) |
-                Q(order_round__transport_coordinator=user) |
-                Q(order_round__distribution_coordinator=user)
+                Q(driver=user)
+                | Q(codriver=user)
+                | Q(order_round__transport_coordinator=user)
+                | Q(order_round__distribution_coordinator=user)
             )
 
         rides = rides.order_by("order_round__collect_datetime", "route")
