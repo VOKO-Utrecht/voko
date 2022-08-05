@@ -132,7 +132,7 @@ def roles(self):
 
     p = sorted(["<a title='%s'>%s</a>" % (
         x, short_name(x)) for x in self.groups.all()]
-               )
+        )
     if self.user_permissions.count():
         p += ['+']
     value = ', '.join(p)

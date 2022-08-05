@@ -6,11 +6,11 @@ class UserIsInvolvedMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
         ride = self.get_object()
         if (
-            request.user != ride.driver and
-            request.user != ride.codriver and
-            request.user != ride.distribution_coordinator and
-            request.user != ride.transport_coordinator and
-            not request.user.groups.filter(
+            request.user != ride.driver
+            and request.user != ride.codriver
+            and request.user != ride.distribution_coordinator
+            and request.user != ride.transport_coordinator
+            and not request.user.groups.filter(
                 name__in=['Transportcoordinatoren', 'Admin']
             ).exists()
         ):

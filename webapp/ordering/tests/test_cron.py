@@ -10,7 +10,8 @@ class TestPickupReminderJob(VokoTestCase):
 
     def test_pickup_reminder_send(self):
         with patch(
-         "ordering.models.OrderRound.send_pickup_reminder_mails") as mock_mail:
+            "ordering.models.OrderRound.send_pickup_reminder_mails") as \
+                mock_mail:
             now = datetime.now(tz=UTC)
             self.cur_order_round = OrderRoundFactory(
                 open_for_orders=now - timedelta(days=4),
@@ -23,7 +24,8 @@ class TestPickupReminderJob(VokoTestCase):
 
     def test_pickup_reminder_not_send_too_early(self):
         with patch(
-         "ordering.models.OrderRound.send_pickup_reminder_mails") as mock_mail:
+            "ordering.models.OrderRound.send_pickup_reminder_mails") as \
+                mock_mail:
             now = datetime.now(tz=UTC)
             self.cur_order_round = OrderRoundFactory(
                 open_for_orders=now - timedelta(days=4),
@@ -36,7 +38,8 @@ class TestPickupReminderJob(VokoTestCase):
 
     def test_pickup_reminder_not_send_too_late(self):
         with patch(
-         "ordering.models.OrderRound.send_pickup_reminder_mails") as mock_mail:
+            "ordering.models.OrderRound.send_pickup_reminder_mails") as \
+                mock_mail:
             now = datetime.now(tz=UTC)
             self.cur_order_round = OrderRoundFactory(
                 open_for_orders=now - timedelta(days=4),
