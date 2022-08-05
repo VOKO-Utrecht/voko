@@ -116,9 +116,9 @@ class TestCreateTransaction(FinanceTestCase):
                     self.order.total_price_to_pay_with_balances_taken_into_account())}, # noqa
                 'description': 'VOKO Utrecht %d' % self.order.id,
                 'webhookUrl': settings.BASE_URL + reverse('finance.callback'),
-                'redirectUrl': (settings.BASE_URL +
-                                reverse("finance.confirmtransaction") +
-                                "?order=%d" % self.order.id),
+                'redirectUrl': (settings.BASE_URL
+                                + reverse("finance.confirmtransaction")
+                                + "?order=%d" % self.order.id),
                 'metadata': {'order_id': self.order.id},
                 'method': 'ideal',
                 'issuer': 'EXAMPLE_BANK'}
@@ -132,9 +132,9 @@ class TestCreateTransaction(FinanceTestCase):
                     self.order.total_price_to_pay_with_balances_taken_into_account())}, # noqa
                 'description': 'VOKO Utrecht %d' % self.order.id,
                 'webhookUrl': settings.BASE_URL + reverse('finance.callback'),
-                'redirectUrl': (settings.BASE_URL +
-                                reverse("finance.confirmtransaction") +
-                                "?order=%d" % self.order.id),
+                'redirectUrl': (settings.BASE_URL
+                                + reverse("finance.confirmtransaction")
+                                + "?order=%d" % self.order.id),
                 'metadata': {'order_id': self.order.id},
                 'method': 'bancontact',
                 'issuer': None}

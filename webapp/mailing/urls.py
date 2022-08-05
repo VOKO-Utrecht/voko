@@ -11,4 +11,4 @@ urlpatterns = (
     url(r'^sendmail/send/(?P<pk>[0-9]+)/$',
         SendMailView.as_view(),
         name="admin_send_mail"),
-  )
+)

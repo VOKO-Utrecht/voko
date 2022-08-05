@@ -8,7 +8,7 @@ from django_cron import CronJobBase, Schedule
 
 from log import log_event
 from .core import get_current_order_round, get_next_order_round, \
-                  get_last_order_round
+    get_last_order_round
 from ordering.models import Supplier
 import unicodecsv as csv
 
@@ -37,9 +37,8 @@ class SendOrderReminders(CronJobBase):
         hours_before_closing = int(closing_delta.total_seconds() / 60 / 60)
         print("Hours before closing (rounded): %s" % hours_before_closing)
 
-        if ((hours_before_closing <=
-             order_round.reminder_hours_before_closing)
-                and order_round.reminder_sent is False):
+        if ((hours_before_closing <= order_round.reminder_hours_before_closing)
+           and order_round.reminder_sent is False):
             print("Sending reminders!")
             order_round.send_reminder_mails()
 
@@ -59,10 +58,9 @@ class SendPickupReminders(CronJobBase):
         hours_before_collecting = int(collect_delta.total_seconds() / 60 / 60)
         print("Hours before collecting: %s" % hours_before_collecting)
 
-        if ((hours_before_collecting <=
-             order_round.reminder_hours_before_pickup
-                and hours_before_collecting > 0)
-                and order_round.pickup_reminder_sent is False):
+        if ((hours_before_collecting <= order_round.reminder_hours_before_pickup
+           and hours_before_collecting > 0)
+           and order_round.pickup_reminder_sent is False):
             print("Sending pickup reminders!")
             order_round.send_pickup_reminder_mails()
 
@@ -209,8 +207,8 @@ class SendPrepareRideMails(CronJobBase):
         if order_round.is_open:
             next_order_round = get_next_order_round()
             print("Next order round: %s" % next_order_round)
-            if (next_order_round is not None and
-                    next_order_round.prepare_ride_mails_sent is False):
+            if (next_order_round is not None
+               and next_order_round.prepare_ride_mails_sent is False):
                 print("Sending prepare ride mails!")
                 next_order_round.send_prepare_ride_mails()
 
@@ -252,7 +250,7 @@ class SendDistributionMails(CronJobBase):
         print("SendDistributionMails")
         order_round = get_current_order_round()
         print("Order round: %s" % order_round)
-        if (order_round.is_open and
-                order_round.distribution_mails_sent is False):
+        if (order_round.is_open
+           and order_round.distribution_mails_sent is False):
             print("Sending distribution mails!")
             order_round.send_distribution_mails()
