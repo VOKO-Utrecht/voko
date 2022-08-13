@@ -8,6 +8,12 @@ from distribution.mixins import UserIsInvolvedWithShiftMixin
 class Schedule(LoginRequiredMixin, ListView):
     template_name = "distribution/schedule.html"
 
+    def get_context_data(self, **kwargs):
+        context = super(Schedule, self).get_context_data(**kwargs)
+        # helper to hide/show ride details
+        context['isCoordinator'] = self.request.user.groups.filter(name='Uitdeelcoordinatoren').exists()
+        return context
+
     def get_queryset(self):
         user = self.request.user
 
