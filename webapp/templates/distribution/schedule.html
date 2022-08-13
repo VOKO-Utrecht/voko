@@ -14,6 +14,10 @@
             <th>Van</th>
             <th>Tot</th>
             <th>Deelnemers</th>
+            {% if isCoordinator %}
+            <th>Transport Bijrijder(s)</th> 
+            {% endif %}
+            
         </tr>
         </thead>
         <tbody>
@@ -23,6 +27,13 @@
             <td class="col-md-1">{{ shift.start_str }}</td>
             <td class="col-md-1">{{ shift.end_str }}</td>
             <td class="col-md-4">{{ shift.members_names|join:", " }}</td>
+            {% if isCoordinator %}
+            <td class="col-md-2">
+                {% for ride in shift.order_round.rides.all %}
+                    {{ ride.route }}: {{ ride.codriver }} ({{ride.codriver.userprofile.phone_number}})<br/>
+                {% endfor %}
+            </td>
+            {% endif %}
         </tr>
         {% endfor %}
         </tbody>
