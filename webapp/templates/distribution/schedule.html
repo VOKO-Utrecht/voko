@@ -15,7 +15,7 @@
             <th>Tot</th>
             <th>Deelnemers</th>
             {% if isCoordinator %}
-            <th>Transport Bijrijder</th> 
+            <th>Transport Bijrijder(s)</th> 
             {% endif %}
             
         </tr>
@@ -30,7 +30,7 @@
             {% if isCoordinator %}
             <td class="col-md-2">
                 {% for ride in shift.order_round.rides.all %}
-                {{ ride.route }}: {{ ride.codriver }} ({{ride.codriver.userprofile.phone_number}})<br/>
+                    {{ ride.route }}: {{ ride.codriver }} ({{ride.codriver.userprofile.phone_number}})<br/>
                 {% endfor %}
             </td>
             {% endif %}
