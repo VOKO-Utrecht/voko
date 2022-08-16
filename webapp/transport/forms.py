@@ -6,7 +6,7 @@ from constance import config
 class GroupManagerForm(forms.Form):
 
     users = forms.ModelMultipleChoiceField(
-        queryset=VokoUser.objects.all().order_by("first_name"), required=False
+        queryset=VokoUser.objects.all().filter(is_active=True).order_by("first_name"), required=False
         )
 
     def __init__(self, *args, **kwargs):
