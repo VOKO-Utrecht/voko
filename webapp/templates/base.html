@@ -13,6 +13,7 @@
     <link href="{% static 'bootstrap/css/bootstrap-theme.min.css' %}" rel="stylesheet" media='screen,print'>
     <link href="{% static 'css/theme.css' %}" rel="stylesheet" media='screen,print'>
     <link rel="stylesheet" type="text/css" href="{% static 'datatables/datatables.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'duallistbox/bootstrap-duallistbox.min.css' %}">
 
     {% block extra_head %}{% endblock %}
 
@@ -42,7 +43,17 @@
             <li><a href="/">Home</a></li>
             <li><a href="{% url 'view_products' %}">Producten</a></li>
             <li><a href="{% url 'docs.document_overview' %}">Documenten</a></li>
+            {% if 'Transportcoordinatoren' in user.flat_groups %}
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Transport<span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="{% url 'groupmanager' %}">Transport leden</a></li>
+                <li><a href="{% url 'schedule' %}">Transport schema</a></li>
+              </ul>
+            </li>
+            {% else %}
             <li><a href="{% url 'schedule' %}">Transport</a></li>
+            {% endif %}
             {% if 'Uitdeel' in user.flat_groups or 'Uitdeelcoordinatoren' in user.flat_groups %}
               <li><a href="{% url 'distribution-schedule' %}">Uitdeel</a></li>
             {% endif %}
@@ -79,6 +90,8 @@
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 
     <script type="text/javascript" src="{% static 'datatables/datatables.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'duallistbox/jquery.bootstrap-duallistbox.min.js' %}"></script>
+    
 
     {% block javascript %}{% endblock %}
   </body>
