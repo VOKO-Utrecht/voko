@@ -82,7 +82,5 @@ class Groupmanager(LoginRequiredMixin, IsTransportCoordinatorMixin, FormView):
             if (m.id not in members_ids):
                 members_to_remove.append(m)
 
-        if (len(members_to_add) > 0):
-            group.user_set.add(*members_to_add)
-        if (len(members_to_remove) > 0):
-            group.user_set.remove(*members_to_remove)
+        group.user_set.add(*members_to_add)
+        group.user_set.remove(*members_to_remove)

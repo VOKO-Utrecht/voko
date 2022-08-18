@@ -5,7 +5,6 @@
 {% block content %}
 <h1>Leden groep Transport</h1>
 <hr/>
-<!-- <h3>Verwijder of voeg Voko leden toe aan de groep.</h3> -->
 
 <form action="{% url 'groupmanager' %}" method="POST" xmlns="http://www.w3.org/1999/html">
     {% csrf_token %}
@@ -33,8 +32,6 @@ document.addEventListener("DOMContentLoaded", () => {
         "filterTextClear": "Toon alle",
         "infoText": "Toon alle {0}",
         "infoTextFiltered": '<span class="label label-warning">Filtered</span> {0} van {1}'
-
-
 })});
 </script>
 {% endblock %}
