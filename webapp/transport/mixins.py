@@ -22,8 +22,9 @@ class UserIsInvolvedMixin(AccessMixin):
 
 class IsTransportCoordinatorMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
-        if (not request.user.groups.filter(
-                name='Transportcoordinatoren').exists()):
+        if (not request.user.is_superuser
+            and not request.user.groups.filter(
+                name__in=['Transportcoordinatoren', 'Admin'])):
             raise PermissionDenied
 
         return super(IsTransportCoordinatorMixin, self).dispatch(
