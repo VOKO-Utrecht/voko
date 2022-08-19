@@ -43,7 +43,7 @@
             <li><a href="/">Home</a></li>
             <li><a href="{% url 'view_products' %}">Producten</a></li>
             <li><a href="{% url 'docs.document_overview' %}">Documenten</a></li>
-            {% if 'Transportcoordinatoren' in user.flat_groups %}
+            {% if 'Transportcoordinatoren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Transport<span class="caret"></span></a>
               <ul class="dropdown-menu" role="menu">
