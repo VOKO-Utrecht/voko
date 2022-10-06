@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 
 from .base import *
+import socket 
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'da)=ydvhyj*u6%ldu_8hf%1op2efv!3q*%(ks=j19dvi$fu0oh'
@@ -37,7 +38,10 @@ EMAIL_FILE_PATH = '/tmp/app-messages'
 
 INSTALLED_APPS += ['debug_toolbar',]
 MIDDLEWARE_CLASSES = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE_CLASSES
-INTERNAL_IPS = ['127.0.0.1']
+
+# Getting the correct internal IP when running in Docker
+hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
 
 # RECAPTCHA Config
 # Below are official public test keys to use with RECAPTCHA V2
