@@ -14,6 +14,7 @@
                 <th>Naam</th>
                 <th>E-mail</th>
                 <th>Telefoon</th>
+                <th class="text-center">Coördinator</th>
             </tr>
             </thead>
             <tbody>
@@ -21,7 +22,8 @@
             <tr class="account">
                 <td class="col-md-2">{{ account.get_full_name }}</td>
                 <td class="col-md-2">{{ account.email }}</td>
-                <td class="col-md-2">{{ account.userprofile.phone_number }}</td>
+                <td class="col-md-1">{{ account.userprofile.phone_number }}</td>              
+                <td class="col-md-1 text-center">{% if 'Transportcoordinatoren' in account.flat_groups %}X{% endif %}</td>
             </tr>
             {% endfor %}
             </tbody>
