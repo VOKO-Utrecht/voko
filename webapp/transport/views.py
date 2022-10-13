@@ -3,10 +3,11 @@ from django.views.generic import (DetailView, ListView, FormView)
 from transport import models
 from django.db.models import Q
 import datetime
-from transport.mixins import UserIsInvolvedMixin, IsTransportCoordinatorMixin
+from transport.mixins import UserIsInvolvedMixin, IsTransportCoordinatorMixin, IsInTransportMixin
 from accounts.models import VokoUser
 from django.contrib.auth.models import Group
 from transport.forms import GroupManagerForm
+from constance import config
 
 
 class Schedule(LoginRequiredMixin, ListView):
@@ -42,12 +43,19 @@ class Ride(LoginRequiredMixin, UserIsInvolvedMixin, DetailView):
     model = models.Ride
 
 
-class Cars(LoginRequiredMixin, ListView):
+class Cars(LoginRequiredMixin, IsInTransportMixin, ListView):
     queryset = VokoUser.objects.filter(
         is_active=True,
         userprofile__shares_car__exact=True
     )
     template_name = "transport/cars.html"
+
+
+class Members(LoginRequiredMixin, IsInTransportMixin, ListView):
+    queryset = VokoUser.objects.filter(
+        is_active=True,
+        groups__id=config.TRANSPORT_GROUP)
+    template_name = "transport/members.html"
 
 
 class Groupmanager(LoginRequiredMixin, IsTransportCoordinatorMixin, FormView):
@@ -58,7 +66,7 @@ class Groupmanager(LoginRequiredMixin, IsTransportCoordinatorMixin, FormView):
     success_url = "/transport/groupmanager"
 
     def post(self, request, *args, **kwargs):
-        transport_group = Group.objects.get(pk=2)
+        transport_group = Group.objects.get(pk=config.TRANSPORT_GROUP)
         form = GroupManagerForm(request.POST)
         if (form.is_valid()):
             if "cancel" in request.POST:

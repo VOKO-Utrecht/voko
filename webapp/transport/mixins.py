@@ -29,3 +29,14 @@ class IsTransportCoordinatorMixin(AccessMixin):
 
         return super(IsTransportCoordinatorMixin, self).dispatch(
             request, *args, **kwargs)
+
+
+class IsInTransportMixin(AccessMixin):
+    def dispatch(self, request, *args, **kwargs):
+        if (not request.user.is_superuser
+            and not request.user.groups.filter(
+                name__in=['Transportcoordinatoren', 'Transport', 'Admin'])):
+            raise PermissionDenied
+
+        return super(IsInTransportMixin, self).dispatch(
+            request, *args, **kwargs)
