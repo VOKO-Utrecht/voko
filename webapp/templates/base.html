@@ -43,18 +43,22 @@
             <li><a href="/">Home</a></li>
             <li><a href="{% url 'view_products' %}">Producten</a></li>
             <li><a href="{% url 'docs.document_overview' %}">Documenten</a></li>
-            {% if 'Transportcoordinatoren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+            {% if 'Transportcoordinatoren' in user.flat_groups or 'Transport' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Transport<span class="caret"></span></a>
               <ul class="dropdown-menu" role="menu">
-                <li><a href="{% url 'groupmanager' %}">Transport leden</a></li>
-                <li><a href="{% url 'schedule' %}">Transport schema</a></li>
+                {% if 'Transportcoordinatoren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+                  <li><a href="{% url 'groupmanager' %}">Leden beheer</a></li>
+                {% endif %}
+                <li><a href="{% url 'members' %}">Leden</a></li>
+                <li><a href="{% url 'schedule' %}">Schema</a></li>
+                <li><a href="{% url 'cars' %}">Auto’s</a></li>
               </ul>
             </li>
             {% else %}
             <li><a href="{% url 'schedule' %}">Transport</a></li>
             {% endif %}
-            {% if 'Uitdeel' in user.flat_groups or 'Uitdeelcoordinatoren' in user.flat_groups %}
+            {% if 'Uitdeel' in user.flat_groups or 'Uitdeelcoordinatoren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser  %}
               <li><a href="{% url 'distribution-schedule' %}">Uitdeel</a></li>
             {% endif %}
             <li><a href="{% url 'contact' %}">Contact</a></li>

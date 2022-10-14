@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% block title %}Transportleden{% endblock %}
+{% block content %}
+    <h1 class="page-header">Transportleden</h1>
+    <p>
+        Lijst van leden in de transportgroep. 
+    </p>
+    <!-- Table -->
+    <div class="panel panel-default">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Naam</th>
+                <th>E-mail</th>
+                <th>Telefoon</th>
+                <th class="text-center">Coördinator</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for account in object_list %}
+            <tr class="account">
+                <td class="col-md-2">{{ account.get_full_name }}</td>
+                <td class="col-md-2">{{ account.email }}</td>
+                <td class="col-md-1">{{ account.userprofile.phone_number }}</td>              
+                <td class="col-md-1 text-center">{% if 'Transportcoordinatoren' in account.flat_groups %}X{% endif %}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
