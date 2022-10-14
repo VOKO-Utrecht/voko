@@ -28,7 +28,7 @@ class Schedule(LoginRequiredMixin, ListView):
                 | Q(order_round__distribution_coordinator=user)
             )
 
-        rides = rides.order_by("order_round__collect_datetime", "route")
+        rides = rides.order_by("-order_round__collect_datetime", "route")
 
         if (user.groups.filter(name='Admin').exists()):
             return rides
