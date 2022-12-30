@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% block title %}Teamindeling{% endblock %}
+{% block content %}
+    <h1 class="page-header">Teamindeling</h1>
+    <p>
+        Lijst van alle teams en actieve leden. 
+    </p>
+    <!-- Table -->
+    <div class="panel panel-default">
+        <table class="table">
+            <tbody>
+            {% for group in object_list %}
+
+            <tr class="bg-primary">
+                <th colspan=4>{{ group.group.name }} ({{ group.members|length }}) </th>
+            </tr>  
+                <tr>
+                    <th>Naam</th>
+                    <th>E-mail</th>
+                    <th>Telefoon</th>
+                </tr>
+          
+                {% for member in group.members %}
+                <tr class="account">
+                    <td class="col-md-2">{{ member }}</td>
+                    <td class="col-md-2">{{ member.email }}</td>
+                    <td class="col-md-1">{{ member.userprofile.phone_number }}</td>              
+                </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
