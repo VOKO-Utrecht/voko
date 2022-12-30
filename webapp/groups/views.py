@@ -14,28 +14,33 @@ class Members(LoginRequiredMixin, ListView):
               'DISTRIBUTION_GROUP',
               'FARMERS_GROUP',
               'IT_GROUP',
-              'PROMO_GROUP'}
+              'PROMO_GROUP'} 
     
-    def _get_groups(groups_to_show):
+    def _get_groups(self):
         group_ids = []
-        for name in groups_to_show:
+        for name in self.groups_to_show:
             id = getattr(config, name)
             group_ids.append(id)
         return Group.objects.filter(pk__in=group_ids)
     
     def _get_members_wo_group():
-        return VokoUser.objects.filter(is_active=True,groups__id__isnull=True)
-       
-    groups = _get_groups(groups_to_show)
+        return VokoUser.objects.filter(is_active=True,groups__id__isnull=True).order_by("first_name", "last_name")
+    
+    def get_queryset(self):
+               
+        groups = self._get_groups()
    
-    queryset = []
-    for group in groups:
-        members = VokoUser.objects.filter(is_active=True,groups__id=group.id)  
-        my_group = {"group": group, "members": members}
-        queryset.append(my_group)
-        
-    queryset.append({"group":Group(name="Leden zonder groep"),"members":_get_members_wo_group})
+        queryset = []
+        for group in groups:
+            members = VokoUser.objects.filter(is_active=True,groups__id=group.id).order_by("first_name", "last_name")  
+            my_group = {"group": group, "members": members}
+            queryset.append(my_group)
+            
+        queryset.append({"group":Group(name="Leden zonder groep"),"members":self._get_members_wo_group})
+        return queryset
+
     
     template_name = "groups/members.html"
+    
     
 

@@ -54,7 +54,7 @@ class Cars(LoginRequiredMixin, IsInTransportMixin, ListView):
 class Members(LoginRequiredMixin, IsInTransportMixin, ListView):
     queryset = VokoUser.objects.filter(
         is_active=True,
-        groups__id=config.TRANSPORT_GROUP)
+        groups__id=config.TRANSPORT_GROUP).order_by("first_name", "last_name")  
     template_name = "transport/members.html"
 
 
@@ -83,12 +83,14 @@ class Groupmanager(LoginRequiredMixin, IsTransportCoordinatorMixin, FormView):
         members_to_remove = []
         for m in members:
             if (group.user_set.all().filter(id=m.id).first() is None):
-                members_to_add.append(m)
+                # members_to_add.append(m)
+                m.groups.add(group)
 
         members_ids = [int(item) for item in members_ids]
         for m in group.user_set.all():
             if (m.id not in members_ids):
-                members_to_remove.append(m)
-
-        group.user_set.add(*members_to_add)
-        group.user_set.remove(*members_to_remove)
+                # members_to_remove.append(m)
+                m.groups.remove(group)
+ 
+        # group.user_set.add(*members_to_add)
+        # group.user_set.remove(*members_to_remove)

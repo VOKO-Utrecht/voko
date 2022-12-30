@@ -6,12 +6,12 @@
 <h1>Leden groep Transport</h1>
 <hr/>
 
-<form action="{% url 'groupmanager' %}" method="POST" xmlns="http://www.w3.org/1999/html">
+<form action="{% url 'transport_groupmanager' %}" method="POST" xmlns="http://www.w3.org/1999/html">
     {% csrf_token %}
     {{ form.users }}
     <div class = "text-right">
         <br/>
-        <a class="btn btn-default"  href="{% url 'groupmanager' %}">Annuleer</a>&nbsp;&nbsp;
+        <a class="btn btn-default"  href="{% url 'transport_groupmanager' %}">Annuleer</a>&nbsp;&nbsp;
         <button class="btn btn-primary" type = 'submit'>Opslaan</button>
     </div>
 </form>

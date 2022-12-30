@@ -48,9 +48,9 @@
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Transport<span class="caret"></span></a>
               <ul class="dropdown-menu" role="menu">
                 {% if 'Transportcoordinatoren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
-                  <li><a href="{% url 'groupmanager' %}">Leden beheer</a></li>
+                  <li><a href="{% url 'transport_groupmanager' %}">Leden beheer</a></li>
                 {% endif %}
-                <li><a href="{% url 'members' %}">Leden</a></li>
+                <li><a href="{% url 'transport_members' %}">Leden</a></li>
                 <li><a href="{% url 'schedule' %}">Schema</a></li>
                 <li><a href="{% url 'cars' %}">Auto’s</a></li>
               </ul>
