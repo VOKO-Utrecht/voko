@@ -20,7 +20,16 @@
 {% endif %}
 
 {% if 'Boeren' in user.flat_groups or 'Admin' in user.flat_groups or 'Uitdeelcoordinatoren' in user.flat_groups or user.is_superuser or user.is_staff %}
-    <li><a href="{% url 'admin:index' %}">Backend</a></li>
+<li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin<span class="caret"></span></a>
+    <ul class="dropdown-menu" role="menu">
+      <li><a href="{% url 'admin:index' %}">Backend</a></li>
+      {% if 'Admin' in user.flat_groups or user.is_superuser %}
+      <li><a href="{% url 'groups_members' %}">Groepen</a></li>
+      {% endif %}
+    </ul>
+</li>
+    
 {% endif %}
 
 <li class="dropdown">
