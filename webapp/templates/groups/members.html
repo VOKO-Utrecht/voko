@@ -10,25 +10,24 @@
     <div class="panel panel-default">
         <table class="table">
             <tbody>
-            {% for group in object_list %}
-
-            <tr class="bg-primary">
-                <th colspan=4>{{ group.group.name }} ({{ group.members|length }}) </th>
-            </tr>  
                 <tr>
-                    <th>Naam</th>
-                    <th>E-mail</th>
-                    <th>Telefoon</th>
+                    {% for group in object_list %}                  
+                    <td>
+                        <table class="table-striped table-condensed table-responsive">
+                            <tr>    
+                                <th class="bg-primary">
+                                    {{ group.group.name }} ({{ group.members|length }})
+                                </th>  
+                            </tr>
+                            {% for member in group.members %}
+                            <tr class="account">
+                                <td class="col-md-2">{{ member }}</td>         
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                    {% endfor %}
                 </tr>
-          
-                {% for member in group.members %}
-                <tr class="account">
-                    <td class="col-md-2">{{ member }}</td>
-                    <td class="col-md-2">{{ member.email }}</td>
-                    <td class="col-md-1">{{ member.userprofile.phone_number }}</td>              
-                </tr>
-                {% endfor %}
-            {% endfor %}
             </tbody>
         </table>
     </div>
