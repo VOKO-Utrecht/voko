@@ -26,7 +26,8 @@ django-picklefield = "==2.1.1"
 psycopg2-binary = "==2.8.6"
 Django = "==1.11.29"
 Unipath = "==1.1"
-uWSGI = "==2.0.19.1"
+# uWSGI = "==2.0.19.1"
+gunicorn = "20.1.0"
 
 [dev-packages]
 fake-factory = "==0.7.4"
@@ -36,4 +37,4 @@ django-debug-toolbar = "==1.11.1"
 flake8 = "==3.8.4"
 
 [requires]
-python_version = "3.6"
+python_version = "3.7"
