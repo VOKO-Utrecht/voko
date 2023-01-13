@@ -1,6 +1,6 @@
 # Pull base image
 # not using "slim" image, because UWSGI dependency fails
-FROM python:3.6-bullseye as base
+FROM python:3.7-bullseye as base
 
 # Setup env
 ENV LANG C.UTF-8
