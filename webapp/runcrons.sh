@@ -1,11 +1,6 @@
 #!/bin/bash
 
-set -e
 
-source ~/production_secrets.sh
+cd /home/voko/voko
 
-source /home/voko/.virtualenvs/voko/bin/activate
-export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
-
-cd /home/voko/voko/webapp
-exec python manage.py runcrons
+pipenv run python webapp/manage.py runcrons --settings=vokou.settings.production 
