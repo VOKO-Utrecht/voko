@@ -18,6 +18,6 @@ ADMINS = (
     ("Voko Utrecht", os.getenv('ADMIN_EMAIL', "info@vokoutrecht.nl")),
 )
 
-ALLOWED_HOSTS = ("acc.leden.vokoutrecht.nl")
+ALLOWED_HOSTS = ("acc.leden.vokoutrecht.nl", "127.0.0.1")
 
 MOLLIE_API_KEY = os.environ["MOLLIE_API_KEY"]
