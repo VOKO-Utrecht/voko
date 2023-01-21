@@ -13,6 +13,8 @@ DATABASES = {
     }
 
 SERVER_EMAIL = "info@vokoutrecht.nl"
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = '/tmp/app-messages'
 
 ADMINS = (
     ("Voko Utrecht", os.getenv('ADMIN_EMAIL', "info@vokoutrecht.nl")),
