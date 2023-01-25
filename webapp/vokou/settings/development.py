@@ -37,7 +37,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = '/tmp/app-messages'
 
 INSTALLED_APPS += ['debug_toolbar',]
-MIDDLEWARE_CLASSES = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE_CLASSES
+MIDDLEWARE = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE
 
 # Getting the correct internal IP when running in Docker
 hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
