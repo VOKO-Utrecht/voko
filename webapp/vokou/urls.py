@@ -11,6 +11,7 @@ import ordering.urls
 import ordering.admin_urls
 import api.urls
 import distribution.urls
+import groups.urls
 from vokou.views import HomeView, PrivacyStatementView, RegulationsView
 
 urlpatterns = [
@@ -22,6 +23,7 @@ urlpatterns = [
     url(r'^finance/', include(finance.urls)),
     url(r'^docs/', include(docs.urls)),
     url(r'^transport/', include(transport.urls)),
+    url(r'^groups/', include(groups.urls)),
     url(r'^api/', include(api.urls)),
     url(r'^distribution/', include(distribution.urls)),
     url(r'^tinymce/', include('tinymce.urls')),

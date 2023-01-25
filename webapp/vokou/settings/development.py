@@ -19,12 +19,8 @@ ALLOWED_HOSTS = []
 
 DATABASES = {
     # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    #     'NAME': 'voko',
-    #     'USER': 'vokouser',
-    #     'PASSWORD': 'vokouser',
-    #     'HOST': 'localhost',
-    #     'PORT': '5432',
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     # }    
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -41,7 +37,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = '/tmp/app-messages'
 
 INSTALLED_APPS += ['debug_toolbar',]
-MIDDLEWARE = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE
+MIDDLEWARE_CLASSES = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE_CLASSES
 
 # Getting the correct internal IP when running in Docker
 hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())

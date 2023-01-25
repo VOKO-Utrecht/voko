@@ -2,6 +2,7 @@
 
 # Apply database migrations
 echo "Apply database migrations"
+python manage.py makemigrations --settings=vokou.settings.development
 python manage.py migrate --settings=vokou.settings.development
 
 # Start server

@@ -158,8 +158,13 @@ CONSTANCE_CONFIG = {
     'PICKUP_REMINDER_MAIL': (107, "Order pickup reminder mail", int),
     'RIDECOSTS_REQUEST_MAIL': (108, "Ride costs request mail", int),
     # group ids
+
+    'ADMIN_GROUP': (1, "Admin Group" , int),
     'TRANSPORT_GROUP': (2, "Transport Group", int),
     'DISTRIBUTION_GROUP': (3, "Distribution Group", int),
+    'FARMERS_GROUP': (5, "Farmers Group", int),
+    'IT_GROUP': (4, "IT Group", int),
+    'PROMO_GROUP': (7, "Promotion Group", int),
     # other config values
     'MARKUP_PERCENTAGE': (4.0, "Markup percentage", float)
 
