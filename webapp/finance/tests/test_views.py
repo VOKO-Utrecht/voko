@@ -395,6 +395,6 @@ class TestCancelPaymentView(VokoTestCase):
 
     def test_redirect_to_finish_order(self):
         ret = self.client.get(self.url)
-        self.assertRedirects(ret, "http://testserver%s" %
+        self.assertRedirects(ret, "%s" %
                              reverse('finish_order', args=(self.order.id,)),
                              fetch_redirect_response=False)
