@@ -87,3 +87,4 @@ class Groupmanager(LoginRequiredMixin, IsTransportCoordinatorMixin, FormView):
         for m in group.user_set.all():
             if (m.id not in members_ids):
                 m.groups.remove(group)
+

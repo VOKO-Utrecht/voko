@@ -24,9 +24,9 @@ class Migration(migrations.Migration):
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('finalized', models.BooleanField(default=False)),
                 ('collected', models.BooleanField(default=False)),
-                ('debit', models.OneToOneField(null=True, blank=True, to='finance.Balance')),
-                ('payment', models.OneToOneField(null=True, blank=True, to='finance.Payment')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('debit', models.OneToOneField(null=True, blank=True, to='finance.Balance', on_delete=models.CASCADE)),
+                ('payment', models.OneToOneField(null=True, blank=True, to='finance.Payment', on_delete=models.CASCADE)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': (b'-modified', b'-created'),
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('amount', models.IntegerField(verbose_name=b'Aantal')),
-                ('order', models.ForeignKey(to='ordering.Order')),
+                ('order', models.ForeignKey(to='ordering.Order', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': (b'-modified', b'-created'),
@@ -59,8 +59,8 @@ class Migration(migrations.Migration):
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('supplied_amount', models.DecimalField(max_digits=6, decimal_places=1)),
                 ('notes', models.TextField(blank=True)),
-                ('credit', models.OneToOneField(to='finance.Balance')),
-                ('order_product', models.OneToOneField(to='ordering.OrderProduct')),
+                ('credit', models.OneToOneField(to='finance.Balance', on_delete=models.CASCADE)),
+                ('order_product', models.OneToOneField(to='ordering.OrderProduct', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': (b'-modified', b'-created'),
@@ -91,7 +91,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='order',
             name='order_round',
-            field=models.ForeignKey(to='ordering.OrderRound'),
+            field=models.ForeignKey(to='ordering.OrderRound', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.CreateModel(
@@ -105,7 +105,7 @@ class Migration(migrations.Migration):
                 ('unit_of_measurement', models.CharField(max_length=2, choices=[(b'St', b'Stuk'), (b'G', b'Gram'), (b'KG', b'Kilogram'), (b'P', b'Pond'), (b'L', b'Liter')])),
                 ('base_price', models.DecimalField(max_digits=6, decimal_places=2)),
                 ('minimum_total_order', models.IntegerField(null=True, blank=True)),
-                ('order_round', models.ForeignKey(to='ordering.OrderRound')),
+                ('order_round', models.ForeignKey(to='ordering.OrderRound', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': (b'-modified', b'-created'),
@@ -117,7 +117,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='orderproduct',
             name='product',
-            field=models.ForeignKey(to='ordering.Product'),
+            field=models.ForeignKey(to='ordering.Product', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
@@ -133,7 +133,7 @@ class Migration(migrations.Migration):
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('name', models.CharField(unique=True, max_length=50)),
-                ('address', models.ForeignKey(to='accounts.Address')),
+                ('address', models.ForeignKey(to='accounts.Address', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': (b'-modified', b'-created'),
@@ -145,7 +145,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='product',
             name='supplier',
-            field=models.ForeignKey(to='ordering.Supplier'),
+            field=models.ForeignKey(to='ordering.Supplier', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.CreateModel(
@@ -154,7 +154,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
-                ('order_round', models.ForeignKey(to='ordering.OrderRound')),
+                ('order_round', models.ForeignKey(to='ordering.OrderRound', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': (b'-modified', b'-created'),
@@ -187,13 +187,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='supplierorderproduct',
             name='order',
-            field=models.ForeignKey(to='ordering.SupplierOrder'),
+            field=models.ForeignKey(to='ordering.SupplierOrder', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='supplierorderproduct',
             name='product',
-            field=models.ForeignKey(to='ordering.Product'),
+            field=models.ForeignKey(to='ordering.Product', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

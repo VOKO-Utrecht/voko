@@ -16,19 +16,19 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='payment',
             name='order',
-            field=models.ForeignKey(to='ordering.Order', null=True),
+            field=models.ForeignKey(to='ordering.Order', null=True, on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='balance',
             name='user',
-            field=models.ForeignKey(related_name='balance', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(related_name='balance', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='payment',
             name='user',
-            field=models.ForeignKey(related_name='user', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(related_name='user', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

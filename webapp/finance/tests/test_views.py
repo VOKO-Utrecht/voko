@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from mock import MagicMock
 from pytz import UTC
 from accounts.tests.factories import VokoUserFactory

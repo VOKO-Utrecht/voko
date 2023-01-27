@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='orderproductcorrection',
             name='order_product',
-            field=models.OneToOneField(related_name='correction', to='ordering.OrderProduct'),
+            field=models.OneToOneField(related_name='correction', to='ordering.OrderProduct', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

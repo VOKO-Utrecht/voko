@@ -6,7 +6,7 @@ from uuid import uuid4
 from django.contrib.auth.models import (BaseUserManager, AbstractBaseUser,
                                         PermissionsMixin)
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 from django.conf import settings
@@ -37,8 +37,12 @@ class UserProfile(TimeStampedModel):
         verbose_name_plural = "ledenprofielen"
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL,
-                                related_name="userprofile")
-    address = models.ForeignKey(Address, null=True, blank=True)
+                                related_name="userprofile",
+                                on_delete=models.CASCADE)
+    address = models.ForeignKey(Address,
+                                null=True,
+                                blank=True,
+                                on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=25, blank=True)
     notes = models.TextField()
     has_drivers_license = models.BooleanField(default=False)
@@ -47,7 +51,8 @@ class UserProfile(TimeStampedModel):
         verbose_name="Contactpersoon voor",
         help_text="Zet contactgegevens op contactpagina van leden site",
         blank=True,
-        null=True
+        null=True,
+        on_delete=models.CASCADE
     )
     shares_car = models.BooleanField(
         default=False,
@@ -145,7 +150,6 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
             message = """Hoi! We hebben een nieuwe gebruiker: %s""" % self
             mail_admins("Nieuwe gebruiker: %s" % self, message,
                         fail_silently=True)
-
         super(VokoUser, self).save(*args, **kwargs)
 
         try:
@@ -164,7 +168,8 @@ class EmailConfirmation(TimeStampedModel):
 
     token = models.CharField(max_length=100, primary_key=True)
     user = models.OneToOneField(settings.AUTH_USER_MODEL,
-                                related_name="email_confirmation")
+                                related_name="email_confirmation",
+                                on_delete=models.CASCADE)
     is_confirmed = models.BooleanField(default=False)
 
     def save(self, **kwargs):
@@ -197,7 +202,8 @@ class PasswordResetRequest(TimeStampedModel):
 
     token = models.CharField(max_length=100, primary_key=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             related_name="password_reset_requests")
+                             related_name="password_reset_requests",
+                             on_delete=models.CASCADE)
     is_used = models.BooleanField(default=False)
 
     def save(self, **kwargs):

@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.urls import path
 import accounts.urls
 import docs.urls
 import transport.urls
@@ -15,7 +16,7 @@ from vokou.views import HomeView, PrivacyStatementView, RegulationsView
 
 urlpatterns = [
     url(r'^admin/mailing/', include(mailing.urls)),
-    url(r'^admin/', include(admin.site.urls)),
+    path('admin/', admin.site.urls),
     url(r'^accounts/', include(accounts.urls)),
     url(r'^ordering/admin/', include(ordering.admin_urls)),
     url(r'^ordering/', include(ordering.urls)),

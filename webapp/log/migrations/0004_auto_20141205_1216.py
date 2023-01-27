@@ -15,13 +15,13 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='eventlog',
             name='operator',
-            field=models.ForeignKey(related_name='operator_logs', blank=True, to=settings.AUTH_USER_MODEL, null=True),
+            field=models.ForeignKey(related_name='operator_logs', blank=True, to=settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='eventlog',
             name='user',
-            field=models.ForeignKey(related_name='user_logs', blank=True, to=settings.AUTH_USER_MODEL, null=True),
+            field=models.ForeignKey(related_name='user_logs', blank=True, to=settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

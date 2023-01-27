@@ -71,12 +71,11 @@ INSTALLED_APPS = [
     'compat',  # Requirement of hijack
 ]
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.common.BrokenLinkEmailsMiddleware',
@@ -159,6 +158,7 @@ CONSTANCE_CONFIG = {
     'PICKUP_REMINDER_MAIL': (107, "Order pickup reminder mail", int),
     'RIDECOSTS_REQUEST_MAIL': (108, "Ride costs request mail", int),
     # group ids
+
     'ADMIN_GROUP': (1, "Admin Group" , int),
     'TRANSPORT_GROUP': (2, "Transport Group", int),
     'DISTRIBUTION_GROUP': (3, "Distribution Group", int),

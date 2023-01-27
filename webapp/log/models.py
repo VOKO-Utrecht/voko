@@ -10,9 +10,11 @@ class EventLog(TimeStampedModel):
     operator = models.ForeignKey(VokoUser,
                                  related_name="operator_logs",
                                  null=True,
-                                 blank=True)
+                                 blank=True,
+                                 on_delete=models.CASCADE)
     user = models.ForeignKey(VokoUser, null=True, blank=True,
-                             related_name="user_logs")
+                             related_name="user_logs",
+                             on_delete=models.CASCADE)
     event = models.CharField(max_length=255)
     extra = models.TextField(blank=True, null=True)
 

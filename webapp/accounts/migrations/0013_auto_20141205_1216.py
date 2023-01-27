@@ -15,19 +15,19 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='emailconfirmation',
             name='user',
-            field=models.OneToOneField(related_name='email_confirmation', to=settings.AUTH_USER_MODEL),
+            field=models.OneToOneField(related_name='email_confirmation', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='passwordresetrequest',
             name='user',
-            field=models.ForeignKey(related_name='password_reset_requests', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(related_name='password_reset_requests', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='userprofile',
             name='user',
-            field=models.OneToOneField(related_name='userprofile', to=settings.AUTH_USER_MODEL),
+            field=models.OneToOneField(related_name='userprofile', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterField(

@@ -8,7 +8,7 @@ from collections import defaultdict
 from tempfile import NamedTemporaryFile
 from braces.views import GroupRequiredMixin
 from django.contrib import messages
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import IntegrityError
 from django.db.models.aggregates import Sum
 from django.http import HttpResponse, HttpResponseRedirect

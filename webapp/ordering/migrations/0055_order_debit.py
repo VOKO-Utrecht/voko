@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='order',
             name='debit',
-            field=models.OneToOneField(related_name='order', null=True, blank=True, to='finance.Balance'),
+            field=models.OneToOneField(related_name='order', null=True, blank=True, to='finance.Balance', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

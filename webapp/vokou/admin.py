@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 from django.utils.html import escape
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.urls import reverse, NoReverseMatch
 
 from accounts.models import VokoUser
 
@@ -11,7 +11,8 @@ from accounts.models import VokoUser
 class DeleteDisabledMixin(object):
     def get_actions(self, request):
         actions = super(DeleteDisabledMixin, self).get_actions(request)
-        del actions['delete_selected']
+        if 'delete_selected' in actions:
+                del actions['delete_selected']
         return actions
 
     @staticmethod
