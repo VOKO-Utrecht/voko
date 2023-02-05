@@ -123,7 +123,6 @@ DEFAULT_FROM_EMAIL = "VOKO Utrecht <info@vokoutrecht.nl>"
 
 TINYMCE_DEFAULT_CONFIG = {
     'plugins': "table,xhtmlxtras,paste,searchreplace",
-    'theme': "advanced",
     "theme_advanced_buttons3_add" : "cite,abbr",
     'cleanup_on_startup': True,
     'custom_undo_redo_levels': 10,
