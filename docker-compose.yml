@@ -15,7 +15,6 @@ services:
     working_dir: /code/webapp
     ports:
       - "8000:8000"
-      - "5678:5678"
     volumes:
       - .:/code
     environment:
