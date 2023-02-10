@@ -55,6 +55,11 @@ CAPTCHA_ENABLED = False
 
 # MOLLIE_API_KEY = 'test_'
 
+if os.environ.get('RUN_MAIN'):
+    import debugpy
+    debugpy.listen(("0.0.0.0", 5678))
+    print('Attached!')
+
 try:
     from .local import *
 except ImportError:
