@@ -68,7 +68,6 @@ INSTALLED_APPS = [
 
     'hijack',
     'hijack.contrib.admin',
-    'compat',  # Requirement of hijack
 ]
 
 MIDDLEWARE = [
