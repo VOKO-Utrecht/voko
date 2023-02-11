@@ -11,7 +11,7 @@ from mailing.helpers import get_template_by_id, render_mail_template, mail_user
 from ordering.core import get_current_order_round
 from ordering.models import Order
 from django.utils.safestring import mark_safe
-from hijack_admin.admin import HijackUserAdminMixin
+from hijack.contrib.admin import HijackUserAdminMixin
 from django.apps import apps
 from constance import config
 
@@ -257,7 +257,7 @@ class VokoUserBaseAdmin(UserAdmin):
 
 
 class VokoUserAdmin(HijackUserAdminMixin, VokoUserBaseAdmin):
-    list_display = VokoUserBaseAdmin.list_display + ['hijack_field']
+    list_display = VokoUserBaseAdmin.list_display
 
     actions = (enable_user,
                force_confirm_email,

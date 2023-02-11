@@ -1,14 +1,14 @@
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-from unipath import Path
+from pathlib import Path
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-PROJECT_DIR = Path(__file__).ancestor(3)
-MEDIA_ROOT = PROJECT_DIR.child("media")
-STATIC_ROOT = PROJECT_DIR.child("static")
+PROJECT_DIR = Path(__file__).parent.parent.parent
+MEDIA_ROOT = PROJECT_DIR / "media"
+STATIC_ROOT = PROJECT_DIR / "static"
 STATICFILES_DIRS = (
-    PROJECT_DIR.child("assets"),
+    PROJECT_DIR / "assets",
 )
 
 DEBUG = False
@@ -67,7 +67,7 @@ INSTALLED_APPS = [
     'constance',
 
     'hijack',
-    'hijack_admin',
+    'hijack.contrib.admin',
     'compat',  # Requirement of hijack
 ]
 
@@ -80,6 +80,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.common.BrokenLinkEmailsMiddleware',
     'vokou.middleware.OrderRoundMiddleware',
+    'hijack.middleware.HijackUserMiddleware',
 ]
 
 CRON_CLASSES = [
