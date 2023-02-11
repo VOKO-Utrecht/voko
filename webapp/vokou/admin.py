@@ -1,4 +1,4 @@
-import unicodecsv
+import csv
 from django.http import HttpResponse
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
@@ -37,12 +37,12 @@ def export_as_csv_action(description="Export selected objects as CSV file",
         else:
             field_names = fields
 
-        response = HttpResponse(content_type='text/csv')
+        response = HttpResponse(content_type='text/csv; charset=utf-8')
         response[
             'Content-Disposition'] = 'attachment; filename=%s.csv' % str(
             opts).replace('.', '_')
 
-        writer = unicodecsv.writer(response, encoding='utf-8')
+        writer = csv.writer(response)
         if header:
             writer.writerow(field_names)
         for obj in queryset:
