@@ -4,7 +4,7 @@ SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ['USER'],
         'USER': os.environ['USER'],
         'PASSWORD': os.environ['DB_PASSWORD'],
