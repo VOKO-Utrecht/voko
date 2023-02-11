@@ -1,4 +1,4 @@
-import csv
+import unicodecsv
 from django.http import HttpResponse
 import datetime
 import simplejson as json
@@ -6,7 +6,7 @@ import simplejson as json
 
 def CSVResponse(data):
     response = HttpResponse(content_type='text/csv')
-    writer = csv.writer(response)
+    writer = unicodecsv.writer(response, encoding='utf-8')
     field_names = data[0].keys()
     writer.writerow(field_names)
     for order_round in data:

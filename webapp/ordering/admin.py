@@ -1,4 +1,4 @@
-import csv
+import unicodecsv
 from django.contrib import admin
 from django.db import OperationalError, ProgrammingError
 import sys
@@ -45,11 +45,11 @@ def export_orders_for_financial_admin(modeladmin, request, queryset):
         'Verrekening debit/credit',
         'Totaalbedrag']
 
-    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response = HttpResponse(content_type='text/csv')
     response[
         'Content-Disposition'] = 'attachment; filename=orders_export.csv'
 
-    writer = csv.writer(response)
+    writer = unicodecsv.writer(response, encoding='utf-8')
     writer.writerow(field_names)
 
     for order in queryset.filter(paid=True):
