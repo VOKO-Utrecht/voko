@@ -9,17 +9,17 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONFAULTHANDLER 1
 
 # Install pipenv
-RUN pip install micropipenv[toml] pipenv
+RUN pip install pipenv
 
 # Set work directory
 WORKDIR /code
 
 # Copy dependencies & files
-COPY ./Pipfile ./Pipfile.lock /code/
+COPY ./Pipfile /code/
 # Recreate lock file
 RUN pipenv lock
 # Install dependencies
-RUN micropipenv install --dev
+RUN pipenv install --dev
 
 # Install application into container
 COPY . .
