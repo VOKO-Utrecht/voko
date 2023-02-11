@@ -10,7 +10,7 @@ from log import log_event
 from .core import get_current_order_round, get_next_order_round, \
     get_last_order_round
 from ordering.models import Supplier
-import csv
+import unicodecsv as csv
 
 
 def fix_decimal_separator(decimal_value):
