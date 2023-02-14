@@ -22,13 +22,14 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.i18n',
                 'django.template.context_processors.media',
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
-                'django.contrib.messages.context_processors.messages',
             ],
         },
     },
@@ -184,7 +185,11 @@ CONSTANCE_CONFIG_FIELDSETS = {
             'RIDECOSTS_REQUEST_MAIL'),
         'Group Ids': (
             'TRANSPORT_GROUP',
-            'DISTRIBUTION_GROUP',),
+            'DISTRIBUTION_GROUP',
+            'ADMIN_GROUP',
+            'FARMERS_GROUP',
+            'IT_GROUP',
+            'PROMO_GROUP'),
         'Other options': ('MARKUP_PERCENTAGE',)
     }    
 
