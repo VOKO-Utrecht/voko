@@ -7,12 +7,14 @@ class Payment(TimeStampedModel):
     """
     Represents a payment initiated by our payment service provider.
     """
+
+    id = models.AutoField(primary_key=True)
     amount = models.DecimalField(max_digits=6, decimal_places=2)
 
     # A Payment is always used to finish an order
     order = models.ForeignKey("ordering.Order",
-                               related_name="payments",
-                               on_delete=models.CASCADE)
+                              related_name="payments",
+                              on_delete=models.CASCADE)
 
     # Credit Balance, for successful payment
     balance = models.OneToOneField("finance.Balance",
@@ -89,6 +91,7 @@ class Balance(TimeStampedModel):
         ("CR", "Credit"),
         ("DR", "Debit"),
     )
+    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              related_name="balance",
                              on_delete=models.CASCADE)

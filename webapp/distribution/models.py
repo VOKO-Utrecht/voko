@@ -11,6 +11,7 @@ class Shift(TimeStampedModel):
         verbose_name_plural = 'Shifts'
         ordering = ['start']
 
+    id = models.AutoField(primary_key=True)
     order_round = models.ForeignKey(
         OrderRound,
         on_delete=models.SET_NULL,

@@ -8,6 +8,7 @@ class Document(TimeStampedModel):
         verbose_name = 'Document'
         verbose_name_plural = 'Documenten'
 
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     file = models.FileField(upload_to='docs/%Y/%m/%d')
     slug = models.SlugField(unique=True, editable=False, max_length=100)
@@ -25,6 +26,7 @@ class Link(TimeStampedModel):
         verbose_name = 'Link'
         verbose_name_plural = 'Links'
 
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     url = models.URLField()
 

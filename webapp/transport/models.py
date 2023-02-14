@@ -10,6 +10,7 @@ class Route(TimeStampedModel):
         verbose_name = 'Route'
         verbose_name_plural = 'Routes'
 
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     suppliers = models.ManyToManyField(Supplier)
     slug = models.SlugField(unique=True, editable=False, max_length=100)
@@ -31,6 +32,7 @@ class Ride(TimeStampedModel):
         verbose_name = 'Ride'
         verbose_name_plural = 'Rides'
 
+    id = models.AutoField(primary_key=True)
     order_round = models.ForeignKey(
         OrderRound, on_delete=models.SET_NULL, null=True, related_name="rides")
     route = models.ForeignKey(

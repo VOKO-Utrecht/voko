@@ -7,6 +7,7 @@ class EventLog(TimeStampedModel):
     class Meta:
         app_label = "log"
 
+    id = models.AutoField(primary_key=True)
     operator = models.ForeignKey(VokoUser,
                                  related_name="operator_logs",
                                  null=True,
