@@ -344,7 +344,7 @@ class UploadProductList(FormView, ProductAdminMixin):
         return redirect(reverse('create_draft_products', kwargs=self.kwargs))
 
     def create_draft_products_from_spreadsheet(self, file_handler):
-        f = NamedTemporaryFile(delete=False,suffix="."+file_handler.name.split(".")[-1])
+        f = NamedTemporaryFile(delete=False, suffix="." + file_handler.name.split(".")[-1])
         f.write(file_handler.read())
         f.close()
 
