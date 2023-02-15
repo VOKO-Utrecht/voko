@@ -100,7 +100,7 @@ class MailOrderLists(CronJobBase):
             print(("Generating lists for supplier %s" % supplier))
 
             # Generate CSV
-            in_mem_file = io.BytesIO()
+            in_mem_file = io.StringIO()
             csv_writer = csv.writer(in_mem_file, delimiter=';', quotechar='|')
 
             # Write header row
@@ -175,7 +175,7 @@ VOKO Utrecht
             )
 
             msg.attach('voko_utrecht_bestelling_ronde_%d.csv' % order_round.pk,
-                       in_mem_file.read().decode("utf-8"), 'text/csv')
+                       in_mem_file.read(), 'text/csv')
             msg.send()
 
 
