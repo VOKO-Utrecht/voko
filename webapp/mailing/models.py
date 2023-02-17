@@ -4,6 +4,7 @@ from tinymce.models import HTMLField
 
 
 class MailTemplate(TimeStampedModel):
+    id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100)
     subject = models.CharField(max_length=100, default="VOKO Utrecht - ")
     from_email = models.CharField(max_length=100, default="", blank=True)

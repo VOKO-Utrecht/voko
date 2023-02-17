@@ -5,10 +5,10 @@ name = "pypi"
 
 [packages]
 django-extensions = "==3.1.2"
-django-bootstrap3 = "==11.0.0"
+django-bootstrap3 = "==12.1.0"
 django-braces = "==1.14.0"
 pytz = "==2021.1"
-django-cron = "==0.5.1"
+django-cron = "==0.6.0"
 html2text = "==2020.1.16"
 django-tinymce = "==3.4.0"
 mollie-api-python = "==2.12.0"
@@ -20,19 +20,19 @@ simplejson = "==3.18.3"
 django-nose = "==1.4.7"
 nose = "==1.3.7"
 django-recaptcha = "==2.0.6"
-django-constance = {version = "==2.3.1", extras = ["database"]}
+django-constance = {version = "==2.9.1", extras = ["database"]}
 django-picklefield = "==2.1.1"
 psycopg2-binary = "==2.8.6"
-Django = "==2.2.28"
+Django = "==3.2.17"
 gunicorn = "20.1.0"
 
 [dev-packages]
 fake-factory = "==0.7.4"
 factory-boy = "==3.2.1"
 mock = "==1.0.1"
-django-debug-toolbar = "==1.11.1"
+django-debug-toolbar = "==3.8.1"
 flake8 = "==3.8.4"
 debugpy = "==1.6.6"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"

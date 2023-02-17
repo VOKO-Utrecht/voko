@@ -21,6 +21,7 @@ class Address(TimeStampedModel):
         verbose_name = "adres"
         verbose_name_plural = "adressen"
 
+    id = models.AutoField(primary_key=True)
     street_and_number = models.CharField(max_length=100, blank=True)
     zip_code = models.CharField(max_length=7)
     city = models.CharField(max_length=100, blank=True)
@@ -36,6 +37,7 @@ class UserProfile(TimeStampedModel):
         verbose_name = "ledenprofiel"
         verbose_name_plural = "ledenprofielen"
 
+    id = models.AutoField(primary_key=True)
     user = models.OneToOneField(settings.AUTH_USER_MODEL,
                                 related_name="userprofile",
                                 on_delete=models.CASCADE)
@@ -106,6 +108,7 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
         verbose_name = "lid"
         verbose_name_plural = "leden"
 
+    id = models.AutoField(primary_key=True)
     email = models.EmailField(
         verbose_name="E-mail adres",
         max_length=255,

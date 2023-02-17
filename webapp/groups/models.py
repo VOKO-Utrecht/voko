@@ -11,5 +11,6 @@ class GroupExt(models.Model):
     def __str__(self):
         return "{}".format(self.group.name)
 
+    id = models.AutoField(primary_key=True)
     group = models.OneToOneField('auth.Group', unique=True, on_delete=models.CASCADE)
     email = models.EmailField(max_length=255, blank=True, default="")

@@ -22,6 +22,7 @@ class Supplier(TimeStampedModel):
     class Meta:
         verbose_name = "Leverancier"
 
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, unique=True)
     address = models.ForeignKey(Address, on_delete=models.CASCADE)
     contact_person = models.CharField(max_length=50, blank=True)
@@ -53,6 +54,7 @@ class PickupLocation(TimeStampedModel):
     class Meta:
         verbose_name = "Ophaallocatie"
 
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=255)
     address = models.ForeignKey(Address,
@@ -76,6 +78,7 @@ class OrderRound(TimeStampedModel):
         verbose_name = "Bestelronde"
         verbose_name_plural = "Bestelronden"
 
+    id = models.AutoField(primary_key=True)
     open_for_orders = models.DateTimeField(
         help_text="When this order round will open")
     closed_for_orders = models.DateTimeField(
@@ -524,10 +527,11 @@ class Order(TimeStampedModel):
 
     objects = OrderManager()
 
+    id = models.AutoField(primary_key=True)
     products = models.ManyToManyField("Product", through="OrderProduct")
     order_round = models.ForeignKey("OrderRound",
-                                     related_name="orders",
-                                     on_delete=models.CASCADE)
+                                    related_name="orders",
+                                    on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              related_name="orders",
                              on_delete=models.CASCADE)
@@ -668,12 +672,13 @@ class OrderProduct(TimeStampedModel):
         verbose_name_plural = "Productbestellingen"
         unique_together = ('order', 'product')
 
+    id = models.AutoField(primary_key=True)
     order = models.ForeignKey("Order",
-                               related_name="orderproducts",
-                               on_delete=models.CASCADE)
+                              related_name="orderproducts",
+                              on_delete=models.CASCADE)
     product = models.ForeignKey("Product",
-                                 related_name="orderproducts",
-                                 on_delete=models.CASCADE)
+                                related_name="orderproducts",
+                                on_delete=models.CASCADE)
     amount = models.IntegerField(verbose_name="Aantal")
     retail_price = models.DecimalField(
         max_digits=6,
@@ -734,6 +739,7 @@ class OrderProductCorrection(TimeStampedModel):
         verbose_name = "Productbestelling-correctie"
         verbose_name_plural = "Productbestelling-correcties"
 
+    id = models.AutoField(primary_key=True)
     order_product = models.OneToOneField("OrderProduct",
                                          related_name="correction",
                                          editable=False,
@@ -812,6 +818,7 @@ class ProductCategory(TimeStampedModel):
         verbose_name = "Productcategorie"
         verbose_name_plural = "Productcategorieën"
 
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -823,6 +830,7 @@ class ProductUnit(TimeStampedModel):
         verbose_name = "Producteenheid"
         verbose_name_plural = "Producteenheden"
 
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=255)
     abbreviations = models.CharField(max_length=255, blank=True,
@@ -837,9 +845,10 @@ class ProductStock(TimeStampedModel):
     TYPE_ADDED = 'added'
     TYPE_LOST = 'lost'
 
+    id = models.AutoField(primary_key=True)
     product = models.ForeignKey("Product",
-                                 related_name="stock",
-                                 on_delete=models.CASCADE)
+                                related_name="stock",
+                                on_delete=models.CASCADE)
     amount = models.IntegerField()
 
     type = models.CharField(max_length=5, choices=(
@@ -869,6 +878,7 @@ class Product(TimeStampedModel):
         verbose_name = "Product"
         verbose_name_plural = "Producten"
 
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     unit = models.ForeignKey(ProductUnit, null=True, on_delete=models.CASCADE)
@@ -876,8 +886,8 @@ class Product(TimeStampedModel):
                                       help_text="e.g. if half a kilo: \"500\"")
     base_price = models.DecimalField(max_digits=6, decimal_places=2)
     supplier = models.ForeignKey("Supplier",
-                                  related_name="products",
-                                  on_delete=models.CASCADE)
+                                 related_name="products",
+                                 on_delete=models.CASCADE)
     # order_round NULL means: recurring / stock product
     order_round = models.ForeignKey("OrderRound", related_name="products",
                                     blank=True, null=True, on_delete=models.CASCADE)
@@ -1060,6 +1070,7 @@ class DraftProduct(TimeStampedModel):
     """
     Product Draft, used to create new products in the backend
     """
+    id = models.AutoField(primary_key=True)
     data = JSONField()
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
     order_round = models.ForeignKey(OrderRound, on_delete=models.CASCADE)
