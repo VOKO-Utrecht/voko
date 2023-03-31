@@ -14,6 +14,8 @@ from accounts.models import EmailConfirmation, VokoUser, PasswordResetRequest
 from django.conf import settings
 import log
 from ordering.core import get_or_create_order
+from constance import config
+from django.contrib.auth.models import Group
 
 
 class LoginView(AnonymousRequiredMixin, FormView):
@@ -191,8 +193,33 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
 
 
 class Contact(LoginRequiredMixin, ListView):
-    queryset = VokoUser.objects.filter(
-        is_active=True,
-        userprofile__contact_person__isnull=False
-    )
+
     template_name = "accounts/contact.html"
+    groups_to_show = {'ADMIN_GROUP',
+                      'TRANSPORT_GROUP',
+                      'DISTRIBUTION_GROUP',
+                      'FARMERS_GROUP',
+                      'IT_GROUP',
+                      'PROMO_GROUP'}
+
+    def _get_groups(self):
+        group_ids = []
+        for name in self.groups_to_show:
+            id = getattr(config, name)
+            group_ids.append(id)
+        return Group.objects.filter(pk__in=group_ids)
+
+    def get_queryset(self):
+
+        groups = self._get_groups()
+        queryset = []
+        for group in groups:
+            try:
+                contact = VokoUser.objects.get(
+                    userprofile__contact_person=group.id
+                )
+            except VokoUser.DoesNotExist:
+                contact = None
+            my_group = {"group": group, "contact": contact}
+            queryset.append(my_group)
+        return queryset
