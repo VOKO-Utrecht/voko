@@ -276,3 +276,4 @@ class ChangeProfileForm(forms.ModelForm):
             log.log_event(user=user, event="User changed profile")
 
         return user
+

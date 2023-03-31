@@ -10,10 +10,11 @@ from django.views.generic import (FormView, DetailView, UpdateView,
 from accounts.forms import (VokoUserCreationForm, VokoUserFinishForm,
                             RequestPasswordResetForm, PasswordResetForm,
                             ChangeProfileForm)
-from accounts.models import EmailConfirmation, VokoUser, PasswordResetRequest
+from accounts.models import EmailConfirmation, UserProfile, VokoUser, PasswordResetRequest
 from django.conf import settings
 import log
 from ordering.core import get_or_create_order
+from django.shortcuts import get_object_or_404
 
 
 class LoginView(AnonymousRequiredMixin, FormView):
@@ -196,3 +197,11 @@ class Contact(LoginRequiredMixin, ListView):
         userprofile__contact_person__isnull=False
     )
     template_name = "accounts/contact.html"
+    
+class EditCoordinatorRemarksView(LoginRequiredMixin, UpdateView):
+    template_name = "accounts/coordinator/remarks.html"
+    model = UserProfile
+    fields = ['coordinator_remarks']
+    success_url = '/transport/members'
+
+

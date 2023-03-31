@@ -13,7 +13,7 @@ html2text = "==2020.1.16"
 django-tinymce = "==3.4.0"
 mollie-api-python = "==2.12.0"
 django-hijack = "==3.2.6"
-
+django-htmx = "1.14.0"
 jsonfield = "==3.1.0"
 openpyxl = "==3.1.0"
 simplejson = "==3.18.3"
@@ -25,6 +25,7 @@ django-picklefield = "==2.1.1"
 psycopg2-binary = "==2.8.6"
 Django = "==3.2.17"
 gunicorn = "20.1.0"
+
 
 [dev-packages]
 fake-factory = "==0.7.4"

@@ -46,7 +46,8 @@ class UserProfile(TimeStampedModel):
                                 blank=True,
                                 on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=25, blank=True)
-    notes = models.TextField()
+    notes = models.TextField(        blank=True,
+        null=True,)
     has_drivers_license = models.BooleanField(default=False)
     contact_person = models.OneToOneField(
         "auth.Group",
@@ -57,7 +58,6 @@ class UserProfile(TimeStampedModel):
         on_delete=models.CASCADE
     )
     shares_car = models.BooleanField(
-        default=False,
         verbose_name=("Ik heb een redelijk grote auto die leden kunnen lenen "
                       "voor transport"),
         help_text=("Dit zet je contactgegevens op transport pagina's van de "
@@ -65,6 +65,22 @@ class UserProfile(TimeStampedModel):
     )
     car_neighborhood = models.CharField(max_length=100, blank=True)
     car_type = models.CharField(max_length=100, blank=True)
+    
+    # To save remarks about availability or other particularities
+    coordinator_remarks = models.TextField(
+        verbose_name="Opmerkingen Coordinator",
+        blank=True,
+        null=True,
+        help_text="Roostervoorkeuren of andere bijzonderheden",
+        max_length=300)
+    
+    # To save remarks about availability or other particularities
+    particularities = models.TextField(
+        verbose_name="Bijzonderheden",
+        blank=True,
+        null=True,
+        help_text="Beschikbaarheid of andere bijzonderheden",
+          max_length=300)
 
     def __str__(self):
         return "Profile for user: %s" % self.user
