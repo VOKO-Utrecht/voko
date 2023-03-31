@@ -57,14 +57,13 @@ class TestPickupReminderJob(VokoTestCase):
             self.order_round = OrderRoundFactory(
                 open_for_orders=now - timedelta(days=4),
                 closed_for_orders=now - timedelta(days=1),
-                collect_datetime=now + timedelta(hours=1))            
+                collect_datetime=now + timedelta(hours=1))
             product = ProductFactory(order_round=self.order_round,
-                                 maximum_total_order=10)
+                                     maximum_total_order=10)
             order1 = OrderFactory(order_round=self.order_round,
-                                finalized=True,
-                                paid=True)
+                                  finalized=True,
+                                  paid=True)
             OrderProductFactory(order=order1, product=product, amount=10)
-
 
             MailOrderLists.do(self)
             self.assertTrue(mock_mail.called)
