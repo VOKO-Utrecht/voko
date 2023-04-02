@@ -69,7 +69,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='productstock',
             name='type',
-            field=models.CharField(choices=[('added', 'Added'), ('lost', 'Lost')], db_index=True, default='added', max_length=5),
+            field=models.CharField(choices=[('added', 'Added'), ('lost', 'Lost')], db_index=True, default='added', max_length=8),
         ),
         migrations.AlterField(
             model_name='productunit',
