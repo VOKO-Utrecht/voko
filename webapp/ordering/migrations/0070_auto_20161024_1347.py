@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='productstock',
             name='type',
-            field=models.CharField(choices=[(b'added', b'Added'), (b'lost', b'Lost')], db_index=True, default=b'added', max_length=5),
+            field=models.CharField(choices=[(b'added', b'Added'), (b'lost', b'Lost')], db_index=True, default=b'added', max_length=8),
         ),
     ]
