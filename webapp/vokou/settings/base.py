@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_nose',
-    'django_htmx',
     'tinymce',
     'django_extensions',
     'braces',
@@ -80,7 +79,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.common.BrokenLinkEmailsMiddleware',
-    'django_htmx.middleware.HtmxMiddleware',
     'vokou.middleware.OrderRoundMiddleware',
     'hijack.middleware.HijackUserMiddleware',
 ]
