@@ -213,6 +213,13 @@ class ChangeProfileForm(forms.ModelForm):
         widget=forms.TextInput,
         required=False
     )
+    particularities = forms.CharField(
+        label="Bijzonderheden",
+        required=False,
+        widget=forms.Textarea,
+        help_text=("Informatie over beschikbaarheid of andere bijzonderheden."
+                   "Zichtbaar voor andere VOKO leden.")
+    )
 
     # TODO: Notes and e-mail address cannot be changed atm.
 
@@ -268,6 +275,7 @@ class ChangeProfileForm(forms.ModelForm):
             userprofile.car_neighborhood = (
                 self.cleaned_data['car_neighborhood'])
             userprofile.car_type = self.cleaned_data['car_type']
+            userprofile.particularities = self.cleaned_data['particularities']
 
             if commit:
                 user.save()
@@ -276,4 +284,3 @@ class ChangeProfileForm(forms.ModelForm):
             log.log_event(user=user, event="User changed profile")
 
         return user
-

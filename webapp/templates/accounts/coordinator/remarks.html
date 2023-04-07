@@ -2,16 +2,19 @@
 {% load bootstrap3 %}
 {% block title %}Profiel opmerkingen{% endblock %}
 {% block content %}
-<h1>Profiel opmerkingen</h1>
-<h3>Opmerkingen of bijzonderheden t.b.v. coordinatoren<br/>
-Zichtbaar voor alle coordinatoren en superusers</h3>
+<h2>{{ object.user }}</h2>
+<hr>
+<h4>Opmerkingen of bijzonderheden t.b.v. coordinatoren</h4>
+<h4>Zichtbaar voor alle coordinatoren en superusers</h4>
+<hr>
+
 <div class="row">
     <div class="col-md-4">
         <form action="" method="post">{% csrf_token %}
         {% bootstrap_form form %}
                     {% buttons %}
                     <button type="submit" class="btn btn-primary">
-                      {% bootstrap_icon "user" %} Profiel wijzigen
+                      {% bootstrap_icon "save" %} Profiel wijzigen
                     </button>
                     {% endbuttons %}
         </form>

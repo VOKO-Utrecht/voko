@@ -31,6 +31,7 @@ urlpatterns = (
     url(r'^overview/$', views.OverView.as_view(), name='overview'),
     url(r'^profile/$', views.EditProfileView.as_view(), name='profile'),
     url(r'^contact/$', views.Contact.as_view(), name='contact'),
-    
-    url(r'^profile/remarks/(?P<pk>[0-9a-zA-Z\-]+)$', views.EditCoordinatorRemarksView.as_view(), name='coordinator_remarks')
+
+    url(r'^profile/remarks/(?P<pk>[0-9a-zA-Z\-]+)$', views.EditCoordinatorRemarksView.as_view(),
+        name='coordinator_remarks')
 )

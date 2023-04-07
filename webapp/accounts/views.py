@@ -1,4 +1,4 @@
-from braces.views import AnonymousRequiredMixin, LoginRequiredMixin
+from braces.views import AnonymousRequiredMixin, LoginRequiredMixin, GroupRequiredMixin
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
@@ -14,7 +14,6 @@ from accounts.models import EmailConfirmation, UserProfile, VokoUser, PasswordRe
 from django.conf import settings
 import log
 from ordering.core import get_or_create_order
-from django.shortcuts import get_object_or_404
 
 
 class LoginView(AnonymousRequiredMixin, FormView):
@@ -197,11 +196,11 @@ class Contact(LoginRequiredMixin, ListView):
         userprofile__contact_person__isnull=False
     )
     template_name = "accounts/contact.html"
-    
-class EditCoordinatorRemarksView(LoginRequiredMixin, UpdateView):
+
+
+class EditCoordinatorRemarksView(LoginRequiredMixin, GroupRequiredMixin, UpdateView):
+    group_required = ('IT')
     template_name = "accounts/coordinator/remarks.html"
     model = UserProfile
     fields = ['coordinator_remarks']
     success_url = '/transport/members'
-
-
