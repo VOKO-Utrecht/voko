@@ -199,7 +199,7 @@ class Contact(LoginRequiredMixin, ListView):
 
 
 class EditCoordinatorRemarksView(LoginRequiredMixin, GroupRequiredMixin, UpdateView):
-    group_required = ('IT')
+    group_required = ('Transportcoordinatoren')
     template_name = "accounts/coordinator/remarks.html"
     model = UserProfile
     fields = ['coordinator_remarks']
