@@ -1,4 +1,4 @@
-from braces.views import AnonymousRequiredMixin, LoginRequiredMixin
+from braces.views import AnonymousRequiredMixin, LoginRequiredMixin, GroupRequiredMixin
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
@@ -10,7 +10,7 @@ from django.views.generic import (FormView, DetailView, UpdateView,
 from accounts.forms import (VokoUserCreationForm, VokoUserFinishForm,
                             RequestPasswordResetForm, PasswordResetForm,
                             ChangeProfileForm)
-from accounts.models import EmailConfirmation, VokoUser, PasswordResetRequest
+from accounts.models import EmailConfirmation, UserProfile, VokoUser, PasswordResetRequest
 from django.conf import settings
 import log
 from ordering.core import get_or_create_order
@@ -223,3 +223,10 @@ class Contact(LoginRequiredMixin, ListView):
             my_group = {"group": group, "contact": contact}
             queryset.append(my_group)
         return queryset
+        
+class EditCoordinatorRemarksView(LoginRequiredMixin, GroupRequiredMixin, UpdateView):
+    group_required = ('Transportcoordinatoren')
+    template_name = "accounts/coordinator/remarks.html"
+    model = UserProfile
+    fields = ['coordinator_remarks']
+    success_url = '/transport/members'

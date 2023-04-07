@@ -2,6 +2,9 @@
 {% load bootstrap3 %}
 {% block title %}Transportleden{% endblock %}
 {% block content %}
+<div id="modal" class="modal fade">
+    <div id="dialog" class="modal-dialog" hx-target="this"></div>
+</div>
     <h1 class="page-header">Transportleden</h1>
     <p>
         Lijst van leden in de transportgroep. 
@@ -14,6 +17,11 @@
                 <th>Naam</th>
                 <th>E-mail</th>
                 <th>Telefoon</th>
+                <th>Opmerkingen lid</th>
+                {% if 'Transportcoordinatoren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+                <th>Opmerkingen<br/> coördinator</th>
+                <th></th>
+                {% endif %}
                 <th class="text-center">Coördinator</th>
             </tr>
             </thead>
@@ -22,8 +30,15 @@
             <tr class="account">
                 <td class="col-md-2">{{ account.get_full_name }}</td>
                 <td class="col-md-2">{{ account.email }}</td>
-                <td class="col-md-1">{{ account.userprofile.phone_number }}</td>              
-                <td class="col-md-1 text-center">{% if 'Transportcoordinatoren' in account.flat_groups %}X{% endif %}</td>
+                <td class="col-md-2">{{ account.userprofile.phone_number }}</td>    
+                <td class="col-md-3">{{ account.userprofile.particularities|default_if_none:"" }}</td> 
+                {% if 'Transportcoordinatoren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+                <td class="col-md-3">{{ account.userprofile.coordinator_remarks|default_if_none:"" }}</td>
+                <td class="col-md-1">
+                    <a href="{% url 'coordinator_remarks' account.userprofile.id %}">{% bootstrap_icon "pencil  " %}</a>
+                </td>   
+                {% endif %}        
+                <td class="col-md-1 text-center">{% if 'Transportcoordinatoren' in account.flat_groups %}{% bootstrap_icon "ok" %}{% endif %}</td>
             </tr>
             {% endfor %}
             </tbody>

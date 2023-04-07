@@ -16,6 +16,8 @@ WORKDIR /code
 
 # Copy dependencies & files
 COPY ./Pipfile /code/
+
+ARG CACHEBUST=1
 # Recreate lock file
 RUN pipenv lock
 # Install dependencies
