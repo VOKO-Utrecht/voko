@@ -15,13 +15,13 @@
                 </tr>
             </thead>
             <tbody>
-            {% for account in object_list %}
+            {% for group in object_list %}
             <tr class="account">
-                <td class="col-md-2">{{ account.userprofile.contact_person }}</td>
-                <td class="col-md-2"><a href="mailto:{{ account.userprofile.contact_person.groupext.email }}">
-                    {{ account.userprofile.contact_person.groupext.email }}</a></td>
-                <td class="col-md-2">{{ account.get_full_name }}</td>
-                <td class="col-md-2">{{ account.userprofile.phone_number }}</td>
+                <td class="col-md-2">{{ group.group.name }}</td>
+                <td class="col-md-2"><a href="mailto:{{ group.group.groupext.email }}">
+                    {{ group.group.groupext.email }}</a></td>
+                <td class="col-md-2">{{ group.contact|default_if_none:"&nbsp;" }}</td>
+                <td class="col-md-2">{{ group.contact.userprofile.phone_number|default_if_none:"&nbsp;" }}</td>
             </tr>
             {% endfor %}
             </tbody>

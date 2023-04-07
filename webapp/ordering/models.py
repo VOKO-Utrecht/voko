@@ -851,7 +851,7 @@ class ProductStock(TimeStampedModel):
                                 on_delete=models.CASCADE)
     amount = models.IntegerField()
 
-    type = models.CharField(max_length=5, choices=(
+    type = models.CharField(max_length=8, choices=(
         (TYPE_ADDED, "Added"),
         (TYPE_LOST, "Lost")), default=TYPE_ADDED, db_index=True)
 
