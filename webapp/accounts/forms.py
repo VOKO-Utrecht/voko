@@ -238,6 +238,8 @@ class ChangeProfileForm(forms.ModelForm):
             self.instance.userprofile.car_neighborhood)
         self.fields['car_type'].initial = (
             self.instance.userprofile.car_type)
+        self.fields['particularities'].initial = (
+            self.instance.userprofile.car_particularities)
 
         # If shares car, set more fields as required
         if data and data.get('shares_car', None) is not None:
