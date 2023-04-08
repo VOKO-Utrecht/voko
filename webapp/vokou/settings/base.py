@@ -113,6 +113,8 @@ AUTH_USER_MODEL = "accounts.VokoUser"
 MEMBER_FEE = 20.0
 LOGIN_REDIRECT_URL = "/"
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 EMAIL_SUBJECT_PREFIX = "[Voko Admin] "
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
