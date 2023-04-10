@@ -223,7 +223,8 @@ class Contact(LoginRequiredMixin, ListView):
             my_group = {"group": group, "contact": contact}
             queryset.append(my_group)
         return queryset
-        
+
+
 class EditCoordinatorRemarksView(LoginRequiredMixin, GroupRequiredMixin, UpdateView):
     group_required = ('Transportcoordinatoren')
     template_name = "accounts/coordinator/remarks.html"

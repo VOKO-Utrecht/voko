@@ -58,9 +58,23 @@
             {% else %}
             <li><a href="{% url 'schedule' %}">Transport</a></li>
             {% endif %}
-            {% if 'Uitdeel' in user.flat_groups or 'Uitdeelcoordinatoren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser  %}
-              <li><a href="{% url 'distribution-schedule' %}">Uitdeel</a></li>
+            {% if 'Uideelcoordinatoren' in user.flat_groups or 'Uitdeel' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Uitdeel<span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                {% if 'Uitdeelcoordinatoren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+                  <li><a href="{% url 'distribution_groupmanager' %}">Leden beheer</a></li>
+                {% endif %}
+                <li><a href="{% url 'distribution_members' %}">Leden</a></li>
+                <li><a href="{% url 'distribution_schedule' %}">Schema</a></li>
+              </ul>
+            </li>
+            {% else %}
+            <li><a href="{% url 'schedule' %}">Uitdeel</a></li>
             {% endif %}
+            {% comment %} {% if 'Uitdeel' in user.flat_groups or 'Uitdeelcoordinatoren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser  %}
+              <li><a href="{% url 'distribution_schedule' %}">Uitdeel</a></li>
+            {% endif %} {% endcomment %}
             <li><a href="{% url 'contact' %}">Contact</a></li>
           </ul>
           {% include 'header.html' %}

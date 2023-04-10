@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% block title %}Manage Transport Group{% endblock %}
+
+{% block content %}
+<h1>Uitdeelleden</h1>
+<hr/>
+
+<form action="{% url 'distribution_groupmanager' %}" method="POST" xmlns="http://www.w3.org/1999/html">
+    {% csrf_token %}
+    {{ form.users }}
+    <div class = "text-right">
+        <br/>
+        <a class="btn btn-default"  href="{% url 'distribution_groupmanager' %}">Annuleer</a>&nbsp;&nbsp;
+        <button class="btn btn-primary" type = 'submit'>Opslaan</button>
+    </div>
+</form>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    $("#id_users").bootstrapDualListbox({
+        "moveOnSelect":false, 
+        "bootstrap3Compatible":true,
+        "preserveSelectionOnMove":"moved",
+        "selectorMinimalHeight":400,
+        "selectedListLabel": "<h4>Huidige leden in uitdeel</h4>",
+        "nonSelectedListLabel": "<h4>Alle actieve VOKO leden</h4>",
+        "removeSelectedLabel": "Verwijder geselecteerde",
+        "removeAllLabel": "Verwijder alle",
+        "moveSelectedLabel": "Voeg geselecteerde toe",
+        "moveAllLabel": "Voeg alle toe",
+        "filterTextClear": "Toon alle",
+        "infoText": "Toon alle {0}",
+        "infoTextFiltered": '<span class="label label-warning">Filtered</span> {0} van {1}'
+})});
+</script>
+{% endblock %}
