@@ -1,9 +1,9 @@
-from braces.views import LoginRequiredMixin
+from braces.views import LoginRequiredMixin, GroupRequiredMixin
 from django.views.generic import (DetailView, ListView)
 from transport import models
 from django.db.models import Q
 import datetime
-from transport.mixins import UserIsInvolvedMixin, IsTransportCoordinatorMixin, IsInTransportMixin
+from transport.mixins import UserIsInvolvedMixin
 from accounts.models import VokoUser
 from constance import config
 from groups.utils.views import GroupmanagerFormView
@@ -42,7 +42,8 @@ class Ride(LoginRequiredMixin, UserIsInvolvedMixin, DetailView):
     model = models.Ride
 
 
-class Cars(LoginRequiredMixin, IsInTransportMixin, ListView):
+class Cars(LoginRequiredMixin, GroupRequiredMixin, ListView):
+    group_required = ('Transport', 'Admin')
     queryset = VokoUser.objects.filter(
         is_active=True,
         userprofile__shares_car__exact=True
@@ -50,15 +51,16 @@ class Cars(LoginRequiredMixin, IsInTransportMixin, ListView):
     template_name = "transport/cars.html"
 
 
-class Members(LoginRequiredMixin, IsInTransportMixin, ListView):
+class Members(LoginRequiredMixin, GroupRequiredMixin, ListView):
+    group_required = ('Transport', 'Admin')
     queryset = VokoUser.objects.filter(
         is_active=True,
         groups__id=config.TRANSPORT_GROUP).order_by("first_name", "last_name")
     template_name = "transport/members.html"
 
 
-class Groupmanager(LoginRequiredMixin, IsTransportCoordinatorMixin, GroupmanagerFormView):
-
+class Groupmanager(LoginRequiredMixin, GroupRequiredMixin, GroupmanagerFormView):
+    group_required = ('Transportcoordinatoren', 'Transport', 'Admin')
     template_name = "transport/group_mgr.html"
     success_url = "/transport/groupmanager"
     group_pk = config.TRANSPORT_GROUP
