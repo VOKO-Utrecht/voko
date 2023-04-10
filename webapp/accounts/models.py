@@ -158,6 +158,10 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.email
 
+    def is_coordinator(self):
+        return self.groups.filter(
+            name__in=['Uitdeelcoordinatoren', 'Transportcoordinatoren'])
+
     def __str__(self):
         return self.get_full_name()
 

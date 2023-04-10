@@ -1,8 +1,11 @@
-from braces.views import LoginRequiredMixin
+from braces.views import LoginRequiredMixin, GroupRequiredMixin
 from django.views.generic import (DetailView, ListView)
 from distribution import models
 import datetime
 from distribution.mixins import UserIsInvolvedWithShiftMixin
+from accounts.models import VokoUser
+from constance import config
+from groups.utils.views import GroupmanagerFormView
 
 
 class Schedule(LoginRequiredMixin, ListView):
@@ -30,3 +33,18 @@ class Schedule(LoginRequiredMixin, ListView):
 class Shift(LoginRequiredMixin, UserIsInvolvedWithShiftMixin, DetailView):
     template_name = "distribution/shift.html"
     model = models.Shift
+
+
+class Members(LoginRequiredMixin, GroupRequiredMixin, ListView):
+    group_required = ('Uitdeelcoordinatoren', 'Uitdeel', 'Admin')
+    queryset = VokoUser.objects.filter(
+        is_active=True,
+        groups__id=config.DISTRIBUTION_GROUP).order_by("first_name", "last_name")
+    template_name = "distribution/members.html"
+
+
+class Groupmanager(LoginRequiredMixin, GroupRequiredMixin, GroupmanagerFormView):
+    group_required = ('Uitdeelcoordinatoren', 'Admin')
+    template_name = "distribution/group_mgr.html"
+    success_url = "/distribution/groupmanager"
+    group_pk = config.DISTRIBUTION_GROUP

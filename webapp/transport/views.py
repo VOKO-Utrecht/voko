@@ -1,13 +1,12 @@
-from braces.views import LoginRequiredMixin
-from django.views.generic import (DetailView, ListView, FormView)
+from braces.views import LoginRequiredMixin, GroupRequiredMixin
+from django.views.generic import (DetailView, ListView)
 from transport import models
 from django.db.models import Q
 import datetime
-from transport.mixins import UserIsInvolvedMixin, IsTransportCoordinatorMixin, IsInTransportMixin
+from transport.mixins import UserIsInvolvedMixin
 from accounts.models import VokoUser
-from django.contrib.auth.models import Group
-from transport.forms import GroupManagerForm
 from constance import config
+from groups.utils.views import GroupmanagerFormView
 
 
 class Schedule(LoginRequiredMixin, ListView):
@@ -43,7 +42,8 @@ class Ride(LoginRequiredMixin, UserIsInvolvedMixin, DetailView):
     model = models.Ride
 
 
-class Cars(LoginRequiredMixin, IsInTransportMixin, ListView):
+class Cars(LoginRequiredMixin, GroupRequiredMixin, ListView):
+    group_required = ('Transport', 'Admin')
     queryset = VokoUser.objects.filter(
         is_active=True,
         userprofile__shares_car__exact=True
@@ -51,39 +51,16 @@ class Cars(LoginRequiredMixin, IsInTransportMixin, ListView):
     template_name = "transport/cars.html"
 
 
-class Members(LoginRequiredMixin, IsInTransportMixin, ListView):
+class Members(LoginRequiredMixin, GroupRequiredMixin, ListView):
+    group_required = ('Transport', 'Admin')
     queryset = VokoUser.objects.filter(
         is_active=True,
         groups__id=config.TRANSPORT_GROUP).order_by("first_name", "last_name")
     template_name = "transport/members.html"
 
 
-class Groupmanager(LoginRequiredMixin, IsTransportCoordinatorMixin, FormView):
-
+class Groupmanager(LoginRequiredMixin, GroupRequiredMixin, GroupmanagerFormView):
+    group_required = ('Transportcoordinatoren', 'Transport', 'Admin')
     template_name = "transport/group_mgr.html"
-    form_class = GroupManagerForm
-    model = Group
     success_url = "/transport/groupmanager"
-
-    def post(self, request, *args, **kwargs):
-        transport_group = Group.objects.get(pk=config.TRANSPORT_GROUP)
-        form = GroupManagerForm(request.POST)
-        if (form.is_valid()):
-            if "cancel" in request.POST:
-                return self.success_url
-            else:
-                user_ids = request.POST.getlist('users', [])
-                self._update_groupmembers(transport_group, user_ids)
-        return super().form_valid(form)
-
-    def _update_groupmembers(self, group, members_ids):
-
-        members = VokoUser.objects.all().filter(pk__in=members_ids)
-        for m in members:
-            if (group.user_set.all().filter(id=m.id).first() is None):
-                m.groups.add(group)
-
-        members_ids = [int(item) for item in members_ids]
-        for m in group.user_set.all():
-            if (m.id not in members_ids):
-                m.groups.remove(group)
+    group_pk = config.TRANSPORT_GROUP

@@ -1,17 +1,17 @@
 {% extends 'base.html' %}
 {% load bootstrap3 %}
-{% block title %}Transportleden{% endblock %}
+{% block title %}Manage Uitdeelleden{% endblock %}
 
 {% block content %}
-<h1>Leden groep Transport</h1>
+<h1>Leden groep Uitdeel</h1>
 <hr/>
 
-<form action="{% url 'transport_groupmanager' %}" method="POST" xmlns="http://www.w3.org/1999/html">
+<form action="{% url 'distribution_groupmanager' %}" method="POST" xmlns="http://www.w3.org/1999/html">
     {% csrf_token %}
     {{ form.users }}
     <div class = "text-right">
         <br/>
-        <a class="btn btn-default"  href="{% url 'transport_groupmanager' %}">Annuleer</a>&nbsp;&nbsp;
+        <a class="btn btn-default"  href="{% url 'distribution_groupmanager' %}">Annuleer</a>&nbsp;&nbsp;
         <button class="btn btn-primary" type = 'submit'>Opslaan</button>
     </div>
 </form>
@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "bootstrap3Compatible":true,
         "preserveSelectionOnMove":"moved",
         "selectorMinimalHeight":400,
-        "selectedListLabel": "<h4>Huidige leden in Transport</h4>",
+        "selectedListLabel": "<h4>Huidige leden in uitdeel</h4>",
         "nonSelectedListLabel": "<h4>Alle actieve VOKO leden</h4>",
         "removeSelectedLabel": "Verwijder geselecteerde",
         "removeAllLabel": "Verwijder alle",
