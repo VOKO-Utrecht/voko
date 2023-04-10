@@ -38,7 +38,7 @@
                     <a href="{% url 'coordinator_remarks' account.userprofile.id %}">{% bootstrap_icon "pencil  " %}</a>
                 </td>   
                 {% endif %}        
-                <td class="col-md-1 text-center">{% if user.is_coordinator %}{% bootstrap_icon "ok" %}{% endif %}</td>
+                <td class="col-md-1 text-center">{% if 'Uitdeelcoordinatoren' in account.flat_groups %}{% bootstrap_icon "ok" %}{% endif %}</td>
             </tr>
             {% endfor %}
             </tbody>
