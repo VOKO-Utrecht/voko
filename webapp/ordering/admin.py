@@ -140,7 +140,7 @@ class ProductStockAdmin(DeleteDisabledMixin, admin.ModelAdmin):
 
 class OrderRoundAdmin(DeleteDisabledMixin, admin.ModelAdmin):
     list_display = ["id", "open_for_orders", "closed_for_orders",
-                    "collect_datetime", "markup_percentage",
+                    "collect_datetime", "pickup_location", "markup_percentage",
                     "transaction_costs", "reminder_hours_before_closing",
                     "order_placed", "reminder_sent"]
     ordering = ("-id", )
