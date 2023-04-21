@@ -7,7 +7,15 @@
     <p class="lead">
     De huidige bestelronde is <strong>bestelronde {{ view.current_order_round.id }}</strong>. Deze bestelronde is nu <strong>{% if view.current_order_round.is_open %}open{% else %}gesloten{% endif %}</strong>.
     </p>
-
+    {% if view.current_order_round.is_open %} 
+    <a href ="{% url 'view_products' %}">
+        <button class="btn btn-success btn-save-order"> Bestellen</button>
+    </a> 
+    {{ value|linebreaks }}
+    {% else %}{% endif %}</strong>.
+    
+   
+    
     <table class="table">
         <tbody>
             <tr>
