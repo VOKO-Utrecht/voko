@@ -58,6 +58,7 @@ class UserProfile(TimeStampedModel):
         on_delete=models.CASCADE
     )
     shares_car = models.BooleanField(
+        default=False,
         verbose_name=("Ik heb een redelijk grote auto die leden kunnen lenen "
                       "voor transport"),
         help_text=("Dit zet je contactgegevens op transport pagina's van de "
