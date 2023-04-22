@@ -5,7 +5,7 @@ from ordering.tests.factories import (
     ProductFactory, ProductStockFactory,
     OrderRoundFactory, SupplierFactory, ProductCategoryFactory,
     ProductUnitFactory)
-from vokou.testing import VokoTestCase
+from vokou.testing import VokoTestCase, suppressWarnings
 
 
 class TestProductStockApiView(VokoTestCase):
@@ -129,6 +129,7 @@ class TestProductStockApiView(VokoTestCase):
                          product.maximum_total_order)
         self.assertEqual(new_product.enabled, product.enabled)
 
+    @suppressWarnings
     def test_nonexistent_product_id(self):
         ret = self.client.post(self.url, data={
             'amount': 10,
@@ -140,6 +141,7 @@ class TestProductStockApiView(VokoTestCase):
 
         self.assertEqual(ret.status_code, 400)
 
+    @suppressWarnings
     def test_missing_parameter(self):
         product = ProductFactory(order_round=None)
 
@@ -153,6 +155,7 @@ class TestProductStockApiView(VokoTestCase):
 
         self.assertEqual(ret.status_code, 400)
 
+    @suppressWarnings
     def test_product_not_enabled(self):
         product = ProductFactory(order_round=None, enabled=False)
 
@@ -166,6 +169,7 @@ class TestProductStockApiView(VokoTestCase):
 
         self.assertEqual(ret.status_code, 400)
 
+    @suppressWarnings
     def test_call_with_regular_non_stock_product(self):
         product = ProductFactory(order_round=OrderRoundFactory())
 
@@ -233,6 +237,7 @@ class TestProductApiView(VokoTestCase):
         self.assertEqual(product.unit, unit)
         self.assertEqual(product.category, category)
 
+    @suppressWarnings
     def test_missing_fields(self):
         supplier = SupplierFactory()
 

@@ -1,7 +1,9 @@
+from functools import wraps
 from django.contrib.auth.models import Group
 from django.test import TransactionTestCase
 import mock
 from accounts.tests.factories import VokoUserFactory
+import logging
 
 
 class VokoTestCase(TransactionTestCase):
@@ -37,3 +39,22 @@ class VokoTestCase(TransactionTestCase):
             "Message '%s' not found in response. Messages found: '%s'" %
             (msg, ', '.join([str(m) for m in messages]))
         )
+
+
+def suppressWarnings(f):
+    """
+    If we need to test for bad requests and expect 404s or 405s we raise to logging level
+    to prevent warning messages when running tests
+    """
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        # raise logging level to ERROR
+        logger = logging.getLogger('django.request')
+        previous_logging_level = logger.getEffectiveLevel()
+        logger.setLevel(logging.ERROR)
+        # trigger original function that would throw warning
+        result = f(*args, **kwargs)
+        # lower logging level back to previous
+        logger.setLevel(previous_logging_level)
+        return result
+    return wrapper
