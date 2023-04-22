@@ -9,7 +9,7 @@ from finance.tests.factories import PaymentFactory
 from ordering.models import Order
 from ordering.tests.factories import (OrderRoundFactory, OrderProductFactory,
                                       OrderFactory)
-from vokou.testing import VokoTestCase
+from vokou.testing import VokoTestCase, suppressWarnings
 
 
 class FinanceTestCase(VokoTestCase):
@@ -209,6 +209,7 @@ class TestConfirmTransaction(FinanceTestCase):
         self.payment = PaymentFactory(order=self.order)
         self.client.login()
 
+    @suppressWarnings
     def test_required_get_parameters_bad(self):
         ret = self.client.get(self.url, {})
         self.assertEqual(ret.status_code, 404)
@@ -305,6 +306,7 @@ class TestPaymentWebhook(FinanceTestCase):
 
         self.url = reverse('finance.callback')
 
+    @suppressWarnings
     def test_required_post_parameters_bad(self):
         ret = self.client.post(self.url, {})
         self.assertEqual(ret.status_code, 404)
