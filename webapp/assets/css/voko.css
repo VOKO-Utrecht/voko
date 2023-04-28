@@ -1,0 +1,132 @@
+.body-background {
+    background-image: url("/static/img/craftpaper.jpg");
+    background-repeat: repeat;
+    background-attachment: fixed;
+    background-size: 661px 480px;
+    font-family: "Lucida Console", sans-serif;
+}
+
+.nav-background {
+    background-image: url("/static/img/headgreen.png");
+    background-position: center bottom;
+    background-size: cover;
+    height: 110px;
+    /* position: relative; */
+    /* background-color: transparent !important; */
+    /* --navbar-color: transparent; */
+}
+
+.logo {
+    width: 106px;
+    height: 73px;
+}
+
+@media (max-width: 800px) {
+    /* line 337, sass/_navbarNavDropdown.scss */
+    #navbarNavDropdown #mm_wrap {
+      height: auto;
+      padding: 0;
+      display: none;
+    }
+    /* line 342, sass/_navbarNavDropdown.scss */
+    .menu-hoofdmenu-container {
+      display: block;
+      position: relative;
+      right: auto;
+      width: 100%;
+      padding: 118px 20px 130px;
+      margin-bottom: 5px;
+      background-image: url("/static/img/craftpaper.jpg");
+      background-size: cover;
+      border-radius: 4px;
+    }
+
+    .menu-hoofdmenu-container li {
+      display: block;
+      width: 100%;
+      position: relative;
+      padding: 15px 10px 17px;
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .menu-hoofdmenu-container li:last-child {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .menu-hoofdmenu-container li .sub-menu {
+      padding-bottom: 0;
+    }
+
+    .menu-hoofdmenu-container li.homelink {
+      position: absolute;
+      top: 47px;
+      left: 50%;
+      padding: 0;
+      width: auto;
+      margin-left: -40px;
+      border: 0;
+    }
+    /* line 375, sass/_navbarNavDropdown.scss */
+    .menu-hoofdmenu-container li.homelink a {
+      width: 210px;
+      height: 34px;
+      text-align: center;
+      background-image: url(imgs/logo-b-mini.png);
+      background-size: 210px 34px;
+    }
+    /* line 381, sass/_navbarNavDropdown.scss */
+    .menu-hoofdmenu-container li.homelink a span {
+      display: block;
+      text-indent: -5000px;
+    }
+    /* line 387, sass/_navbarNavDropdown.scss */
+    .menu-hoofdmenu-container li a {
+      display: block;
+      width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0;
+      color: #fff !important;
+      line-height: 1;
+    }
+    /* line 395, sass/_navbarNavDropdown.scss */
+    .menu-hoofdmenu-container li a:hover {
+      opacity: 1;
+    }
+    /* line 397, sass/_navbarNavDropdown.scss */
+    .menu-hoofdmenu-container li a:hover:after {
+      content: none !important;
+    }
+    /* line 404, sass/_navbarNavDropdown.scss */
+    .menu-hoofdmenu-container li.current a:after {
+      content: none !important;
+    }
+    /* line 412, sass/_navbarNavDropdown.scss */
+    .menu-sidemenu-container {
+      position: absolute;
+      bottom: 50px;
+      width: 100%;
+      left: 0;
+      top: auto;
+      right: auto;
+      text-align: center;
+    }
+    /* line 420, sass/_navbarNavDropdown.scss */
+     .menu-sidemenu-container li {
+      padding: 5px 10px;
+    }
+    /* line 422, sass/_navbarNavDropdown.scss */
+    .menu-sidemenu-container li a {
+      color: #e5dd14;
+    }
+    /* line 425, sass/_navbarNavDropdown.scss */
+    .menu-sidemenu-container li i {
+      font-size: 24px;
+    }
+    /* line 430, sass/_navbarNavDropdown.scss */
+    #navbarNavDropdown.show {
+      top: 0;
+    }
+  }
+
