@@ -114,18 +114,21 @@
       color: #fff !important;
       line-height: 1;
     }
-    /* .navbar-collapse li a:hover {
-      opacity: 1;
-    } */
-    /* .navbar-collapse li a:hover:after {
-      content: none !important;
+
+    .dropdown-toggle::after {
+      display: none;
     }
-    .navbar-collapse li.current a:after {
-      content: none !important;
-    } */
-    /* line 430, sass/_navbarNavDropdown.scss */
-    /* #navbarNavDropdown.show {
-      top: 0;
-    } */
+
+    .dropdown-menu {
+      display: block;
+      background-image: unset;
+      background: unset;
+      border: 0px;
+    }
+
+    .dropdown-menu li  {
+      border-bottom: 0px;
+      padding: 6px;
+    }
   }
 
