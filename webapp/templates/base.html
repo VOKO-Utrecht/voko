@@ -20,12 +20,13 @@
   <body class="body-background">
     <nav class="navbar navbar-expand-lg sticky-top nav-background">
       <div class="container">
-        <a class="navbar-brand" href="#"><img src="{% static 'img/logo-b.png' %}" class="logo"/></a>
+        <a class="navbar-brand" href="/" class="logo"></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse container-fluid justify-content-end" id="navbarNavDropdown">
-          <ul class="navbar-nav menu-hoofdmenu-container" id="menu-hoofdmenu">
+          <div class+"menu-hoofdmenu-container">
+          <ul class="navbar-nav" id="menu-hoofdmenu">
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="#">Home</a>
             </li>
@@ -46,6 +47,7 @@
               </ul>
             </li>
           </ul>
+          </div>
         </div>
       </div>
     </nav>
