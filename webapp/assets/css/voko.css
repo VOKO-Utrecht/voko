@@ -11,9 +11,6 @@
     background-position: center bottom;
     background-size: cover;
     height: 110px;
-    /* position: relative; */
-    /* background-color: transparent !important; */
-    /* --navbar-color: transparent; */
 }
 
 .navbar-brand {
@@ -21,20 +18,8 @@
     height: 73px;
     background-image: url('/static/img/logo-b.png');
     background-size: 106px 73px;
+    background-repeat: no-repeat;
 }
-
-/* .homebt {
-  display: none;
-  position: fixed;
-  z-index: 100;
-  left: 10px;
-  top: 6px;
-  width: 210px;
-  height: 34px;
-  background-image: url(imgs/logo-b-mini.png);
-  background-size: 210px 34px;
-  z-index: 100;
-} */
 
 @media (max-width: 800px) {
 
@@ -84,10 +69,10 @@
       color: #fff !important;
       line-height: 1;
     }
-    /* .navbar-collapse li a:hover {
+    .navbar-collapse li a:hover {
       opacity: 1;
     }
-    .navbar-collapse li a:hover:after {
+    /* .navbar-collapse li a:hover:after {
       content: none !important;
     }
     .navbar-collapse li.current a:after {

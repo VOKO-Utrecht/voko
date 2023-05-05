@@ -1,0 +1,39 @@
+<ul class="navbar-nav">
+    <li class="nav-item"><a class="nav-link" href="{% url 'view_products' %}">Producten</a></li>
+    <li class="nav-item"><a class="nav-link" href="{% url 'docs.document_overview' %}">Documenten</a></li>
+    <!-- Transport -->
+    {% if 'Transportcoordinatoren' in user.flat_groups or 'Transport' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+    <li class="nav-item dropdown">
+      <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Transport<span class="caret"></span></a>
+      <ul class="dropdown-menu">
+        {% if 'Transportcoordinatoren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+          <li><a class="dropdown-item" href="{% url 'transport_groupmanager' %}">Leden beheer</a></li>
+        {% endif %}
+        <li><a class="dropdown-item" href="{% url 'transport_members' %}">Leden</a></li>
+        <li><a class="dropdown-item" href="{% url 'schedule' %}">Schema</a></li>
+        <li><a class="dropdown-item" href="{% url 'cars' %}">Auto’s</a></li>
+      </ul>
+    </li>
+    {% else %}
+    <li class="nav-item"><a class="nav-link" href="{% url 'schedule' %}">Transport</a></li>
+    {% endif %}
+
+    <!-- Uitdeel -->
+    {% if 'Uideelcoordinatoren' in user.flat_groups or 'Uitdeel' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+    <li class="nav-item dropdown">
+      <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Uitdeel<span class="caret"></span></a>
+      <ul class="dropdown-menu">
+        {% if 'Uitdeelcoordinatoren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+          <li><a class="dropdown-item" href="{% url 'distribution_groupmanager' %}">Leden beheer</a></li>
+        {% endif %}
+        <li><a class="dropdown-item" href="{% url 'distribution_members' %}">Leden</a></li>
+        <li><a class="dropdown-item" href="{% url 'distribution_schedule' %}">Schema</a></li>
+      </ul>
+    </li>
+    {% else %}
+    <li class="nav-item"><a class="nav-link" href="{% url 'schedule' %}">Uitdeel</a></li>
+    {% endif %}
+    <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
+  </ul>
+
+  
