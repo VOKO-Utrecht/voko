@@ -5,11 +5,15 @@
   font-style: normal;
 }
 
-/* line 43, sass/_normalize.scss */
+body {
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;
+}
+
+
 .normalfont {
   font-family: "Lucida Console", sans-serif;
 }
-/* line 45, sass/_normalize.scss */
+
 .windows .normalfont {
   font-family: "Hipsterish", "Lucida Console", sans-serif;
 }
@@ -19,7 +23,6 @@
     background-repeat: repeat;
     background-attachment: fixed;
     background-size: 661px 480px;
-    font-family: "Lucida Console", sans-serif;
 }
 
 .nav-background {
@@ -34,14 +37,7 @@
   font-size: larger;
   font-weight: bolder;
   --bs-nav-link-color: #291703 !important;
-}
-
-.navbar-brand {
-    width: 122px;
-    height: 73px;
-    background-image: url('/static/img/logo-b.png');
-    background-size: 106px 73px;
-    background-repeat: no-repeat;
+  height: 100%;
 }
 
 .dropdown-menu {
@@ -72,6 +68,10 @@
         height: 34px;
         background-image: url('/static/img/logo-b-mini.png');
         background-size: 210px 34px;    
+    }
+
+    .navbar-brand img {
+      display: none;
     }
 
     .navbar {
