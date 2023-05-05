@@ -1,3 +1,19 @@
+@font-face {
+  font-family: 'Hipsterish';
+  src: url("/static/font/hipsterishfontnormal-webfont.woff2") format("woff2"), url("/static/font/hipsterishfontnormal-webfont.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* line 43, sass/_normalize.scss */
+.normalfont {
+  font-family: "Lucida Console", sans-serif;
+}
+/* line 45, sass/_normalize.scss */
+.windows .normalfont {
+  font-family: "Hipsterish", "Lucida Console", sans-serif;
+}
+
 .body-background {
     background-image: url("/static/img/craftpaper.jpg");
     background-repeat: repeat;
@@ -13,12 +29,41 @@
     height: 110px;
 }
 
+.navbar  li {
+  font-family: "Hipsterish", "Times New Roman", sans-serif;
+  font-size: larger;
+  font-weight: bolder;
+  --bs-nav-link-color: #291703 !important;
+}
+
 .navbar-brand {
     width: 122px;
     height: 73px;
     background-image: url('/static/img/logo-b.png');
     background-size: 106px 73px;
     background-repeat: no-repeat;
+}
+
+.dropdown-menu {
+  background-image: url("/static/img/headgreen.png");
+}
+
+.dropdown-item {
+  opacity: 0.7;
+  font-size: smaller;
+  font-weight: bolder;
+}
+
+.dropdown-item:hover {
+  opacity: 1;
+  background: none;
+}
+
+@media all and (min-width: 800px) {
+	.navbar .nav-item .dropdown-menu{ display: none; }
+	.navbar .nav-item:hover .nav-link{   }
+	.navbar .nav-item:hover .dropdown-menu{ display: block; }
+	.navbar .nav-item .dropdown-menu{ margin-top:0; }
 }
 
 @media (max-width: 800px) {
@@ -69,9 +114,9 @@
       color: #fff !important;
       line-height: 1;
     }
-    .navbar-collapse li a:hover {
+    /* .navbar-collapse li a:hover {
       opacity: 1;
-    }
+    } */
     /* .navbar-collapse li a:hover:after {
       content: none !important;
     }

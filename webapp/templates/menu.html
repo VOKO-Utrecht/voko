@@ -1,6 +1,7 @@
 <ul class="navbar-nav">
     <li class="nav-item"><a class="nav-link" href="{% url 'view_products' %}">Producten</a></li>
     <li class="nav-item"><a class="nav-link" href="{% url 'docs.document_overview' %}">Documenten</a></li>
+    <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
     <!-- Transport -->
     {% if 'Transportcoordinatoren' in user.flat_groups or 'Transport' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
     <li class="nav-item dropdown">
@@ -33,7 +34,48 @@
     {% else %}
     <li class="nav-item"><a class="nav-link" href="{% url 'schedule' %}">Uitdeel</a></li>
     {% endif %}
-    <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
+
+    <!-- Boeren -->
+    {% if 'Boeren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+    <li class="nav-item dropdown">
+        <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Boeren<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'productadmin_main' %}">Producten</a></li>
+            <li><a class="dropdown-item" href="{% url 'stockadmin_main' %}">Voorraad</a></li>
+            </ul>
+    </li>
+    {% endif %}
+
+    <!-- Besteloverzichten -->
+    {% if 'Uitdeelcoordinatoren' in user.flat_groups or 'Boeren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+    <li class="nav-item"><a class="nav-link" href="{% url 'orderadmin_main' %}">Besteloverzichten</a></li>
+    {% endif %}
+
+    {% if 'Boeren' in user.flat_groups or 'Admin' in user.flat_groups or 'Uitdeelcoordinatoren' in user.flat_groups or user.is_superuser or user.is_staff %}
+    <li class="nav-item dropdown">
+        <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Admin<span class="caret"></span></a>
+        <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="{% url 'admin:index' %}">Backend</a></li>
+        {% if 'Admin' in user.flat_groups or user.is_superuser %}
+        <li><a class="dropdown-item" href="{% url 'groups_members' %}">Groepen</a></li>
+        {% endif %}
+        </ul>
+    </li>
+    {% endif %}
+
+    {% if user.orders.all %}
+        {% if user.orders.get_current_order.orderproducts.all %}
+        <li><a class="nav-link" href="{% url 'finish_order' user.orders.get_current_order.pk %}">Bestelling (&euro; {{ user.orders.get_current_order.total_price }})</a></li>
+        {% endif %}
+    {% endif %}
+
+    <li class="nav-item dropdown">
+        <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ user.get_full_name }}<span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'profile' %}">Profiel</a></li>
+            <li><a class="dropdown-item" href="{% url 'logout' %}">Uitloggen</a></li>
+        </ul>
+    </li>
   </ul>
 
   
