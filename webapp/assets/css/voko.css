@@ -5,9 +5,28 @@
   font-style: normal;
 }
 
+
+
 :root {
   --hipster-font-family: "Hipsterish", 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;
   --regular-font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;
+}
+
+.btn-primary {
+  background-color: #efd301;
+  border-color: #efd301;
+  color:#291703;
+}
+
+.btn-primary:hover {
+  background-color: #cbb402;
+  border-color: #cbb402;
+  color:#291703;
+}
+
+.panel {
+  margin-top: 2em;
+  display: block;
 }
 
 body {
@@ -20,7 +39,7 @@ body {
 }
 
 .body-background {
-    background-image: url("/static/img/craftpaper.jpg");
+    background-image: url("/static/img/craftpaper-light.jpg");
     background-repeat: repeat;
     background-attachment: fixed;
     background-size: 661px 480px;
@@ -35,10 +54,12 @@ body {
 
 .navbar  li {
   font-family: var(--hipster-font-family);
-  font-size: larger;
+  font-size: 1.3em;
   font-weight: bolder;
+  letter-spacing: .06em;
   --bs-nav-link-color: #291703 !important;
   height: 100%;
+  margin-right: 1em;
 }
 
 .dropdown-menu {
@@ -87,7 +108,7 @@ body {
       width: 100%;
       height: 100%;
       padding: 20px 20px 130px;
-      background-image: url("/static/img/craftpaper-d.jpg");
+      background-image: url("/static/img/craftpaper.jpg");
       background-size: 661px 480px;
       transition: all 0.2s ease; 
       border-radius: 6px;    
@@ -151,11 +172,30 @@ a:hover {
 }
 
 tr {
-  border-color: #291703;
+  border-color: #d1c091;
 }
 
 textarea, input, option, select {
   background-color: #e8d39e !important;
   border-color: #e8d39e !important;
 }
+
+ul.pagination li a {
+  background-color: #d1c091 !important;
+  border-color: #756700 !important;
+  color:#291703;
+}
+
+ul.pagination li.active a {
+  background-color: #fee8ae !important;
+  border-color: #756700 !important;
+  color:#291703;
+}
+
+ul.pagination li:hover a {
+  background-color: #fee8ae !important;
+  border-color: #756700 !important;
+  color:#291703;
+}
+
 
