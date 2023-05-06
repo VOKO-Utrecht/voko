@@ -5,17 +5,22 @@
   font-style: normal;
 }
 
+:root {
+  --hipster-font-family: "Hipsterish", 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;
+  --regular-font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;
+}
+
 body {
-  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;
+  font-family: var(--regular-font-family)
 }
 
 
 .normalfont {
-  font-family: "Lucida Console", sans-serif;
+  font-family: var(--regular-font-family)
 }
 
 .windows .normalfont {
-  font-family: "Hipsterish", "Lucida Console", sans-serif;
+  font-family: 
 }
 
 .body-background {
@@ -33,7 +38,7 @@ body {
 }
 
 .navbar  li {
-  font-family: "Hipsterish", "Times New Roman", sans-serif;
+  font-family: var(--hipster-font-family);
   font-size: larger;
   font-weight: bolder;
   --bs-nav-link-color: #291703 !important;
@@ -134,7 +139,7 @@ body {
 h1, h2, h3, h4, h5, h6 {
   clear: both;
   font-weight: bold;
-  font-family: "Hipsterish", "Times New Roman", sans-serif;
+  font-family: var(--hipster-font-family);
   line-height: 1.2;
   letter-spacing: 0.01em;
   margin: 0;
@@ -147,5 +152,10 @@ a {
 
 tr {
   border-color: #291703;
+}
+
+textarea, input, option, select {
+  background-color: #e8d39e !important;
+  border-color: #e8d39e !important;
 }
 
