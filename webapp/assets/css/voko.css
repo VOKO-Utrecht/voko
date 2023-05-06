@@ -131,3 +131,21 @@ body {
     }
   }
 
+h1, h2, h3, h4, h5, h6 {
+  clear: both;
+  font-weight: bold;
+  font-family: "Hipsterish", "Times New Roman", sans-serif;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  margin: 0;
+  color: #007200;
+}
+
+a {
+  color: #02385a;
+}
+
+tr {
+  border-color: #291703;
+}
+
