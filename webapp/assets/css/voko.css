@@ -12,6 +12,14 @@
   --regular-font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;
 }
 
+a {
+  color: #02385a;
+}
+
+a:hover {
+  color: #035081;
+}
+
 .btn-primary {
   background-color: #efd301;
   border-color: #efd301;
@@ -52,7 +60,7 @@ body {
     height: 110px;
 }
 
-.navbar  li {
+.navbar li a {
   font-family: var(--hipster-font-family);
   font-size: 1.3em;
   font-weight: bolder;
@@ -62,18 +70,25 @@ body {
   margin-right: 1em;
 }
 
+.nav-link:hover {
+  color:#007200;
+}
+
 .dropdown-menu {
   background-image: url("/static/img/headgreen.png");
+  font-size: 0.8em;
+  letter-spacing: .06em;
+  margin-top: -10px !important;
 }
 
 .dropdown-item {
-  opacity: 0.7;
+  opacity: 1;
   font-size: smaller;
   font-weight: bolder;
 }
 
 .dropdown-item:hover {
-  opacity: 1;
+  color:#007200;
   background: none;
 }
 
@@ -163,22 +178,14 @@ h1, h2, h3 {
   color: #007200;
 }
 
-a {
-  color: #02385a;
-}
-
-a:hover {
-  color: #035081;
-}
-
 tr {
   border-color: #d1c091;
 }
 
-textarea, input, option, select {
-  background-color: #e8d39e !important;
+/* textarea, input, option, select {
+  background-color: #f1dca5 !important;
   border-color: #e8d39e !important;
-}
+} */
 
 ul.pagination li a {
   background-color: #d1c091 !important;
