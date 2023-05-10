@@ -1,0 +1,84 @@
+{% comment %}TODO: extract logic what to hide or show to a util class {% endcomment %}
+
+<div class="collapse navbar-collapse justify-content-end " id="navbarNavDropdown">
+  <ul class="navbar-nav">
+    <li class="nav-item"><a class="nav-link" href="{% url 'view_products' %}">Producten</a></li>
+    <li class="nav-item"><a class="nav-link" href="{% url 'docs.document_overview' %}">Documenten</a></li>
+    <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
+    <!-- Transport -->
+    {% if 'Transportcoordinatoren' in user.flat_groups or 'Transport' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+    <li class="nav-item dropdown">
+      <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Transport<span class="caret"></span></a>
+      <ul class="dropdown-menu">
+        {% if 'Transportcoordinatoren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+          <li><a class="dropdown-item" href="{% url 'transport_groupmanager' %}">Leden beheer</a></li>
+        {% endif %}
+        <li><a class="dropdown-item" href="{% url 'transport_members' %}">Leden</a></li>
+        <li><a class="dropdown-item" href="{% url 'schedule' %}">Schema</a></li>
+        <li><a class="dropdown-item" href="{% url 'cars' %}">Auto’s</a></li>
+      </ul>
+    </li>
+    {% else %}
+    <li class="nav-item"><a class="nav-link" href="{% url 'schedule' %}">Transport</a></li>
+    {% endif %}
+
+    <!-- Uitdeel -->
+    {% if 'Uideelcoordinatoren' in user.flat_groups or 'Uitdeel' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+    <li class="nav-item dropdown">
+      <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Uitdeel<span class="caret"></span></a>
+      <ul class="dropdown-menu">
+        {% if 'Uitdeelcoordinatoren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+          <li><a class="dropdown-item" href="{% url 'distribution_groupmanager' %}">Leden beheer</a></li>
+        {% endif %}
+        <li><a class="dropdown-item" href="{% url 'distribution_members' %}">Leden</a></li>
+        <li><a class="dropdown-item" href="{% url 'distribution_schedule' %}">Schema</a></li>
+      </ul>
+    </li>
+    {% else %}
+    <li class="nav-item"><a class="nav-link" href="{% url 'distribution_schedule' %}">Uitdeel</a></li>
+    {% endif %}
+
+    <!-- Boeren -->
+    {% if 'Boeren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+    <li class="nav-item dropdown">
+        <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Boeren<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'productadmin_main' %}">Producten</a></li>
+            <li><a class="dropdown-item" href="{% url 'stockadmin_main' %}">Voorraad</a></li>
+            </ul>
+    </li>
+    {% endif %}
+
+    <!-- Besteloverzichten -->
+    {% if 'Uitdeelcoordinatoren' in user.flat_groups or 'Boeren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
+    <li class="nav-item"><a class="nav-link" href="{% url 'orderadmin_main' %}">Besteloverzichten</a></li>
+    {% endif %}
+
+    {% if 'Boeren' in user.flat_groups or 'Admin' in user.flat_groups or 'Uitdeelcoordinatoren' in user.flat_groups or user.is_superuser or user.is_staff %}
+    <li class="nav-item dropdown">
+        <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Admin<span class="caret"></span></a>
+        <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="{% url 'admin:index' %}">Backend</a></li>
+        {% if 'Admin' in user.flat_groups or user.is_superuser %}
+        <li><a class="dropdown-item" href="{% url 'groups_members' %}">Groepen</a></li>
+        {% endif %}
+        </ul>
+    </li>
+    {% endif %}
+
+    {% if user.orders.all %}
+        {% if user.orders.get_current_order.orderproducts.all %}
+        <li><a class="nav-link" href="{% url 'finish_order' user.orders.get_current_order.pk %}">Bestelling (&euro; {{ user.orders.get_current_order.total_price }})</a></li>
+        {% endif %}
+    {% endif %}
+
+    <li class="nav-item dropdown">
+        <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ user.get_full_name }}<span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'profile' %}">Profiel</a></li>
+            <li><a class="dropdown-item" href="{% url 'logout' %}">Uitloggen</a></li>
+        </ul>
+    </li>
+  </ul>
+</div>
+  
