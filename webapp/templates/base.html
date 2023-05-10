@@ -70,7 +70,7 @@
               </ul>
             </li>
             {% else %}
-            <li><a href="{% url 'schedule' %}">Uitdeel</a></li>
+            <li><a href="{% url 'distribution_schedule' %}">Uitdeel</a></li>
             {% endif %}
             {% comment %} {% if 'Uitdeel' in user.flat_groups or 'Uitdeelcoordinatoren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser  %}
               <li><a href="{% url 'distribution_schedule' %}">Uitdeel</a></li>
