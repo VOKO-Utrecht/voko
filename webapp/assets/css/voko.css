@@ -70,8 +70,11 @@ body {
   margin-right: 1em;
 }
 
-.nav-link:hover {
-  color:#007200;
+.nav-tabs, .nav-item {
+  --bs-nav-tabs-border-color: #291703;
+  --bs-nav-tabs-link-hover-border-color: #291703;
+  --bs-nav-link-color: #291703;  
+  --bs-nav-link-hover-color: #007200;  
 }
 
 .dropdown-menu {
