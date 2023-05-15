@@ -34,7 +34,7 @@
           </div>
           {% endif %}
         </row>
-        <div class="dropdown pull-right visible-xs-block">
+        <div class="dropdown pull-right d-sm-none">
           <button class="btn btn-default dropdown-toggle" type="button" id="category-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
             Categorie
             <span class="caret"></span>
@@ -50,7 +50,7 @@
       </div>
 
       <!-- Categories -->
-      <div role="tabpanel" class="hidden-xs">
+      <div role="tabpanel" class="d-none d-sm-block">
         <ul id="categories-tabs" class="nav nav-tabs categories" role="tablist">
           <li role="presentation" class="nav-item active"><a href="#" class="nav-link category-option" data-category="all" role="tab" data-toggle="tab">Alle producten</a></li>
           {% for category in view.categories %}
