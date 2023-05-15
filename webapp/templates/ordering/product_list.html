@@ -35,16 +35,16 @@
           {% endif %}
         </row>
         <div class="dropdown pull-right d-sm-none">
-          <button class="btn btn-default dropdown-toggle" type="button" id="category-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+          <button class="btn btn-default dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             Categorie
             <span class="caret"></span>
           </button>
-          <ul class="dropdown-menu" aria-labelledby="category-dropdown">
-            <li><a href="#" class="category-option" data-category="all">Alle producten</a></li>
+          <ul class="dropdown-menu">
+            <li><a href="#" class="dropdown-item category-option" data-category="all">Alle producten</a></li>
             {% for category in view.categories %}
-                <li><a href="#" class="category-option" data-category="{{ category.id }}">{{ category.name }}</a></li>
+                <li><a href="#" class="dropdown-item category-option" data-category="{{ category.id }}">{{ category.name }}</a></li>
             {% endfor %}
-            <li><a href="#" class="category-option" data-category="no-category">Overig</a></li>
+            <li><a href="#" class="dropdown-item category-option" data-category="no-category">Overig</a></li>
           </ul>
         </div>
       </div>
