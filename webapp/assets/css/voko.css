@@ -38,7 +38,19 @@ a:hover {
 }
 
 body {
+  font-size: 14px;
   font-family: var(--regular-font-family)
+}
+
+.form-control {
+  height: 34px;
+}
+
+.product {
+  border-color: rgb(117, 103, 0, 0.3);
+  border-width: 0px 0px 1px 0px;
+  border-style: solid;
+  margin-bottom: 1.2em;
 }
 
 
@@ -75,6 +87,11 @@ body {
   --bs-nav-tabs-link-hover-border-color: #291703;
   --bs-nav-link-color: #291703;  
   --bs-nav-link-hover-color: #007200;  
+  font-size: 16px;
+}
+
+.info a {
+  text-decoration: none;
 }
 
 .dropdown-menu {
@@ -93,6 +110,18 @@ body {
 .dropdown-item:hover {
   color:#007200;
   background: none;
+}
+
+.progress {
+  width: 10em;
+}
+
+.progress-bar {
+  background-color: #007200;
+}
+
+h4.product-name a {
+  text-decoration: none;
 }
 
 @media all and (min-width: 800px) {

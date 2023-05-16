@@ -23,17 +23,18 @@
     <div class="panel panel-default">
       <!-- Heading -->
       <div class="panel-heading clearfix">
-        <row>
-          <div class="col-md-6">
+        <div class="d-flex justify-content-between">
+          <div>
             <button type="submit" class="btn btn-success btn-save-order">
               <span class="glyphicon glyphicon-ok-sign"></span> Bestelling bevestigen
-            </button></div>
-            {% if current_order_round.get_pickup_location %}
-          <div class="col-md-6 text-right center">
-            Ophaallocatie: <strong>{{ current_order_round.get_pickup_location }}</strong>
+            </button>
+          </div>
+          {% if current_order_round.get_pickup_location %}
+          <div>
+            <h5>Ophaallocatie: <strong>{{ current_order_round.get_pickup_location }}</strong></h5>
           </div>
           {% endif %}
-        </row>
+        </div>
         <div class="dropdown pull-right d-sm-none">
           <button class="btn btn-default dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             Categorie
@@ -50,9 +51,9 @@
       </div>
 
       <!-- Categories -->
-      <div role="tabpanel" class="d-none d-sm-block">
+      <div role="tabpanel" class="my-4 d-none d-sm-block">
         <ul id="categories-tabs" class="nav nav-tabs categories" role="tablist">
-          <li role="presentation" class="nav-item active"><a href="#" class="nav-link category-option" data-category="all" role="tab" data-toggle="tab">Alle producten</a></li>
+          <li role="presentation" class="nav-item"><a href="#" class="nav-link category-option" aria-current="page" data-category="all" role="tab" data-toggle="tab">Alle producten</a></li>
           {% for category in view.categories %}
             <li role="presentation" class="nav-item"><a href="#" role="tab" class="nav-link category-option" data-category="{{ category.id }}" data-toggle="tab">{{ category.name }}</a></li>
           {% endfor %}
@@ -84,11 +85,11 @@
             </div>
             <div class="order col-sm-5 pl-0 pr-0">
               <div class="container-fluid">
-                <div class="row">
-                  <div class="order col-xs-8">
+                <div class="d-flex justify-content-between">
+                  <div class="order col-xs-8 flex-fill">
                     &euro; {{ product.retail_price }} per {{ product.unit_of_measurement|lower }}
                   </div>
-                  <div class="order col-xs-4 pl-0">
+                  <div class="order col-xs-4">
                     {% if not product.is_available %}
                       Uitverkocht
                     {% else %}
@@ -101,26 +102,24 @@
                     {% endif %}
                   </div>
                 </div>
-                <input type="number" step="1" min="0" class="form-control" name="order-product-{{ product.id }}" size="2" placeholder="" value="{% if product.is_available %}{{ product.ordered_amount }}{% endif %}" {% if not product.is_available %}disabled{% endif %}>
+                <input type="number" step="1" min="0" class="form-control text-end" name="order-product-{{ product.id }}" size="2" placeholder="" value="{% if product.is_available %}{{ product.ordered_amount }}{% endif %}" {% if not product.is_available %}disabled{% endif %}>
               </div>
             </div>
           </div>
         {% endfor %}
       </div>
       <!-- Footer -->
-      <div class="panel-footer clearfix">
-        <row>
-          <div class="col-md-6">
-            <button type="submit" class="btn btn-success btn-save-order">
-              <span class="glyphicon glyphicon-ok-sign"></span> Bestelling bevestigen
-            </button>
-          </div>
-          {% if current_order_round.get_pickup_location %}
-            <div class="col-md-6 text-right center">
-              Ophaallocatie: <strong>{{ current_order_round.get_pickup_location }}</strong>
-            </div>
-          {% endif %}
-        </row>
+      <div class="d-flex justify-content-between">
+        <div>
+          <button type="submit" class="btn btn-success btn-save-order">
+            <span class="glyphicon glyphicon-ok-sign"></span> Bestelling bevestigen
+          </button>
+        </div>
+        {% if current_order_round.get_pickup_location %}
+        <div>
+          <h5>Ophaallocatie: <strong>{{ current_order_round.get_pickup_location }}</strong></h5>
+        </div>
+        {% endif %}
       </div>
     </div>
   </form>
