@@ -36,7 +36,7 @@ class Members(LoginRequiredMixin, GroupRequiredMixin, ListView):
         members_wo_group = VokoUser.objects.filter(is_active=True,
                                                    groups__id__isnull=True
                                                    ).order_by("first_name", "last_name")
-        queryset.append({"group": Group(name="Leden zonder groep"), "members": members_wo_group})
+        queryset.append({"group": Group(name="Leden zonder groep"), "members": members_wo_group, "show_detailed": True})
         return queryset
 
     template_name = "groups/members.html"
