@@ -21,7 +21,17 @@
                             </tr>
                             {% for member in group.members %}
                             <tr class="account">
-                                <td class="col-md-2">{{ member }}</td>         
+                                <td class="col-md-2">
+                                    {% if user.is_admin or user.is_superuser %}
+                                        <a href="/admin/accounts/vokouser/{{ member.id }}">{{ member }}</a>
+                                    {% else %}
+                                        {{ member }}
+                                    {% endif %}
+                                    {% if group.show_detailed %}
+                                        <br/><div class="small text-right text-muted">lid sinds: {{ member.created|date:"M d, Y" }}<br/>
+                                        laatste login: {{ member.last_login|date:"M d, Y" }}</div>
+                                    {% endif %}
+                                </td>         
                             </tr>
                             {% endfor %}
                         </table>
