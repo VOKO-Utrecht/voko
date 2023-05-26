@@ -184,7 +184,7 @@ class VokoUserBaseAdmin(UserAdmin):
 
     if hasattr(settings, 'ADMIN_USER_LIST_COUNT'):
         list_per_page = settings.ADMIN_USER_LIST_COUNT
-        
+
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.

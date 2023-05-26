@@ -167,6 +167,7 @@ CONSTANCE_CONFIG = {
     'FARMERS_GROUP': (5, "Farmers Group", int),
     'IT_GROUP': (4, "IT Group", int),
     'PROMO_GROUP': (7, "Promotion Group", int),
+    'FINANCE_GROUP': (9, "Finance Group", int),
     # other config values
     'MARKUP_PERCENTAGE': (4.0, "Markup percentage", float)
 
@@ -191,7 +192,8 @@ CONSTANCE_CONFIG_FIELDSETS = {
             'ADMIN_GROUP',
             'FARMERS_GROUP',
             'IT_GROUP',
-            'PROMO_GROUP'),
+            'PROMO_GROUP',
+            'FINANCE_GROUP'),
         'Other options': ('MARKUP_PERCENTAGE',)
     }    
 

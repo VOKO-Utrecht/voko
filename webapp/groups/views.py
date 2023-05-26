@@ -1,18 +1,19 @@
-from braces.views import LoginRequiredMixin, GroupRequiredMixin
+from braces.views import LoginRequiredMixin, StaffuserRequiredMixin
 from django.views.generic import (ListView)
 from accounts.models import VokoUser
 from django.contrib.auth.models import Group
 from constance import config
 
 
-class Members(LoginRequiredMixin, GroupRequiredMixin, ListView):
+class Members(LoginRequiredMixin, StaffuserRequiredMixin, ListView):
     group_required = ('Admin')
     groups_to_show = {'ADMIN_GROUP',
                       'TRANSPORT_GROUP',
                       'DISTRIBUTION_GROUP',
                       'FARMERS_GROUP',
                       'IT_GROUP',
-                      'PROMO_GROUP'}
+                      'PROMO_GROUP',
+                      'FINANCE_GROUP'}
 
     def _get_groups(self):
         group_ids = []
