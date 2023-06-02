@@ -9,7 +9,32 @@
 
 :root {
   --hipster-font-family: "Hipsterish", 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;
-  --regular-font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;
+  --regular-font-family: "Open Sans", 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;
+
+}
+
+.btn-primary {
+  --bs-btn-active-bg: #000;
+  --bs-btn-bg: #efd301;
+  --bs-btn-border-color: #efd301;
+  --bs-btn-color:#291703;  
+  --bs-btn-hover-bg: #cbb402;
+  --bs-btn-hover-border-color: #cbb402;
+  --bs-btn-hover-color:#291703;
+}
+
+.lead {
+  font-size: 1.1em;
+}
+
+.btn-secondary {
+  --bs-btn-bg: #faae66;
+  --bs-btn-color:#291703;
+  --bs-btn-border-color: #faae66;
+  --bs-btn-active-bg: #d8995f;
+  --bs-btn-hover-bg: #d8995f;
+  --bs-btn-hover-border-color: #d8995f;
+  --bs-btn-hover-color:#291703;  
 }
 
 a {
@@ -20,17 +45,7 @@ a:hover {
   color: #035081;
 }
 
-.btn-primary {
-  background-color: #efd301;
-  border-color: #efd301;
-  color:#291703;
-}
 
-.btn-primary:hover {
-  background-color: #cbb402;
-  border-color: #cbb402;
-  color:#291703;
-}
 
 .panel {
   margin-top: 2em;
@@ -75,7 +90,7 @@ body {
 .navbar li a {
   font-family: var(--hipster-font-family);
   font-size: 1.3em;
-  font-weight: bolder;
+  font-weight: 800;
   letter-spacing: .06em;
   --bs-nav-link-color: #291703 !important;
   height: 100%;
