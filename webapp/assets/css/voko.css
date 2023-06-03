@@ -27,6 +27,10 @@
   font-size: 1.1em;
 }
 
+strong {
+  font-weight: bold;
+}
+
 .btn-secondary {
   --bs-btn-bg: #faae66;
   --bs-btn-color:#291703;
