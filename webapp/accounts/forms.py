@@ -135,7 +135,7 @@ class VokoUserChangeForm(forms.ModelForm):
 
 
 class RequestPasswordResetForm(forms.Form):
-    email = forms.EmailField(label="Email-adres", widget=forms.TextInput)
+    email = forms.EmailField(label="E-mail adres", widget=forms.TextInput)
 
 
 class PasswordResetForm(forms.Form):
