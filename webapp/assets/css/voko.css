@@ -118,6 +118,7 @@ body {
   font-size: 0.8em;
   letter-spacing: .06em;
   margin-top: -10px !important;
+  
 }
 
 .dropdown-item {
@@ -168,37 +169,41 @@ h4.product-name a {
 
     .navbar-collapse {
       display: block;
-      position: relative;
-      margin: 5px 0px 5px 5px;
-      right: auto;
+      margin: 15px 5px 5px 5px;
       width: 100%;
       height: 100%;
-      padding: 20px 20px 130px;
-      background-image: url("/static/img/craftpaper.jpg");
+      padding: 20px;
+      background-image: url("/static/img/craftpaper_medium.jpg");
       background-size: 661px 480px;
-      transition: all 0.2s ease; 
-      border-radius: 6px;    
+      transition: all 0.4s ease; 
+      border-radius: 16px;  
+      border-width: 1px;
+      border-style: solid;  
+      border-color:#cbb402;
     }
 
     .navbar-collapse li {
+      color:#291703;
       display: block;
       width: 100%;
       position: relative;
-      padding: 15px 10px 17px;
+      padding: 15px 10px 15px;
       text-align: center;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.2);
     }
 
     .navbar-collapse li .sub-menu {
       padding-bottom: 0;
+      padding-top: 5px;
     }
+
     .navbar-collapse li a {
       display: block;
       width: 80%;
       margin-left: auto;
       margin-right: auto;
-      padding: 0;
-      color: #fff !important;
+      padding-top: 5px;
+      color:#291703;
       line-height: 1;
     }
 
