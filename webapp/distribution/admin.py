@@ -56,8 +56,8 @@ class ShiftAdmin(admin.ModelAdmin):
     # Show only members who are in the distribution group
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == "members":
-            kwargs["queryset"] = \
-                VokoUser.objects.filter(groups__id=config.DISTRIBUTION_GROUP)
+            kwargs["queryset"] = VokoUser.objects.filter(
+                groups__id=config.DISTRIBUTION_GROUP).order_by("first_name", "last_name")
         return super().formfield_for_manytomany(db_field, request, **kwargs)
 
     # Improve order round name in shift creation form
