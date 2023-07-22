@@ -11,6 +11,10 @@
   --neucha-font-family: "Neucha",'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;
 }
 
+th {
+  --bs-primary-rgb: rgba(15, 15, 11,1);
+}
+
 .btn-primary {
   --bs-btn-active-bg: #000;
   --bs-btn-bg: #efd301;
@@ -139,6 +143,17 @@ body {
 
 h4.product-name a {
   text-decoration: none;
+}
+
+/* duallistbox */
+.btn.moveall,
+.btn.move,
+.btn.removeall,
+.btn.remove {
+  border-width: 1px;
+  border-color:#756700;
+  background-color: #fff;
+  color:#000;
 }
 
 @media all and (min-width: 800px) {

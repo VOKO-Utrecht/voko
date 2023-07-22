@@ -8,7 +8,7 @@
     <!-- Transport -->
     {% if 'Transportcoordinatoren' in user.flat_groups or 'Transport' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
     <li class="nav-item dropdown">
-      <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Whereas<span class="caret"></span></a>
+      <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Transport<span class="caret"></span></a>
       <ul class="dropdown-menu">
         {% if 'Transportcoordinatoren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
           <li><a class="dropdown-item" href="{% url 'transport_groupmanager' %}">Leden beheer</a></li>
