@@ -38,9 +38,8 @@ De bestelronde is gesloten. Je kunt geen producten toevoegen.
       </tr>
 
       {% for product in view.draft_products %}
-      <tr class="{% if product.is_valid == True %}success valid-product{% elif product.is_valid == False %}danger invalid-product{% endif %}">
+      <tr class="align-middle {% if product.is_valid == True %}bg-success valid-product{% elif product.is_valid == False %}bg-danger invalid-product{% endif %}">
                 {% with product.data as product %}
-
         <td class="col-md-3">
             <input type="text" value="{{ product.name|title }}" class="form-control" name="product_name_{{ forloop.counter }}">
         </td>
@@ -57,9 +56,10 @@ De bestelronde is gesloten. Je kunt geen producten toevoegen.
         </td>
         <td class="col-md-2">
             <div class="input-group">
-                <div class="input-group-addon">&euro;</div>
-                    <input type="text" class="form-control" value="{{ product.base_price }}" name="product_base_price_{{ forloop.counter }}">
-                </div>
+                <span class="input-group-text">&euro;</span>
+                <input type="text" class="form-control" value="{{ product.base_price }}" name="product_base_price_{{ forloop.counter }}">
+                </span>
+            </div>
         </td>
         <td class="col-md-2">
             <input value="{{ product.unit|default_if_none:'' }}" class="form-control"
@@ -70,22 +70,22 @@ De bestelronde is gesloten. Je kunt geen producten toevoegen.
             <input value="{{ product.maximum_total_order|default_if_none:'' }}" class="form-control"
                    placeholder="onbep." name="product_maximum_total_order_{{ forloop.counter }}">
         </td>
-        <td>
-            <a href="#"><span class="glyphicon glyphicon-remove remove-product" style="color:red"></span></a>
+        <td> 
+            <a href="#" title="Verwijder product"><span class="btn btn-light  bi-trash3-fill remove-product" style="color:red"></span></a>
         </td>
     </tr>
           {% endwith %}
   {% endfor %}
     </tbody>
   </table>
-    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Valideren</button>
+    <button type="submit" class="btn btn-primary"><span class="bi bi-arrow-clockwise" aria-hidden="true"></span> Valideren</button>
     <a class="btn btn-primary" href="#" role="button" id="add_product">
-        <span class="glyphicon glyphicon-plus"></span> Product toevoegen
+        <span class="bi bi-plus-circle"></span> Product toevoegen
     </a>
 
 
     <a class="btn btn-danger pull-right" href="{% url 'create_real_products' supplier %}" role="button" id="finish">
-        <span class="glyphicon glyphicon-ok"></span> Resultaat opslaan
+        <span class="bi bi-save"></span> Resultaat opslaan
     </a>
 
 </form>
