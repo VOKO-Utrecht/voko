@@ -3,17 +3,18 @@
 {% block title %}Profiel{% endblock %}
 {% block content %}
 <h1>Profiel</h1>
-<div class="row">
-    <div class="col-md-4">
+<div>
         <form action="" method="post">{% csrf_token %}
         {% bootstrap_form form %}
                     {% buttons %}
-                    <button type="submit" class="btn btn-primary">
-                      {% bootstrap_icon "user" %} Profiel wijzigen
+                    <div class="d-flex justify-content-between">
+                    <a class="btn btn-warning" href="/" role="button"><span class="bi-arrow-left-square"></span> Annuleren</a>
+                    <button type="submit" class="btn btn-success">
+                      <span class="bi-save"></span> wijzigen
                     </button>
+                </div>
                     {% endbuttons %}
         </form>
-    </div>
 </div>
 {% endblock %}
 

@@ -109,11 +109,11 @@
             </div>
         {% endif %}
     </div>
-    <div class="panel">
-      <a class="btn btn-primary" href="{% url 'view_products' %}" role="button"><span class="glyphicon glyphicon-arrow-left"></span> Bestelling wijzigen</a>
+    <div class="mt-4 d-flex justify-content-between">
+      <a class="btn btn-warning" href="{% url 'view_products' %}" role="button"><span class="bi-arrow-left-square"></span> Bestelling wijzigen</a>
 
-      <button type="submit" class="btn btn-danger pull-right" {% if not order.has_products %}disabled{% endif %}>
-        {% bootstrap_icon "euro" %} Bestelling plaatsen en betalen
+      <button type="submit" class="btn btn-success pull-right" {% if not order.has_products %}disabled{% endif %}>
+        Bestelling plaatsen en betalen
       </button>
     </div>
 </form>

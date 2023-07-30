@@ -26,7 +26,7 @@
         <div class="d-flex justify-content-between">
           <div>
             <button type="submit" class="btn btn-success btn-save-order">
-              <span class="glyphicon glyphicon-ok-sign"></span> Bestelling bevestigen
+              <span class="bi-bag-check"></span> Bestelling bevestigen
             </button>
           </div>
           {% if current_order_round.get_pickup_location %}
@@ -112,7 +112,7 @@
       <div class="d-flex justify-content-between">
         <div>
           <button type="submit" class="btn btn-success btn-save-order">
-            <span class="glyphicon glyphicon-ok-sign"></span> Bestelling bevestigen
+            <span class="bi-bag-check"></span> Bestelling bevestigen
           </button>
         </div>
         {% if current_order_round.get_pickup_location %}
@@ -131,7 +131,6 @@
 {% endblock %}
 {% block javascript %}
 <script language="javascript">
-  {# categories filtering #}
   $(".category-option").click(function(event) {
     var category = event.target.dataset.category;
     if (category != "all") $(".product").fadeOut();

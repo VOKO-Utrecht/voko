@@ -24,18 +24,18 @@
     <strong>Te betalen: &euro; {{ order.total_price_to_pay_with_balances_taken_into_account }}</strong>
     </p>
 
-    <div class="row">
-        <div class="col-md-4">
-            <form action="{% url 'finance.createtransaction' %}" method="post">{% csrf_token %}
-                {% bootstrap_form form %}
-                {% buttons %}
-                <button type="submit" class="btn btn-primary">
-                  {% bootstrap_icon "star" %} Betalen
-                </button>
-                {% endbuttons %}
-                <a class="btn btn-warning" href="{%  url 'finance.cancelpayment' %}" role="button"><span class="glyphicon glyphicon-remove"></span> Annuleren</a>
-            </form>
-        </div>
+    <div class="w-50 row">
+        <form action="{% url 'finance.createtransaction' %}" method="post">{% csrf_token %}
+            {% bootstrap_form form %}
+            {% buttons %}
+            <div class="mt-4 d-flex justify-content-between">
+            <a class="btn btn-warning" href="{%  url 'finance.cancelpayment' %}" role="button"><span class="bi-x-square"></span> Annuleren</a>
+            <button type="submit" class="btn btn-success">
+                {% bootstrap_icon "star" %} Betalen
+            </button>
+            </div>
+            {% endbuttons %}
+        </form>
     </div>
 
     {% endif %}

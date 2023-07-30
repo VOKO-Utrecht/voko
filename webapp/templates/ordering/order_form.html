@@ -34,7 +34,7 @@
             <th>Aantal</th>
             <th>Stukprijs</th>
             <th>Subtotaal</th>
-            <th><span class="glyphicon glyphicon-trash"></span></th>
+            <th><span class="bi-trash"></span></th>
           </tr>
         </thead>
         <tbody>
@@ -79,7 +79,7 @@
       {% bootstrap_icon "pencil" %} Bestelling bijwerken
     </button>
     <a class="btn btn-success {% if object.finalized %}disabled{% endif %}" href="{% url 'finish_order' object.pk %}" role="button">
-        <span class="glyphicon glyphicon-ok"></span> Bestelling afronden</a>
+        <span class="bag-check"></span> Bestelling afronden</a>
     {% endbuttons %}
 
 

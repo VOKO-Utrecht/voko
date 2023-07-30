@@ -8,17 +8,15 @@
 <h4>Zichtbaar voor alle coordinatoren en superusers</h4>
 <hr>
 
-<div class="row">
-    <div class="col-md-4">
+<div class="d-flex justify-content-end">
         <form action="" method="post">{% csrf_token %}
         {% bootstrap_form form %}
                     {% buttons %}
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-success">
                       {% bootstrap_icon "save" %} Profiel wijzigen
                     </button>
                     {% endbuttons %}
         </form>
-    </div>
 </div>
 {% endblock %}
 
