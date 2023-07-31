@@ -112,7 +112,7 @@
     <div class="mt-4 d-flex justify-content-between">
       <a class="btn btn-warning" href="{% url 'view_products' %}" role="button"><span class="bi-arrow-left-square"></span> Bestelling wijzigen</a>
 
-      <button type="submit" class="btn btn-success pull-right" {% if not order.has_products %}disabled{% endif %}>
+      <button type="submit" class="btn btn-primary pull-right" {% if not order.has_products %}disabled{% endif %}>
         Bestelling plaatsen en betalen
       </button>
     </div>

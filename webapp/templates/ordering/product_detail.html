@@ -52,8 +52,8 @@
     <form action="" method="post">{% csrf_token %}
             {% bootstrap_form view.form %}
             {% buttons %}
-            <button type="submit" class="btn btn-primary">
-            {% bootstrap_icon "shopping-cart" %} Bestelling bijwerken
+            <button type="submit" class="mt-4 btn btn-primary">
+            <span class="bi-bag-check"></span> Bestelling bijwerken
             </button>
             {% endbuttons %}
     </form>
