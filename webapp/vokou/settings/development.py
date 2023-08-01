@@ -56,7 +56,7 @@ SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']
 
 CAPTCHA_ENABLED = False
 
-MOLLIE_API_KEY = 'test_mMpjV4xanRPNgvnC7JmPvM84Vz8WJ2'
+MOLLIE_API_KEY = 'test_'
 
 if os.environ.get('RUN_MAIN'):
     import debugpy
