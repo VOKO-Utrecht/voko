@@ -51,8 +51,6 @@ a:hover {
   color: #035081;
 }
 
-
-
 .panel {
   margin-top: 2em;
   display: block;
@@ -73,7 +71,6 @@ body {
   border-style: solid;
   margin-bottom: 1.2em;
 }
-
 
 .normalfont {
   font-family: var(--regular-font-family)
@@ -219,12 +216,7 @@ h4.product-name a {
       line-height: 1;
     }
 
-    .dropdown-toggle::after {
-      display: none;
-    }
-
     .dropdown-menu {
-      display: block;
       background-image: unset;
       background: unset;
       border: 0px;
@@ -234,6 +226,12 @@ h4.product-name a {
       border-bottom: 0px;
       padding: 6px;
     }
+
+    .dropdown-menu.categories {
+      background-color: #d1c091;
+    }
+
+    
   }
 
 h1, h2, h3 {

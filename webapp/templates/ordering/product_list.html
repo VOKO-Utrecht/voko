@@ -30,17 +30,17 @@
             </button>
           </div>
           {% if current_order_round.get_pickup_location %}
-          <div>
+          <div class="text-end">
             <h5>Ophaallocatie: <strong>{{ current_order_round.get_pickup_location }}</strong></h5>
           </div>
           {% endif %}
         </div>
-        <div class="dropdown pull-right d-sm-none">
-          <button class="btn btn-default dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <div class="dropdown text-end d-sm-none">
+          <button class="btn btn-default category dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             Categorie
             <span class="caret"></span>
           </button>
-          <ul class="dropdown-menu">
+          <ul class="dropdown-menu categories">
             <li><a href="#" class="dropdown-item category-option" data-category="all">Alle producten</a></li>
             {% for category in view.categories %}
                 <li><a href="#" class="dropdown-item category-option" data-category="{{ category.id }}">{{ category.name }}</a></li>
