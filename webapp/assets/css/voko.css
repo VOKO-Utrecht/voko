@@ -17,23 +17,13 @@ th {
 
 .btn-primary {
   --bs-btn-active-bg: #000;
-  --bs-btn-bg: hsl(83, 69%, 68%);
-  --bs-btn-border-color: hsl(66, 68%, 48%);
-  --bs-btn-color:#291703; 
-  --bs-btn-hover-bg: hsl(83, 90%, 76%);
-  --bs-btn-hover-border-color: hsl(66, 68%, 48%);
-  --bs-btn-hover-color:#291703;
-}
-/* 
-.btn-primary {
-  --bs-btn-active-bg: #000;
-  --bs-btn-bg: #007200;
-  --bs-btn-border-color: hsl(66, 68%, 48%);
+  --bs-btn-bg: #4c6c4c;
+  --bs-btn-border-color: #005000;
   --bs-btn-color:#ffffff; 
-  --bs-btn-hover-bg: hsl(83, 90%, 76%);
-  --bs-btn-hover-border-color: hsl(66, 68%, 48%);
-  --bs-btn-hover-color:#291703;
-} */
+  --bs-btn-hover-bg: #007200;
+  --bs-btn-hover-border-color: #005000;
+  --bs-btn-hover-color:#ffffff; 
+}
 
 .lead {
   font-size: 1.1em;
