@@ -1,3 +1,4 @@
+/* TODO: Use Sass to override Bootstrap 5 styles more easily */
 @font-face {
   font-family: 'Hipsterish';
   src: url("/static/font/hipsterishfontnormal-webfont.woff2") format("woff2"), url("/static/font/hipsterishfontnormal-webfont.woff") format("woff");
@@ -17,12 +18,18 @@ th {
 
 .btn-primary {
   --bs-btn-active-bg: #000;
-  --bs-btn-bg: #4c6c4c;
-  --bs-btn-border-color: #005000;
+  --bs-btn-bg: #007200;
+  --bs-btn-border-color: #007200;
   --bs-btn-color:#ffffff; 
-  --bs-btn-hover-bg: #007200;
-  --bs-btn-hover-border-color: #005000;
+  --bs-btn-hover-bg: #44A244;
+  --bs-btn-hover-border-color: #44A244;
   --bs-btn-hover-color:#ffffff; 
+}
+
+.btn:disabled {
+  --bs-btn-disabled-color: #291703;
+  --bs-btn-disabled-bg: #6d6d6d;
+  --bs-btn-disabled-border-color: #291703;
 }
 
 .lead {
