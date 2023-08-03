@@ -72,7 +72,7 @@
                     <a href="{% url 'view_product' product.pk %}">
                       {{ product.name|title }}
                     </a>
-                    {% if product.new %} <span class="label label-primary">Nieuw!</span>{% endif %}
+                    {% if product.new %} <span class="fs-6 label label-primary">Nieuw!</span>{% endif %}
                   </h4>
                   <p>
                     Van: <a class="supplier-{{ product.supplier.pk }}" href="{% url 'view_supplier' product.supplier.pk %}">{{ product.supplier }}</a>

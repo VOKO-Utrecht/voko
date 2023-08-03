@@ -27,9 +27,13 @@ th {
 }
 
 .btn:disabled {
-  --bs-btn-disabled-color: #291703;
+  --bs-btn-disabled-color: #000;
   --bs-btn-disabled-bg: #6d6d6d;
-  --bs-btn-disabled-border-color: #291703;
+  --bs-btn-disabled-border-color: #6d6d6d;
+}
+
+.btn-default {
+  --bs-btn-border-color: #060;
 }
 
 .lead {
