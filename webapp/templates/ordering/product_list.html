@@ -102,7 +102,7 @@
                     {% endif %}
                   </div>
                 </div>
-                <input type="number" step="1" min="0" class="form-control text-end" name="order-product-{{ product.id }}" size="2" placeholder="" value="{% if product.is_available %}{{ product.ordered_amount }}{% endif %}" {% if not product.is_available %}disabled{% endif %}>
+                <div width="100%"><input type="number" step="1" min="0" class="text-end" name="order-product-{{ product.id }}" size="6" placeholder="" value="{% if product.is_available %}{{ product.ordered_amount }}{% endif %}" {% if not product.is_available %}disabled{% endif %}></div>
               </div>
             </div>
           </div>

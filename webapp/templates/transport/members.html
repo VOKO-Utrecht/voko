@@ -37,12 +37,12 @@
                 {% if 'Transportcoordinatoren' in user.flat_groups or 'Admin' in user.flat_groups or user.is_superuser %}
                 <td class="col-md-3">{{ account.userprofile.coordinator_remarks|default_if_none:"" }}</td>
                 <td class="col-md-1">
-                    <a href="{% url 'coordinator_remarks' account.userprofile.id %}">{% bootstrap_icon "pencil  " %}</a>
+                    <a href="{% url 'coordinator_remarks' account.userprofile.id %}"><span class="bi-pencil-fill"></span></a>
                 </td>   
                 {% endif %}        
-                <td class="col-md-1 text-center">{% if 'Transportcoordinatoren' in account.flat_groups %}{% bootstrap_icon "ok" %}{% endif %}</td>
-                <td class="col-md-1 text-center">{% if account.userprofile.shares_car %}{% bootstrap_icon "ok" %}{% endif %}</td>
-                <td class="col-md-1 text-center">{% if account.userprofile.has_drivers_license %}{% bootstrap_icon "ok" %}{% endif %}</td>
+                <td class="col-md-1 text-center">{% if 'Transportcoordinatoren' in account.flat_groups %}<span class="bi-check-lg"></span>{% endif %}</td>
+                <td class="col-md-1 text-center">{% if account.userprofile.shares_car %}<span class="bi-check-lg"></span>{% endif %}</td>
+                <td class="col-md-1 text-center">{% if account.userprofile.has_drivers_license %}<span class="bi-check-lg"></span>{% endif %}</td>
             </tr>
             {% endfor %}
             </tbody>
