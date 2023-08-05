@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 django-extensions = "==3.1.2"
-django-bootstrap3 = "==12.1.0"
+django-bootstrap5 = "==23.3"
 django-braces = "==1.14.0"
 pytz = "==2021.1"
 django-cron = "==0.6.0"
