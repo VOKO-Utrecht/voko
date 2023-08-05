@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% block title %}Betalen{% endblock %}
 {% block content %}
 <script type="text/javascript">
@@ -27,14 +27,12 @@
     <div class="w-50 row">
         <form action="{% url 'finance.createtransaction' %}" method="post">{% csrf_token %}
             {% bootstrap_form form %}
-            {% buttons %}
             <div class="mt-4 d-flex justify-content-between">
             <a class="btn btn-warning" href="{%  url 'finance.cancelpayment' %}" role="button"><span class="bi-x-square"></span> Annuleren</a>
             <button type="submit" class="btn btn-primary">
                 <span class="bi-star"></span> Betalen
             </button>
             </div>
-            {% endbuttons %}
         </form>
     </div>
 

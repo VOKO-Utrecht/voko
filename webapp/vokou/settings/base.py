@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'tinymce',
     'django_extensions',
     'braces',
-    'bootstrap3',
+    'django_bootstrap5',
     "django_cron",
     "captcha",
 

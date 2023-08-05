@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% block title %}Profiel opmerkingen{% endblock %}
 {% block content %}
 <h2>{{ object.user }}</h2>
@@ -11,11 +11,9 @@
 <div class="d-flex justify-content-end">
         <form action="" method="post">{% csrf_token %}
         {% bootstrap_form form %}
-                    {% buttons %}
-                    <button type="submit" class="btn btn-primary">
-                      <span class="bi-save"></span> Profiel wijzigen
-                    </button>
-                    {% endbuttons %}
+          <button type="submit" class="btn btn-primary">
+            <span class="bi-save"></span> Profiel wijzigen
+          </button>
         </form>
 </div>
 {% endblock %}

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% block title %}Account activeren{% endblock %}
 {% block content %}
 <h1>Welkom terug {{ object.first_name }}!</h1>
@@ -48,11 +48,9 @@
     <div class="col-md-4">
         <form action="" method="post">{% csrf_token %}
             {% bootstrap_form form %}
-            {% buttons %}
             <button type="submit" class="mt-4 btn btn-primary">
               <span class="bi-star"></span> Account activeren
             </button>
-            {% endbuttons %}
         </form>
     </div>
 </div>
