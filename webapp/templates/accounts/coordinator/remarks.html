@@ -5,10 +5,10 @@
 <h2>{{ object.user }}</h2>
 <hr>
 <h4>Opmerkingen of bijzonderheden t.b.v. coordinatoren</h4>
-<h4>Zichtbaar voor alle coordinatoren en superusers</h4>
+<h5>Zichtbaar voor alle coordinatoren en superusers</h5>
 <hr>
 
-<div class="d-flex justify-content-end">
+<div class="d-flex">
         <form action="" method="post">{% csrf_token %}
         {% bootstrap_form form %}
           <button type="submit" class="btn btn-primary">
