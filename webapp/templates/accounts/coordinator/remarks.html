@@ -1,24 +1,20 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% block title %}Profiel opmerkingen{% endblock %}
 {% block content %}
 <h2>{{ object.user }}</h2>
 <hr>
 <h4>Opmerkingen of bijzonderheden t.b.v. coordinatoren</h4>
-<h4>Zichtbaar voor alle coordinatoren en superusers</h4>
+<h5>Zichtbaar voor alle coordinatoren en superusers</h5>
 <hr>
 
-<div class="row">
-    <div class="col-md-4">
+<div class="d-flex">
         <form action="" method="post">{% csrf_token %}
         {% bootstrap_form form %}
-                    {% buttons %}
-                    <button type="submit" class="btn btn-primary">
-                      {% bootstrap_icon "save" %} Profiel wijzigen
-                    </button>
-                    {% endbuttons %}
+          <button type="submit" class="btn btn-primary">
+            <span class="bi-save"></span> Profiel wijzigen
+          </button>
         </form>
-    </div>
 </div>
 {% endblock %}
 

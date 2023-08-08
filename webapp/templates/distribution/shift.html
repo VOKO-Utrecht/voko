@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
 TODO {% block title %}{{ object.date|date:"j F Y" }} {{ object.start_str }} - {{ object.end_str }}{% endblock %}
 {% block content %}
 <h1>Uitdeel dienst op {{ object.date|date:"j F Y" }}</h1>

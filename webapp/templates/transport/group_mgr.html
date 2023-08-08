@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
 {% block title %}Transportleden{% endblock %}
 
 {% block content %}
@@ -20,7 +19,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     $("#id_users").bootstrapDualListbox({
         "moveOnSelect":false, 
-        "bootstrap3Compatible":true,
         "preserveSelectionOnMove":"moved",
         "selectorMinimalHeight":400,
         "selectedListLabel": "<h4>Huidige leden in Transport</h4>",

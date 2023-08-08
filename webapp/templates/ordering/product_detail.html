@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% block title %}{{ object.name}} van {{ object.supplier }}{% endblock %}
 {% block content %}
 <h1>{{ object.name }} van <a href="{% url 'view_supplier' object.supplier.pk %}">{{ object.supplier }}</a></h1>
@@ -51,11 +51,9 @@
     {% if object.is_available %}
     <form action="" method="post">{% csrf_token %}
             {% bootstrap_form view.form %}
-            {% buttons %}
-            <button type="submit" class="btn btn-primary">
-            {% bootstrap_icon "shopping-cart" %} Bestelling bijwerken
+            <button type="submit" class="mt-4 btn btn-primary">
+            <span class="bi-bag-check"></span> Bestelling bijwerken
             </button>
-            {% endbuttons %}
     </form>
     {% else %}
         Helaas! Dit product is uitverkocht.

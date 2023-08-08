@@ -23,9 +23,9 @@
     </thead>
     <tbody>
       {% for orderround in object_list %}
-          <tr {% if orderround.is_current %}class="success"{% endif %}>
+          <tr {% if orderround.is_current %}class="bg-light"{% endif %}>
             <td>{{ orderround.pk }}</td>
-            <td>{% if orderround.is_open %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}</td>
+            <td>{% if orderround.is_open %}<span class="bi-check-lg"></span>{% else %}<span class="bi-x-lg"></span>{% endif %}</td>
             <td>{{ orderround.open_for_orders }}</td>
             <td>{{ orderround.closed_for_orders }}</td>
             <td><a href="{% url 'orderadmin_orderlists' orderround.pk %}">Bestellijsten</a></td>

@@ -1,38 +1,40 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+
 {% block title %}Accountoverzicht{% endblock %}
 {% block content %}
-    <h1 class="page-header">Welkom, {{ user.first_name }}</h1>
+    <h1 class="page-header mt-2">Welkom, {{ user.first_name }}</h1>
 
-    <p class="lead">
-    De huidige bestelronde is <strong>bestelronde {{ view.current_order_round.id }}</strong>. Deze bestelronde is nu <strong>{% if view.current_order_round.is_open %}open{% else %}gesloten{% endif %}</strong>.
-    </p>
+    <div class="panel">
+        <p class="lead">
+        De huidige bestelronde is <strong>bestelronde {{ view.current_order_round.id }}</strong>. Deze bestelronde is nu <strong>{% if view.current_order_round.is_open %}open{% else %}gesloten{% endif %}</strong>.
+        </p>
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td>Bestelronde open vanaf</td>
+                    <td>{{ view.current_order_round.open_for_orders }}</td>
+                </tr>
+                <tr>
+                    <td>Bestelronde open tot</td>
+                    <td>{{ view.current_order_round.closed_for_orders }}</td>
+                </tr>
+                <tr>
+                    <td>Ophaalmoment</td>
+                    <td>{{ view.current_order_round.collect_datetime }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <td>Bestelronde open vanaf</td>
-                <td>{{ view.current_order_round.open_for_orders }}</td>
-            </tr>
-            <tr>
-                <td>Bestelronde open tot</td>
-                <td>{{ view.current_order_round.closed_for_orders }}</td>
-            </tr>
-            <tr>
-                <td>Ophaalmoment</td>
-                <td>{{ view.current_order_round.collect_datetime }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <h2 class="page-header">Jouw financiën</h2>
-    <p class="lead">
-        {% if user.balance.debit %}
-            Saldo: &euro; -{{ user.balance.debit }}
-        {% else %}
-            Saldo: &euro; {{ user.balance.credit }}
-        {% endif %}
-    </p>
+    <div class="panel">
+        <h2 class="page-header">Jouw financiën</h2>
+        <p class="lead">
+            {% if user.balance.debit %}
+                Saldo: &euro; -{{ user.balance.debit }}
+            {% else %}
+                Saldo: &euro; {{ user.balance.credit }}
+            {% endif %}
+        </p>
 
     {% if balances %}
         <table class="table table-condensed" id="finance-table">
@@ -54,44 +56,46 @@
             </tbody>
         </table>
     {% endif %}
-
-    <h2 class="page-header">Jouw bestellingen</h2>
-
-    <p class="lead">
-        {% if orders %}
-            Je hebt {{ orders|length }} bestellingen geplaatst.
-        {% else %}
-            Je hebt nog geen bestellingen geplaatst.
-        {% endif %}
-    </p>
-
-    {% if orders %}
-    <table class="table table-condensed" id="orders-table">
-        <thead>
-            <tr>
-                <th>Bestelling</th>
-                <th>Bestelronde</th>
-                <th>Bedrag</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for order in orders %}
-                <tr>
-                    <td><a href="{% url 'order_summary' order.pk %}">Bestelling {{ order.user_order_number }}</a></td>
-                    <td>{{ order.order_round }}</td>
-                    <td>&euro; {{ order.total_price }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
-
-    <h2 class="page-header">Reglement & privacy statement</h2>
-    <div class="row">
-      <div class="col-md-6"><a href="{% url 'regulations' %}">Reglement</a></div>
-      <div class="col-md-6"><a href="{% url 'privacy' %}">Privacy statement</a></div>
     </div>
+    <div class="panel">
+        <h2 class="page-header">Jouw bestellingen</h2>
 
+        <p class="lead">
+            {% if orders %}
+                Je hebt {{ orders|length }} bestellingen geplaatst.
+            {% else %}
+                Je hebt nog geen bestellingen geplaatst.
+            {% endif %}
+        </p>
+
+        {% if orders %}
+        <table class="table table-condensed" id="orders-table">
+            <thead>
+                <tr>
+                    <th>Bestelling</th>
+                    <th>Bestelronde</th>
+                    <th>Bedrag</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td><a href="{% url 'order_summary' order.pk %}">Bestelling {{ order.user_order_number }}</a></td>
+                        <td>{{ order.order_round }}</td>
+                        <td>&euro; {{ order.total_price }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+    <div class="panel">
+        <h2 class="page-header">Reglement & privacy statement</h2>
+        <div class="row">
+            <div class="col-md-6"><a href="{% url 'regulations' %}">Reglement</a></div>
+            <div class="col-md-6"><a href="{% url 'privacy' %}">Privacy statement</a></div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block javascript %}
