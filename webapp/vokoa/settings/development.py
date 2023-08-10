@@ -1,5 +1,5 @@
 """
-Django settings for vokou project.
+Django settings for vokoa project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/dev/topics/settings/

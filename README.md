@@ -1,5 +1,6 @@
 # VOKO
-Django based custom web application for food collective www.vokoutrecht.nl.
+Django based custom web application for food collective (Voedselkollektief) Amersfoort.
+Based on code of its neighbour VOKO Utrecht (www.vokoutrecht.nl).
 
 ![example workflow](https://github.com/VOKO-Utrecht/voko/actions/workflows/ci.yml/badge.svg)
 

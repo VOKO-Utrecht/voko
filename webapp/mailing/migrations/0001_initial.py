@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('title', models.CharField(max_length=100)),
-                ('subject', models.CharField(default=b'VOKO Utrecht - ', max_length=100)),
+                ('subject', models.CharField(default=b'Voedselkollektief - ', max_length=100)),
                 ('html_body', models.TextField()),
             ],
             options={

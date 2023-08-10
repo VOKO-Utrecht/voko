@@ -12,15 +12,15 @@ DATABASES = {
         }
     }
 
-SERVER_EMAIL = "info@vokoutrecht.nl"
+SERVER_EMAIL = "ict@voedselkollektief.nl"
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = '/tmp/app-messages'
 
 ADMINS = (
-    ("Voko Utrecht", os.getenv('ADMIN_EMAIL', "info@vokoutrecht.nl")),
+    ("Voedselkollektief", os.getenv('ADMIN_EMAIL', "ict@voedselkollektief.nl")),
 )
 
-ALLOWED_HOSTS = ("acc.leden.vokoutrecht.nl", "127.0.0.1")
+ALLOWED_HOSTS = ("acc.leden.voedselkollektief.nl", "127.0.0.1")
 
-BASE_URL = "http://acc.leden.vokoutrecht.nl"
+BASE_URL = "http://acc.leden.voedselkollektief.nl"
 MOLLIE_API_KEY = os.environ["MOLLIE_API_KEY"]

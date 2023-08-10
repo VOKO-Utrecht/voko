@@ -19,6 +19,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='mailtemplate',
             name='subject',
-            field=models.CharField(default='VOKO Utrecht - ', max_length=100),
+            field=models.CharField(default='Voedselkollektief - ', max_length=100),
         ),
     ]

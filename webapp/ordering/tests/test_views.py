@@ -5,7 +5,7 @@ from ordering.models import Product, OrderProduct
 from ordering.tests.factories import (ProductFactory, OrderRoundFactory,
                                       OrderProductFactory, OrderFactory,
                                       ProductCategoryFactory, SupplierFactory)
-from vokou.testing import VokoTestCase
+from vokoa.testing import VokoTestCase
 
 
 class TestProductsView(VokoTestCase):

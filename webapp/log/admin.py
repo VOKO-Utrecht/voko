@@ -1,6 +1,6 @@
 from django.contrib import admin
 from log.models import EventLog
-from vokou.admin import DeleteDisabledMixin
+from vokoa.admin import DeleteDisabledMixin
 
 
 class EventLogAdmin(DeleteDisabledMixin, admin.ModelAdmin):

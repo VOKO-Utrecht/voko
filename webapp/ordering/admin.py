@@ -6,7 +6,7 @@ import sys
 from django.http import HttpResponse
 
 from finance.models import Balance
-from vokou.admin import DeleteDisabledMixin
+from vokoa.admin import DeleteDisabledMixin
 from .models import (Order, OrderProduct, Product, OrderRound, ProductCategory,
                      OrderProductCorrection, ProductStock, Supplier,
                      ProductUnit, DraftProduct, PickupLocation)

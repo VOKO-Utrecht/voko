@@ -1,4 +1,4 @@
-from vokou.testing import VokoTestCase
+from vokoa.testing import VokoTestCase
 from ordering.cron import SendPickupReminders, MailOrderLists
 from datetime import datetime, timedelta
 from pytz import UTC

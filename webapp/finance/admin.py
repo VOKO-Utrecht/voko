@@ -1,6 +1,6 @@
 from django.contrib import admin
 from finance.models import Balance, Payment
-from vokou.admin import DeleteDisabledMixin, export_as_csv_action
+from vokoa.admin import DeleteDisabledMixin, export_as_csv_action
 
 
 class BalanceFilterMixin(object):

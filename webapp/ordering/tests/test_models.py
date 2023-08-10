@@ -15,7 +15,7 @@ from ordering.tests.factories import (
     OrderProductCorrectionFactory, ProductFactory, UnitFactory,
     ProductStockFactory)
 from transport.tests.factories import RideFactory
-from vokou.testing import VokoTestCase
+from vokoa.testing import VokoTestCase
 from constance import config
 
 

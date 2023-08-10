@@ -12,7 +12,7 @@ import ordering.admin_urls
 import api.urls
 import distribution.urls
 import groups.urls
-from vokou.views import HomeView, PrivacyStatementView, RegulationsView
+from vokoa.views import HomeView, PrivacyStatementView, RegulationsView
 
 urlpatterns = [
     url(r'^admin/mailing/', include(mailing.urls)),

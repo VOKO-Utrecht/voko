@@ -157,7 +157,7 @@ class CreateTransactionView(LoginRequiredMixin, MollieMixin, FormView):
         # Start the payment
         results = self.create_payment(
             amount=float(amount_to_pay),
-            description="VOKO Utrecht %d"
+            description="VOKO Amersfoort %d"
                         % order_to_pay.id,
             issuer_id=bank,
             order_id=order_to_pay.id,

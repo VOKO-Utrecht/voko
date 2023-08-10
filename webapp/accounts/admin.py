@@ -81,7 +81,7 @@ def anonymize_user(modeladmin, request, queryset):
         user.is_asleep = True
 
         # Anonymize email address
-        user.email = "{}@anon.vokoutrecht.nl".format(user.id)
+        user.email = "{}@anon.voedselkollektief.nl".format(user.id)
 
         # Anonymize name
         user.first_name = 'account'

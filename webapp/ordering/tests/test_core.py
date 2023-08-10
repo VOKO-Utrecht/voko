@@ -5,7 +5,7 @@ from ordering.core import get_current_order_round, get_last_order_round, \
 from ordering.models import OrderProduct
 from ordering.tests.factories import OrderRoundFactory, OrderFactory, \
     ProductFactory, OrderProductFactory, ProductStockFactory
-from vokou.testing import VokoTestCase
+from vokoa.testing import VokoTestCase
 
 
 class TestGetCurrentOrderRound(VokoTestCase):

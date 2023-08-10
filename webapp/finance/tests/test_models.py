@@ -1,7 +1,7 @@
 from accounts.tests.factories import VokoUserFactory
 from finance.models import Balance, Payment
 from finance.tests.factories import PaymentFactory, BalanceFactory
-from vokou.testing import VokoTestCase
+from vokoa.testing import VokoTestCase
 
 
 class TestPaymentModel(VokoTestCase):

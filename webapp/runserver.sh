@@ -1,2 +1,2 @@
 #!/bin/sh
-./manage.py runserver --settings=vokou.settings.development
+./manage.py runserver --settings=vokoa.settings.development

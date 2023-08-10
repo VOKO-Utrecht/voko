@@ -143,9 +143,9 @@ class MailOrderLists(CronJobBase):
             in_mem_file.seek(0)  # Why is this here twice?
 
             # Generate mail
-            subject = ('VOKO Utrecht - Bestellijst voor %s' %
+            subject = ('Voedselkollektief Amersfoort - Bestellijst voor %s' %
                        order_round.collect_datetime.strftime("%d %B %Y"))
-            from_email = 'VOKO Utrecht Boerencontact <boeren@vokoutrecht.nl>'
+            from_email = 'Voedselkollektief Amersfoort <bestel@voedselkollektief.nl>'
             to = '%s <%s>' % (supplier.name, supplier.email)
 
             text_content = """
@@ -159,7 +159,7 @@ De bestelling is in CSV-formaat, dit is te openen in bijvoorbeeld Excel.
 Dit is een geautomatiseerd bericht, maar reageren is gewoon mogelijk.
 
 Vriendelijke groeten,
-VOKO Utrecht
+Voedselkollektief Amersfoort
 """ % (
                 supplier,
                 order_round.pk,
@@ -171,10 +171,10 @@ VOKO Utrecht
                 text_content,
                 from_email,
                 [to],
-                cc=["VOKO Utrecht Boerencontact <boeren@vokoutrecht.nl>"]
+                cc=["Voedselkollektief Amersfoort <bestel@voedselkollektief.nl>"]
             )
 
-            msg.attach('voko_utrecht_bestelling_ronde_%d.csv' % order_round.pk,
+            msg.attach('voko_amersfoort_bestelling_ronde_%d.csv' % order_round.pk,
                        in_mem_file.read(), 'text/csv')
             msg.send()
 

@@ -5,7 +5,7 @@ from ordering.tests.factories import (
     ProductFactory, ProductStockFactory,
     OrderRoundFactory, SupplierFactory, ProductCategoryFactory,
     ProductUnitFactory)
-from vokou.testing import VokoTestCase, suppressWarnings
+from vokoa.testing import VokoTestCase, suppressWarnings
 
 
 class TestProductStockApiView(VokoTestCase):

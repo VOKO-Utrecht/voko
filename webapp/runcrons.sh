@@ -3,4 +3,4 @@
 
 cd /home/voko/voko
 
-pipenv run python webapp/manage.py runcrons --settings=vokou.settings.production 
+pipenv run python webapp/manage.py runcrons --settings=vokoa.settings.production 
