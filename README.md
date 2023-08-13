@@ -23,14 +23,14 @@ _first time postgress restarts which confuses Django_
 
 ### Start voko website and run migrations
 1. Run: docker-compose up -d
-2. Run: docker exec -it voko_web_1 bash
-3. Run: ./manage.py makemigrations --settings=vokou.settings.development
-4. Run: ./manage.py migrate --settings=vokou.settings.development
+2. Run: docker exec -it voko-web-1 bash
+3. Run: ./manage.py makemigrations --settings=vokoa.settings.development
+4. Run: ./manage.py migrate --settings=vokoa.settings.development
 5. Run: exit
 
 ### Create superuser in the voko web container
-1. Run: docker exec -it voko_web_1 bash
-2. Run: ./manage.py createsuperuser --settings=vokou.settings.development
+1. Run: docker exec -it voko-web-1 bash
+2. Run: ./manage.py createsuperuser --settings=vokoa.settings.development
 3. _follow the prompts_
 4. Run: exit
 
