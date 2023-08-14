@@ -28,7 +28,7 @@
           <span class="navbar-toggler-icon"></span>
         </button>
           {% if user.is_authenticated %}
-            {% include 'menu.html' %}
+            {% include 'partials/menu.html' %}
           {% endif %}
       </div>
     </nav>
@@ -51,26 +51,8 @@
     {% block content %}{% endblock %}
     </div>
 
-    {% include 'footer.html' %}
-    <!-- <footer class="footer mt-auto py-3">
-      <div class="container-fluid">
-        <footer class="d-flex justify-content-center align-items-center py-3 my-4 border-top">
+    {% include 'partials/footer.html' %}
 
-          <img src="/static/img/logo-b.png">
-      
-      
-          <ul class="nav col-md-4 justify-content-end">
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Home</a></li>
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Features</a></li>
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Pricing</a></li>
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">FAQs</a></li>
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">About</a></li>
-          </ul>
-
-
-        </footer>
-      </div>
-    </footer> -->
     <!-- jQuery (necessary for datatables and dualbox plugins) -->
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
