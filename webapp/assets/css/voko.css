@@ -77,10 +77,6 @@ body {
   font-family: var(--regular-font-family)
 }
 
-.form-control {
-  /* height: 34px; */
-}
-
 .product {
   border-color: rgb(117, 103, 0, 0.3);
   border-width: 0px 0px 1px 0px;
@@ -169,13 +165,13 @@ h4.product-name a {
   color:#000;
 }
 
-@media all and (min-width: 800px) {
+@media all and (min-width: 900px) {
 	.navbar .nav-item .dropdown-menu{ display: none; }
 	.navbar .nav-item:hover .dropdown-menu{ display: block; }
 	.navbar .nav-item .dropdown-menu{ margin-top:0; }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 900px) {
 
     .navbar-brand {
         width: 210px;
