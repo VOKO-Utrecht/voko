@@ -49,16 +49,6 @@ strong {
   font-weight: bold;
 }
 
-.btn-secondary {
-  --bs-btn-bg: #faae66;
-  --bs-btn-color:#291703;
-  --bs-btn-border-color: #faae66;
-  --bs-btn-active-bg: #d8995f;
-  --bs-btn-hover-bg: #d8995f;
-  --bs-btn-hover-border-color: #d8995f;
-  --bs-btn-hover-color:#291703;  
-}
-
 a {
   color: #02385a;
 }
