@@ -34,6 +34,7 @@ class TransientEvent(Event):
         abstract = True
         managed = False
 
+    is_shift = models.BooleanField(default=False)
     original_model = models.CharField(blank=True,null=True)
     original_id = models.IntegerField(blank=True,null=True)
 

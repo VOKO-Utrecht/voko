@@ -16,6 +16,7 @@ import log
 from ordering.core import get_or_create_order
 from constance import config
 from django.contrib.auth.models import Group
+from agenda.models import Event
 
 
 class LoginView(AnonymousRequiredMixin, FormView):
@@ -104,6 +105,7 @@ class OverView(LoginRequiredMixin, TemplateView):
         ctx['orders'] = self.request.user.orders.filter(
             paid=True).order_by("-pk")
         ctx['balances'] = self.request.user.balance.all().order_by('-pk')
+        ctx['events'] = Event.objects.all().order_by('-date_time')
         return ctx
 
     def current_order_round(self):
