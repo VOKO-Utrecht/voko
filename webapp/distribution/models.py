@@ -3,29 +3,29 @@ from django.utils.text import slugify
 from django_extensions.db.models import TimeStampedModel
 from django.conf import settings
 from ordering.models import OrderRound
+from agenda.models import TransientEvent
+from django.urls import reverse
 
 
 class Shift(TimeStampedModel):
     class Meta:
-        verbose_name = 'Shift'
-        verbose_name_plural = 'Shifts'
-        ordering = ['start']
+        verbose_name = "Shift"
+        verbose_name_plural = "Shifts"
+        ordering = ["start"]
 
     id = models.AutoField(primary_key=True)
     order_round = models.ForeignKey(
         OrderRound,
         on_delete=models.SET_NULL,
         null=True,
-        related_name="distribution_shifts")
+        related_name="distribution_shifts",
+    )
     members = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        related_name="distribution_shifts")
-    start = models.TimeField(
-        help_text="When this shift starts")
-    end = models.TimeField(
-        help_text="When this shifts ends")
-    slug = models.SlugField(
-        unique=True, editable=False, max_length=100)
+        settings.AUTH_USER_MODEL, related_name="distribution_shifts"
+    )
+    start = models.TimeField(help_text="When this shift starts")
+    end = models.TimeField(help_text="When this shifts ends")
+    slug = models.SlugField(unique=True, editable=False, max_length=100)
 
     @property
     def date(self):
@@ -66,15 +66,25 @@ class Shift(TimeStampedModel):
             return None
         key_collectors = []
         for ride in next_order_round.rides.all():
-            key_collectors.append({
-                'route': ride.route,
-                'codriver': ride.codriver
-            })
+            key_collectors.append({"route": ride.route, "codriver": ride.codriver})
         return key_collectors
 
     def save(self, **kwargs):
         self.slug = slugify(self)
         return super(Shift, self).save(**kwargs)
 
+    def as_event(self):
+        event = TransientEvent()
+        event.address = self.order_round.pickup_location.address
+        event.title = f"Uitdeeldienst {self.order_round.pickup_location}"
+        event.short_description = (
+            f"<a href=\"{reverse('shift', args={self.slug})}\">"
+            f"Uitdeeldienst</a> voor ronde {self.order_round.id}"
+        )
+        event.date = self.date.date()
+        event.time = self.start
+        event.is_shift = True
+        return event
+
     def __str__(self):
-        return '{}-{}-{}'.format(self.date_str, self.start_str, self.end_str)
+        return "{}-{}-{}".format(self.date_str, self.start_str, self.end_str)

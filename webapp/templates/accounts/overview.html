@@ -33,11 +33,31 @@
                 <h2 class="page-header">
                     Jouw agenda
                 </h2>
-                <ul class="mt-2">
+                <table class="mt-2 table">
                 {% for e in events  %}
-                <li>{{ e.date_time }} {{ e.title }}</li>
+                {% if e.is_shift %}
+                <tr class="fw-bold bg-light" data-bs-toggle="tooltip" data-bs-placement="right" title="Je bent ingedeeld voor deze dienst.">
+                {% else %}
+                <tr>
+                {% endif %}
+                <td><table class="table-condensed w-100">
+                    <tr>
+                        <td class="w-50">{{ e.date|date:'j F Y' }}{% if e.time %}, {{ e.time|date:'H:i' }}{% endif %}</td>
+                        <td class="w-50">{{ e.title }}</td>
+                        <td class="w-auto">{% if e.is_shift %}<span class="text-danger bi bi-exclamation-square"></span>{% endif %}
+                        </td>
+                    </tr>
+                    {% if e.short_description %}
+                    <tr>
+                        <td colspan="3" style="border-width: 0px;">{{ e.short_description|safe }}</td>
+                    </tr>
+                    {% endif %}
+                </table></td>
+                </tr>
+
+                
                 {% endfor %}
-                </ul>
+                </table>
             </div>
         </div>
     </div>

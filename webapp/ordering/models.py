@@ -10,12 +10,12 @@ from django.core.exceptions import ValidationError
 from accounts.models import Address, VokoUser
 from finance.models import Balance
 from log import log_event
-from mailing.helpers import (mail_user, get_template_by_id,
-                             render_mail_template)
-from ordering.core import (get_or_create_order, get_current_order_round,
-                           find_unit)
+from mailing.helpers import mail_user, get_template_by_id, render_mail_template
+from ordering.core import get_or_create_order, get_current_order_round, find_unit
 from django.conf import settings
 from constance import config
+
+from agenda.models import TransientEvent
 
 
 class Supplier(TimeStampedModel):
@@ -38,12 +38,12 @@ class Supplier(TimeStampedModel):
 
     def has_orders_in_current_order_round(self):
         """
-         Ignores stock products!
+        Ignores stock products!
         """
         return OrderProduct.objects.filter(
             product__supplier=self,
             order__order_round=get_current_order_round(),
-            order__paid=True
+            order__paid=True,
         ).exists()
 
 
@@ -51,16 +51,16 @@ class PickupLocation(TimeStampedModel):
     """
     Pickup Location for an order round
     """
+
     class Meta:
         verbose_name = "Ophaallocatie"
 
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=255)
-    address = models.ForeignKey(Address,
-                                null=True,
-                                blank=True,
-                                on_delete=models.CASCADE)
+    address = models.ForeignKey(
+        Address, null=True, blank=True, on_delete=models.CASCADE
+    )
     is_default = models.BooleanField(default=False)
 
     def save(self, **kwargs):
@@ -79,59 +79,62 @@ class OrderRound(TimeStampedModel):
         verbose_name_plural = "Bestelronden"
 
     id = models.AutoField(primary_key=True)
-    open_for_orders = models.DateTimeField(
-        help_text="When this order round will open")
+    open_for_orders = models.DateTimeField(help_text="When this order round will open")
     closed_for_orders = models.DateTimeField(
-        help_text="When this order round will close")
+        help_text="When this order round will close"
+    )
     collect_datetime = models.DateTimeField(
-        help_text="When the products can be collected")
+        help_text="When the products can be collected"
+    )
     markup_percentage = models.DecimalField(
-        decimal_places=2, max_digits=5, default=config.MARKUP_PERCENTAGE)
+        decimal_places=2, max_digits=5, default=config.MARKUP_PERCENTAGE
+    )
     transaction_costs = models.DecimalField(
-        decimal_places=2, max_digits=5, default=0.21)
+        decimal_places=2, max_digits=5, default=0.21
+    )
     order_placed = models.BooleanField(
-        default=False, editable=False,
-        help_text="Whether the order was placed at our suppliers")
+        default=False,
+        editable=False,
+        help_text="Whether the order was placed at our suppliers",
+    )
 
     reminder_hours_before_closing = models.IntegerField(
         default=12,
         help_text="Number of hours before closing time when order "
-                  "reminder mail will be sent"
+        "reminder mail will be sent",
     )
     reminder_sent = models.BooleanField(
         default=False,
         editable=False,
-        help_text="Whether we've sent order reminders to our members"
+        help_text="Whether we've sent order reminders to our members",
     )
     reminder_hours_before_pickup = models.IntegerField(
         default=4,
         help_text="Number of hours before collecting time when pickup "
-                  "reminder mail will be sent"
+        "reminder mail will be sent",
     )
     pickup_reminder_sent = models.BooleanField(
         default=False,
         editable=False,
-        help_text="Whether we've sent pickup order reminders to our members"
+        help_text="Whether we've sent pickup order reminders to our members",
     )
     rides_mails_sent = models.BooleanField(
-        default=False,
-        editable=False,
-        help_text="Whether we've sent ride info mails"
+        default=False, editable=False, help_text="Whether we've sent ride info mails"
     )
     prepare_ride_mails_sent = models.BooleanField(
         default=False,
         editable=False,
-        help_text="Whether we've sent prepare ride info mails"
+        help_text="Whether we've sent prepare ride info mails",
     )
     ridecosts_request_mails_sent = models.BooleanField(
         default=False,
         editable=False,
-        help_text="Whether we've sent ridecosts request mails"
+        help_text="Whether we've sent ridecosts request mails",
     )
     distribution_mails_sent = models.BooleanField(
         default=False,
         editable=False,
-        help_text="Whether we've sent distribution info mails"
+        help_text="Whether we've sent distribution info mails",
     )
 
     distribution_coordinator = models.ForeignKey(
@@ -139,7 +142,7 @@ class OrderRound(TimeStampedModel):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="coordinating_distribution_orderrounds"
+        related_name="coordinating_distribution_orderrounds",
     )
 
     transport_coordinator = models.ForeignKey(
@@ -160,7 +163,8 @@ class OrderRound(TimeStampedModel):
     def clean(self):
         if self.is_over:
             raise ValidationError(
-                "Orderrounds which are in the past cannot be saved or changed")
+                "Orderrounds which are in the past cannot be saved or changed"
+            )
 
     def is_not_open_yet(self):
         current_datetime = datetime.now(pytz.utc)
@@ -175,49 +179,56 @@ class OrderRound(TimeStampedModel):
     @property
     def is_open(self):
         current_datetime = datetime.now(pytz.utc)
-        return (current_datetime >= self.open_for_orders
-                and current_datetime < self.closed_for_orders)
+        return (
+            current_datetime >= self.open_for_orders
+            and current_datetime < self.closed_for_orders
+        )
 
     def is_current(self):
         return self == get_current_order_round()
 
     def get_next_order_round(self):
         order_rounds = OrderRound.objects.all()
-        return order_rounds.filter(
-            open_for_orders__gt=self.open_for_orders
-        ).order_by("open_for_orders").first()
+        return (
+            order_rounds.filter(open_for_orders__gt=self.open_for_orders)
+            .order_by("open_for_orders")
+            .first()
+        )
 
     def get_previous_order_round(self):
         order_rounds = OrderRound.objects.all()
-        return order_rounds.filter(
-            open_for_orders__lt=self.open_for_orders
-        ).order_by("open_for_orders").reverse().first()
+        return (
+            order_rounds.filter(open_for_orders__lt=self.open_for_orders)
+            .order_by("open_for_orders")
+            .reverse()
+            .first()
+        )
 
     def suppliers(self):
         """
         Return suppliers with at least one paid order in this round
         """
-        supplier_ids = set(OrderProduct.objects.filter(
-            order__order_round=self, order__paid=True).values_list(
-            'product__supplier', flat=True)
+        supplier_ids = set(
+            OrderProduct.objects.filter(
+                order__order_round=self, order__paid=True
+            ).values_list("product__supplier", flat=True)
         )
 
-        return [Supplier.objects.get(id=supplier_id)
-                for supplier_id in supplier_ids]
+        return [Supplier.objects.get(id=supplier_id) for supplier_id in supplier_ids]
 
     def supplier_total_order_sum(self, supplier):
         """
         Return sum of total order amount (in euro) for a supplier
         """
         order_products = OrderProduct.objects.filter(
-            order__order_round=self, order__paid=True,
-            product__supplier=supplier
+            order__order_round=self, order__paid=True, product__supplier=supplier
         )
         return sum([o_p.total_cost_price() for o_p in order_products])
 
     def total_order_sum(self):
         order_products = OrderProduct.objects.filter(
-            order__order_round=self, order__paid=True)
+            order__order_round=self, order__paid=True
+        )
         return sum([o_p.total_cost_price() for o_p in order_products])
 
     def total_corrections(self):
@@ -233,40 +244,45 @@ class OrderRound(TimeStampedModel):
         )
 
         supplier_exc = sum(
-            [c.calculate_supplier_refund()
-             for c in corrections.filter(charge_supplier=True)]
+            [
+                c.calculate_supplier_refund()
+                for c in corrections.filter(charge_supplier=True)
+            ]
         )
 
         supplier_inc = sum(
-            [c.calculate_refund()
-             for c in corrections.filter(charge_supplier=True)]
+            [c.calculate_refund() for c in corrections.filter(charge_supplier=True)]
         )
 
         voko_inc = sum(
-            [c.calculate_refund()
-             for c in corrections.filter(charge_supplier=False)]
+            [c.calculate_refund() for c in corrections.filter(charge_supplier=False)]
         )
 
-        return {'supplier_exc': supplier_exc,
-                'supplier_inc': supplier_inc,
-                'voko_inc': voko_inc}
+        return {
+            "supplier_exc": supplier_exc,
+            "supplier_inc": supplier_inc,
+            "voko_inc": voko_inc,
+        }
 
     def total_profit(self):
         """
         Total profit purely by markup on products for this round
         """
         # FIXME: Does not take corrections into account. Is this by design?
-        orderproducts = OrderProduct.objects.filter(order__order_round=self,
-                                                    order__paid=True)
-        return sum([orderprod.product.profit * orderprod.amount
-                    for orderprod in orderproducts])
+        orderproducts = OrderProduct.objects.filter(
+            order__order_round=self, order__paid=True
+        )
+        return sum(
+            [orderprod.product.profit * orderprod.amount for orderprod in orderproducts]
+        )
 
     def total_revenue(self):
         """
         Total revenue on products for this round
         """
         order_products = OrderProduct.objects.filter(
-            order__order_round=self, order__paid=True)
+            order__order_round=self, order__paid=True
+        )
 
         total = sum([o_p.total_retail_price for o_p in order_products])
         print("  total_revenue: %f" % total)
@@ -286,21 +302,23 @@ class OrderRound(TimeStampedModel):
     def orders_per_supplier(self):
         data = {}
         for supplier in Supplier.objects.all():
-            suppliers_products_this_round = supplier.products.filter(
-                order_round=self)
-            data[supplier] = {'orderproducts': [],
-                              'sum': self.supplier_total_order_sum(
-                                  supplier)}
+            suppliers_products_this_round = supplier.products.filter(order_round=self)
+            data[supplier] = {
+                "orderproducts": [],
+                "sum": self.supplier_total_order_sum(supplier),
+            }
 
             for product in suppliers_products_this_round:
                 order_products = product.orderproducts.filter(order__paid=True)
                 product_sum = sum([op.amount for op in order_products])
                 if product_sum == 0:
                     continue
-                data[supplier]['orderproducts'].append(
-                    {'product': product,
-                     'amount': product_sum,
-                     'sub_total': product_sum * product.base_price}
+                data[supplier]["orderproducts"].append(
+                    {
+                        "product": product,
+                        "amount": product_sum,
+                        "sub_total": product_sum * product.base_price,
+                    }
                 )
 
         return data
@@ -314,26 +332,34 @@ class OrderRound(TimeStampedModel):
     def get_users_without_orders(self):
         def _users_without_orders_filter(voko_user):
             return not Order.objects.filter(
-                order_round=self, user=voko_user, paid=True).exists()
+                order_round=self, user=voko_user, paid=True
+            ).exists()
 
-        return list(filter(_users_without_orders_filter,
-                           VokoUser.objects.filter(is_active=True)))
+        return list(
+            filter(
+                _users_without_orders_filter, VokoUser.objects.filter(is_active=True)
+            )
+        )
 
     def get_users_with_orders(self):
         def _users_with_orders_filter(voko_user):
             return Order.objects.filter(
-                order_round=self, user=voko_user, paid=True).exists()
+                order_round=self, user=voko_user, paid=True
+            ).exists()
 
-        return list(filter(_users_with_orders_filter,
-                           VokoUser.objects.filter(is_active=True)))
+        return list(
+            filter(_users_with_orders_filter, VokoUser.objects.filter(is_active=True))
+        )
 
     def send_reminder_mails(self):
         """
         Sends reminder mails for users not yet ordered this round
         """
         if self.reminder_sent is True:
-            log_event(event="Not sending order reminder for round %d because "
-                            "reminder_sent is True" % self.pk)
+            log_event(
+                event="Not sending order reminder for round %d because "
+                "reminder_sent is True" % self.pk
+            )
 
             return
 
@@ -346,7 +372,8 @@ class OrderRound(TimeStampedModel):
 
         for user in self.get_users_without_orders():
             rendered_template_vars = render_mail_template(
-                mail_template, user=user, order_round=self)
+                mail_template, user=user, order_round=self
+            )
             mail_user(user, *rendered_template_vars)
 
     def send_pickup_reminder_mails(self):
@@ -354,8 +381,10 @@ class OrderRound(TimeStampedModel):
         Sends pickup reminder mails for users who did order this round
         """
         if self.pickup_reminder_sent is True:
-            log_event(event="Not sending pickup reminder for round %d because "
-                            "pickup_reminder_sent is True" % self.pk)
+            log_event(
+                event="Not sending pickup reminder for round %d because "
+                "pickup_reminder_sent is True" % self.pk
+            )
             return
 
         log_event(event="Sending pickup reminder for round %d" % self.pk)
@@ -367,13 +396,16 @@ class OrderRound(TimeStampedModel):
 
         for user in self.get_users_with_orders():
             rendered_template_vars = render_mail_template(
-                mail_template, user=user, order_round=self)
+                mail_template, user=user, order_round=self
+            )
             mail_user(user, *rendered_template_vars)
 
     def send_ride_mails(self):
         if self.rides_mails_sent is True:
-            log_event(event="Not sending ride mails for round %d because "
-                            "rides_mails_sent is True" % self.pk)
+            log_event(
+                event="Not sending ride mails for round %d because "
+                "rides_mails_sent is True" % self.pk
+            )
             return
 
         log_event(event="Sending ride mails for round %d" % self.pk)
@@ -385,11 +417,7 @@ class OrderRound(TimeStampedModel):
 
         rides = self.rides.all()
         for ride in rides:
-            involved = {
-                ride.driver,
-                ride.codriver,
-                self.distribution_coordinator
-            }
+            involved = {ride.driver, ride.codriver, self.distribution_coordinator}
             for user in involved:
                 if user is None:
                     continue
@@ -398,15 +426,16 @@ class OrderRound(TimeStampedModel):
                     user=user,
                     ride=ride,
                     order_round=self,
-                    base_url=settings.BASE_URL
+                    base_url=settings.BASE_URL,
                 )
                 mail_user(user, *rendered_template_vars)
 
     def send_prepare_ride_mails(self):
         if self.prepare_ride_mails_sent is True:
-            log_event(event="Not sending prepare ride mails for round %d "
-                            "because prepare_ride_mails_sent is True" %
-                            self.pk)
+            log_event(
+                event="Not sending prepare ride mails for round %d "
+                "because prepare_ride_mails_sent is True" % self.pk
+            )
             return
 
         log_event(event="Sending prepare ride mails for round %d" % self.pk)
@@ -421,18 +450,16 @@ class OrderRound(TimeStampedModel):
             drivers = [ride.driver, ride.codriver]
             for user in drivers:
                 rendered_template_vars = render_mail_template(
-                    mail_template,
-                    user=user,
-                    ride=ride,
-                    base_url=settings.BASE_URL
+                    mail_template, user=user, ride=ride, base_url=settings.BASE_URL
                 )
                 mail_user(user, *rendered_template_vars)
 
     def send_ridecosts_request_mails(self):
         if self.ridecosts_request_mails_sent is True:
-            log_event(event="Not sending ridecosts mails for round %d "
-                            "because ridecosts_request_mails_sent is True" %
-                            self.pk)
+            log_event(
+                event="Not sending ridecosts mails for round %d "
+                "because ridecosts_request_mails_sent is True" % self.pk
+            )
             return
 
         log_event(event="Sending ridecosts reqst mails for round %d" % self.pk)
@@ -447,18 +474,16 @@ class OrderRound(TimeStampedModel):
             drivers = [ride.driver]
             for user in drivers:
                 rendered_template_vars = render_mail_template(
-                    mail_template,
-                    user=user,
-                    ride=ride,
-                    base_url=settings.BASE_URL
+                    mail_template, user=user, ride=ride, base_url=settings.BASE_URL
                 )
                 mail_user(user, *rendered_template_vars)
 
     def send_distribution_mails(self):
         if self.distribution_mails_sent is True:
-            log_event(event="Not sending distribution mails for round %d "
-                            "because distribution_mails_sent is True" %
-                            self.pk)
+            log_event(
+                event="Not sending distribution mails for round %d "
+                "because distribution_mails_sent is True" % self.pk
+            )
             return
 
         log_event(event="Sending distribution mails for round %d" % self.pk)
@@ -472,10 +497,7 @@ class OrderRound(TimeStampedModel):
         for shift in shifts:
             for user in shift.members.all():
                 rendered_template_vars = render_mail_template(
-                    mail_template,
-                    user=user,
-                    shift=shift,
-                    base_url=settings.BASE_URL
+                    mail_template, user=user, shift=shift, base_url=settings.BASE_URL
                 )
                 mail_user(user, *rendered_template_vars)
 
@@ -483,6 +505,15 @@ class OrderRound(TimeStampedModel):
         if self.pickup_location is not None:
             return self.pickup_location
         return PickupLocation.objects.get(is_default=True)
+
+    def as_event(self):
+        event = TransientEvent()
+        event.address = self.pickup_location.address
+        event.title = f"Bestelronde {self.id} - {self.pickup_location}"
+        # event.short_description = F"Bestelronde {self.id}"
+        event.date = self.open_for_orders.date()
+        event.time = self.open_for_orders.time()
+        return event
 
     def __str__(self):
         return "Bestelronde #%s" % self.pk
@@ -497,11 +528,16 @@ class OrderManager(models.Manager):
         VokoUser.orders.get_current_order()
         """
         try:
-            return super(OrderManager, self).get_queryset().filter(
-                paid=False,
-                user=self.instance,
-                order_round=get_current_order_round()
-            ).order_by('-pk')[0]
+            return (
+                super(OrderManager, self)
+                .get_queryset()
+                .filter(
+                    paid=False,
+                    user=self.instance,
+                    order_round=get_current_order_round(),
+                )
+                .order_by("-pk")[0]
+            )
         except IndexError:
             return get_or_create_order(user=self.instance)
 
@@ -511,11 +547,14 @@ class OrderManager(models.Manager):
         VokoUser.orders.get_last_paid_order()
         """
         try:
-            return super(OrderManager, self).get_queryset().filter(
-                paid=True,
-                user=self.instance,
-                order_round=get_current_order_round()
-            ).order_by('-pk')[0]
+            return (
+                super(OrderManager, self)
+                .get_queryset()
+                .filter(
+                    paid=True, user=self.instance, order_round=get_current_order_round()
+                )
+                .order_by("-pk")[0]
+            )
         except IndexError:
             return
 
@@ -529,21 +568,21 @@ class Order(TimeStampedModel):
 
     id = models.AutoField(primary_key=True)
     products = models.ManyToManyField("Product", through="OrderProduct")
-    order_round = models.ForeignKey("OrderRound",
-                                    related_name="orders",
-                                    on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             related_name="orders",
-                             on_delete=models.CASCADE)
+    order_round = models.ForeignKey(
+        "OrderRound", related_name="orders", on_delete=models.CASCADE
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="orders", on_delete=models.CASCADE
+    )
     user_notes = models.TextField(null=True, blank=True)
 
     # To "freeze" order before payment
     finalized = models.BooleanField(default=False)
     paid = models.BooleanField(default=False)
     # Debit created when this order was finished (describes total order value)
-    debit = models.OneToOneField(Balance, null=True, blank=True,
-                                 related_name="order",
-                                 on_delete=models.CASCADE)
+    debit = models.OneToOneField(
+        Balance, null=True, blank=True, related_name="order", on_delete=models.CASCADE
+    )
 
     # TODO: order cannot be 'paid' without having a 'debit'. Add sanity check.
 
@@ -564,11 +603,8 @@ class Order(TimeStampedModel):
         Return total retail price for this order.
         Includes payment transaction costs and eventual member fee.
         """
-        product_sum = sum([odp.total_retail_price
-                           for odp in self.orderproducts.all()])
-        return (product_sum
-                + self.order_round.transaction_costs
-                + self.member_fee)
+        product_sum = sum([odp.total_retail_price for odp in self.orderproducts.all()])
+        return product_sum + self.order_round.transaction_costs + self.member_fee
 
     def total_price_to_pay_with_balances_taken_into_account(self):
         """
@@ -593,11 +629,12 @@ class Order(TimeStampedModel):
         Return contribution fee if this is users'
         first order (non-paid orders not included)
         """
-        amount_of_paid_orders = self.user.orders.\
-            filter(paid=True).\
-            exclude(pk=self.pk).\
-            exclude(pk__gt=self.pk).\
-            count()
+        amount_of_paid_orders = (
+            self.user.orders.filter(paid=True)
+            .exclude(pk=self.pk)
+            .exclude(pk__gt=self.pk)
+            .count()
+        )
 
         if amount_of_paid_orders == 0:
             return Decimal(settings.MEMBER_FEE)
@@ -610,8 +647,7 @@ class Order(TimeStampedModel):
         Counts all user's finished and paid orders, ascending, by ID, and
         returns the number of the current order
         """
-        user_orders = self.user.orders.filter(paid=True,
-                                              finalized=True).order_by("pk")
+        user_orders = self.user.orders.filter(paid=True, finalized=True).order_by("pk")
         for index, uo in enumerate(user_orders):
             if uo == self:
                 return index + 1
@@ -621,8 +657,7 @@ class Order(TimeStampedModel):
         Complete order by setting the 'paid' boolean,
         creating debit and mailing the user.
         """
-        log_event(event="Completing (paid) order %s" % self.id,
-                  user=self.user)
+        log_event(event="Completing (paid) order %s" % self.id, user=self.user)
         with transaction.atomic():
             self.paid = True
             self.save()
@@ -638,8 +673,8 @@ class Order(TimeStampedModel):
             user=self.user,
             type="DR",
             amount=self.total_price,
-            notes="Debit van %s voor bestelling #%d" % (self.total_price,
-                                                        self.pk))
+            notes="Debit van %s voor bestelling #%d" % (self.total_price, self.pk),
+        )
         self.save()
 
     def mail_confirmation(self):
@@ -647,9 +682,9 @@ class Order(TimeStampedModel):
         Send confirmation mail to user about successful order placement
         """
         mail_template = get_template_by_id(config.ORDER_CONFIRM_MAIL)
-        rendered_template_vars = render_mail_template(mail_template,
-                                                      user=self.user,
-                                                      order=self)
+        rendered_template_vars = render_mail_template(
+            mail_template, user=self.user, order=self
+        )
         mail_user(self.user, *rendered_template_vars)
 
     def mail_failure_notification(self):
@@ -657,9 +692,9 @@ class Order(TimeStampedModel):
         Use when order was paid after round has been closed (corner case)
         """
         mail_template = get_template_by_id(config.ORDER_FAILED_MAIL)
-        rendered_template_vars = render_mail_template(mail_template,
-                                                      user=self.user,
-                                                      order=self)
+        rendered_template_vars = render_mail_template(
+            mail_template, user=self.user, order=self
+        )
         mail_user(self.user, *rendered_template_vars)
 
 
@@ -667,28 +702,25 @@ class OrderProduct(TimeStampedModel):
     """
     Represents an order of one particular product
     """
+
     class Meta:
         verbose_name = "Productbestelling"
         verbose_name_plural = "Productbestellingen"
-        unique_together = ('order', 'product')
+        unique_together = ("order", "product")
 
     id = models.AutoField(primary_key=True)
-    order = models.ForeignKey("Order",
-                              related_name="orderproducts",
-                              on_delete=models.CASCADE)
-    product = models.ForeignKey("Product",
-                                related_name="orderproducts",
-                                on_delete=models.CASCADE)
+    order = models.ForeignKey(
+        "Order", related_name="orderproducts", on_delete=models.CASCADE
+    )
+    product = models.ForeignKey(
+        "Product", related_name="orderproducts", on_delete=models.CASCADE
+    )
     amount = models.IntegerField(verbose_name="Aantal")
     retail_price = models.DecimalField(
-        max_digits=6,
-        decimal_places=2,
-        help_text="The price the product was sold for"
+        max_digits=6, decimal_places=2, help_text="The price the product was sold for"
     )
     base_price = models.DecimalField(
-        max_digits=6,
-        decimal_places=2,
-        help_text="The price the product was bought for"
+        max_digits=6, decimal_places=2, help_text="The price the product was bought for"
     )
 
     # TODO: assert order.order_round == product.order_round on save()
@@ -733,6 +765,7 @@ class OrderProductCorrection(TimeStampedModel):
     Used to register (and compensate for) non/partly delivered products.
     Creates Balance object upon creation.
     """
+
     objects = CorrectionManager()
 
     class Meta:
@@ -740,23 +773,26 @@ class OrderProductCorrection(TimeStampedModel):
         verbose_name_plural = "Productbestelling-correcties"
 
     id = models.AutoField(primary_key=True)
-    order_product = models.OneToOneField("OrderProduct",
-                                         related_name="correction",
-                                         editable=False,
-                                         on_delete=models.CASCADE)
+    order_product = models.OneToOneField(
+        "OrderProduct",
+        related_name="correction",
+        editable=False,
+        on_delete=models.CASCADE,
+    )
     supplied_percentage = models.IntegerField(editable=False)
     notes = models.TextField(blank=True)
-    credit = models.OneToOneField(Balance, related_name="correction",
-                                  editable=False,
-                                  on_delete=models.CASCADE)
+    credit = models.OneToOneField(
+        Balance, related_name="correction", editable=False, on_delete=models.CASCADE
+    )
     charge_supplier = models.BooleanField(
-        default=True,
-        verbose_name="Charge expenses to supplier"
+        default=True, verbose_name="Charge expenses to supplier"
     )
 
     def __str__(self):
-        return "Correctie van %s%%: %s" % (100 - self.supplied_percentage,
-                                           self.order_product)
+        return "Correctie van %s%%: %s" % (
+            100 - self.supplied_percentage,
+            self.order_product,
+        )
 
     def calculate_refund(self):
         """
@@ -765,8 +801,8 @@ class OrderProductCorrection(TimeStampedModel):
         """
         return Decimal(
             (self.order_product.total_retail_price / Decimal("100.0"))
-            * (100 - self.supplied_percentage)).quantize(Decimal('.01'),
-                                                         rounding=ROUND_DOWN)
+            * (100 - self.supplied_percentage)
+        ).quantize(Decimal(".01"), rounding=ROUND_DOWN)
 
     def calculate_supplier_refund(self):
         """
@@ -776,13 +812,11 @@ class OrderProductCorrection(TimeStampedModel):
         FIXME: Rename this method to change refund to debit or something?
         """
         if self.charge_supplier is False:
-            return Decimal('0')
+            return Decimal("0")
         return Decimal(
-            (self.order_product.total_cost_price() / Decimal('100'))
-            * (Decimal('100') - self.supplied_percentage)).quantize(
-            Decimal('.01'),
-            rounding=ROUND_DOWN
-        )
+            (self.order_product.total_cost_price() / Decimal("100"))
+            * (Decimal("100") - self.supplied_percentage)
+        ).quantize(Decimal(".01"), rounding=ROUND_DOWN)
 
     def _create_credit(self):
         if self.order_product.product.order_round is None:
@@ -794,11 +828,13 @@ class OrderProductCorrection(TimeStampedModel):
             user=self.order_product.order.user,
             type="CR",
             amount=self.calculate_refund(),
-            notes="Correctie in ronde %d, %dx %s, geleverd: %s%%" %
-                  (order_round.id,
-                   self.order_product.amount,
-                   self.order_product.product.name,
-                   self.supplied_percentage)
+            notes="Correctie in ronde %d, %dx %s, geleverd: %s%%"
+            % (
+                order_round.id,
+                self.order_product.amount,
+                self.order_product.product.name,
+                self.supplied_percentage,
+            ),
         )
 
     def save(self, **kwargs):
@@ -833,27 +869,32 @@ class ProductUnit(TimeStampedModel):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=255)
-    abbreviations = models.CharField(max_length=255, blank=True,
-                                     help_text="whitespace separated")
+    abbreviations = models.CharField(
+        max_length=255, blank=True, help_text="whitespace separated"
+    )
 
     def __str__(self):
         return self.description
 
 
 class ProductStock(TimeStampedModel):
-    """ Product purchase / stock """
-    TYPE_ADDED = 'added'
-    TYPE_LOST = 'lost'
+    """Product purchase / stock"""
+
+    TYPE_ADDED = "added"
+    TYPE_LOST = "lost"
 
     id = models.AutoField(primary_key=True)
-    product = models.ForeignKey("Product",
-                                related_name="stock",
-                                on_delete=models.CASCADE)
+    product = models.ForeignKey(
+        "Product", related_name="stock", on_delete=models.CASCADE
+    )
     amount = models.IntegerField()
 
-    type = models.CharField(max_length=8, choices=(
-        (TYPE_ADDED, "Added"),
-        (TYPE_LOST, "Lost")), default=TYPE_ADDED, db_index=True)
+    type = models.CharField(
+        max_length=8,
+        choices=((TYPE_ADDED, "Added"), (TYPE_LOST, "Lost")),
+        default=TYPE_ADDED,
+        db_index=True,
+    )
 
     notes = models.CharField(max_length=255, null=True, blank=True)
 
@@ -861,7 +902,7 @@ class ProductStock(TimeStampedModel):
         verbose_name = verbose_name_plural = "Productvoorraad"
 
     def __str__(self):
-        return '%d x %s' % (self.amount, self.product)
+        return "%d x %s" % (self.amount, self.product)
 
     def save(self, **kwargs):
         if self.pk is not None:
@@ -882,18 +923,27 @@ class Product(TimeStampedModel):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     unit = models.ForeignKey(ProductUnit, null=True, on_delete=models.CASCADE)
-    unit_amount = models.IntegerField(default=1,
-                                      help_text="e.g. if half a kilo: \"500\"")
+    unit_amount = models.IntegerField(default=1, help_text='e.g. if half a kilo: "500"')
     base_price = models.DecimalField(max_digits=6, decimal_places=2)
-    supplier = models.ForeignKey("Supplier",
-                                 related_name="products",
-                                 on_delete=models.CASCADE)
+    supplier = models.ForeignKey(
+        "Supplier", related_name="products", on_delete=models.CASCADE
+    )
     # order_round NULL means: recurring / stock product
-    order_round = models.ForeignKey("OrderRound", related_name="products",
-                                    blank=True, null=True, on_delete=models.CASCADE)
+    order_round = models.ForeignKey(
+        "OrderRound",
+        related_name="products",
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+    )
     # No category means "Other"
-    category = models.ForeignKey("ProductCategory", related_name="products",
-                                 null=True, blank=True, on_delete=models.CASCADE)
+    category = models.ForeignKey(
+        "ProductCategory",
+        related_name="products",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
     new = models.BooleanField(default=False, verbose_name="Show 'new' label")
     maximum_total_order = models.IntegerField(null=True, blank=True)
     enabled = models.BooleanField(default=True)
@@ -902,11 +952,14 @@ class Product(TimeStampedModel):
 
     def __str__(self):
         if self.is_stock_product():
-            return '[voorraadproduct] %s (%s)' % (self.name, self.supplier)
+            return "[voorraadproduct] %s (%s)" % (self.name, self.supplier)
         if self.order_round:
-            return '[ronde %s] %s (%s)' % (self.order_round.pk, self.name,
-                                           self.supplier)
-        return '%s (%s)' % (self.name, self.supplier)
+            return "[ronde %s] %s (%s)" % (
+                self.order_round.pk,
+                self.name,
+                self.supplier,
+            )
+        return "%s (%s)" % (self.name, self.supplier)
 
     @property
     def unit_of_measurement(self):
@@ -934,9 +987,10 @@ class Product(TimeStampedModel):
             markup = get_current_order_round().markup_percentage
 
         total_percentage = 100 + markup
-        new_price = ((Decimal(self.base_price) / Decimal('100.0'))
-                     * Decimal(total_percentage))
-        rounded = new_price.quantize(Decimal('.01'), rounding=ROUND_UP)
+        new_price = (Decimal(self.base_price) / Decimal("100.0")) * Decimal(
+            total_percentage
+        )
+        rounded = new_price.quantize(Decimal(".01"), rounding=ROUND_UP)
         return rounded
 
     def all_stock(self):
@@ -980,8 +1034,7 @@ class Product(TimeStampedModel):
             return "%s in voorraad" % available
 
         if self.maximum_total_order:
-            return "%s van %s" % (self.amount_available,
-                                  self.maximum_total_order)
+            return "%s van %s" % (self.amount_available, self.maximum_total_order)
 
         return "Onbeperkt"
 
@@ -1005,8 +1058,9 @@ class Product(TimeStampedModel):
 
         if self.maximum_total_order is None:
             return 100
-        return int((float(self.amount_available)
-                    / float(self.maximum_total_order)) * 100)
+        return int(
+            (float(self.amount_available) / float(self.maximum_total_order)) * 100
+        )
 
     @property
     def is_available(self):
@@ -1030,13 +1084,13 @@ class Product(TimeStampedModel):
         when the product was ordered, but not supplied at all.
         """
         for order_product in self.orderproducts.filter(
-                correction__isnull=True, order__paid=True):
+            correction__isnull=True, order__paid=True
+        ):
             OrderProductCorrection.objects.create(
                 order_product=order_product,
                 supplied_percentage=0,
-                notes='Product niet geleverd: "%s" (%s) [%s]' % (
-                    self.name, self.supplier.name, self.id
-                ),
+                notes='Product niet geleverd: "%s" (%s) [%s]'
+                % (self.name, self.supplier.name, self.id),
                 charge_supplier=True,
             )
 
@@ -1051,15 +1105,14 @@ class Product(TimeStampedModel):
         except OrderRound.DoesNotExist:
             return
 
-        if not prev_round.products.filter(name=self.name,
-                                          supplier=self.supplier,
-                                          unit=self.unit):
+        if not prev_round.products.filter(
+            name=self.name, supplier=self.supplier, unit=self.unit
+        ):
             self.new = True
             self.save()
             log_event(
                 event="Setting product %s to 'new' because I could not find a "
-                      "similar product in order round %d" %
-                      (self, prev_round.id)
+                "similar product in order round %d" % (self, prev_round.id)
             )
 
     def is_stock_product(self):
@@ -1070,6 +1123,7 @@ class DraftProduct(TimeStampedModel):
     """
     Product Draft, used to create new products in the backend
     """
+
     id = models.AutoField(primary_key=True)
     data = JSONField()
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
@@ -1082,13 +1136,13 @@ class DraftProduct(TimeStampedModel):
 
     def validate(self):
         self.is_valid = False
-        if not self._valid_name(self.data['name']):
+        if not self._valid_name(self.data["name"]):
             self.validation_error = "Naam onjuist"
-        elif not self._valid_price(self.data['base_price']):
+        elif not self._valid_price(self.data["base_price"]):
             self.validation_error = "Prijs onjuist"
-        elif not self._valid_unit(self.data['unit']):
+        elif not self._valid_unit(self.data["unit"]):
             self.validation_error = "Eenheid onjuist"
-        elif not self._valid_max(self.data['maximum_total_order']):
+        elif not self._valid_max(self.data["maximum_total_order"]):
             self.validation_error = "Max. onjuist"
         else:
             self.is_valid = True
@@ -1130,25 +1184,23 @@ class DraftProduct(TimeStampedModel):
             return
 
         # Decide on unit & amount
-        unit = self.data['unit']
+        unit = self.data["unit"]
         unit_amount, unit = find_unit(unit)
 
         prod = Product.objects.create(
-            name=self.data['name'],
-            description=(self.data['description']
-                         if self.data['description'] else ""),
+            name=self.data["name"],
+            description=(self.data["description"] if self.data["description"] else ""),
             unit=unit,
             unit_amount=unit_amount,
-            base_price=self.data['base_price'],
-            maximum_total_order=self.data['maximum_total_order'],
+            base_price=self.data["base_price"],
+            maximum_total_order=self.data["maximum_total_order"],
             supplier=self.supplier,
             order_round=self.order_round,
         )
 
-        if self.data['category']:
+        if self.data["category"]:
             try:
-                prod.category = ProductCategory.objects.get(
-                    name=self.data['category'])
+                prod.category = ProductCategory.objects.get(name=self.data["category"])
                 prod.save()
             except ProductCategory.DoesNotExist:
                 pass
@@ -1157,4 +1209,4 @@ class DraftProduct(TimeStampedModel):
 
     @property
     def product_data(self):
-        return self.data['product_data']
+        return self.data["product_data"]

@@ -5,10 +5,10 @@ from tinymce.widgets import AdminTinyMCE
 
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ["title", "date_time"]
+    list_display = ["title", "date", "time"]
     formfield_overrides = {
         HTMLField: {'widget': AdminTinyMCE(attrs={'cols': 10, 'rows': 50})}
-        }
+    }
 
 
 admin.site.register(PersistentEvent, EventAdmin)
