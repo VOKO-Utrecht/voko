@@ -230,4 +230,4 @@ class EditCoordinatorRemarksView(LoginRequiredMixin, GroupRequiredMixin, UpdateV
     template_name = "accounts/coordinator/remarks.html"
     model = UserProfile
     fields = ['coordinator_remarks']
-    success_url = '/transport/members'
+    success_url = '/transport/members'  # make this dynamic depending on starting on transport or distribution

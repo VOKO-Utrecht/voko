@@ -1,12 +1,11 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
 {% block title %}Bestelling plaatsen{% endblock %}
 {% block content %}
 <h1>Bestelling plaatsen</h1>
 {% if object.order_round.is_open %}
 <div class="panel panel-primary">
   <!-- Default panel contents -->
-  <div class="panel-heading">Je huidige bestelling</div>
+  <!-- <div class="panel-heading">Je huidige bestelling</div> -->
   <div class="panel-body">
       {% if not order.has_products %}
           <strong>Je hebt nog geen producten in je bestelling!</strong>
@@ -87,7 +86,7 @@
     <div class="row">
         <div class="col-md-6">
             <div class="panel panel-info">
-                <div class="panel-heading">Feedback</div>
+                <!-- <div class="panel-heading">Feedback</div> -->
                     <div class="panel-body">
                     <p>We willen graag van je horen wat je van de producten en de bestelprocedure van vorige bestelronde vond.
                         (je mag dit vak ook leeglaten).</p>
@@ -98,7 +97,7 @@
         {% if object.order_round.get_pickup_location %}
             <div class="col-md-6">
                 <div class="panel panel-danger">
-                    <div class="panel-heading">Ophaallocatie</div>
+                    <!-- <div class="panel-heading">Ophaallocatie</div> -->
                         <div class="panel-body">
                           <h4>Ophaallocatie voor deze bestelling is:</h4>
                           <h2>{{ object.order_round.get_pickup_location }}</h2>
@@ -109,12 +108,13 @@
             </div>
         {% endif %}
     </div>
+    <div class="mt-4 d-flex justify-content-between">
+      <a class="btn btn-warning" href="{% url 'view_products' %}" role="button"><span class="bi-arrow-left-square"></span> Bestelling wijzigen</a>
 
-    <a class="btn btn-primary" href="{% url 'view_products' %}" role="button"><span class="glyphicon glyphicon-arrow-left"></span> Bestelling wijzigen</a>
-
-    <button type="submit" class="btn btn-danger pull-right" {% if not order.has_products %}disabled{% endif %}>
-      {% bootstrap_icon "euro" %} Bestelling plaatsen en betalen
-    </button>
+      <button type="submit" class="btn btn-primary pull-right" {% if not order.has_products %}disabled{% endif %}>
+        Bestelling plaatsen en betalen
+      </button>
+    </div>
 </form>
 {% else %}
 <div class="alert alert-danger" role="alert">
