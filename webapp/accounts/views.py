@@ -1,21 +1,32 @@
-from braces.views import AnonymousRequiredMixin, LoginRequiredMixin, GroupRequiredMixin
+import logging
+from datetime import datetime, timedelta
+
+import log
+import pytz
+from accounts.forms import (ChangeProfileForm, PasswordResetForm,
+                            RequestPasswordResetForm, VokoUserCreationForm,
+                            VokoUserFinishForm)
+from accounts.models import (EmailConfirmation, PasswordResetRequest,
+                             UserProfile, VokoUser)
+from agenda.models import PersistentEvent
+from braces.views import (AnonymousRequiredMixin, GroupRequiredMixin,
+                          LoginRequiredMixin)
+from constance import config
+from distribution.models import Shift
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import Group
 from django.db import transaction
+from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import redirect
-from django.views.generic import (FormView, DetailView, UpdateView,
-                                  TemplateView, ListView, View)
-from accounts.forms import (VokoUserCreationForm, VokoUserFinishForm,
-                            RequestPasswordResetForm, PasswordResetForm,
-                            ChangeProfileForm)
-from accounts.models import EmailConfirmation, UserProfile, VokoUser, PasswordResetRequest
-from django.conf import settings
-import log
+from django.views.generic import (DetailView, FormView, ListView, TemplateView,
+                                  UpdateView, View)
 from ordering.core import get_or_create_order
-from constance import config
-from django.contrib.auth.models import Group
+from ordering.models import OrderRound
+from transport.models import Ride
 
 
 class LoginView(AnonymousRequiredMixin, FormView):
@@ -26,7 +37,7 @@ class LoginView(AnonymousRequiredMixin, FormView):
         login(self.request, form.get_user())
         next_url = settings.LOGIN_REDIRECT_URL
         try:
-            next_url = self.request.GET['next']
+            next_url = self.request.GET["next"]
         except KeyError:
             pass
 
@@ -55,7 +66,7 @@ class WelcomeView(TemplateView):
 class LogoutView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         logout(request)
-        return redirect('login')
+        return redirect("login")
 
 
 class FinishRegistration(AnonymousRequiredMixin, UpdateView):
@@ -69,7 +80,7 @@ class FinishRegistration(AnonymousRequiredMixin, UpdateView):
             is_confirmed=True,
             user__can_activate=True,
             user__is_active=False,
-            token=self.kwargs['pk']
+            token=self.kwargs["pk"],
         )
 
     def get_object(self, queryset=None):
@@ -96,18 +107,93 @@ class OverView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super(OverView, self).get_context_data(**kwargs)
+        user = self.request.user
 
-        if self.request.user.id:
+        if user.id:
             # TODO: this line might be obsolete
-            get_or_create_order(self.request.user)
+            get_or_create_order(user)
 
-        ctx['orders'] = self.request.user.orders.filter(
-            paid=True).order_by("-pk")
-        ctx['balances'] = self.request.user.balance.all().order_by('-pk')
+        ctx["orders"] = user.orders.filter(paid=True).order_by("-pk")
+        ctx["balances"] = user.balance.all().order_by("-pk")
+        ctx["events"] = self._getAllEvents()
         return ctx
 
     def current_order_round(self):
         return self.request.current_order_round
+
+    def _getAllEvents(self):
+        user = self.request.user
+        myevents = []
+        self._get_agenda_items(myevents)
+        self._get_shifts(user, myevents)
+        self._get_rides(user, myevents)
+        self._get_coordinator_shifts(user, myevents)
+        self._get_rounds(myevents)
+
+        myevents.sort(key=lambda e: (e.date, e.time))
+        return myevents
+
+    def _get_rounds(self, myevents):
+        # gets scheduled rounds until 60 days in future
+        rounds = OrderRound.objects.filter(
+            Q(open_for_orders__gt=datetime.now(pytz.utc))
+            & Q(open_for_orders__lt=datetime.now(pytz.utc) + timedelta(days=60))
+        )
+        for r in rounds:
+            try:
+                myevents.append(r.as_event())
+            except Exception as err:
+                logging.log(logging.ERROR, err)
+
+    def _get_coordinator_shifts(self, user, myevents):
+        # get scheduled coordinator shifts for current user
+        # from now until 60 days in future
+        coords = OrderRound.objects.filter(
+            Q(open_for_orders__gt=datetime.now(pytz.utc))
+            & Q(open_for_orders__lt=datetime.now(pytz.utc) + timedelta(days=60))
+            & (Q(distribution_coordinator=user) | Q(transport_coordinator=user))
+        )
+        for c in coords:
+            try:
+                event = c.as_event()
+                event.is_shift = True
+                if user == c.distribution_coordinator:
+                    event.title = f"Uitdeelcoordinator ronde {c.id}"
+                else:
+                    event.title = f"Transportcoordinator ronde {c.id}"
+                myevents.append(event)
+            except Exception as err:
+                logging.log(logging.ERROR, err)
+
+    def _get_rides(self, user, myevents):
+        # gets scheduled rides for current user
+        # from now until 60 days in future
+        rides = Ride.objects.filter(Q(driver__in=[user]) | Q(codriver__in=[user]))
+        for r in rides:
+            try:
+                if r.date > datetime.now(pytz.utc) and r.date < datetime.now(pytz.utc) + timedelta(days=60):
+                    myevents.append(r.as_event())
+            except Exception as err:
+                logging.log(logging.ERROR, err)
+
+    def _get_shifts(self, user, myevents):
+        # gets scheduled (distribution) shifts for current user
+        # from now until 60 days in future
+        shifts = Shift.objects.filter(members__in=[user])
+        for s in shifts:
+            try:
+                if s.date > datetime.now(pytz.utc) and s.date < datetime.now(pytz.utc) + timedelta(days=60):
+                    myevents.append(s.as_event())
+            except Exception as err:
+                logging.log(logging.ERROR, err)
+
+    def _get_agenda_items(self, myevents):
+        events = PersistentEvent.objects.filter(date__gt=datetime.now(pytz.utc))
+        for e in events:
+            try:
+                myevents.append(e)
+            except Exception as err:
+                logging.log(logging.ERROR, err)
 
 
 class RequestPasswordResetView(AnonymousRequiredMixin, FormView):
@@ -119,9 +205,7 @@ class RequestPasswordResetView(AnonymousRequiredMixin, FormView):
 
     def form_valid(self, form):
         try:
-            user = VokoUser.objects.get(
-                email=form.cleaned_data['email'].lower()
-            )
+            user = VokoUser.objects.get(email=form.cleaned_data["email"].lower())
             request = PasswordResetRequest(user=user)
             request.save()
             request.send_email()
@@ -130,7 +214,7 @@ class RequestPasswordResetView(AnonymousRequiredMixin, FormView):
             # Do not notify user
             log.log_event(
                 event="Password reset requested for unknown email address: %s"
-                      % form.cleaned_data['email']
+                % form.cleaned_data["email"]
             )
 
         return super(RequestPasswordResetView, self).form_valid(form)
@@ -155,7 +239,7 @@ class PasswordResetView(AnonymousRequiredMixin, FormView, DetailView):
             raise Http404
 
         context = super(PasswordResetView, self).get_context_data(**kwargs)
-        context['form'] = self.form_class()
+        context["form"] = self.form_class()
         return context
 
     def post(self, request, *args, **kwargs):
@@ -166,7 +250,7 @@ class PasswordResetView(AnonymousRequiredMixin, FormView, DetailView):
             with transaction.atomic():
                 self.object.is_used = True
                 self.object.save()
-                self.object.user.set_password(form.cleaned_data['password1'])
+                self.object.user.set_password(form.cleaned_data["password1"])
                 self.object.user.save()
             return self.form_valid(form)
 
@@ -187,20 +271,20 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
     def form_valid(self, form):
-        messages.add_message(self.request, messages.SUCCESS,
-                             "Je profiel is aangepast.")
+        messages.add_message(self.request, messages.SUCCESS, "Je profiel is aangepast.")
         return super(EditProfileView, self).form_valid(form)
 
 
 class Contact(LoginRequiredMixin, ListView):
-
     template_name = "accounts/contact.html"
-    groups_to_show = {'ADMIN_GROUP',
-                      'TRANSPORT_GROUP',
-                      'DISTRIBUTION_GROUP',
-                      'FARMERS_GROUP',
-                      'IT_GROUP',
-                      'PROMO_GROUP'}
+    groups_to_show = {
+        "ADMIN_GROUP",
+        "TRANSPORT_GROUP",
+        "DISTRIBUTION_GROUP",
+        "FARMERS_GROUP",
+        "IT_GROUP",
+        "PROMO_GROUP",
+    }
 
     def _get_groups(self):
         group_ids = []
@@ -210,14 +294,11 @@ class Contact(LoginRequiredMixin, ListView):
         return Group.objects.filter(pk__in=group_ids)
 
     def get_queryset(self):
-
         groups = self._get_groups()
         queryset = []
         for group in groups:
             try:
-                contact = VokoUser.objects.get(
-                    userprofile__contact_person=group.id
-                )
+                contact = VokoUser.objects.get(userprofile__contact_person=group.id)
             except VokoUser.DoesNotExist:
                 contact = None
             my_group = {"group": group, "contact": contact}
@@ -226,8 +307,8 @@ class Contact(LoginRequiredMixin, ListView):
 
 
 class EditCoordinatorRemarksView(LoginRequiredMixin, GroupRequiredMixin, UpdateView):
-    group_required = ('Transportcoordinatoren')
+    group_required = "Transportcoordinatoren"
     template_name = "accounts/coordinator/remarks.html"
     model = UserProfile
-    fields = ['coordinator_remarks']
-    success_url = '/transport/members'  # make this dynamic depending on starting on transport or distribution
+    fields = ["coordinator_remarks"]
+    success_url = "/transport/members"  # make this dynamic depending on starting on transport or distribution

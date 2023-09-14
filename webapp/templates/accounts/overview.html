@@ -4,26 +4,62 @@
 {% block content %}
     <h1 class="page-header mt-2">Welkom, {{ user.first_name }}</h1>
 
-    <div class="panel">
-        <p class="lead">
-        De huidige bestelronde is <strong>bestelronde {{ view.current_order_round.id }}</strong>. Deze bestelronde is nu <strong>{% if view.current_order_round.is_open %}open{% else %}gesloten{% endif %}</strong>.
-        </p>
-        <table class="table">
-            <tbody>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                
+                <p class="mt-5 lead">
+                De huidige bestelronde is <strong>bestelronde {{ view.current_order_round.id }}</strong>. Deze bestelronde is nu <strong>{% if view.current_order_round.is_open %}open{% else %}gesloten{% endif %}</strong>.
+                </p>
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <td>Bestelronde open vanaf</td>
+                            <td>{{ view.current_order_round.open_for_orders }}</td>
+                        </tr>
+                        <tr>
+                            <td>Bestelronde open tot</td>
+                            <td>{{ view.current_order_round.closed_for_orders }}</td>
+                        </tr>
+                        <tr>
+                            <td>Ophaalmoment</td>
+                            <td>{{ view.current_order_round.collect_datetime }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col">
+                <h2 class="page-header">
+                    Jouw agenda
+                </h2>
+                <table class="mt-2 table">
+                {% for e in events  %}
+                {% if e.is_shift %}
+                <tr class="fw-bold bg-light" data-bs-toggle="tooltip" data-bs-placement="right" title="Je bent ingedeeld voor deze dienst.">
+                {% else %}
                 <tr>
-                    <td>Bestelronde open vanaf</td>
-                    <td>{{ view.current_order_round.open_for_orders }}</td>
+                {% endif %}
+                <td><table class="table-condensed w-100">
+                    <tr>
+                        <td class="w-50">{{ e.date|date:'j F Y' }}{% if e.time %}, {{ e.time|date:'H:i' }}{% endif %}</td>
+                        <td class="w-50">{{ e.title }}</td>
+                        <td class="w-auto">{% if e.is_shift %}<span class="text-danger bi bi-exclamation-square"></span>{% endif %}
+                        </td>
+                    </tr>
+                    {% if e.short_description %}
+                    <tr>
+                        <td colspan="3" class="ms-4 fw-normal" style="border-width: 0px;"><span class="ms-4">{{ e.short_description|safe }}</span></td>
+                    </tr>
+                    {% endif %}
+                </table></td>
                 </tr>
-                <tr>
-                    <td>Bestelronde open tot</td>
-                    <td>{{ view.current_order_round.closed_for_orders }}</td>
-                </tr>
-                <tr>
-                    <td>Ophaalmoment</td>
-                    <td>{{ view.current_order_round.collect_datetime }}</td>
-                </tr>
-            </tbody>
-        </table>
+
+                
+                {% endfor %}
+                </table>
+            </div>
+        </div>
     </div>
 
     <div class="panel">
@@ -57,6 +93,7 @@
         </table>
     {% endif %}
     </div>
+    
     <div class="panel">
         <h2 class="page-header">Jouw bestellingen</h2>
 

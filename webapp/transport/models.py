@@ -1,14 +1,16 @@
 from django.db import models
+from django.urls import reverse
 from django.utils.text import slugify
 from django_extensions.db.models import TimeStampedModel
 from django.conf import settings
 from ordering.models import Supplier, OrderRound
+from agenda.models import TransientEvent
 
 
 class Route(TimeStampedModel):
     class Meta:
-        verbose_name = 'Route'
-        verbose_name_plural = 'Routes'
+        verbose_name = "Route"
+        verbose_name_plural = "Routes"
 
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
@@ -29,20 +31,27 @@ class Route(TimeStampedModel):
 
 class Ride(TimeStampedModel):
     class Meta:
-        verbose_name = 'Ride'
-        verbose_name_plural = 'Rides'
+        verbose_name = "Ride"
+        verbose_name_plural = "Rides"
 
     id = models.AutoField(primary_key=True)
     order_round = models.ForeignKey(
-        OrderRound, on_delete=models.SET_NULL, null=True, related_name="rides")
+        OrderRound, on_delete=models.SET_NULL, null=True, related_name="rides"
+    )
     route = models.ForeignKey(
-        Route, on_delete=models.SET_NULL, null=True, related_name="rides")
+        Route, on_delete=models.SET_NULL, null=True, related_name="rides"
+    )
     driver = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="rides_as_driver")
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="rides_as_driver",
+    )
     codriver = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="rides_as_codriver")
-    slug = models.SlugField(
-        unique=True, editable=False, max_length=100)
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="rides_as_codriver",
+    )
+    slug = models.SlugField(unique=True, editable=False, max_length=100)
 
     @property
     def date(self):
@@ -76,8 +85,19 @@ class Ride(TimeStampedModel):
         }
 
     def save(self, **kwargs):
-        self.slug = slugify('{}-{}'.format(self.date_str, self.route))
+        self.slug = slugify("{}-{}".format(self.date_str, self.route))
         return super(Ride, self).save(**kwargs)
 
+    def as_event(self):
+        event = TransientEvent()
+        event.address = self.order_round.pickup_location.address
+        event.title = f"Transportdienst {self.order_round.pickup_location}"
+        event.short_description = (f"<a href=\"{reverse('ride', args={self.slug})}\">"
+                                   f"Transportdienst</a> voor ronde {self.order_round.id}")
+        event.date = self.date.date()
+        event.time = None
+        event.is_shift = True
+        return event
+
     def __str__(self):
-        return '{}-{}'.format(self.date_str, self.route)
+        return "{}-{}".format(self.date_str, self.route)
