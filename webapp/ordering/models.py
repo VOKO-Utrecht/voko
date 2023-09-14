@@ -510,9 +510,8 @@ class OrderRound(TimeStampedModel):
         event = TransientEvent()
         event.address = self.pickup_location.address
         event.title = f"Bestelronde {self.id} - {self.pickup_location}"
-        # event.short_description = F"Bestelronde {self.id}"
         event.date = self.open_for_orders.date()
-        event.time = self.open_for_orders.time()
+        event.time = None
         return event
 
     def __str__(self):
