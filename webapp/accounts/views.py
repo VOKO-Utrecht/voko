@@ -134,6 +134,7 @@ class OverView(LoginRequiredMixin, TemplateView):
         return myevents
 
     def _get_rounds(self, myevents):
+        # gets scheduled rounds until 60 days in future
         rounds = OrderRound.objects.filter(
             Q(open_for_orders__gt=datetime.now(pytz.utc))
             & Q(open_for_orders__lt=datetime.now(pytz.utc) + timedelta(days=60))
@@ -145,7 +146,8 @@ class OverView(LoginRequiredMixin, TemplateView):
                 logging.log(logging.ERROR, err)
 
     def _get_coordinator_shifts(self, user, myevents):
-        # TODO: move to user model
+        # get scheduled coordinator shifts for current user
+        # from now until 60 days in future
         coords = OrderRound.objects.filter(
             Q(open_for_orders__gt=datetime.now(pytz.utc))
             & Q(open_for_orders__lt=datetime.now(pytz.utc) + timedelta(days=60))
@@ -164,7 +166,8 @@ class OverView(LoginRequiredMixin, TemplateView):
                 logging.log(logging.ERROR, err)
 
     def _get_rides(self, user, myevents):
-        # TODO: move to user model
+        # gets scheduled rides for current user
+        # from now until 60 days in future
         rides = Ride.objects.filter(Q(driver__in=[user]) | Q(codriver__in=[user]))
         for r in rides:
             try:
@@ -174,7 +177,8 @@ class OverView(LoginRequiredMixin, TemplateView):
                 logging.log(logging.ERROR, err)
 
     def _get_shifts(self, user, myevents):
-        # TODO: move to user model
+        # gets scheduled (distribution) shifts for current user
+        # from now until 60 days in future
         shifts = Shift.objects.filter(members__in=[user])
         for s in shifts:
             try:
