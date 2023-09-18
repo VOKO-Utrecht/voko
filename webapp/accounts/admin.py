@@ -242,7 +242,6 @@ class VokoUserBaseAdmin(UserAdmin):
             .order_by("-modified").first()
         return order.modified if order else None
 
-
     @staticmethod
     def debit(obj):
         return obj.balance.debit()
