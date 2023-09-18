@@ -191,7 +191,7 @@ class VokoUserBaseAdmin(UserAdmin):
     list_display = ["first_name", "last_name", "email", phone,
                     "email_confirmed", "can_activate", "is_active", "is_staff",
                     has_paid,
-                    "created", 'has_drivers_license', 'orders_round', 'debit',
+                    "created", "last_order", 'has_drivers_license', 'orders_round', 'debit',
                     'credit', 'total_orders', 'first_payment', roles]
     list_filter = ("is_staff", "is_superuser", "is_active",
                    "can_activate", HasPaidFilter, "groups")
@@ -234,6 +234,13 @@ class VokoUserBaseAdmin(UserAdmin):
                                       user=obj,
                                       paid=True).count()
         return orders
+
+    @staticmethod
+    def last_order(obj):
+        # Most recent order
+        order = Order.objects.filter(user=obj, paid=True)\
+            .order_by("-modified").first()
+        return order.modified if order else None
 
     @staticmethod
     def debit(obj):
