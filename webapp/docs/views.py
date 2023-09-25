@@ -3,17 +3,20 @@ from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.views.generic import ListView, DetailView
-
+from datetime import date
+from dateutil.relativedelta import relativedelta
 from docs.models import Document, Link
 
 
 class DocumentOverview(LoginRequiredMixin, ListView):
+    old_docs_cutoff_date = date.today() - relativedelta(years=1)
     template_name = 'docs/document_overview.html'
-    queryset = Document.objects.all().order_by("-id")
+    queryset = Document.objects.filter(modified__gte=old_docs_cutoff_date).order_by("-id")
 
     def get_context_data(self, **kwargs):
         context = super(DocumentOverview, self).get_context_data(**kwargs)
         context['links'] = Link.objects.all().order_by("-id")
+        context['old_documents'] = Document.objects.filter(modified__lt=self.old_docs_cutoff_date).order_by("-id")
         return context
 
 

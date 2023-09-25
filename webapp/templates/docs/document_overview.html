@@ -1,20 +1,49 @@
 {% extends 'base.html' %}
 {% block title %}Documenten{% endblock %}
 {% block content %}
-    {% if links %}
-        <h1>Links</h1>
-        <ul>
-        {% for link in links %}
-            <li><strong><a href="{{link.url}}" target="_blank" rel="noreferrer noopener">{{ link.name }}</a></strong></li>
-        {% endfor %}
-        </ul>
-    {% endif %}
-    <h1>Documenten</h1>
-    <ul>
-    {% for d in object_list %}
-        <li><strong><a href="{% url 'docs.document_download' d.slug %}">{{ d }}</a></strong></li>
+{% if links %}
+<h1>Links</h1>
+<ul>
+  {% for link in links %}
+  <li><strong><a href="{{link.url}}" target="_blank" rel="noreferrer noopener">{{ link.name }}</a></strong></li>
+  {% endfor %}
+</ul>
+{% endif %}
+<h1>Documenten</h1>
+<ul>
+  {% for d in object_list %}
+  <li><strong><a href="{% url 'docs.document_download' d.slug %}">{{ d }}</a></strong></li>
+  {% empty %}
+  <li style="list-style: none; padding-left: 0;">Niks!</li>
+  {% endfor %}
+</ul>
+
+<!-- styles for arrow on old-docs button -->
+<style type="text/css">
+  button.collapsed span.when-expanded {
+    display: none;
+  }
+  button:not(.collapsed) span.when-collapsed {
+    display: none;
+  }
+</style>
+
+<p>
+  <button class="btn btn-primary collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOldDocuments"
+    aria-expanded="false" aria-controls="collapseDocuments">
+    Oudere documenten
+    <span class="bi bi-caret-down-fill when-expanded"></span> 
+    <span class="bi bi-caret-right-fill when-collapsed"></span>
+  </button>
+</p>
+<div class="collapse" id="collapseOldDocuments">
+  <ul>
+    {% for d in old_documents %}
+    <li><strong><a href="{% url 'docs.document_download' d.slug %}">{{ d }}</a></strong></li>
     {% empty %}
-        Niks!
+    <li style="list-style: none; padding-left: 0;">Niks!</li>
     {% endfor %}
-    </ul>
+  </ul>
+</div>
+
 {% endblock %}
