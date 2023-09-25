@@ -14,7 +14,7 @@
   {% for d in object_list %}
   <li><strong><a href="{% url 'docs.document_download' d.slug %}">{{ d }}</a></strong></li>
   {% empty %}
-  Niks!
+  <li style="list-style: none; padding-left: 0;">Niks!</li>
   {% endfor %}
 </ul>
 
@@ -41,7 +41,7 @@
     {% for d in old_documents %}
     <li><strong><a href="{% url 'docs.document_download' d.slug %}">{{ d }}</a></strong></li>
     {% empty %}
-    Niks!
+    <li style="list-style: none; padding-left: 0;">Niks!</li>
     {% endfor %}
   </ul>
 </div>
