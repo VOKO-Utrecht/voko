@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block title %}Profiel{% endblock %}
+{% block content %}
+<h1>Bestelgeschiedenis</h1>
+<div>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="container">
+                    <div class="panel">
+                        <h2 class="page-header">Jouw bestellingen</h2>
+                        <p class="lead">
+                            {% if orders %}
+                            Je hebt {{ orders|length }} bestellingen geplaatst.
+                            {% else %}
+                            Je hebt nog geen bestellingen geplaatst.
+                            {% endif %}
+                        </p>
+                        {% if orders %}
+                        <table class="table table-condensed" id="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Bestelling</th>
+                                    <th>Bestelronde</th>
+                                    <th>Afhaaldatum</th>
+                                    <th>Bedrag</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td><a href="{% url 'order_summary' order.pk %}">Bestelling
+                                            {{ order.user_order_number }}</a></td>
+                                    <td>{{ order.order_round }}</td>
+                                    <td>{{ order.order_round.collect_datetime|date:'j F Y' }}</td>
+                                    <td>&euro; {{ order.total_price }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% endif %}
+                    </div>
+                    <div class="panel" id="finance">
+                        <h2 class="page-header">Jouw financiën</h2>
+                        <p class="lead">
+                            {% if user.balance.debit %}
+                            Saldo: &euro; -{{ user.balance.debit }}
+                            {% else %}
+                            Saldo: &euro; {{ user.balance.credit }}
+                            {% endif %}
+                        </p>
+                        {% if balances %}
+                        <table class="table table-condensed" id="finance-table">
+                            <thead>
+                                <tr>
+                                    <th>Datum</th>
+                                    <th>Bedrag</th>
+                                    <th>Opmerkingen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for b in balances %}
+                                <tr>
+                                    <td>{{ b.created.date }}</td>
+                                    <td>&euro; {% if b.type == 'DR' %}-{% endif %}{{ b.amount }}</td>
+                                    <td>{{ b.notes }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block javascript %}
+<script>
+    $(document).ready(function () {
+        $('#finance-table').DataTable({
+            "searching": false,
+            "lengthChange": false,
+            "ordering": false,
+            "info": false,
+            "pagingType": "numbers",
+            "language": {
+                "emptyTable": "Je hebt (nog) geen transacties"
+            }
+        });
+        $('#orders-table').DataTable({
+            "searching": false,
+            "lengthChange": false,
+            "ordering": false,
+            "info": false,
+            "pagingType": "numbers",
+            "language": {
+                "emptyTable": "Je hebt (nog) geen bestellingen"
+            }
+        });
+    });
+</script>
+{% endblock %}
