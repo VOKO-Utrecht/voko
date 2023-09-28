@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block title %}Profiel{% endblock %}
+{% block content %}
+<h1>Profiel</h1>
+<div>
+        <form action="" method="post">{% csrf_token %}
+        {% bootstrap_form form %}
+                    <div class="d-flex justify-content-between">
+                    <a class="btn btn-warning" href="/" role="button"><span class="bi-arrow-left-square"></span> Annuleren</a>
+                    <button type="submit" class="btn btn-primary">
+                      <span class="bi-save"></span> wijzigen
+                    </button>
+                </div>
+        </form>
+</div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        function updateForm(duration) {
+            var sharesCar = $("#id_shares_car").prop("checked");
+            var fields = $("#id_car_neighborhood, #id_car_type").parent();
+            if (sharesCar) fields.show(duration);
+            else fields.hide(duration);
+        }
+        updateForm(0);
+        $("#id_shares_car").change(updateForm);
+    </script>
+{% endblock %}
+
+
+

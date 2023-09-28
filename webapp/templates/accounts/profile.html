@@ -2,32 +2,164 @@
 {% load django_bootstrap5 %}
 {% block title %}Profiel{% endblock %}
 {% block content %}
-<h1>Profiel</h1>
+<h1>{{ user.first_name }} {{ user.last_name }}</h1>
 <div>
-        <form action="" method="post">{% csrf_token %}
-        {% bootstrap_form form %}
-                    <div class="d-flex justify-content-between">
-                    <a class="btn btn-warning" href="/" role="button"><span class="bi-arrow-left-square"></span> Annuleren</a>
-                    <button type="submit" class="btn btn-primary">
-                      <span class="bi-save"></span> wijzigen
-                    </button>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="container">
+                    <div class="panel">
+                        <h2 class="page-header">Profiel</h2>
+                        <div class="row">
+                            <div class="col">
+                                Naam
+                            </div>
+                            <div class="col">
+                                {{ user.first_name }} {{ user.last_name }}
+                            </div>
+                        </div>
+                        <div class="row pt-1">
+                            <div class="col">
+                                E-mail
+                            </div>
+                            <div class="col">
+                                {{ user.email }}
+                            </div>
+                        </div>
+                        <div class="row pt-1">
+                            <div class="col">
+                                Telefoonnummer
+                            </div>
+                            <div class="col">
+                                {{ user.userprofile.phone_number|default:"-" }}
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <hr>
+                        </div>
+                        {% if user.userprofile.contact_person %}
+                        <div class="row">
+                            <div class="col">
+                                Contactpersoon voor
+                            </div>
+                            <div class="col">
+                                {{ user.userprofile.contact_person }}
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <hr>
+                        </div>
+                        {% endif %}
+                        <div class="row pt-1">
+                            <div class="col">
+                                Rijbewijs
+                            </div>
+                            <div class="col">
+                                {% if user.userprofile.has_drivers_license %}Ja{% else %}Nee{% endif %}
+                            </div>
+                        </div>
+                        <div class="row pt-1">
+                            <div class="col">
+                                In bezit van redelijk grote auto die leden kunnen lenen voor transport
+                            </div>
+                            <div class="col">
+                                {% if user.userprofile.shares_car %}
+                                Ja
+                                {% else %}
+                                Nee
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if user.userprofile.shares_car and user.userprofile.car_type %}
+                        <div class="row  pt-1">
+                            <div class="col">
+                                Type auto
+                            </div>
+                            <div class="col">
+                                {{ user.userprofile.car_type }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if user.userprofile.shares_car and user.userprofile.car_neighborhood %}
+                        <div class="row  pt-1">
+                            <div class="col">
+                                Buurt waar de auto staat
+                            </div>
+                            <div class="col">
+                                {{ user.userprofile.car_neighborhood }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="row mt-3">
+                            <hr>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                Bijzonderheden:<br />
+                                (Ter informatie voor andere leden)
+                            </div>
+                            <div class="col">
+                                {{ user.userprofile.particularities|default:"-" }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-        </form>
+                <a href="{% url 'update_profile' %}">
+                    <button type="submit" class="btn btn-primary mt-4">
+                        <span class="bi bi-pencil-square"></span> wijzigen
+                    </button></a>
+
+            </div>
+            <div class="col-sm-1"></div>
+            <div class="col-sm-5">
+                <div class="container">
+                    <div class="panel">
+                        <h2 class="page-header">Recente bestellingen</h2>
+                        <p class="lead">
+                            {% if orders %}
+                            Je hebt {{ orders|length }} bestellingen geplaatst.
+                            {% else %}
+                            Je hebt nog geen bestellingen geplaatst.
+                            {% endif %}
+                        </p>
+                        {% if orders %}
+                        <table class="table table-condensed" id="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Bestelling</th>
+                                    <th>Bestelronde</th>
+                                    <th>Bedrag</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders|slice:":5" %}
+                                <tr>
+                                    <td><a href="{% url 'order_summary' order.pk %}">Bestelling
+                                            {{ order.user_order_number }}</a></td>
+                                    <td>{{ order.order_round }}</td>
+                                    <td>&euro; {{ order.total_price }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="text-end"><a href="{% url 'order_history' %}">Bestelgeschiedenis</a></div>
+                        {% endif %}
+                    </div>
+                    <div class="panel">
+                        <h2 class="page-header">Jouw financiën</h2>
+                        <div class="d-flex justify-content-between">
+                            {% if user.balance.debit %}
+                            Saldo: &euro; -{{ user.balance.debit }}
+                            {% else %}
+                            Saldo: &euro; {{ user.balance.credit }}
+                            {% endif %}
+                            <div class="text-end"><a href="{% url 'order_history' %}#finance">Overzicht</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
-
-{% block javascript %}
-    <script>
-        function updateForm(duration) {
-            var sharesCar = $("#id_shares_car").prop("checked");
-            var fields = $("#id_car_neighborhood, #id_car_type").parent();
-            if (sharesCar) fields.show(duration);
-            else fields.hide(duration);
-        }
-        updateForm(0);
-        $("#id_shares_car").change(updateForm);
-    </script>
-{% endblock %}
-
-
-

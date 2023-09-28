@@ -8,13 +8,13 @@
         <div class="row">
             <div class="col-md-6">
                 
-                <p class="mt-5 lead">
-                De huidige bestelronde is <strong>bestelronde {{ view.current_order_round.id }}</strong>. Deze bestelronde is nu <strong>{% if view.current_order_round.is_open %}open{% else %}gesloten{% endif %}</strong>.
+                <p class="mt-5 lead fs-6">
+                De huidige bestelronde is <strong>bestelronde {{ view.current_order_round.id }}</strong>.<br/>Deze bestelronde is nu <strong>{% if view.current_order_round.is_open %}open{% else %}gesloten{% endif %}</strong>.
                 </p>
-                <table class="table">
+                <table class="table fs-6">
                     <tbody>
                         <tr>
-                            <td>Bestelronde open vanaf</td>
+                            <td>Bestelronde open op</td>
                             <td>{{ view.current_order_round.open_for_orders }}</td>
                         </tr>
                         <tr>
@@ -28,8 +28,8 @@
                     </tbody>
                 </table>
             </div>
-
-            <div class="col">
+            <div class="col-md-1"></div>
+            <div class="col-md-5">
                 <h2 class="page-header">
                     Jouw agenda
                 </h2>
@@ -53,104 +53,59 @@
                     </tr>
                     {% endif %}
                 </table></td>
-                </tr>
-
-                
+                </tr>               
                 {% endfor %}
                 </table>
+
+                <div class="container">
+                    <div class="panel">
+                        <h2 class="page-header">Recente bestellingen</h2>
+                        <p class="lead">
+                            {% if orders %}
+                            Je hebt {{ orders|length }} bestellingen geplaatst.
+                            {% else %}
+                            Je hebt nog geen bestellingen geplaatst.
+                            {% endif %}
+                        </p>
+                        {% if orders %}
+                        <table class="table table-condensed" id="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Bestelling</th>
+                                    <th>Bestelronde</th>
+                                    <th>Bedrag</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders|slice:":5" %}
+                                <tr>
+                                    <td><a href="{% url 'order_summary' order.pk %}">Bestelling
+                                            {{ order.user_order_number }}</a></td>
+                                    <td>{{ order.order_round }}</td>
+                                    <td>&euro; {{ order.total_price }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="text-end"><a href="{% url 'order_history' %}">Bestelgeschiedenis</a></div>
+                        {% endif %}
+                    </div>
+                    <div class="panel">
+                        <h2 class="page-header">Jouw financiën</h2>
+                        <div class="d-flex justify-content-between">
+                            {% if user.balance.debit %}
+                            Saldo: &euro; -{{ user.balance.debit }}
+                            {% else %}
+                            Saldo: &euro; {{ user.balance.credit }}
+                            {% endif %}
+                            <div class="text-end"><a href="{% url 'order_history' %}#finance">Overzicht</a></div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
-
-    <div class="panel">
-        <h2 class="page-header">Jouw financiën</h2>
-        <p class="lead">
-            {% if user.balance.debit %}
-                Saldo: &euro; -{{ user.balance.debit }}
-            {% else %}
-                Saldo: &euro; {{ user.balance.credit }}
-            {% endif %}
-        </p>
-
-    {% if balances %}
-        <table class="table table-condensed" id="finance-table">
-            <thead>
-                <tr>
-                    <th>Datum</th>
-                    <th>Bedrag</th>
-                    <th>Opmerkingen</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for b in balances  %}
-                    <tr>
-                        <td>{{ b.created.date }}</td>
-                        <td>&euro; {% if b.type == 'DR' %}-{% endif %}{{ b.amount }}</td>
-                        <td>{{ b.notes }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
-    </div>
-    
-    <div class="panel">
-        <h2 class="page-header">Jouw bestellingen</h2>
-
-        <p class="lead">
-            {% if orders %}
-                Je hebt {{ orders|length }} bestellingen geplaatst.
-            {% else %}
-                Je hebt nog geen bestellingen geplaatst.
-            {% endif %}
-        </p>
-
-        {% if orders %}
-        <table class="table table-condensed" id="orders-table">
-            <thead>
-                <tr>
-                    <th>Bestelling</th>
-                    <th>Bestelronde</th>
-                    <th>Bedrag</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for order in orders %}
-                    <tr>
-                        <td><a href="{% url 'order_summary' order.pk %}">Bestelling {{ order.user_order_number }}</a></td>
-                        <td>{{ order.order_round }}</td>
-                        <td>&euro; {{ order.total_price }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% endif %}
-    </div>
 {% endblock %}
 
-{% block javascript %}
-    <script>
-        $(document).ready(function() {
-            $('#finance-table').DataTable({
-                "searching": false,
-                "lengthChange": false,
-                "ordering": false,
-                "info": false,
-                "pagingType": "numbers",
-                "language": {
-                    "emptyTable": "Je hebt (nog) geen transacties"
-                }
-            });
-            $('#orders-table').DataTable({
-                "searching": false,
-                "lengthChange": false,
-                "ordering": false,
-                "info": false,
-                "pagingType": "numbers",
-                "language": {
-                    "emptyTable": "Je hebt (nog) geen bestellingen"
-                }
-            });
-        });
-    </script>
-{% endblock %}
+

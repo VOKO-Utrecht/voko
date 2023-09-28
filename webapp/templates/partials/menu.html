@@ -76,6 +76,7 @@
         <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ user.get_full_name }}<span class="caret"></span></a>
         <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="{% url 'profile' %}">Profiel</a></li>
+            <li><a class="dropdown-item" href="{% url 'order_history' %}">Bestelgeschiedenis</a></li>
             <li><a class="dropdown-item" href="{% url 'logout' %}">Uitloggen</a></li>
         </ul>
     </li>

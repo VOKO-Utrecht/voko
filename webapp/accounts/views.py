@@ -102,6 +102,29 @@ class EmailConfirmView(AnonymousRequiredMixin, DetailView):
         return super(EmailConfirmView, self).get_context_data(**kwargs)
 
 
+class ProfileView(LoginRequiredMixin, TemplateView):
+    template_name = "accounts/profile.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super(ProfileView, self).get_context_data(**kwargs)
+        user = self.request.user
+
+        ctx["orders"] = user.orders.filter(paid=True).order_by("-pk")
+        return ctx
+
+
+class OrderHistory(LoginRequiredMixin, TemplateView):
+    template_name = "accounts/order_history.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super(OrderHistory, self).get_context_data(**kwargs)
+        user = self.request.user
+
+        ctx["orders"] = user.orders.filter(paid=True).order_by("-pk")
+        ctx["balances"] = user.balance.all().order_by("-pk")
+        return ctx
+
+
 class OverView(LoginRequiredMixin, TemplateView):
     template_name = "accounts/overview.html"
 
@@ -265,7 +288,7 @@ class PasswordResetFinishedView(AnonymousRequiredMixin, TemplateView):
 class EditProfileView(LoginRequiredMixin, UpdateView):
     form_class = ChangeProfileForm
     success_url = "/accounts/profile"
-    template_name = "accounts/profile.html"
+    template_name = "accounts/update_profile.html"
 
     def get_object(self, queryset=None):
         return self.request.user

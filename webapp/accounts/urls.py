@@ -29,8 +29,10 @@ urlpatterns = (
 
     url(r'^welcome/$', views.WelcomeView.as_view()),
     url(r'^overview/$', views.OverView.as_view(), name='overview'),
-    url(r'^profile/$', views.EditProfileView.as_view(), name='profile'),
+    url(r'^profile/$', views.ProfileView.as_view(), name='profile'),
+    url(r'^updateProfile/$', views.EditProfileView.as_view(), name='update_profile'),
     url(r'^contact/$', views.Contact.as_view(), name='contact'),
+    url(r'^orderHistory/$', views.OrderHistory.as_view(), name='order_history'),
 
     url(r'^profile/remarks/(?P<pk>[0-9a-zA-Z\-]+)$', views.EditCoordinatorRemarksView.as_view(),
         name='coordinator_remarks')
