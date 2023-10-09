@@ -21,16 +21,19 @@
                         <hr class="mb-2 mt-0"
                             style="width: 100%; height: 2px" />
                         <div class="d-flex flex-row justify-content-between">
-                            <span>
-                                <h5>Averechts <a href="https://goo.gl/maps/cAT9koytCy6Rd9gA6"><span class="bi bi-map"></span></a></h5>
-                                Lijsterstraat 49<br>
-                                Vogelenbuurt<br>
-                            </span>
-                            <span>
-                                <h5>Krachtstation <a href="https://goo.gl/maps/jMgcZbDnxkMYTvdw7"><span class="bi bi-map"></span></a></h5>
-                                Amerikalaan 199<br>
-                                Kanaleneiland
-                            </span>
+
+                            {% for location in pickup_locations %}
+                            <address>
+                                <h5>{{ location.description }} 
+                                    <a href="https://www.google.com/maps/search/?api=1&query={{location.address.street_and_number|urlencode}}%20{{location.address.city|urlencode}}" title="Toon {{ location.description }} op de kaart">
+                                        <span class="bi bi-map"></span>
+                                    </a>
+                                </h5>
+                                {{ location.address.street_and_number }}<br>
+                                {{ location.address.city }}
+                            </address>
+                            {% endfor %}
+
                         </div>
                     </div>
                     <!-- Grid column -->
