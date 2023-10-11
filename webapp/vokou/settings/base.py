@@ -30,6 +30,7 @@ TEMPLATES = [
                 'django.template.context_processors.media',
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
+                'ordering.context_processors.pickup_locations'
             ],
         },
     },
