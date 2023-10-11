@@ -20,7 +20,8 @@ class VokoUserCreationForm(forms.ModelForm):
         fields = ("email", "first_name", "last_name")
 
     if settings.CAPTCHA_ENABLED:
-        captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox)
+        captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(
+            api_params={'hl': 'cl', 'onload': 'onLoadFunc'}))
 
     def save(self, commit=True):
         # Create user
