@@ -105,10 +105,18 @@
                         </div>
                     </div>
                 </div>
-                <a href="{% url 'update_profile' %}">
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'update_profile' %}">
                     <button type="submit" class="btn btn-primary mt-4">
                         <span class="bi bi-pencil-square"></span> wijzigen
                     </button></a>
+                    {% if unsubscribe_from_url %}
+                    <a href="{{ unsubscribe_from_url }}" target='_blank'>
+                        <button type="submit" class="btn btn-secondary mt-4">
+                            <span class="bi bi-pencil-square"></span> Uitschrijven / Pauzeren
+                        </button></a>           
+                    {% endif %}
+                </div>
 
             </div>
             <div class="col-sm-1"></div>

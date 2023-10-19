@@ -170,7 +170,8 @@ CONSTANCE_CONFIG = {
     'PROMO_GROUP': (7, "Promotion Group", int),
     'FINANCE_GROUP': (9, "Finance Group", int),
     # other config values
-    'MARKUP_PERCENTAGE': (4.0, "Markup percentage", float)
+    'MARKUP_PERCENTAGE': (4.0, "Markup percentage", float),
+    'UNSUBSCRIBE_FORM_URL': ("", "Unsubscribe form URL", str)
 
 }
 
@@ -195,7 +196,7 @@ CONSTANCE_CONFIG_FIELDSETS = {
             'IT_GROUP',
             'PROMO_GROUP',
             'FINANCE_GROUP'),
-        'Other options': ('MARKUP_PERCENTAGE',)
+        'Other options': ('MARKUP_PERCENTAGE','UNSUBSCRIBE_FORM_URL')
     }    
 
 

@@ -108,7 +108,7 @@ class ProfileView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         ctx = super(ProfileView, self).get_context_data(**kwargs)
         user = self.request.user
-
+        ctx["unsubscribe_from_url"] = config.UNSUBSCRIBE_FORM_URL
         ctx["orders"] = user.orders.filter(paid=True).order_by("-pk")
         return ctx
 
