@@ -24,13 +24,13 @@
 
                             {% for location in pickup_locations %}
                             <address>
-                                <h5>{{ location.description }} 
-                                    <a href="https://www.google.com/maps/search/?api=1&query={{location.address.street_and_number|urlencode}}%20{{location.address.city|urlencode}}" title="Toon {{ location.description }} op de kaart">
+                                <h5>{{ location.name }} 
+                                    <a href="https://www.google.com/maps/search/?api=1&query={{location.address.street_and_number|urlencode}}%20{{location.address.city|urlencode}}" title="Toon {{ location.name }} op de kaart">
                                         <span class="bi bi-map"></span>
                                     </a>
                                 </h5>
                                 {{ location.address.street_and_number }}<br>
-                                {{ location.address.city }}
+                                {{ location.description }}
                             </address>
                             {% endfor %}
 
