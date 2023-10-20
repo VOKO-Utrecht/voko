@@ -19,6 +19,16 @@ def fix_decimal_separator(decimal_value):
 
 
 class SendOrderReminders(CronJobBase):
+    """
+    Sends email reminder to members who haven´t ordered yet this round
+
+    cron runs every 30 minutes
+
+    When: 12 hours (default) before closed for orders (configured per order round in admin)
+    To every active user who hasn´t ordered during current order round
+    Send only once per order round
+    Template: ORDER_REMINDER_MAIL
+    """
     RUN_EVERY_MINS = 30
 
     schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
@@ -44,6 +54,16 @@ class SendOrderReminders(CronJobBase):
 
 
 class SendPickupReminders(CronJobBase):
+    """
+    Sends email reminder to members to pickup their order
+
+    cron runs every 30 minutes
+
+    When: 4 hours (default) before collect time (configured per order round in admin)
+    To every user with paid orders this round
+    Send only once per order round
+    Template: PICKUP_REMINDER_MAIL
+    """
     RUN_EVERY_MINS = 30
 
     schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
@@ -66,6 +86,16 @@ class SendPickupReminders(CronJobBase):
 
 
 class MailOrderLists(CronJobBase):
+    """
+    Sends email to every supplier which has orders this round
+
+    cron runs every 30 minutes
+
+    When: order round is not open and open date is in the past (so order round is closed and in the past)
+    Every supplier with orders receives email with .csv file attached containing order details
+    Copy is send to boeren@vokoutrecht.nl
+    Send only once per order round
+    """
     RUN_EVERY_MINS = 30
 
     schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
@@ -180,6 +210,15 @@ VOKO Utrecht
 
 
 class SendRideMails(CronJobBase):
+    """
+    Sends email to members scheduled to collect products from suppliers
+
+    When: order round is closed for orders
+    For every ride scheduled for the current order round, the driver and co-driver and
+    distribution coordinator receive a reminder
+    Send only once per order round
+    Template: RIDE_MAIL
+    """
     RUN_EVERY_MINS = 30
 
     schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
@@ -195,6 +234,14 @@ class SendRideMails(CronJobBase):
 
 
 class SendPrepareRideMails(CronJobBase):
+    """
+    Sends email to members scheduled to collect products next! order round
+
+    When: as soon as order round is open, send reminder for next order round
+    For every ride scheduled for the next order round, the driver and co-driver receive a reminder
+    Send only once per order round
+    Template: PREPARE_RIDE_MAIL
+    """
     RUN_EVERY_MINS = 30
 
     schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
@@ -215,8 +262,13 @@ class SendPrepareRideMails(CronJobBase):
 
 class SendRideCostsRequestMails(CronJobBase):
     """
-    After the order_round is finished a mail is send to the riders,
-    to request the costs they made
+    Sends email to remind drivers to send the costs they made
+
+    When: After collection time of most recent order round.
+    Not after 48 hours (to prevent sending mails for very old rounds)
+    For every ride scheduled for the most recent round, the driver receives this email
+    Send only once per round
+    Template: RIDECOSTS_REQUEST_MAIL
     """
     RUN_EVERY_MINS = 30
 
@@ -241,6 +293,13 @@ class SendRideCostsRequestMails(CronJobBase):
 
 
 class SendDistributionMails(CronJobBase):
+    """
+    Sends email to remind members they are scheduled for a distribution shift in the current round
+
+    When: order round is open
+    For all shifts of the current round, a mail is send to scheduled members
+    Template: DISTRIBUTION_MAIL
+    """
     RUN_EVERY_MINS = 30
 
     schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
