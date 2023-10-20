@@ -95,6 +95,8 @@ CRON_CLASSES = [
     "ordering.cron.SendRideCostsRequestMails"
 ]
 
+DJANGO_CRON_DELETE_LOGS_OLDER_THAN = 365
+
 ROOT_URLCONF = 'vokou.urls'
 WSGI_APPLICATION = 'vokou.wsgi.application'
 
