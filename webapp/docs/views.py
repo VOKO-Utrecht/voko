@@ -3,13 +3,13 @@ from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.views.generic import ListView, DetailView
-from datetime import date
+from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 from docs.models import Document, Link
 
 
 class DocumentOverview(LoginRequiredMixin, ListView):
-    old_docs_cutoff_date = date.today() - relativedelta(years=1)
+    old_docs_cutoff_date = timezone.now() - relativedelta(years=1)
     template_name = 'docs/document_overview.html'
     queryset = Document.objects.filter(modified__gte=old_docs_cutoff_date).order_by("-id")
 
