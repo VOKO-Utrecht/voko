@@ -19,12 +19,11 @@ COPY ./Pipfile /code/
 
 ARG CACHEBUST=1
 # Recreate lock file
-RUN pipenv lock
-# Install dependencies
-RUN pipenv install --dev
+RUN pipenv lock && pipenv install --dev
 
 # Install application into container
 COPY . .
 
+EXPOSE 8000
 RUN ["chmod", "+x", "/code/docker-entrypoint.sh"]
 ENTRYPOINT [ "/code/docker-entrypoint.sh" ]

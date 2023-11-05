@@ -24,21 +24,26 @@ _first time postgress restarts which confuses Django_
 ### Start voko website and run migrations
 1. Run: docker-compose up -d
 2. Run: docker exec -it voko-web-1 bash
-3. Run: ./manage.py makemigrations --settings=vokoa.settings.development
-4. Run: ./manage.py migrate --settings=vokoa.settings.development
-5. Run: exit
+3. Run: cd /code/webapp/
+4. Run: pipenv run python ./manage.py makemigrations --settings=$VOKO_ENV
+5. Run: pipenv run python ./manage.py migrate --settings=$VOKO_ENV
+6. Run: exit
+
+#### Optional steps for serving static content in new environment
+7. Run: pipenv run python ./manage.py collectstatic --settings=$VOKO_ENV
+
 
 ### Create superuser in the voko web container
 1. Run: docker exec -it voko-web-1 bash
-2. Run: ./manage.py createsuperuser --settings=vokoa.settings.development
-3. _follow the prompts_
-4. Run: exit
+2. Run: cd /code/webapp/
+3. Run: pipenv run python ./manage.py createsuperuser --settings=$VOKO_ENV
+4. _follow the prompts_
+5. Run: exit
 
 In your browser go to: http://127.0.0.1:8000/admin/ordering/orderround/
 
 Login as the super user just created \
 Use the admin site to create an order round (otherwise you get an ugly error going to the main site --FIXTHIS)
-
 
 
 # Development environment without Docker

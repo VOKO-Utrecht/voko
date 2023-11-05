@@ -1,5 +1,9 @@
 *
-!*.sh
-!*.py
+!**/*.sh
+!**/*.py
 !Pipfile
 !Pipfile.lock
+# To serve static content
+!**/*.html
+!**/assets/*
+!**/uwsgi.ini

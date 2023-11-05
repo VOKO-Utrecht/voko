@@ -5,10 +5,10 @@ SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ['USER'],
-        'USER': os.environ['USER'],
-        'PASSWORD': os.environ['DB_PASSWORD'],
-        'HOST': 'localhost',
+        'NAME': os.environ['POSTGRES_DB'],
+        'USER': os.environ['POSTGRES_USER'],
+        'PASSWORD': os.environ['POSTGRES_PASSWORD'],
+        'HOST': os.environ['POSTGRES_HOST'],
         }
     }
 
@@ -20,7 +20,11 @@ ADMINS = (
     ("Voedselkollektief", os.getenv('ADMIN_EMAIL', "ict@voedselkollektief.nl")),
 )
 
-ALLOWED_HOSTS = ("acc.leden.voedselkollektief.nl", "127.0.0.1")
+ALLOWED_HOSTS = ("leden.acc.voedselkollektief.nl", "127.0.0.1", "localhost")
 
-BASE_URL = "http://acc.leden.voedselkollektief.nl"
+# BASE_URL = os.environ["VIRTUAL_HOST"]
 MOLLIE_API_KEY = os.environ["MOLLIE_API_KEY"]
+
+# RECAPTCHA Config
+RECAPTCHA_PUBLIC_KEY = os.environ["RECAPTCHA_PUBLIC_KEY"]
+RECAPTCHA_PRIVATE_KEY = os.environ["RECAPTCHA_PRIVATE_KEY"]
