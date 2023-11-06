@@ -6,6 +6,7 @@ import html2text
 from mailing.models import MailTemplate
 from email.utils import formataddr
 
+
 def render_mail_template(template, **kwargs):
     body_tpl = Template(template.html_body)
     subject_tpl = Template(template.subject)
