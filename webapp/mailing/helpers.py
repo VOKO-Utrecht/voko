@@ -4,7 +4,7 @@ from django.core.mail import send_mail
 from django.template import Template, Context
 import html2text
 from mailing.models import MailTemplate
-
+from email.utils import formataddr
 
 def render_mail_template(template, **kwargs):
     body_tpl = Template(template.html_body)
@@ -38,9 +38,10 @@ def get_template_by_id(template_id):
 
 def mail_user(user, subject, html_body, plain_body, from_email):
     default_from_email = settings.DEFAULT_FROM_EMAIL
+    recipient = formataddr((user.get_full_name(), user.email))
     send_mail(subject=subject,
               message=plain_body,
               from_email=from_email if from_email else default_from_email,
-              recipient_list=["%s <%s>" % (user.get_full_name(), user.email)],
+              recipient_list=[recipient],
               html_message=html_body)
     log.log_event(user=user, event="Mail sent: %s" % subject, extra=html_body)
