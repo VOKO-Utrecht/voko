@@ -46,6 +46,7 @@ class RouteAdmin(admin.ModelAdmin):
 
 class RideAdmin(admin.ModelAdmin):
     list_display = ["date", "route", "driver", "codriver"]
+    autocomplete_fields = ["driver", "codriver"]
     ordering = ("-order_round__collect_datetime", "route")
     list_filter = (RecentListFilter,)
 
