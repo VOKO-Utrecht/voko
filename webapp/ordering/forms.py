@@ -33,3 +33,4 @@ class OrderForm(forms.ModelForm):
 
 class UploadProductListForm(forms.Form):
     product_list = forms.FileField()
+    product_list.widget.attrs['accept'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
