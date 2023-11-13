@@ -348,7 +348,7 @@ class UploadProductList(FormView, ProductAdminMixin):
         f.write(file_handler.read())
         f.close()
 
-        workbook = openpyxl.load_workbook(f.name, read_only=True)
+        workbook = openpyxl.load_workbook(f.name, read_only=True, data_only=True)
         sheet = workbook.active
         PRODUCT_NAME, DESCRIPTION, UNIT, PRICE, MAX, CATEGORY = list(
             range(0, 6))
