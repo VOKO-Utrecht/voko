@@ -313,7 +313,7 @@ class ProductAdminMixin(GroupRequiredMixin):
     def _convert_number(self, value):
         if isinstance(value, (int, float)):
             return value
-        str_value = str(value or "").strip(" \t\r\n")
+        str_value = str(value or "").strip()  # Treat whitespace, empty string and None as None
         if len(str_value) == 0:
             return None
         return float(str_value.replace(",", "."))
