@@ -310,6 +310,14 @@ class ProductAdminMixin(GroupRequiredMixin):
         # price = price.replace(".", ",")
         return price
 
+    def _convert_number(self, value):
+        if isinstance(value, (int, float)):
+            return value
+        str_value = str(value or "").strip(" \t\r\n")
+        if len(str_value) == 0:
+            return None
+        return float(str_value.replace(",", "."))
+
     @property
     def supplier(self):
         return Supplier.objects.get(id=self.kwargs['supplier'])
@@ -371,7 +379,7 @@ class UploadProductList(FormView, ProductAdminMixin):
                  'description': description if description else "",
                  'unit': unit,
                  'base_price': self._convert_price(price),
-                 'maximum_total_order': maximum,
+                 'maximum_total_order': self._convert_number(maximum),
                  'category': category}
             )
 
