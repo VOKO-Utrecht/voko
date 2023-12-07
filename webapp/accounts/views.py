@@ -140,10 +140,10 @@ class OverView(LoginRequiredMixin, TemplateView):
         ctx["orders"] = user.orders.filter(paid=True).order_by("-pk")
         ctx["balances"] = user.balance.all().order_by("-pk")
         ctx["events"] = self._getAllEvents()
-        _news_date = datetime.today() - timedelta(days=60)
-        
+
         ctx['news'] = Newsitem.objects.filter(Q(publish=True) & Q(publish_date__lte=datetime.now(pytz.utc))
-            & Q(publish_date__gt=datetime.now(pytz.utc) - timedelta(days=60))).order_by("-publish_date")
+                                              & Q(publish_date__gt=datetime.now(pytz.utc)
+                                                  - timedelta(days=60))).order_by("-publish_date")
         return ctx
 
     def current_order_round(self):
