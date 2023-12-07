@@ -27,6 +27,16 @@
                         </tr>
                     </tbody>
                 </table>
+                {% if news %}
+                    <h2 class="mt-5 page-header">
+                        VOKO Utrecht nieuws
+                    </h2>
+                    <table class="mt-2 table">
+                    {% for n in news  %}
+                        <tr><td class="">{{ n.publish_date|date:'j F Y' }}</td><td class="w-75 "><div class="fs-6">{{ n.title }}</div><div>{{ n.summary }}</div></td></tr>                       
+                    {% endfor %}
+                    </table>
+                {% endif %}
             </div>
             <div class="col-md-1"></div>
             <div class="col-md-5">

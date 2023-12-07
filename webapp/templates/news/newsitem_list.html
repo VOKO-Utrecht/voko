@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Nieuws{% endblock %}
+{% block content %}
+
+<h1>VOKO Utrecht Nieuws</h1>
+<div>
+
+    <div class="container mt-5">
+        <div class="row gx-5">
+            <div class="col-lg-4 col-12 overflow-auto "  style="max-height:50%">
+              <table class="table table-striped mh-50">
+                {% for n in object_list %}
+                <tr><td class="p-3"><span class="smaller">{{ n.publish_date|date:'j F Y' }}</span>
+                <h6>{{ n.title }}</h6>
+                <span class="smaller"><i>{{ n.summary }}</i></span>
+                </td>
+              </tr>
+                {% endfor %}
+              </table>
+            </div>
+
+            <div class="col-8 newsitem">
+              <div>{{ object_list.1.summary }}</div>
+              <div>{% autoescape off %}{{ object_list.1.content }}{% endautoescape %}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

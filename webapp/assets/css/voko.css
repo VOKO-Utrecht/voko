@@ -273,4 +273,8 @@ ul.pagination li:hover a {
   color:#291703;
 }
 
+.newslist {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
 
