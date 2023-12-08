@@ -274,7 +274,13 @@ ul.pagination li:hover a {
 }
 
 .newslist {
+
   background-color: rgba(0, 0, 0, 0.05);
+}
+
+.card .card-body{
+  --bs-card-bg: transparent !important;
+  background-color: transparent !important;
 }
 
 

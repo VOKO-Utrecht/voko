@@ -12,7 +12,6 @@
                 {% for n in newsitems %}
                 <tr><td class="p-3"><span class="smaller">{{ n.publish_date|date:'j F Y' }}</span>
                 <h6>{{ n.title }}</h6>
-                <span class="smaller"><i>{{ n.summary }}</i></span>
                 </td>
               </tr>
                 {% endfor %}

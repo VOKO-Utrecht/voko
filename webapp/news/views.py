@@ -1,9 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Any
 from braces.views import LoginRequiredMixin
-from django.views.generic import (
-    DetailView, TemplateView
-)
+from django.views.generic import TemplateView
 import pytz
 from django.db.models import Q
 from news.models import Newsitem
@@ -28,8 +26,3 @@ class NewsitemsView(LoginRequiredMixin, TemplateView):
         ctx['newsitem'] = newsitem
 
         return ctx
-
-
-class NewsitemDetail(LoginRequiredMixin, DetailView):
-    template_name = 'news/newsitem_detail.html'
-    model = Newsitem
