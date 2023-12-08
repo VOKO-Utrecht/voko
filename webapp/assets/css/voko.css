@@ -278,9 +278,13 @@ ul.pagination li:hover a {
   background-color: rgba(0, 0, 0, 0.05);
 }
 
-.card .card-body{
-  --bs-card-bg: transparent !important;
-  background-color: transparent !important;
+.card {
+  background: none !important;
+  border: none;
+  /* --bs-card-bg: transparent !important;
+  background-color: transparent !important; */
 }
+
+
 
 

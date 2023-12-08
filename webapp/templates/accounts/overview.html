@@ -31,22 +31,36 @@
                     <h2 class="mt-5 page-header">
                         VOKO Utrecht nieuws
                     </h2>
+                    <div class="mt-4"></div>
                     <!-- <table class="mt-2 table"> -->
-                    {% for n in news  %}
-                    <div class="card">
-                        <div class="card-header">
+                       <div class="col-12 ">
+                        <table class="table table-striped mh-50">
+                        {% for n in news %}
+                        <tr><td class="p-3"><span class="smaller">{{ n.publish_date|date:'j F Y' }}</span>
+                        <h6>{{ n.title }}</h6>
+                        {{ n.summary }}
+                        </td>
+                        </tr>
+                        {% endfor %}
+                        </table>
+                    </div>
+                        
+
+                    <!-- {% for n in news  %} -->
+                    <!-- <div class="card">
+                        <div class="card-header text-end small">
                             {{ n.publish_date|date:'j F Y' }}
                         </div>
                         <div class="card-body">
-                          <h5 class="card-title">{{ n.title }}</h5>
+                            <a href="{% url 'view_newsitems' %}{{ n.id }}"><h5 class="card-title">{{ n.title }}</h5></a>
                           <p class="card-text">{{ n.summary }}</p>
-                          <!-- <a href="{% url 'view_newsitems' %}{{ n.id }}" class="btn btn-primary">Go somewhere</a> -->
+                          <a href="{% url 'view_newsitems' %}{{ n.id }}" class="fa fa-chevron-right"></a> 
                         </div>
-                      </div>
+                      </div> -->
 
                         <!-- <tr><td class="">{{ n.publish_date|date:'j F Y' }}</td><td class="w-75 "><div class="fs-6">{{ n.title }}</div><div>{{ n.summary }}</div>
                             <div class="text-end"><a href="{% url 'view_newsitems' %}{{ n.id }}"><span class="fa fa-chevron-right">ss</span></a></div></td></tr>                        -->
-                    {% endfor %}
+                    <!-- {% endfor %} -->
                     <!-- </table> -->
                 {% endif %}
             </div>
