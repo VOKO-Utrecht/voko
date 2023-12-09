@@ -4,7 +4,7 @@
 
 <h1>VOKO Utrecht nieuws</h1>
 <div>
-
+{% if newsitems %}
     <div class="container mt-5">
         <div class="row gx-5">
             <div class="col-lg-4 col-12 overflow-scroll vh-100"  style="max-height:500px;">
@@ -29,6 +29,12 @@
             </div>
         </div>
     </div>
+
+{% else %}
+  <div class="container mt-5">
+    <h5>Er is op dit moment geen nieuws</h5>
+  </div>
+{% endif %}
 </div>
 
 
