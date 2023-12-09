@@ -27,6 +27,29 @@
                         </tr>
                     </tbody>
                 </table>
+                {% if news %}
+                    <h2 class="mt-5 page-header">
+                        VOKO Utrecht nieuws
+                    </h2>
+                    <div class="mt-4"></div>
+                       <div class="col-12 overflow-scroll" style="max-height: 500px;">
+                        <table class="table table-striped">
+                        {% for n in news %}
+                        <tr>
+                            <td class="p-3"><span class="small">{{ n.publish_date|date:'j F Y' }}</span>
+                                <h6>{{ n.title }}</h6>
+                                <table class="table-condensed">
+                                    <tr>
+                                        <td class="w-100 small">{{ n.summary }}</td>
+                                        <td class="align-bottom"><a href="{% url 'view_newsitems' %}{{ n.id }}"><button class="btn btn-outline-primary mx-3">Lees&nbsp;verder</button></a></td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </table>
+                    </div>                 
+                {% endif %}
             </div>
             <div class="col-md-1"></div>
             <div class="col-md-5">

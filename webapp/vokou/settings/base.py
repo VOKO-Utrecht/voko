@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'distribution',
     'groups',
     'agenda',
+    'news',
 
     'constance.backends.database',
     'constance',
