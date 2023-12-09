@@ -141,6 +141,7 @@ class OverView(LoginRequiredMixin, TemplateView):
         ctx["balances"] = user.balance.all().order_by("-pk")
         ctx["events"] = self._getAllEvents()
 
+        # Show published news, published max 60 days ago. Order by publish date (desc)
         ctx['news'] = Newsitem.objects.filter(Q(publish=True) & Q(publish_date__lte=datetime.now(pytz.utc))
                                               & Q(publish_date__gt=datetime.now(pytz.utc)
                                                   - timedelta(days=60))).order_by("-publish_date")

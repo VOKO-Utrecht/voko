@@ -6,8 +6,9 @@ from news.models import Newsitem
 
 def publish_selected_items(modeladmin, request, queryset):
     for item in queryset:
-        item.publish = True
-        item.save()
+        if not item.publish:
+            item.publish = True
+            item.save()
 
 
 publish_selected_items.short_description = "Geselecteerd berichten publiceren"
@@ -15,8 +16,9 @@ publish_selected_items.short_description = "Geselecteerd berichten publiceren"
 
 def unpublish_selected_items(modeladmin, request, queryset):
     for item in queryset:
-        item.publish = False
-        item.save()
+        if item.publish:
+            item.publish = False
+            item.save()
 
 
 unpublish_selected_items.short_description = "Geselecteerd berichten niet (meer) publiceren"

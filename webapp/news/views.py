@@ -13,9 +13,11 @@ class NewsitemsView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs: Any):
         ctx = super(NewsitemsView, self).get_context_data(**kwargs)
+
+        # Show all published news published max 1 year ago. Order by publish date (desc)
         ctx['newsitems'] = Newsitem.objects.filter(Q(publish=True) & Q(publish_date__lte=datetime.now(pytz.utc))
                                                    & Q(publish_date__gt=datetime.now(pytz.utc)
-                                                       - timedelta(days=60))).order_by("-publish_date")
+                                                       - timedelta(days=365))).order_by("-publish_date")
 
         try:
             newsitem = Newsitem.objects.get(pk=kwargs['pk'])

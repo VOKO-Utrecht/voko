@@ -32,36 +32,23 @@
                         VOKO Utrecht nieuws
                     </h2>
                     <div class="mt-4"></div>
-                    <!-- <table class="mt-2 table"> -->
-                       <div class="col-12 ">
-                        <table class="table table-striped mh-50">
+                       <div class="col-12 overflow-scroll" style="max-height: 500px;">
+                        <table class="table table-striped">
                         {% for n in news %}
-                        <tr><td class="p-3"><span class="smaller">{{ n.publish_date|date:'j F Y' }}</span>
-                        <h6>{{ n.title }}</h6>
-                        {{ n.summary }}
-                        </td>
+                        <tr>
+                            <td class="p-3"><span class="small">{{ n.publish_date|date:'j F Y' }}</span>
+                                <h6>{{ n.title }}</h6>
+                                <table class="table-condensed">
+                                    <tr>
+                                        <td class="w-100 small">{{ n.summary }}</td>
+                                        <td class="align-bottom"><a href="{% url 'view_newsitems' %}{{ n.id }}"><button class="btn btn-outline-primary mx-3">Lees&nbsp;verder</button></a></td>
+                                    </tr>
+                                </table>
+                            </td>
                         </tr>
                         {% endfor %}
                         </table>
-                    </div>
-                        
-
-                    <!-- {% for n in news  %} -->
-                    <!-- <div class="card">
-                        <div class="card-header text-end small">
-                            {{ n.publish_date|date:'j F Y' }}
-                        </div>
-                        <div class="card-body">
-                            <a href="{% url 'view_newsitems' %}{{ n.id }}"><h5 class="card-title">{{ n.title }}</h5></a>
-                          <p class="card-text">{{ n.summary }}</p>
-                          <a href="{% url 'view_newsitems' %}{{ n.id }}" class="fa fa-chevron-right"></a> 
-                        </div>
-                      </div> -->
-
-                        <!-- <tr><td class="">{{ n.publish_date|date:'j F Y' }}</td><td class="w-75 "><div class="fs-6">{{ n.title }}</div><div>{{ n.summary }}</div>
-                            <div class="text-end"><a href="{% url 'view_newsitems' %}{{ n.id }}"><span class="fa fa-chevron-right">ss</span></a></div></td></tr>                        -->
-                    <!-- {% endfor %} -->
-                    <!-- </table> -->
+                    </div>                 
                 {% endif %}
             </div>
             <div class="col-md-1"></div>

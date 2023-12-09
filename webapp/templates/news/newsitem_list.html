@@ -2,25 +2,30 @@
 {% block title %}Nieuws{% endblock %}
 {% block content %}
 
-<h1>VOKO Utrecht Nieuws</h1>
+<h1>VOKO Utrecht nieuws</h1>
 <div>
 
     <div class="container mt-5">
         <div class="row gx-5">
-            <div class="col-lg-4 col-12 overflow-auto "  style="max-height:50%">
-              <table class="table table-striped mh-50">
+            <div class="col-lg-4 col-12 overflow-scroll vh-100"  style="max-height:500px;">
+              <table class="table table-striped">
                 {% for n in newsitems %}
-                <tr><td class="p-3"><span class="smaller">{{ n.publish_date|date:'j F Y' }}</span>
-                <h6>{{ n.title }}</h6>
-                </td>
-              </tr>
+                <tr>
+                  <td class="p-3"><span class="smaller">{{ n.publish_date|date:'j F Y' }}</span>
+                    <h6>{{ n.title }}</h6>
+                    <div class="text-end">
+                      <a href="{% url 'view_newsitems' %}{{ n.id }}"><button class="btn btn-outline-primary mx-3">Lees&nbsp;verder</button></a>
+                    </div>
+                  </td>
+                </tr>
                 {% endfor %}
               </table>
             </div>
 
-            <div class="col-8 newsitem">
-              <div>{{ newsitem.summary }}</div>
-              <div>{% autoescape off %}{{ newsitem.content }}{% endautoescape %}</div>
+            <div class="col-lg-8 newsitem">
+              <h2>{{ newsitem.title }}</h2>
+              <h5 class="mt-3">{{ newsitem.summary }}</h5>
+              <div class="mt-3">{% autoescape off %}{{ newsitem.content }}{% endautoescape %}</div>
             </div>
         </div>
     </div>
