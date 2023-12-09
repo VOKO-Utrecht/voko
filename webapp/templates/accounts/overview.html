@@ -40,7 +40,7 @@
                                 <h6>{{ n.title }}</h6>
                                 <table class="table-condensed">
                                     <tr>
-                                        <td class="w-100 small">{{ n.summary }}</td>
+                                        <td class="w-100 small">{% if n.summary is not None %}{{ n.summary }}{% endif %}</td>
                                         <td class="align-bottom"><a href="{% url 'view_newsitems' %}{{ n.id }}"><button class="btn btn-outline-primary mx-3">Lees&nbsp;verder</button></a></td>
                                     </tr>
                                 </table>
