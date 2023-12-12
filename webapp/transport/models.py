@@ -2,7 +2,6 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from django_extensions.db.models import TimeStampedModel
-from django.conf import settings
 from ordering.models import Supplier, OrderRound
 from agenda.models import TransientEvent
 from accounts.models import ReadOnlyVokoUser
