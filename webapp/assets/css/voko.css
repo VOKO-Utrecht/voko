@@ -288,14 +288,22 @@ ul.pagination li:hover a {
   background-color: transparent;
 }
 
-
-
 .newsitem {
   background-color: rgba(255,255,255,0.35);
   padding: 40px;
-
 }
 
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button.hide-arrows ,
+input::-webkit-inner-spin-button.hide-arrows  {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+[type=number].hide-arrows  {
+  -moz-appearance: textfield;
+}
 
 
 

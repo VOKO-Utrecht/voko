@@ -102,7 +102,7 @@
                     {% endif %}
                   </div>
                 </div>
-                <div width="100%"><input type="number" step="1" min="0" class="text-end" name="order-product-{{ product.id }}" size="6" placeholder="" value="{% if product.is_available %}{{ product.ordered_amount }}{% endif %}" {% if not product.is_available %}disabled{% endif %}></div>
+                <div class="row align-items-center"><div class="col-auto pe-2 dec numbutton bi-dash-square text-danger fs-5"></div><div class="col-auto"><input type="number" min="0" step="1" size="6" name="order-product-{{ product.id }}" value="{% if product.is_available %}{{ product.ordered_amount }}{% endif %}" {% if not product.is_available %}disabled{% endif %} class="form-control hide-arrows"></div><div class="col-auto ps-2 inc numbutton bi bi-plus-square text-success fs-5"></div></div>
               </div>
             </div>
           </div>
@@ -155,13 +155,35 @@
 
 <script>
 // Popovers
-{% for supplier in view.suppliers %}
-    $(".supplier-{{ supplier.pk }}").popover({
-        trigger: "hover",
-        title: "{{ supplier.name|escapejs }}",
-        content: "{{ supplier.biography|truncatechars:400|escapejs }}"
-    });
-{% endfor %}
+// {% for supplier in view.suppliers %}
+//     $(".supplier-{{ supplier.pk }}").popover({
+//         trigger: "hover",
+//         title: "{{ supplier.name|escapejs }}",
+//         content: "{{ supplier.biography|truncatechars:400|escapejs }}"
+//     });
+// {% endfor %}
+
+$(".numbutton").on("click", function() {
+
+var $button = $(this);
+var oldValue = $button.parent().find("input").val();
+
+if (!oldValue) { oldValue = 0}
+
+if ($button.hasClass("inc")) {
+  var newVal = parseFloat(oldValue) + 1;
+} else {
+ // Don't allow decrementing below zero
+  if (oldValue > 0) {
+    var newVal = parseFloat(oldValue) - 1;
+  } else {
+    newVal = 0;
+  }
+}
+
+$button.parent().find("input").val(newVal);
+
+});
 </script>
 
 {% endblock %}
