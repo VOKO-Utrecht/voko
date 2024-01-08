@@ -31,6 +31,14 @@ th {
   --bs-btn-hover-color:#ffffff; 
 }
 
+.btn-outline-primary {
+  --bs-btn-border-color: #007200;
+  --bs-btn-color: #02385a;
+  --bs-btn-hover-bg: rgba(0,0,0,0.05);
+  --bs-btn-hover-border-color: #44A244;
+  --bs-btn-hover-color:#02385a; 
+}
+
 .btn:disabled {
   --bs-btn-disabled-color: #000;
   --bs-btn-disabled-bg: #6d6d6d;
@@ -272,5 +280,30 @@ ul.pagination li:hover a {
   border-color: #756700 !important;
   color:#291703;
 }
+
+.dark {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.transparent {
+  background-color: transparent;
+}
+
+.newsitem {
+  background-color: rgba(255,255,255,0.35);
+  padding: 40px;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button.hide-arrows ,
+input::-webkit-inner-spin-button.hide-arrows  {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+[type=number].hide-arrows  {
+  -moz-appearance: textfield;
+}
+
 
 

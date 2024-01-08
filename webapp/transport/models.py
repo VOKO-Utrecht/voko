@@ -2,9 +2,9 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from django_extensions.db.models import TimeStampedModel
-from django.conf import settings
 from ordering.models import Supplier, OrderRound
 from agenda.models import TransientEvent
+from accounts.models import ReadOnlyVokoUser
 
 
 class Route(TimeStampedModel):
@@ -41,13 +41,15 @@ class Ride(TimeStampedModel):
     route = models.ForeignKey(
         Route, on_delete=models.SET_NULL, null=True, related_name="rides"
     )
+
+    # ReadOnlyVokoUser so selection box in admin works with autocomplete
     driver = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        ReadOnlyVokoUser,
         on_delete=models.CASCADE,
         related_name="rides_as_driver",
     )
     codriver = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        ReadOnlyVokoUser,
         on_delete=models.CASCADE,
         related_name="rides_as_codriver",
     )

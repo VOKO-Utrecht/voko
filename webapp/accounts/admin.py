@@ -270,6 +270,11 @@ class VokoUserBaseAdmin(UserAdmin):
 
 class VokoUserAdmin(HijackUserAdminMixin, VokoUserBaseAdmin):
     list_display = VokoUserBaseAdmin.list_display
+    # Setting search_fields impacts both the user admin page, and the dropdown in
+    # admin/transport/ride/add. In user admin, we should probably search on all fields, but the
+    # dropdown only show first and last name, resulting in 'false positives', e.g. when the email
+    # address matches. For now, we'll just accept that minor inconvenience
+    # search_fields = ["first_name", "last_name"]
 
     actions = (enable_user,
                force_confirm_email,
