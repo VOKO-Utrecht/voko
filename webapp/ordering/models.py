@@ -1142,7 +1142,7 @@ class DraftProduct(TimeStampedModel):
         elif not self._valid_unit(self.data["unit"]):
             self.validation_error = "Eenheid onjuist"
         elif not self._valid_max(self.data["maximum_total_order"]):
-            self.validation_error = "Max. onjuist"
+            self.validation_error = "Aantal onjuist"
         else:
             self.is_valid = True
             self.validation_error = None

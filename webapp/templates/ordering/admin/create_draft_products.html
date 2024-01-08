@@ -38,7 +38,8 @@ De bestelronde is gesloten. Je kunt geen producten toevoegen.
       </tr>
 
       {% for product in view.draft_products %}
-      <tr class="align-middle {% if product.is_valid == True %}bg-success valid-product{% elif product.is_valid == False %}bg-danger invalid-product{% endif %}">
+      <tr class="align-middle {% if product.is_valid == True %}bg-success valid-product{% elif product.is_valid == False %}bg-danger invalid-product{% endif %}" 
+          title="{% if product.is_valid == False %}{{ product.validation_error }}{% endif %}">
                 {% with product.data as product %}
         <td class="col-md-3">
             <input type="text" value="{{ product.name|title }}" class="form-control" name="product_name_{{ forloop.counter }}">
