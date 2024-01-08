@@ -17,6 +17,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, TemplateView, View, \
     FormView
+import os
 import sys
 from accounts.models import VokoUser
 from .core import get_current_order_round
@@ -310,6 +311,14 @@ class ProductAdminMixin(GroupRequiredMixin):
         # price = price.replace(".", ",")
         return price
 
+    def _convert_number(self, value):
+        if isinstance(value, (int, float)):
+            return value
+        str_value = str(value or "").strip()  # Treat whitespace, empty string and None as None
+        if len(str_value) == 0:
+            return None
+        return float(str_value.replace(",", "."))
+
     @property
     def supplier(self):
         return Supplier.objects.get(id=self.kwargs['supplier'])
@@ -348,32 +357,42 @@ class UploadProductList(FormView, ProductAdminMixin):
         f.write(file_handler.read())
         f.close()
 
-        workbook = openpyxl.load_workbook(f.name, read_only=True)
-        sheet = workbook.active
-        PRODUCT_NAME, DESCRIPTION, UNIT, PRICE, MAX, CATEGORY = list(
-            range(0, 6))
+        workbook = None
 
-        for idx, row in enumerate(sheet.rows):
-            name, description, unit, price, maximum, category = (
-                row[PRODUCT_NAME].value,
-                row[DESCRIPTION].value,
-                row[UNIT].value,
-                row[PRICE].value,
-                row[MAX].value,
-                row[CATEGORY].value
-            )
+        try:
+            workbook = openpyxl.load_workbook(f.name, read_only=True, data_only=True)
+            sheet = workbook.active
+            PRODUCT_NAME, DESCRIPTION, UNIT, PRICE, MAX, CATEGORY = list(
+                range(0, 6))
 
-            if not name or idx == 0:
-                continue  # skips header and empty rows
+            self._delete_current_drafts()
 
-            self._create_draft_product(
-                {'name': name,
-                 'description': description if description else "",
-                 'unit': unit,
-                 'base_price': self._convert_price(price),
-                 'maximum_total_order': maximum,
-                 'category': category}
-            )
+            for idx, row in enumerate(sheet.rows):
+                name, description, unit, price, maximum, category = (
+                    row[PRODUCT_NAME].value,
+                    row[DESCRIPTION].value,
+                    row[UNIT].value,
+                    row[PRICE].value,
+                    row[MAX].value,
+                    row[CATEGORY].value
+                )
+
+                if not name or idx == 0:
+                    continue  # skips header and empty rows
+
+                self._create_draft_product(
+                    {'name': name,
+                     'description': description if description else "",
+                     'unit': unit,
+                     'base_price': self._convert_price(price),
+                     'maximum_total_order': self._convert_number(maximum),
+                     'category': category}
+                )
+        finally:
+            if workbook is not None:
+                workbook.close()
+            if os.path.exists(f.name):
+                os.remove(f.name)
 
     def _create_draft_product(self, data):
         return DraftProduct.objects.create(
@@ -381,6 +400,11 @@ class UploadProductList(FormView, ProductAdminMixin):
             order_round=self.current_order_round,
             data=data
         )
+
+    def _delete_current_drafts(self):
+        DraftProduct.objects.filter(
+            order_round=self.current_order_round,
+            supplier=self.supplier).delete()
 
 
 class CreateDraftProducts(TemplateView, ProductAdminMixin):
