@@ -365,6 +365,8 @@ class UploadProductList(FormView, ProductAdminMixin):
             PRODUCT_NAME, DESCRIPTION, UNIT, PRICE, MAX, CATEGORY = list(
                 range(0, 6))
 
+            self._delete_current_drafts()
+
             for idx, row in enumerate(sheet.rows):
                 name, description, unit, price, maximum, category = (
                     row[PRODUCT_NAME].value,
@@ -398,6 +400,11 @@ class UploadProductList(FormView, ProductAdminMixin):
             order_round=self.current_order_round,
             data=data
         )
+
+    def _delete_current_drafts(self):
+        DraftProduct.objects.filter(
+            order_round=self.current_order_round,
+            supplier=self.supplier).delete()
 
 
 class CreateDraftProducts(TemplateView, ProductAdminMixin):
