@@ -507,7 +507,7 @@ class ProductAdminMain(GroupRequiredMixin, ListView):
         return ctx
 
     def get_queryset(self):
-        return Supplier.objects.all().order_by("id")
+        return Supplier.objects.filter(is_active=True).order_by("id")
 
     template_name = "ordering/admin/suppliers.html"
 
