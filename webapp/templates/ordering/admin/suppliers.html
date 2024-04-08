@@ -2,13 +2,14 @@
 {% block content %}
 <h1>Boerenadmin</h1>
 
-<h2>Leveranciers</h2>
+<h2>Actieve leveranciers</h2>
 <div class="panel panel-default">
   <table class="table">
     <thead>
       <tr>
         <th>#</th>
         <th>Leverancier</th>
+        <th>Aantal producten in huidige ronde</th>
         <th>Producten maken</th>
       </tr>
     </thead>
@@ -17,6 +18,7 @@
           <tr>
             <td>{{ supplier.pk }}</td>
             <td>{{ supplier.name }}</td>
+            <td>{{ supplier.product_count }}</td>
             <td><a href="{% url 'create_draft_products' supplier.pk %}">Producten maken</a></td>
           </tr>
       {% endfor %}

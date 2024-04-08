@@ -10,7 +10,8 @@ from braces.views import GroupRequiredMixin
 from django.contrib import messages
 from django.urls import reverse
 from django.db import IntegrityError
-from django.db.models.aggregates import Sum
+from django.db.models import Q
+from django.db.models.aggregates import Sum, Count
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.utils.datastructures import MultiValueDictKeyError
@@ -507,7 +508,11 @@ class ProductAdminMain(GroupRequiredMixin, ListView):
         return ctx
 
     def get_queryset(self):
-        return Supplier.objects.filter(is_active=True).order_by("id")
+        result = Supplier.objects \
+            .filter(is_active=True) \
+            .annotate(product_count=Count("products", filter=Q(products__order_round=get_current_order_round()))) \
+            .order_by("id")
+        return result
 
     template_name = "ordering/admin/suppliers.html"
 
