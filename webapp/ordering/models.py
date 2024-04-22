@@ -32,6 +32,7 @@ class Supplier(TimeStampedModel):
     transport_info = models.TextField(blank=True, null=True)
     website = models.URLField(blank=True, null=True)
     facebook_url = models.URLField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
