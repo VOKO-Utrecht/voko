@@ -137,7 +137,7 @@ class VokoUserChangeForm(forms.ModelForm):
     def clean(self):
         if self.cleaned_data["is_asleep"]:
             user = self.instance
-            balance = -user.balance.debit if user.balance.debit else user.balance.credit
+            balance = user.balance.credit() or -user.balance.debit()
             if balance:
                 raise forms.ValidationError(
                     f"Lid kan niet worden gedeactiveerd omdat de balans € { balance:.2f} is.")
