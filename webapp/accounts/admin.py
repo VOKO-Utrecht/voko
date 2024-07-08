@@ -288,13 +288,6 @@ class VokoUserAdmin(HijackUserAdminMixin, VokoUserBaseAdmin):
                force_confirm_email,
                send_email_to_selected_users,
                anonymize_user)
-    
-    # TODO Implement balance check in these two methods
-    # def delete_model(self, request, obj):
-    #     pass
-
-    # def delete_queryset(self, request, queryset):
-    #     pass
 
 
 class ReadOnlyUserProfileInline(UserProfileInline):
