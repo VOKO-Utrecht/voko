@@ -77,6 +77,14 @@ send_email_to_selected_users.short_description = "Verstuur E-mail"
 def anonymize_user(modeladmin, request, queryset):
     """ Anonymize user to comply with GDPR regulations"""
     for user in queryset:
+
+        balance = user.balance.credit() or -user.balance.debit()
+        if balance:
+            messages.add_message(
+                request, messages.WARNING,
+                f'{user.get_full_name()} kan niet worden geanonimiseerd omdat de balans € {balance:.2f} is.')
+            continue
+
         # Set user to "sleeping mode"
         user.is_asleep = True
 

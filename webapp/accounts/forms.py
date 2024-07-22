@@ -134,6 +134,14 @@ class VokoUserChangeForm(forms.ModelForm):
         # to the initial value
         return self.initial["password"]
 
+    def clean(self):
+        if self.cleaned_data["is_asleep"]:
+            user = self.instance
+            balance = user.balance.credit() or -user.balance.debit()
+            if balance:
+                raise forms.ValidationError(
+                    f"Lid kan niet worden gedeactiveerd omdat de balans € { balance:.2f} is.")
+
 
 class RequestPasswordResetForm(forms.Form):
     email = forms.EmailField(label="E-mail adres", widget=forms.TextInput)
