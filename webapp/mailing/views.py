@@ -2,7 +2,7 @@ from braces.views import StaffuserRequiredMixin
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView, ListView, View
-from accounts.models import VokoUser
+from accounts.models import ReadOnlyVokoUser
 from log import log_event
 from mailing.helpers import render_mail_template, mail_user
 from mailing.models import MailTemplate
@@ -19,8 +19,7 @@ class PreviewMailView(StaffuserRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(PreviewMailView, self).get_context_data(**kwargs)
 
-        users = [VokoUser.objects.get(pk=uid)
-                 for uid in self.request.session.get('mailing_user_ids')]
+        users = ReadOnlyVokoUser.objects.filter(id__in=self.request.session.get('mailing_user_ids'))
         context['mailing_users'] = users
 
         template = MailTemplate.objects.get(pk=self.kwargs.get('pk'))
@@ -37,8 +36,8 @@ class PreviewMailView(StaffuserRequiredMixin, TemplateView):
 
 class SendMailView(StaffuserRequiredMixin, View):
     def dispatch(self, request, *args, **kwargs):
-        self.users = [VokoUser.objects.get(pk=uid)
-                      for uid in self.request.session.get('mailing_user_ids')]
+
+        self.users = ReadOnlyVokoUser.objects.filter(id__in=self.request.session.get('mailing_user_ids'))
         self.template = MailTemplate.objects.get(pk=self.kwargs.get('pk'))
         self.current_order_round = self.request.current_order_round
 
