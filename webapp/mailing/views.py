@@ -21,7 +21,7 @@ class PreviewMailView(StaffuserRequiredMixin, TemplateView):
 
         users = VokoUser.objects.filter(id__in=self.request.session.get('mailing_user_ids'))
         sleeping_users = SleepingVokoUser.objects.filter(id__in=self.request.session.get('mailing_user_ids'))
-        
+
         context['mailing_users'] = list(users) + list(sleeping_users)
 
         template = MailTemplate.objects.get(pk=self.kwargs.get('pk'))
