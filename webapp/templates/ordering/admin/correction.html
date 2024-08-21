@@ -15,7 +15,7 @@
         <div class="form-group">
             <label for="lid" class="col-sm-2 control-label">Lid</label>
             <div class="col-sm-10">
-                <select class="form-control" id="lid" name="member_id">
+                <select class="form-control" id="lid" name="member_id" required>
                     <option></option>
                 </select>
             </div>
@@ -24,7 +24,7 @@
         <div class="form-group">
             <label for="order" class="col-sm-2 control-label">Bestelling</label>
             <div class="col-sm-10">
-                <select class="form-control" id="order" name="order_id">
+                <select class="form-control" id="order" name="order_id" required>
                 </select>
             </div>
         </div>
@@ -32,7 +32,7 @@
         <div class="form-group">
             <label for="product" class="col-sm-2 control-label">Subbestelling / Product</label>
             <div class="col-sm-10">
-                <select class="form-control" id="product" name="order_product_id">
+                <select class="form-control" id="product" name="order_product_id" required>
                 </select>
             </div>
         </div>
@@ -40,7 +40,7 @@
         <div class="form-group">
             <label for="supplied" class="col-sm-2 control-label">Geleverd percentage</label>
             <div class="col-sm-10">
-                <select class="form-control" id="supplied" name="supplied_percentage">
+                <select class="form-control" id="supplied" name="supplied_percentage" required>
                     <option value="0">0%</option>
                     <option value="5">5%</option>
                     <option value="10">10%</option>
@@ -95,7 +95,7 @@
         <div class="form-group">
             <label for="product" class="col-sm-2 control-label">Product</label>
             <div class="col-sm-10">
-                <select class="form-control" id="product" name="product_id">
+                <select class="form-control" id="product" name="product_id" required>
                     <option></option>
                     {% for p in view.products %}
                         <option value="{{ p.id }}">[{{ p.unit_of_measurement }}] {{ p.name }} ({{ p.supplier.name }})</option>
