@@ -22,7 +22,7 @@ django-recaptcha = "==3.0.0"
 django-constance = {version = "==2.9.1", extras = ["database"]}
 django-picklefield = "==2.1.1"
 psycopg2-binary = "==2.8.6"
-Django = "==3.2.23"
+Django = "==3.2.25"
 gunicorn = "22.0.0"
 python-dateutil = "2.8.2"
 
