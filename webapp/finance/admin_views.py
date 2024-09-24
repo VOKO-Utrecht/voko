@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 
 class JsonRoundOverview(GroupRequiredMixin, View):
-    group_required = "Admin"
+    group_required = ("Admin", "Financien")
 
     def get(self, request, round_id):
         order_round = OrderRound.objects.get(id=round_id)
@@ -44,7 +44,7 @@ class JsonRoundOverview(GroupRequiredMixin, View):
 
 
 class RoundOverview(GroupRequiredMixin, TemplateView):
-    group_required = "Admin"
+    group_required = ("Admin", "Financien")
     template_name = "finance/admin/round_overview.html"
 
     def get_context_data(self, round_id, **kwargs):
@@ -54,7 +54,7 @@ class RoundOverview(GroupRequiredMixin, TemplateView):
 
 
 class YearOverview(GroupRequiredMixin, TemplateView):
-    group_required = "Admin"
+    group_required = ("Admin", "Financien")
     template_name = "finance/admin/year_overview.html"
 
     def get_context_data(self, year, **kwargs):
