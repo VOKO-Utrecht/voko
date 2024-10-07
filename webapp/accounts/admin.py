@@ -100,16 +100,18 @@ def anonymize_user(modeladmin, request, queryset):
         try:
             # Anonymize user profile
             profile = user.userprofile
-            profile.phone_number = ''
-            profile.notes = ''
-            profile.save()
+            if profile:
+                profile.phone_number = ''
+                profile.notes = ''
+                profile.save()
 
-            # Anonymize address
-            address = profile.address
-            address.street_and_number = ''
-            address.zip_code = '0000'
-            address.city = ''
-            address.save()
+                # Anonymize address
+                address = profile.address
+                if address:
+                    address.street_and_number = ''
+                    address.zip_code = '0000'
+                    address.city = ''
+                    address.save()
 
         except (UserProfile.DoesNotExist, Address.DoesNotExist):
             # Can happen with inactive users
