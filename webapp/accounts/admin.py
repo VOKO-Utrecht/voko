@@ -95,7 +95,7 @@ def anonymize_user(modeladmin, request, queryset):
         user.first_name = 'account'
         user.last_name = str(user.id)
 
-        # user.save()
+        user.save()
 
         try:
             # Anonymize user profile
