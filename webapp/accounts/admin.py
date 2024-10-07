@@ -78,7 +78,7 @@ def anonymize_user(modeladmin, request, queryset):
     """ Anonymize user to comply with GDPR regulations"""
     for user in queryset:
 
-        balance = user.balance.credit() or -user.balance.debit()
+        balance = user.balance and (user.balance.credit() or -user.balance.debit())
         if balance:
             messages.add_message(
                 request, messages.WARNING,
@@ -95,7 +95,7 @@ def anonymize_user(modeladmin, request, queryset):
         user.first_name = 'account'
         user.last_name = str(user.id)
 
-        user.save()
+        # user.save()
 
         try:
             # Anonymize user profile
