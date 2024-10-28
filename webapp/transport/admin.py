@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from transport.models import Route, Ride
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 import datetime
 
 

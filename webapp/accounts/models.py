@@ -12,7 +12,7 @@ from django.core.mail import mail_admins
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 from mailing.helpers import get_template_by_id, mail_user, render_mail_template
 

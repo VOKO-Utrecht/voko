@@ -1,16 +1,16 @@
-from django.conf.urls import url
+from django.urls import path
 from ordering import views
 
 urlpatterns = (
-    url(r'^supplier/(?P<pk>[0-9]+)/$', views.SupplierView.as_view(),
-        name="view_supplier"),
-    url(r'^products/$', views.ProductsView.as_view(),
-        name="view_products"),
-    url(r'^product/(?P<pk>[0-9]+)/$', views.ProductDetail.as_view(),
-        name="view_product"),
-    url(r'^order/(?P<pk>[0-9]+)/finish/$', views.FinishOrder.as_view(),
-        name="finish_order"),
-    url(r'^order/(?P<pk>[0-9]+)/summary/$', views.OrderSummary.as_view(),
-        name="order_summary"),
-    url(r'^orders/$', views.OrdersDisplay.as_view(), name="view_orders"),
+    path('supplier/<pk>/', views.SupplierView.as_view(),
+         name="view_supplier"),
+    path('products/', views.ProductsView.as_view(),
+         name="view_products"),
+    path('product/<pk>/', views.ProductDetail.as_view(),
+         name="view_product"),
+    path('order/<pk>/finish/', views.FinishOrder.as_view(),
+         name="finish_order"),
+    path('order/<pk>/summary/', views.OrderSummary.as_view(),
+         name="order_summary"),
+    path('orders/', views.OrdersDisplay.as_view(), name="view_orders"),
 )

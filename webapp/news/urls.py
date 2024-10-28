@@ -1,9 +1,11 @@
-from django.conf.urls import url
+from django.urls import path
 from news import views
 
 urlpatterns = (
-    url(r'^$', views.NewsitemsView.as_view(),
-        name="view_newsitems"),
-    url(r'^(?P<pk>[0-9]+)/$', views.NewsitemsView.as_view(),
-        name="view_newsitem"),
+    path('',
+         views.NewsitemsView.as_view(),
+         name="view_newsitems"),
+    path('<pk>/',
+         views.NewsitemsView.as_view(),
+         name="view_newsitem"),
 )
