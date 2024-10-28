@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'braces',
     'django_bootstrap5',
     "django_cron",
-    "captcha",
+    "django_recaptcha",
 
     'mailing',
     'accounts',
