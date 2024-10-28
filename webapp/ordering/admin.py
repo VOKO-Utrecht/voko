@@ -171,7 +171,9 @@ class OrderProductAdmin(DeleteDisabledMixin, admin.ModelAdmin):
 
 
 class SupplierAdmin(DeleteDisabledMixin, admin.ModelAdmin):
-    pass
+    list_display = ["name", "is_active"]
+    ordering = ("name",)
+    list_filter = ("is_active",)
 
 
 class CategoryAdmin(DeleteDisabledMixin, admin.ModelAdmin):
