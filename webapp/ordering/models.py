@@ -302,7 +302,7 @@ class OrderRound(TimeStampedModel):
     @property
     def orders_per_supplier(self):
         data = {}
-        for supplier in Supplier.objects.all():
+        for supplier in Supplier.objects.filter(is_active=True):
             suppliers_products_this_round = supplier.products.filter(order_round=self)
             data[supplier] = {
                 "orderproducts": [],
