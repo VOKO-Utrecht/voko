@@ -5,6 +5,7 @@ import pytz
 from datetime import datetime
 from decimal import Decimal, ROUND_UP, ROUND_DOWN
 from django.db import models, transaction
+from django.db.models import Q
 from django_extensions.db.models import TimeStampedModel
 from django.core.exceptions import ValidationError
 from accounts.models import Address, VokoUser
@@ -338,7 +339,10 @@ class OrderRound(TimeStampedModel):
 
         return list(
             filter(
-                _users_without_orders_filter, VokoUser.objects.filter(is_active=True)
+                _users_without_orders_filter,
+                VokoUser.objects.filter(Q(is_active=True)
+                                        (Q(userprofile__isnull=True)
+                                         | Q(userprofile__orderround_mail_optout=False)))
             )
         )
 
