@@ -532,7 +532,9 @@ class RedirectToMailingView(GroupRequiredMixin, DetailView):
 
         if kwargs['mailing_type'] == "round-open":
             mailing_id = 11  # Order round open
-            queryset = VokoUser.objects.filter(can_activate=True)
+            queryset = VokoUser.objects.filter(Q(can_activate=True)
+                                               & (Q(userprofile__isnull=True)
+                                                  | Q(userprofile__orderround_mail_optout=False)))
 
         user_ids = [user.pk for user in queryset]
         request.session['mailing_user_ids'] = user_ids
