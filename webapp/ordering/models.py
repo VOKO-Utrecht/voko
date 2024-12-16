@@ -341,8 +341,8 @@ class OrderRound(TimeStampedModel):
             filter(
                 _users_without_orders_filter,
                 VokoUser.objects.filter(Q(is_active=True)
-                                        (Q(userprofile__isnull=True)
-                                         | Q(userprofile__orderround_mail_optout=False)))
+                                        & (Q(userprofile__isnull=True)
+                                           | Q(userprofile__orderround_mail_optout=False)))
             )
         )
 
