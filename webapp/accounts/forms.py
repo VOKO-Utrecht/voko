@@ -229,6 +229,11 @@ class ChangeProfileForm(forms.ModelForm):
         help_text=("Informatie over beschikbaarheid of andere bijzonderheden."
                    "Zichtbaar voor andere VOKO leden.")
     )
+    orderround_mail_optout = forms.BooleanField(
+        label=("Ik wil geen e-mails ontvangen wanneer een bestelronde wordt geopend"),
+        required=False,
+        help_text=("Je krijgt geen e-mail meer wanneer een bestelronde wordt geopend")
+    )
 
     # TODO: Notes and e-mail address cannot be changed atm.
 
@@ -249,6 +254,8 @@ class ChangeProfileForm(forms.ModelForm):
             self.instance.userprofile.car_type)
         self.fields['particularities'].initial = (
             self.instance.userprofile.particularities)
+        self.fields['orderround_mail_optout'].initial = (
+            self.instance.userprofile.orderround_mail_optout)
 
         # If shares car, set more fields as required
         if data and data.get('shares_car', None) is not None:
@@ -287,6 +294,7 @@ class ChangeProfileForm(forms.ModelForm):
                 self.cleaned_data['car_neighborhood'])
             userprofile.car_type = self.cleaned_data['car_type']
             userprofile.particularities = self.cleaned_data['particularities']
+            userprofile.orderround_mail_optout = self.cleaned_data['orderround_mail_optout']
 
             if commit:
                 user.save()
