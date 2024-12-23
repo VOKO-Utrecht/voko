@@ -87,6 +87,12 @@ class UserProfile(TimeStampedModel):
         max_length=300,
     )
 
+    orderround_mail_optout = models.BooleanField(
+        default=False,
+        verbose_name="Opt-out van bestelronde e-mails",
+        help_text="Je krijgt geen e-mail meer wanneer een bestelronde wordt geopend",
+    )
+
     def __str__(self):
         return "Profile for user: %s" % self.user
 
