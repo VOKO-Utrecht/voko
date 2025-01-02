@@ -1,5 +1,4 @@
 from mollie.api.client import Client as MollieClient
-from mollie.api.resources.methods import Method as MollieMethods
 from braces.views import LoginRequiredMixin
 from django import forms
 from django.conf import settings
@@ -15,31 +14,8 @@ from ordering.core import get_current_order_round
 from ordering.models import Order
 
 
-def choosebankform_factory(methods):
-    """
-    Generate a Django Form used to choose your bank from a drop down
-    Based on the up-to-date list of :banks: from our PSP
-    """
-    paymethods = [(method['id'], method['description'])
-                  for method in methods
-                  if method['status'] == 'activated']
-
-    bankchoices = []
-    for method in methods:
-        if (method['id'] == 'ideal'):
-            bankchoices = [(issuer['id'], issuer['name'])
-                           for issuer in method['issuers']]
-
-    class ChooseBankForm(forms.Form):
-        method = forms.ChoiceField(
-            choices=paymethods,
-            required=True,
-            initial='ideal',
-            widget=forms.RadioSelect,
-            label="Betaalwijze")
-        bank = forms.ChoiceField(choices=bankchoices, required=True)
-
-    return ChooseBankForm
+class ChooseBankForm(forms.Form):
+    pass
 
 
 def get_order_to_pay(user):
@@ -54,14 +30,8 @@ class MollieMixin(object):
     def __init__(self):
         self.mollie = MollieClient()
         self.mollie.set_api_key(settings.MOLLIE_API_KEY)
-        self.methods = self.mollie.methods.all(include='issuers')
 
-    def create_payment(self, amount, description, issuer_id, order_id, method):
-        if (method == 'ideal'):
-            mollieMethod = MollieMethods.IDEAL
-        else:
-            mollieMethod = MollieMethods.BANCONTACT
-
+    def create_payment(self, amount, description, order_id):
         # Mollie API wants exactly two decimals, always
         return self.mollie.payments.create({
             'amount': {'currency': 'EUR', 'value': "{0:.2f}".format(amount)},
@@ -72,8 +42,6 @@ class MollieMixin(object):
                 + "?order=%s" % order_id
             ),
             'webhookUrl': settings.BASE_URL + reverse("finance.callback"),
-            'method': mollieMethod,
-            'issuer': issuer_id,
             'metadata': {
                 'order_id': order_id
             },
@@ -89,8 +57,7 @@ class ChooseBankView(LoginRequiredMixin, MollieMixin, FormView):
     """
     template_name = "finance/choose_bank.html"
 
-    def get_form_class(self):
-        return choosebankform_factory(methods=self.methods)
+    form_class = ChooseBankForm
 
     def get_context_data(self, **kwargs):
         context = super(ChooseBankView, self).get_context_data(**kwargs)
@@ -102,28 +69,7 @@ class CreateTransactionView(LoginRequiredMixin, MollieMixin, FormView):
     """
     Create transaction @ bank and redirect user to bank URL
     """
-
-    def get_form_class(self):
-        return choosebankform_factory(methods=self.methods)
-
     def post(self, request, *args, **kwargs):
-        Form = self.get_form_class()
-        form = Form(data=request.POST)
-        form.full_clean()
-
-        # input validation
-        if 'method' not in form.cleaned_data:
-            return redirect(reverse('finance.choosebank'))
-        method = form.cleaned_data.get('method')
-
-        if (method == 'ideal'):
-            if 'bank' not in form.cleaned_data:
-                return redirect(reverse('finance.choosebank'))
-            bank = form.cleaned_data.get('bank')
-        else:
-            bank = None
-        # end input validation
-
         order_to_pay = get_order_to_pay(request.user)
         if not order_to_pay:
             messages.error(request, "Geen bestelling gevonden")
@@ -159,9 +105,10 @@ class CreateTransactionView(LoginRequiredMixin, MollieMixin, FormView):
             amount=float(amount_to_pay),
             description="VOKO Utrecht %d"
                         % order_to_pay.id,
-            issuer_id=bank,
+            # issuer_id=bank,
+            # method=method,
             order_id=order_to_pay.id,
-            method=method)
+            )
 
         Payment.objects.create(amount=amount_to_pay,
                                order=order_to_pay,
