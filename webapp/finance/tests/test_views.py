@@ -66,8 +66,7 @@ class TestCreateTransaction(FinanceTestCase):
                 'redirectUrl': (settings.BASE_URL
                                 + reverse("finance.confirmtransaction")
                                 + "?order=%d" % self.order.id),
-                'metadata': {'order_id': self.order.id},
-                'issuer': 'EXAMPLE_BANK'}
+                'metadata': {'order_id': self.order.id}}
         )
 
     def test_that_payment_object_is_created_when_ideal(self):
