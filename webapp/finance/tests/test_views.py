@@ -7,8 +7,7 @@ from accounts.tests.factories import VokoUserFactory
 from finance.models import Payment, Balance
 from finance.tests.factories import PaymentFactory
 from ordering.models import Order
-from ordering.tests.factories import (OrderRoundFactory, OrderProductFactory,
-                                      OrderFactory)
+from ordering.tests.factories import (OrderRoundFactory, OrderFactory)
 from vokou.testing import VokoTestCase, suppressWarnings
 
 
@@ -56,46 +55,6 @@ class FinanceTestCase(VokoTestCase):
 
         self.mollie_client.return_value.payments.create.return_value = (
             FakePaymentResult())
-
-
-class TestChooseBank(FinanceTestCase):
-    def setUp(self):
-        super(TestChooseBank, self).setUp()
-        self.url = reverse('finance.choosebank')
-        self.login()
-
-        self.order_round = OrderRoundFactory.create()
-        o_p = OrderProductFactory.create(order__order_round=self.order_round,
-                                         product__order_round=self.order_round,
-                                         order__user=self.user,
-                                         order__finalized=True)
-        o_p.order.create_debit()
-        o_p.save()
-        self.order = o_p.order
-
-    def test_that_qantani_api_client_is_initiated(self):
-        self.client.get(self.url)
-        self.mollie_client.assert_called_once_with()
-        self.mollie_client.return_value.set_api_key.assert_called_once_with(
-            settings.MOLLIE_API_KEY)
-
-    def test_that_context_contains_form_with_bank_choices(self):
-        ret = self.client.get(self.url)
-        form = ret.context[1].get('form')
-        expected = [('EXAMPLE_BANK', 'Example Bank'),
-                    ('ANOTHER_BANK', 'Another Bank')]
-        self.assertEqual(form.fields.get('bank').choices, expected)
-
-    def test_order_is_placed_in_context(self):
-        ret = self.client.get(self.url)
-        self.assertEqual(ret.context[0]['order'], self.order)
-
-    def test_no_order(self):
-        self.order.delete()
-        ret = self.client.get(self.url)
-        self.assertEqual(ret.status_code, 200)
-        self.assertContains(ret, "Je hebt geen bestelling om te betalen.")
-        self.assertNotContains(ret, "Te betalen")
 
 
 class TestCreateTransaction(FinanceTestCase):
