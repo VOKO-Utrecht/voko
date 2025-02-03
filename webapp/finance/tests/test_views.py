@@ -16,19 +16,6 @@ class FinanceTestCase(VokoTestCase):
         self.mollie_client = self.patch("finance.views.MollieClient")
         self.mollie_client.return_value.issuers.all.return_value = \
             MagicMock()
-        self.mollie_methods = self.patch("finance.views.MollieMethods")
-        self.mollie_methods.IDEAL = 'ideal'
-        self.mollie_methods.BANCONTACT = 'bancontact'
-
-        # we only support bancontact and iDeal payment methods
-        methods = [
-            {'id': 'bancontact', 'description': 'Bancontact',
-             'status': 'activated'},
-            {'id': 'ideal', 'description': 'iDeal', 'status': 'activated',
-                'issuers': [{'id': 'EXAMPLE_BANK', 'name': "Example Bank"},
-                            {'id': 'ANOTHER_BANK', 'name': "Another Bank"}]}
-        ]
-        self.mollie_client.return_value.methods.all.return_value = methods
 
         self.user = VokoUserFactory.create()
         self.user.set_password('secret')
@@ -67,7 +54,7 @@ class TestCreateTransaction(FinanceTestCase):
                                   paid=False)
 
     def test_that_ideal_transaction_is_created(self):
-        self.client.post(self.url, {'bank': 'EXAMPLE_BANK', 'method': "ideal"})
+        self.client.post(self.url, {'bank': 'EXAMPLE_BANK', })
         self.mollie_client.return_value.payments.create.assert_called_once_with(  # noqa
             {'amount': {
                 'currency': 'EUR',
@@ -79,24 +66,7 @@ class TestCreateTransaction(FinanceTestCase):
                                 + reverse("finance.confirmtransaction")
                                 + "?order=%d" % self.order.id),
                 'metadata': {'order_id': self.order.id},
-                'method': 'ideal',
                 'issuer': 'EXAMPLE_BANK'}
-        )
-
-    def test_that_bancontact_transaction_is_created(self):
-        self.client.post(self.url, {'method': "bancontact"})
-        self.mollie_client.return_value.payments.create.assert_called_once_with(  # noqa
-            {'amount': {
-                'currency': 'EUR', 'value': "{0:.2f}".format( \
-                    self.order.total_price_to_pay_with_balances_taken_into_account())}, # noqa
-                'description': 'VOKO Utrecht %d' % self.order.id,
-                'webhookUrl': settings.BASE_URL + reverse('finance.callback'),
-                'redirectUrl': (settings.BASE_URL
-                                + reverse("finance.confirmtransaction")
-                                + "?order=%d" % self.order.id),
-                'metadata': {'order_id': self.order.id},
-                'method': 'bancontact',
-                'issuer': None}
         )
 
     def test_that_payment_object_is_created_when_ideal(self):
