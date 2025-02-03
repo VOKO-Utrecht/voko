@@ -48,20 +48,6 @@ class MollieMixin(object):
         return self.mollie.payments.get(payment_id)
 
 
-class ChooseBankView(LoginRequiredMixin, MollieMixin, FormView):
-    """
-    Let user choose a bank to use for iDeal payment
-    """
-    template_name = "finance/choose_bank.html"
-
-    form_class = forms.Form
-
-    def get_context_data(self, **kwargs):
-        context = super(ChooseBankView, self).get_context_data(**kwargs)
-        context['order'] = get_order_to_pay(self.request.user)
-        return context
-
-
 class CreateTransactionView(LoginRequiredMixin, MollieMixin, FormView):
     """
     Create transaction @ bank and redirect user to bank URL
