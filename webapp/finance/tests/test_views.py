@@ -72,22 +72,7 @@ class TestCreateTransaction(FinanceTestCase):
     def test_that_payment_object_is_created_when_ideal(self):
         assert Payment.objects.count() == 0
 
-        self.client.post(self.url, {'bank': "EXAMPLE_BANK",
-                                    'method': "ideal"})
-        payment = Payment.objects.get()
-
-        self.assertEqual(
-            payment.amount,
-            self.order.total_price_to_pay_with_balances_taken_into_account()
-        )
-        self.assertEqual(payment.order, self.order)
-        self.assertEqual(payment.mollie_id, "transaction_id")
-        self.assertEqual(payment.balance, None)
-
-    def test_that_payment_object_is_created_when_bancontact(self):
-        assert Payment.objects.count() == 0
-
-        self.client.post(self.url, {'method': "bancontact"})
+        self.client.post(self.url, {'bank': "EXAMPLE_BANK", })
         payment = Payment.objects.get()
 
         self.assertEqual(
@@ -99,8 +84,7 @@ class TestCreateTransaction(FinanceTestCase):
         self.assertEqual(payment.balance, None)
 
     def test_that_user_is_redirected_to_bank_url(self):
-        ret = self.client.post(self.url, {'bank': "EXAMPLE_BANK",
-                                          'method': "ideal"})
+        ret = self.client.post(self.url, {'bank': "EXAMPLE_BANK", })
         self.assertEqual(ret.status_code, 302)
         self.assertEqual(ret.url, "http://bank.url")
 
@@ -109,8 +93,7 @@ class TestCreateTransaction(FinanceTestCase):
         self.order.finalized = False
         self.order.save()
 
-        ret = self.client.post(self.url, {'bank': "EXAMPLE_BANK",
-                                          'method': "ideal"})
+        ret = self.client.post(self.url, {'bank': "EXAMPLE_BANK", })
         self.assertRedirects(ret, reverse('view_products'))
 
     def test_redirect_when_order_round_is_closed(self):
@@ -121,8 +104,7 @@ class TestCreateTransaction(FinanceTestCase):
         self.order.order_round = order_round
         self.order.save()
 
-        ret = self.client.post(self.url, {'bank': "EXAMPLE_BANK",
-                                          'method': "ideal"})
+        ret = self.client.post(self.url, {'bank': "EXAMPLE_BANK", })
         self.assertRedirects(ret, reverse('view_products'))
 
 
