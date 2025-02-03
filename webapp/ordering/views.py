@@ -9,7 +9,6 @@ from django.views.generic import (
     ListView, DetailView, FormView, View, UpdateView
 )
 from django.views.generic.detail import SingleObjectMixin
-from log import log_event
 
 from ordering.core import (get_or_create_order, get_order_product,
                            update_totals_for_products_with_max_order_amounts)
@@ -46,7 +45,7 @@ class ProductsView(LoginRequiredMixin, ListView):
                 self.request, "Je bent doorgestuurd naar de betaalpagina "
                               "omdat je bestelling nog niet is betaald!"
             )
-            return HttpResponseRedirect(reverse('finance.choosebank'))
+            return HttpResponseRedirect(reverse('finish_order', args=(order.pk,)))
         return ret
 
     def post(self, request, *args, **kwargs):  # noqa: C901
@@ -91,7 +90,7 @@ class ProductsView(LoginRequiredMixin, ListView):
                     value = 0
 
                 # User deleted a product
-                if type(value) != int and not value.isdigit():
+                if not isinstance(value, int) and not value.isdigit():
                     value = 0
                 if not int(value):
                     if order_product:
@@ -280,43 +279,6 @@ class FinishOrder(LoginRequiredMixin, UserOwnsObjectMixin, UpdateView):
         update_totals_for_products_with_max_order_amounts(self.get_object(),
                                                           self.request)
         return super(UpdateView, self).get_context_data(**kwargs)
-
-    def calculate_payment(self):
-        order = self.get_object()
-        return order.total_price_to_pay_with_balances_taken_into_account()
-
-    def post(self, request, *args, **kwargs):
-        order = self.get_object()
-
-        user_notes = request.POST.get('notes').strip()
-        if user_notes:
-            order.user_notes = user_notes
-
-        log_event(event="Finalizing order %s" % order.id, user=order.user)
-        order.finalized = True  # Freeze order
-        order.save()
-
-        if self.calculate_payment() == 0:
-            log_event(
-                event="Payment for order %d not necessary because order total "
-                      "is %f and user's credit is %f" %
-                      (order.id, order.total_price,
-                       order.user.balance.credit()),
-                user=order.user
-            )
-
-            self._message_payment_unnecessary()
-            order.complete_after_payment()
-            return redirect(reverse('order_summary', args=(order.pk,)))
-
-        return redirect('finance.choosebank')
-
-    def _message_payment_unnecessary(self):
-        messages.add_message(
-            self.request, messages.SUCCESS,
-            'Omdat je genoeg krediet had was betalen niet nodig. '
-            'Je bestelling is bevestigd.'
-        )
 
 
 class OrdersDisplay(LoginRequiredMixin, UserOwnsObjectMixin, ListView):

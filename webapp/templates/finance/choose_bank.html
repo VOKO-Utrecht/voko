@@ -2,17 +2,8 @@
 {% load django_bootstrap5 %}
 {% block title %}Betalen{% endblock %}
 {% block content %}
-<script type="text/javascript">
-    window.onload = function() {
-        $("#id_method").change( function(){
-            if ($("#id_method input[name='method']:checked").val() == "ideal") {
-                $("#id_bank").parent().show();
-            }else
-                $("#id_bank").parent().hide();
-        });
-    }
-</script>
-<h1>Betalen via iDeal</h1>
+
+<h1>Betaaloverzicht voor deze bestelling</h1>
     {% if not order %}
     <div class="alert alert-warning" role="alert">Je hebt geen bestelling om te betalen.</div>
     {% else %}
@@ -23,14 +14,14 @@
     <br/><br/>
     <strong>Te betalen: &euro; {{ order.total_price_to_pay_with_balances_taken_into_account }}</strong>
     </p>
+    <p>Klik hieronder op ‘Betalen’ om naar de betaalomgeving te gaan.</p>
 
     <div class="w-50 row">
         <form action="{% url 'finance.createtransaction' %}" method="post">{% csrf_token %}
-            {% bootstrap_form form %}
             <div class="mt-4 d-flex justify-content-between">
             <a class="btn btn-warning" href="{%  url 'finance.cancelpayment' %}" role="button"><span class="bi-x-square"></span> Annuleren</a>
             <button type="submit" class="btn btn-primary">
-                <span class="bi-star"></span> Betalen
+                <span class="bi-cash-coin"></span> Betalen
             </button>
             </div>
         </form>

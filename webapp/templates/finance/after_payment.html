@@ -8,7 +8,7 @@
         </p>
     {% else %}
             <h1>Betaling mislukt</h1>
-            <p><a href="{% url 'finance.choosebank' %}">Klik hier om het nogmaals te proberen.</a></p>
+            <p><a href="{% url 'finish_order' user.orders.get_current_order.pk %}">Klik hier om het nogmaals te proberen.</a></p>
     {% endif %}
 
 {% endblock %}
