@@ -7,8 +7,7 @@ from accounts.tests.factories import VokoUserFactory
 from finance.models import Payment, Balance
 from finance.tests.factories import PaymentFactory
 from ordering.models import Order
-from ordering.tests.factories import (OrderRoundFactory, OrderProductFactory,
-                                      OrderFactory)
+from ordering.tests.factories import (OrderRoundFactory, OrderFactory)
 from vokou.testing import VokoTestCase, suppressWarnings
 
 
