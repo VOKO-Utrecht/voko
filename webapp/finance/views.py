@@ -14,10 +14,6 @@ from ordering.core import get_current_order_round
 from ordering.models import Order
 
 
-class ChooseBankForm(forms.Form):
-    pass
-
-
 def get_order_to_pay(user):
     cur_order_round = get_current_order_round()
 
@@ -36,6 +32,7 @@ class MollieMixin(object):
         return self.mollie.payments.create({
             'amount': {'currency': 'EUR', 'value': "{0:.2f}".format(amount)},
             'description': description,
+            'method': 'ideal',
             'redirectUrl': (
                 settings.BASE_URL
                 + reverse("finance.confirmtransaction")
@@ -57,7 +54,7 @@ class ChooseBankView(LoginRequiredMixin, MollieMixin, FormView):
     """
     template_name = "finance/choose_bank.html"
 
-    form_class = ChooseBankForm
+    form_class = forms.Form
 
     def get_context_data(self, **kwargs):
         context = super(ChooseBankView, self).get_context_data(**kwargs)
@@ -75,12 +72,33 @@ class CreateTransactionView(LoginRequiredMixin, MollieMixin, FormView):
             messages.error(request, "Geen bestelling gevonden")
             return redirect(reverse('view_products'))
 
+        user_notes = request.POST.get('notes').strip()
+        if user_notes:
+            order_to_pay.user_notes = user_notes
+
+        log_event(event="Finalizing order %s" % order_to_pay.id, user=order_to_pay.user)
+        order_to_pay.finalized = True  # Freeze order
+        order_to_pay.save()
+
         amount_to_pay = order_to_pay\
             .total_price_to_pay_with_balances_taken_into_account()
         log_event(
             event="Initiating payment (creating transaction) for order %d "
                   "and amount %f" %
                   (order_to_pay.id, amount_to_pay), user=order_to_pay.user)
+
+        if amount_to_pay == 0:
+            log_event(
+                event="Payment for order %d not necessary because order total "
+                      "is %f and user's credit is %f" %
+                      (order_to_pay.id, order_to_pay.total_price,
+                       order_to_pay.user.balance.credit()),
+                user=order_to_pay.user
+            )
+
+            self._message_payment_unnecessary()
+            order_to_pay.complete_after_payment()
+            return redirect(reverse('order_summary', args=(order_to_pay.pk,)))
 
         # Sanity checks. If one of these fails, it's very likely that someone
         # is tampering.
@@ -116,6 +134,13 @@ class CreateTransactionView(LoginRequiredMixin, MollieMixin, FormView):
 
         redirect_url = results.checkout_url
         return redirect(redirect_url)
+
+    def _message_payment_unnecessary(self):
+        messages.add_message(
+            self.request, messages.SUCCESS,
+            'Omdat je genoeg krediet had was betalen niet nodig. '
+            'Je bestelling is bevestigd.'
+        )
 
 
 class ConfirmTransactionView(LoginRequiredMixin, MollieMixin, TemplateView):

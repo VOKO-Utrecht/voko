@@ -81,7 +81,7 @@
   </table>
 </div>
 
-<form action="" method="post">{% csrf_token %}
+<form action="{% url 'finance.createtransaction' %}" method="post">{% csrf_token %}
 
     <div class="row">
         <div class="col-md-6">
