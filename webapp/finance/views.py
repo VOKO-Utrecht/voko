@@ -57,9 +57,9 @@ class CreateTransactionView(LoginRequiredMixin, MollieMixin, FormView):
             messages.error(request, "Geen bestelling gevonden")
             return redirect(reverse('view_products'))
 
-        user_notes = request.POST.get('notes').strip()
+        user_notes = request.POST.get('notes')
         if user_notes:
-            order_to_pay.user_notes = user_notes
+            order_to_pay.user_notes = user_notes.strip()
 
         log_event(event="Finalizing order %s" % order_to_pay.id, user=order_to_pay.user)
         order_to_pay.finalized = True  # Freeze order
