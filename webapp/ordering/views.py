@@ -9,7 +9,6 @@ from django.views.generic import (
     ListView, DetailView, FormView, View, UpdateView
 )
 from django.views.generic.detail import SingleObjectMixin
-from log import log_event
 
 from ordering.core import (get_or_create_order, get_order_product,
                            update_totals_for_products_with_max_order_amounts)
@@ -91,7 +90,7 @@ class ProductsView(LoginRequiredMixin, ListView):
                     value = 0
 
                 # User deleted a product
-                if type(value) != int and not value.isdigit():
+                if not isinstance(value, int) and not value.isdigit():
                     value = 0
                 if not int(value):
                     if order_product:
