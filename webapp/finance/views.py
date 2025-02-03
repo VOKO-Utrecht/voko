@@ -1,6 +1,5 @@
 from mollie.api.client import Client as MollieClient
 from braces.views import LoginRequiredMixin
-from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.urls import reverse
