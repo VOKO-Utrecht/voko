@@ -13,12 +13,15 @@ from ordering.core import get_current_order_round
 from ordering.models import Order
 
 
-def get_order_to_pay(user):
+def get_order_to_pay(user, is_finalized):
     cur_order_round = get_current_order_round()
 
-    return Order.objects.filter(paid=False, finalized=True,
-                                order_round=cur_order_round,
-                                user=user).last()
+    result = Order.objects.filter(paid=False,
+                                  order_round=cur_order_round,
+                                  user=user)
+    if is_finalized is not None:
+        result = result.filter(finalized=is_finalized)
+    return result.last()
 
 
 class MollieMixin(object):
@@ -52,7 +55,7 @@ class CreateTransactionView(LoginRequiredMixin, MollieMixin, FormView):
     Create transaction @ bank and redirect user to bank URL
     """
     def post(self, request, *args, **kwargs):
-        order_to_pay = get_order_to_pay(request.user)
+        order_to_pay = get_order_to_pay(request.user, None)
         if not order_to_pay:
             messages.error(request, "Geen bestelling gevonden")
             return redirect(reverse('view_products'))
@@ -108,8 +111,6 @@ class CreateTransactionView(LoginRequiredMixin, MollieMixin, FormView):
             amount=float(amount_to_pay),
             description="VOKO Utrecht %d"
                         % order_to_pay.id,
-            # issuer_id=bank,
-            # method=method,
             order_id=order_to_pay.id,
             )
 
@@ -259,7 +260,7 @@ class CancelPaymentView(View):
     """
 
     def get(self, request, *args, **kwargs):
-        order_to_pay = get_order_to_pay(request.user)
+        order_to_pay = get_order_to_pay(request.user, True)
         if not order_to_pay:
             messages.error(request, "Geen bestelling gevonden")
             return redirect(reverse('view_products'))
