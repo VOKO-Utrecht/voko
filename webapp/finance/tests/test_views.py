@@ -94,6 +94,9 @@ class TestCreateTransaction(FinanceTestCase):
         self.order.save()
 
         ret = self.client.post(self.url, {'bank': "EXAMPLE_BANK", })
+        # TODO post does not redirect to view_products anymore, because the
+        # order is now finalized in that method. The happy flow will redirect
+        # to mollie.com
         self.assertRedirects(ret, reverse('view_products'))
 
     def test_redirect_when_order_round_is_closed(self):
