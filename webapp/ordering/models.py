@@ -92,7 +92,7 @@ class OrderRound(TimeStampedModel):
         decimal_places=2, max_digits=5, default=config.MARKUP_PERCENTAGE
     )
     transaction_costs = models.DecimalField(
-        decimal_places=2, max_digits=5, default=0.21
+        decimal_places=2, max_digits=5, default=0.23
     )
     order_placed = models.BooleanField(
         default=False,
