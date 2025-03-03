@@ -18,18 +18,18 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    # }    
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_NAME', 'postgres'),
-        'USER': os.environ.get('POSTGRES_USER', 'postgres'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'postgres'),
-        'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
-        'PORT': 5432,
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db-acc.sqlite3'),
     }    
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': os.environ.get('POSTGRES_NAME', 'postgres'),
+    #     'USER': os.environ.get('POSTGRES_USER', 'postgres'),
+    #     'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'postgres'),
+    #     'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
+    #     'PORT': 5432,
+    # }    
 }
 
 # to improve performance on local dev machine
@@ -74,7 +74,8 @@ DEBUG_TOOLBAR_CONFIG = {
     'debug_toolbar.panels.profiling.ProfilingPanel',
 ]
 }
-# MOLLIE_API_KEY = 'test_'
+
+MOLLIE_API_KEY = 'test_mMpjV4xanRPNgvnC7JmPvM84Vz8WJ2'
 
 if os.environ.get('RUN_MAIN'):
     import debugpy
