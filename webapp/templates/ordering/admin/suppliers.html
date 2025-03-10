@@ -33,11 +33,4 @@
         Je kunt geen mailing versturen want de huidige bestelronde is niet open.
     {% endif %}
 
-<h2>Laatste 10 opmerkingen</h2>
-<ol>
-    {% for o in last_ten_orders_with_notes %}
-        <li><strong>{{ o.user.get_full_name }}</strong> op <strong>{{ o.modified.date }}</strong> (ronde {{ o.order_round.id }}): {{ o.user_notes  }}</li>
-    {% endfor %}
-</ol>
-
 {% endblock %}
