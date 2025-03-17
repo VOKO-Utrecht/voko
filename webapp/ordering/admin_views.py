@@ -501,10 +501,6 @@ class ProductAdminMain(GroupRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         ctx = super(ProductAdminMain, self).get_context_data()
         ctx['current_order_round'] = get_current_order_round()
-        ctx['last_ten_orders_with_notes'] = Order.objects.filter(
-            user_notes__isnull=False).order_by('-id')[:10]
-        ctx['last_ten_orders_with_notes'] = Order.objects.filter(
-            user_notes__isnull=False).order_by('-id')[:10]
         return ctx
 
     def get_queryset(self):
