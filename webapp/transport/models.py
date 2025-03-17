@@ -97,7 +97,7 @@ class Ride(TimeStampedModel):
         event.short_description = (f"<a href=\"{reverse('ride', args={self.slug})}\">"
                                    f"Transportdienst</a> voor ronde {self.order_round.id}")
         event.date = self.date.date()
-        event.time = None
+        event.time = self.date.time()
         event.is_shift = True
         return event
 
