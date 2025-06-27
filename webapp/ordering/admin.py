@@ -7,9 +7,19 @@ from django.http import HttpResponse
 
 from finance.models import Balance
 from vokou.admin import DeleteDisabledMixin
-from .models import (Order, OrderProduct, Product, OrderRound, ProductCategory,
-                     OrderProductCorrection, ProductStock, Supplier,
-                     ProductUnit, DraftProduct, PickupLocation)
+from .models import (
+    Order,
+    OrderProduct,
+    Product,
+    OrderRound,
+    ProductCategory,
+    OrderProductCorrection,
+    ProductStock,
+    Supplier,
+    ProductUnit,
+    DraftProduct,
+    PickupLocation,
+)
 
 
 class OrderProductInline(admin.TabularInline):
@@ -18,36 +28,60 @@ class OrderProductInline(admin.TabularInline):
 
 def create_credit_for_order(modeladmin, request, queryset):
     for order in queryset:
-        Balance.objects.create(user=order.user,
-                               type="CR",
-                               amount=order.total_price,
-                               notes="Bestelling #%d contant betaald"
-                                     % order.pk)
+        Balance.objects.create(
+            user=order.user, type="CR", amount=order.total_price, notes="Bestelling #%d contant betaald" % order.pk
+        )
 
 
 create_credit_for_order.short_description = "Contant betaald"
 
 
+def create_next_orderround(modeladmin, request, queryset):
+    """Admin action to manually create the next order round"""
+    from ordering.core import create_orderround_automatically
+    from django.contrib import messages
+
+    try:
+        order_round = create_orderround_automatically()
+        if order_round:
+            messages.success(
+                request,
+                f"Successfully created order round #{order_round.pk}. "
+                f"Opens: {order_round.open_for_orders.strftime('%Y-%m-%d %H:%M')}, "
+                f"Closes: {order_round.closed_for_orders.strftime('%Y-%m-%d %H:%M')}, "
+                f"Collect: {order_round.collect_datetime.strftime('%Y-%m-%d %H:%M')}",
+            )
+        else:
+            messages.warning(
+                request, "No new order round was created. Check if automation is enabled and if a new round is needed."
+            )
+    except Exception as e:
+        messages.error(request, f"Failed to create order round: {str(e)}")
+
+
+create_next_orderround.short_description = "Create next order round automatically"
+
+
 def dutch_decimal(value):
-    return str(value).replace('.', ',')
+    return str(value).replace(".", ",")
 
 
 def export_orders_for_financial_admin(modeladmin, request, queryset):
     field_names = [
-        'Bestelling ID',
-        'Lid',
-        'Datum',
-        'Ronde',
-        'Totaalsom producten (incl. marge)',
-        'ledenbijdrage',
-        'Transactiekosten',
-        'Betaald',
-        'Verrekening debit/credit',
-        'Totaalbedrag']
+        "Bestelling ID",
+        "Lid",
+        "Datum",
+        "Ronde",
+        "Totaalsom producten (incl. marge)",
+        "ledenbijdrage",
+        "Transactiekosten",
+        "Betaald",
+        "Verrekening debit/credit",
+        "Totaalbedrag",
+    ]
 
-    response = HttpResponse(content_type='text/csv; charset=utf-8')
-    response[
-        'Content-Disposition'] = 'attachment; filename=orders_export.csv'
+    response = HttpResponse(content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = "attachment; filename=orders_export.csv"
 
     writer = csv.writer(response)
     writer.writerow(field_names)
@@ -64,27 +98,24 @@ def export_orders_for_financial_admin(modeladmin, request, queryset):
             "{0} ({1})".format(order.user, order.user_id),
             order.modified.date(),
             order.order_round_id,
-            dd(sum([odp.total_retail_price
-                    for odp in order.orderproducts.all()])),
+            dd(sum([odp.total_retail_price for odp in order.orderproducts.all()])),
             dd(order.member_fee),
             dd(order.order_round.transaction_costs),
-            dd(actually_paid).replace('.', ','),
+            dd(actually_paid).replace(".", ","),
             dd(order.debit.amount - actually_paid),
-            dd(order.debit.amount)
+            dd(order.debit.amount),
         ]
         writer.writerow(row)
 
     return response
 
 
-export_orders_for_financial_admin.short_description = (
-    "Exporteer voor financiële admin")
+export_orders_for_financial_admin.short_description = "Exporteer voor financiële admin"
 
 
 class OrderAdmin(DeleteDisabledMixin, admin.ModelAdmin):
-    list_display = ["id", "created", "order_round", "user", "finalized",
-                    "paid", "total_price"]
-    ordering = ("-id", )
+    list_display = ["id", "created", "order_round", "user", "finalized", "paid", "total_price"]
+    ordering = ("-id",)
     # inlines = [OrderProductInline]  ## causes timeout
     list_filter = ("paid", "finalized", "order_round")
     actions = (create_credit_for_order, export_orders_for_financial_admin)
@@ -96,6 +127,7 @@ def generate_action(category):
         for product in queryset:
             product.category = category
             product.save()
+
     return fn
 
 
@@ -114,6 +146,7 @@ try:
         for product in queryset:
             product.category = None
             product.save()
+
     remove_category.short_description = "Remove category from product"
     prod_cat_actions.append(remove_category)
 
@@ -122,51 +155,67 @@ except (OperationalError, ProgrammingError):
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ["name", 'description', "order_round", "supplier",
-                    "category", "base_price", "maximum_total_order",
-                    "new"]
-    ordering = ("-id", )
+    list_display = [
+        "name",
+        "description",
+        "order_round",
+        "supplier",
+        "category",
+        "base_price",
+        "maximum_total_order",
+        "new",
+    ]
+    ordering = ("-id",)
     list_filter = ("order_round", "supplier", "category", "new")
     actions = prod_cat_actions
     list_per_page = 500
 
 
 class ProductStockAdmin(DeleteDisabledMixin, admin.ModelAdmin):
-    list_display = ["id", "created", "product", 'amount', "type", "notes"]
+    list_display = ["id", "created", "product", "amount", "type", "notes"]
     ordering = ("-id", "created", "product", "amount", "type", "notes")
     list_filter = ("type",)
-    raw_id_fields = ('product',)
+    raw_id_fields = ("product",)
 
 
 class OrderRoundAdmin(DeleteDisabledMixin, admin.ModelAdmin):
-    list_display = ["id", "open_for_orders", "closed_for_orders",
-                    "collect_datetime", "pickup_location", "markup_percentage",
-                    "transaction_costs", "reminder_hours_before_closing",
-                    "order_placed", "reminder_sent"]
-    ordering = ("-id", )
+    list_display = [
+        "id",
+        "open_for_orders",
+        "closed_for_orders",
+        "collect_datetime",
+        "pickup_location",
+        "markup_percentage",
+        "transaction_costs",
+        "reminder_hours_before_closing",
+        "order_placed",
+        "reminder_sent",
+    ]
+    ordering = ("-id",)
+    actions = [create_next_orderround]
 
 
 class OrderProductCorrectionAdmin(DeleteDisabledMixin, admin.ModelAdmin):
-    list_display = ["id", 'created', 'order_product', "supplied_percentage",
-                    "notes", "credit", "charge_supplier"]
-    ordering = ("-id", 'charge_supplier', 'supplied_percentage', 'created')
+    list_display = ["id", "created", "order_product", "supplied_percentage", "notes", "credit", "charge_supplier"]
+    ordering = ("-id", "charge_supplier", "supplied_percentage", "created")
     list_filter = ("charge_supplier",)
-    raw_id_fields = ('order_product',)
+    raw_id_fields = ("order_product",)
 
 
 class OrderProductAdmin(DeleteDisabledMixin, admin.ModelAdmin):
-    list_display = ["id", 'order', 'order_paid', "product", "amount",
-                    "stock_product", "base_price", "retail_price"]
-    ordering = ("-id", 'order', 'product')
+    list_display = ["id", "order", "order_paid", "product", "amount", "stock_product", "base_price", "retail_price"]
+    ordering = ("-id", "order", "product")
     list_filter = ("order__paid", "product__order_round")
-    raw_id_fields = ('order', 'product')
+    raw_id_fields = ("order", "product")
 
     def order_paid(self, obj):
         return obj.order.paid is True
+
     order_paid.boolean = True
 
     def stock_product(self, obj):
         return obj.product.is_stock_product()
+
     stock_product.boolean = True
 
 
