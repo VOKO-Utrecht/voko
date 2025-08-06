@@ -1,24 +1,26 @@
 import csv
-from django.contrib import admin
-from django.db import OperationalError, ProgrammingError
 import sys
 
+from django.contrib import admin, messages
+from django.db import OperationalError, ProgrammingError
 from django.http import HttpResponse
-
 from finance.models import Balance
 from vokou.admin import DeleteDisabledMixin
+
+from ordering.core import create_orderround_batch
+
 from .models import (
+    DraftProduct,
     Order,
     OrderProduct,
-    Product,
-    OrderRound,
-    ProductCategory,
     OrderProductCorrection,
-    ProductStock,
-    Supplier,
-    ProductUnit,
-    DraftProduct,
+    OrderRound,
     PickupLocation,
+    Product,
+    ProductCategory,
+    ProductStock,
+    ProductUnit,
+    Supplier,
 )
 
 
@@ -36,30 +38,25 @@ def create_credit_for_order(modeladmin, request, queryset):
 create_credit_for_order.short_description = "Contant betaald"
 
 
-def create_next_orderround(modeladmin, request, queryset):
-    """Admin action to manually create the next order round"""
-    from ordering.core import create_orderround_automatically
-    from django.contrib import messages
+def create_next_orderround_batch(modeladmin, request, queryset):
+    """Admin action to manually create the next order round batch"""
 
     try:
-        order_round = create_orderround_automatically()
-        if order_round:
+        order_round_batch = create_orderround_batch()
+        if order_round_batch:
             messages.success(
                 request,
-                f"Successfully created order round #{order_round.pk}. "
-                f"Opens: {order_round.open_for_orders.strftime('%Y-%m-%d %H:%M')}, "
-                f"Closes: {order_round.closed_for_orders.strftime('%Y-%m-%d %H:%M')}, "
-                f"Collect: {order_round.collect_datetime.strftime('%Y-%m-%d %H:%M')}",
+                f"Successfully created {len(order_round_batch)} new order rounds."
+                f" The first one starts on {order_round_batch[0].open_for_orders}."
+                f" The last order round is on {order_round_batch[-1].open_for_orders}.",
             )
         else:
-            messages.warning(
-                request, "No new order round was created. Check if automation is enabled and if a new round is needed."
-            )
+            messages.warning(request, "No new order round batch needed at this time.")
     except Exception as e:
-        messages.error(request, f"Failed to create order round: {str(e)}")
+        messages.error(request, f"Failed to create order round batch: {str(e)}")
 
 
-create_next_orderround.short_description = "Create next order round automatically"
+create_next_orderround_batch.short_description = "Create next order round batch automatically"
 
 
 def dutch_decimal(value):
@@ -192,7 +189,7 @@ class OrderRoundAdmin(DeleteDisabledMixin, admin.ModelAdmin):
         "reminder_sent",
     ]
     ordering = ("-id",)
-    actions = [create_next_orderround]
+    actions = [create_next_orderround_batch]
 
 
 class OrderProductCorrectionAdmin(DeleteDisabledMixin, admin.ModelAdmin):

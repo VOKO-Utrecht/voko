@@ -1,15 +1,17 @@
+import csv
 import io
-
 from datetime import datetime
+
 import pytz
+from constance import config
 from django.core.mail import EmailMultiAlternatives
 from django.db.models.aggregates import Sum
 from django_cron import CronJobBase, Schedule
-
 from log import log_event
-from .core import get_current_order_round, get_next_order_round, get_last_order_round
+
 from ordering.models import Supplier
-import csv
+
+from .core import create_orderround_batch, get_current_order_round, get_latest_order_round, get_next_order_round
 
 
 def fix_decimal_separator(decimal_value):
@@ -271,7 +273,7 @@ class SendRideCostsRequestMails(CronJobBase):
 
     def do(self):
         print("SendRideCostsRequestMails")
-        last_order_round = get_last_order_round()
+        last_order_round = get_latest_order_round()
         print("Order round: %s" % last_order_round)
 
         current_datetime = datetime.now(pytz.utc)
@@ -309,11 +311,11 @@ class SendDistributionMails(CronJobBase):
             order_round.send_distribution_mails()
 
 
-class AutoCreateOrderRounds(CronJobBase):
+class AutoCreateOrderRoundBatch(CronJobBase):
     """
     Automatically create new order rounds
 
-    Cron runs every 6 hours (4 times per day)
+    Cron runs every day
 
     Creates new order rounds based on configured schedule when:
     - AUTO_CREATE_ORDERROUNDS is enabled
@@ -321,32 +323,29 @@ class AutoCreateOrderRounds(CronJobBase):
     - Follows the configured interval (default every 2 weeks on Sunday)
     """
 
-    RUN_EVERY_MINS = 360  # 6 hours
+    RUN_EVERY_MINS = 60 * 24  # 24 hours
 
     schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
     code = "ordering.auto_create_orderrounds"
 
     def do(self):
-        from constance import config
-        from .core import create_orderround_automatically
-
-        print("AutoCreateOrderRounds cron job running...")
+        print("AutoCreateOrderRoundBatch cron job running...")
 
         if not config.AUTO_CREATE_ORDERROUNDS:
             print("Auto-creation disabled in config")
             return
-
         try:
-            order_round = create_orderround_automatically()
-            if order_round:
-                print("Successfully created order round #%d" % order_round.pk)
-                print("  Opens: %s" % order_round.open_for_orders)
-                print("  Closes: %s" % order_round.closed_for_orders)
-                print("  Collect: %s" % order_round.collect_datetime)
+            order_round_batch = create_orderround_batch()
+            if order_round_batch:
+                print(
+                    f"Successfully created {len(order_round_batch)} new order rounds."
+                    f" The first one starts on {order_round_batch[0].open_for_orders}."
+                    f" The last order round is on {order_round_batch[-1].open_for_orders}."
+                )
             else:
-                print("No new order round needed at this time")
+                print("No new order round batch needed at this time")
         except Exception as e:
-            print("Error creating order round: %s" % str(e))
+            print("Error creating order round batch: %s" % str(e))
             import traceback
 
             traceback.print_exc()

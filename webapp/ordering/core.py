@@ -1,7 +1,14 @@
-from django.contrib import messages
-from pytz import UTC
 import re
-from datetime import datetime
+from datetime import datetime, timedelta, date
+
+import pytz
+from accounts.models import VokoUser
+from constance import config
+from django.contrib import messages
+from log import log_event
+from pytz import UTC
+from tzlocal import get_localzone
+
 from ordering import models
 
 
@@ -33,7 +40,7 @@ def get_current_order_round():
         return filtered.order_by("-open_for_orders")[0]
 
 
-def get_last_order_round():
+def get_latest_order_round():
     """
     Return the most recent finished order round, after collecting time
 
@@ -56,6 +63,16 @@ def get_next_order_round():
         .order_by("open_for_orders")
         .first()
     )
+
+
+def get_last_order_round():
+    """
+    Return the last order round that exists.
+
+    :return: OrderRound object || None
+    """
+    order_rounds = models.OrderRound.objects.all()
+    return order_rounds.order_by("open_for_orders").last()
 
 
 def get_or_create_order(user):
@@ -178,150 +195,111 @@ def _find_unit_by_abbr(unit):
             return product_unit
 
 
-def calculate_next_orderround_dates(
-    interval_weeks=2, open_hour=10, close_hour=20, duration_hours=72, collect_days_after=4, collect_hour=14
-):
+def calculate_next_orderround_dates(open_date):
     """
     Calculate dates for the next order round based on configuration.
-
-    Args:
-        interval_weeks: How many weeks between order rounds
-        open_hour: Hour when order rounds open (0-23)
-        close_hour: Hour when order rounds close (0-23)
-        duration_hours: How long order rounds stay open (hours)
-        collect_days_after: Days after closing when products can be collected
-        collect_hour: Hour when products can be collected (0-23)
 
     Returns:
         tuple: (open_datetime, close_datetime, collect_datetime)
     """
-    from datetime import datetime, timedelta
-    import pytz
-
-    # Get the last order round to calculate from
-    last_round = get_last_order_round()
-
-    if last_round:
-        # Calculate next round based on the last round's opening date
-        base_date = last_round.open_for_orders.date()
-        next_open_date = base_date + timedelta(weeks=interval_weeks)
-    else:
-        # If no previous rounds, start from next Sunday
-        today = datetime.now(pytz.UTC).date()
-        days_until_sunday = (6 - today.weekday()) % 7
-        if days_until_sunday == 0:  # If today is Sunday, use next Sunday
-            days_until_sunday = 7
-        next_open_date = today + timedelta(days=days_until_sunday)
-
     # Create datetimes
-    open_datetime = datetime.combine(next_open_date, datetime.min.time().replace(hour=open_hour))
-    open_datetime = pytz.UTC.localize(open_datetime)
+    open_datetime = datetime.combine(open_date, datetime.min.time().replace(hour=config.ORDERROUND_OPEN_HOUR)).replace(
+        tzinfo=get_localzone()
+    )
 
-    close_datetime = open_datetime + timedelta(hours=duration_hours)
+    close_datetime = open_datetime + timedelta(hours=config.ORDERROUND_DURATION_HOURS)
 
-    collect_date = close_datetime.date() + timedelta(days=collect_days_after)
-    collect_datetime = datetime.combine(collect_date, datetime.min.time().replace(hour=collect_hour))
-    collect_datetime = pytz.UTC.localize(collect_datetime)
+    collect_date = close_datetime.date() + timedelta(days=config.ORDERROUND_COLLECT_DAYS_AFTER)
+    collect_datetime = datetime.combine(
+        collect_date, datetime.min.time().replace(hour=config.ORDERROUND_COLLECT_HOUR)
+    ).replace(tzinfo=get_localzone())
 
     return open_datetime, close_datetime, collect_datetime
 
 
-def should_create_new_orderround(create_days_ahead=7):
+def get_last_day_of_next_quarter():
     """
-    Check if we should create a new order round.
-
-    Args:
-        create_days_ahead: How many days ahead to create new order rounds
+    Get the last day of the next quarter as a datetime object.
 
     Returns:
-        bool: True if a new order round should be created
+        datetime: Last day of next quarter
     """
-    from datetime import datetime, timedelta
-    import pytz
+    now = datetime.now(pytz.UTC)
+    current_quarter = (now.month - 1) // 3 + 1
+    next_quarter = current_quarter + 2
 
-    # Check if there's already a future order round
-    future_rounds = models.OrderRound.objects.filter(open_for_orders__gt=datetime.now(pytz.UTC)).order_by(
-        "open_for_orders"
-    )
+    # Handle year rollover
+    year = now.year
+    if next_quarter > 4:
+        next_quarter = 1
+        year += 1
 
-    if not future_rounds.exists():
-        # No future rounds, we should create one
-        return True
+    # Calculate last month of next quarter
+    last_month_of_quarter = next_quarter * 3
 
-    # Check if the next future round is far enough ahead
-    next_round = future_rounds.first()
-    if next_round is None:
-        return True
+    # Get first day of the month after the quarter
+    if last_month_of_quarter == 12:
+        next_month_first_day = date(year + 1, 1, 1)
+    else:
+        next_month_first_day = date(year, last_month_of_quarter + 1, 1)
 
-    cutoff_date = datetime.now(pytz.UTC) + timedelta(days=create_days_ahead)
+    # Last day of quarter is one day before first day of next month
+    last_day_of_quarter = next_month_first_day - timedelta(days=1)
 
-    return next_round.open_for_orders > cutoff_date
+    return last_day_of_quarter
 
 
-def create_orderround_automatically():
+def create_orderround_batch():
     """
-    Create a new order round automatically based on configuration.
+    Create a new order round batch automatically based on configuration.
 
     Returns:
-        OrderRound or None: The created order round, or None if creation failed
+        list[models.OrderRound]: The order round batches created
     """
-    from constance import config
-    from log import log_event
+    # Check if we should create a new order round batch
+    last_round = get_last_order_round()
+    now = datetime.now(pytz.UTC)
 
-    if not config.AUTO_CREATE_ORDERROUNDS:
-        return None
+    # If there's no last round, we start from next week
+    if last_round is None:
+        start_date = now.date() + timedelta(days=7)
+    # If the last order round is less than a month from now, we need new round starting two weeks after the last round
+    elif last_round.open_for_orders < now + timedelta(days=31):
+        start_date = last_round.open_for_orders.date() + timedelta(weeks=config.ORDERROUND_INTERVAL_WEEKS)
+    # If the last order round is more than a month from now, we dont create a new round batch
+    else:
+        return []
 
-    if not should_create_new_orderround(config.ORDERROUND_CREATE_DAYS_AHEAD):
-        return None
+    # Adjust start date to the configured open day of the week
+    if start_date.weekday() < config.ORDERROUND_OPEN_DAY_OF_WEEK:  # Ensure it starts on the configured day
+        start_date += timedelta(days=config.ORDERROUND_OPEN_DAY_OF_WEEK - start_date.weekday())
+    elif start_date.weekday() > config.ORDERROUND_OPEN_DAY_OF_WEEK:
+        start_date -= timedelta(days=start_date.weekday() - config.ORDERROUND_OPEN_DAY_OF_WEEK)
 
-    try:
-        open_datetime, close_datetime, collect_datetime = calculate_next_orderround_dates(
-            interval_weeks=config.ORDERROUND_INTERVAL_WEEKS,
-            open_hour=config.ORDERROUND_OPEN_HOUR,
-            close_hour=config.ORDERROUND_CLOSE_HOUR,
-            duration_hours=config.ORDERROUND_DURATION_HOURS,
-            collect_days_after=config.ORDERROUND_COLLECT_DAYS_AFTER,
-            collect_hour=config.ORDERROUND_COLLECT_HOUR,
-        )
+    # Calculate the end date for the next quarter
+    # This will be the last day of the next quarter
+    end_date = get_last_day_of_next_quarter()
+    order_rounds = []
+    while start_date <= end_date:
+        open_datetime, close_datetime, collect_datetime = calculate_next_orderround_dates(start_date)
 
         # Get default pickup location and transport coordinator
-        default_pickup = None
-        transport_coordinator = None
+        pickup_location = models.PickupLocation.objects.filter(is_default=True).first()
+        transport_coordinator = VokoUser.objects.filter(pk=config.ORDERROUND_TRANSPORT_COORDINATOR).first()
 
-        if hasattr(config, "ORDERROUND_DEFAULT_PICKUP_LOCATION") and config.ORDERROUND_DEFAULT_PICKUP_LOCATION:
-            try:
-                default_pickup = models.PickupLocation.objects.get(pk=config.ORDERROUND_DEFAULT_PICKUP_LOCATION)
-            except models.PickupLocation.DoesNotExist:
-                # Fallback to default pickup location
-                default_pickup = models.PickupLocation.objects.filter(is_default=True).first()
-        else:
-            default_pickup = models.PickupLocation.objects.filter(is_default=True).first()
-
-        if (
-            hasattr(config, "ORDERROUND_DEFAULT_TRANSPORT_COORDINATOR")
-            and config.ORDERROUND_DEFAULT_TRANSPORT_COORDINATOR
-        ):
-            try:
-                from accounts.models import VokoUser
-
-                transport_coordinator = VokoUser.objects.get(pk=config.ORDERROUND_DEFAULT_TRANSPORT_COORDINATOR)
-            except Exception:
-                pass  # Leave as None if user doesn't exist or import fails
-
-        # Create the new order round
         order_round = models.OrderRound.objects.create(
             open_for_orders=open_datetime,
             closed_for_orders=close_datetime,
             collect_datetime=collect_datetime,
             markup_percentage=config.MARKUP_PERCENTAGE,
-            pickup_location=default_pickup,
+            pickup_location=pickup_location,
             transport_coordinator=transport_coordinator,
         )
 
+        order_rounds.append(order_round)
+
         log_event(event="Auto-created order round #%d" % order_round.pk)
 
-        return order_round
+        start_date += timedelta(weeks=config.ORDERROUND_INTERVAL_WEEKS)
 
-    except Exception as e:
-        log_event(event="Failed to auto-create order round: %s" % str(e))
-        return None
+    return order_rounds

@@ -1,17 +1,26 @@
-version: "3"
+version: "3.8"
 services:
   db:
     image: postgres:14
+    container_name: voko_db
     ports:
       - "5433:5432"
     volumes:
-      - ./data/db:/var/lib/postgresql/data:z
+      - db_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+      
   web:
     build: .
+    container_name: voko_web
     working_dir: /code/webapp
     ports:
       - "8000:8000"
@@ -19,9 +28,19 @@ services:
     volumes:
       - .:/code:z
     environment:
-      - POSTGRES_NAME=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_HOST=db
+      - POSTGRES_NAME=${POSTGRES_NAME:-postgres}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_HOST=${POSTGRES_HOST:-db}
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE:-vokou.settings.development}
+      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL:-admin@voko.local}
+      - DJANGO_SUPERUSER_FIRST_NAME=${DJANGO_SUPERUSER_FIRST_NAME:-Admin}
+      - DJANGO_SUPERUSER_LAST_NAME=${DJANGO_SUPERUSER_LAST_NAME:-User}
+      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD:-admin123}
+      - AUTO_CREATE_ORDERROUNDS=${AUTO_CREATE_ORDERROUNDS:-true}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+
+volumes:
+  db_data:

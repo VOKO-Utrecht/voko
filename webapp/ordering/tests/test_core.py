@@ -1,10 +1,20 @@
 from datetime import datetime, timedelta
 from pytz import UTC
-from ordering.core import get_current_order_round, get_last_order_round, \
-    update_totals_for_products_with_max_order_amounts
+from ordering.core import (
+    get_current_order_round,
+    get_latest_order_round,
+    update_totals_for_products_with_max_order_amounts,
+    create_orderround_batch,
+    get_last_day_of_next_quarter,
+)
 from ordering.models import OrderProduct
-from ordering.tests.factories import OrderRoundFactory, OrderFactory, \
-    ProductFactory, OrderProductFactory, ProductStockFactory
+from ordering.tests.factories import (
+    OrderRoundFactory,
+    OrderFactory,
+    ProductFactory,
+    OrderProductFactory,
+    ProductStockFactory,
+)
 from vokou.testing import VokoTestCase
 
 
@@ -19,23 +29,21 @@ class TestGetCurrentOrderRound(VokoTestCase):
         self.assertIsNone(ret)
 
     def test_given_one_open_order_round_it_is_returned(self):
-        self.mock_datetime.now.return_value = datetime(2014, 10, 28, 0, 0,
-                                                       tzinfo=UTC)
+        self.mock_datetime.now.return_value = datetime(2014, 10, 28, 0, 0, tzinfo=UTC)
         orderround = OrderRoundFactory(
             open_for_orders=datetime(2014, 10, 27, 0, 0, tzinfo=UTC),
             closed_for_orders=datetime(2014, 10, 31, 19, 0, tzinfo=UTC),
-            collect_datetime=datetime(2014, 11, 5, 17, 30, tzinfo=UTC)
+            collect_datetime=datetime(2014, 11, 5, 17, 30, tzinfo=UTC),
         )
         ret = get_current_order_round()
         self.assertEqual(ret, orderround)
 
     def test_given_one_closed_order_round_it_is_returned(self):
-        self.mock_datetime.now.return_value = datetime(2014, 11, 6, 0, 0,
-                                                       tzinfo=UTC)
+        self.mock_datetime.now.return_value = datetime(2014, 11, 6, 0, 0, tzinfo=UTC)
         orderround = OrderRoundFactory(
             open_for_orders=datetime(2014, 10, 27, 0, 0, tzinfo=UTC),
             closed_for_orders=datetime(2014, 10, 31, 19, 0, tzinfo=UTC),
-            collect_datetime=datetime(2014, 11, 5, 17, 30, tzinfo=UTC)
+            collect_datetime=datetime(2014, 11, 5, 17, 30, tzinfo=UTC),
         )
         ret = get_current_order_round()
         self.assertEqual(ret, orderround)
@@ -44,15 +52,14 @@ class TestGetCurrentOrderRound(VokoTestCase):
         OrderRoundFactory(
             open_for_orders=datetime(2014, 10, 27, 0, 0, tzinfo=UTC),
             closed_for_orders=datetime(2014, 10, 31, 19, 0, tzinfo=UTC),
-            collect_datetime=datetime(2014, 11, 5, 17, 30, tzinfo=UTC)
+            collect_datetime=datetime(2014, 11, 5, 17, 30, tzinfo=UTC),
         )
         current = OrderRoundFactory(
             open_for_orders=datetime(2014, 11, 10, 0, 0, tzinfo=UTC),
             closed_for_orders=datetime(2014, 11, 14, 19, 0, tzinfo=UTC),
-            collect_datetime=datetime(2014, 11, 19, 17, 30, tzinfo=UTC)
+            collect_datetime=datetime(2014, 11, 19, 17, 30, tzinfo=UTC),
         )
-        self.mock_datetime.now.return_value = datetime(2014, 11, 15, 0, 0,
-                                                       tzinfo=UTC)
+        self.mock_datetime.now.return_value = datetime(2014, 11, 15, 0, 0, tzinfo=UTC)
 
         ret = get_current_order_round()
         self.assertEqual(ret, current)
@@ -61,15 +68,14 @@ class TestGetCurrentOrderRound(VokoTestCase):
         current = OrderRoundFactory(
             open_for_orders=datetime(2014, 10, 27, 0, 0, tzinfo=UTC),
             closed_for_orders=datetime(2014, 10, 31, 19, 0, tzinfo=UTC),
-            collect_datetime=datetime(2014, 11, 5, 17, 30, tzinfo=UTC)
+            collect_datetime=datetime(2014, 11, 5, 17, 30, tzinfo=UTC),
         )
         OrderRoundFactory(
             open_for_orders=datetime(2014, 11, 10, 0, 0, tzinfo=UTC),
             closed_for_orders=datetime(2014, 11, 14, 19, 0, tzinfo=UTC),
-            collect_datetime=datetime(2014, 11, 19, 17, 30, tzinfo=UTC)
+            collect_datetime=datetime(2014, 11, 19, 17, 30, tzinfo=UTC),
         )
-        self.mock_datetime.now.return_value = datetime(2014, 11, 4, 0, 0,
-                                                       tzinfo=UTC)
+        self.mock_datetime.now.return_value = datetime(2014, 11, 4, 0, 0, tzinfo=UTC)
 
         ret = get_current_order_round()
         self.assertEqual(ret, current)
@@ -78,15 +84,14 @@ class TestGetCurrentOrderRound(VokoTestCase):
         OrderRoundFactory(
             open_for_orders=datetime(2014, 10, 27, 0, 0, tzinfo=UTC),
             closed_for_orders=datetime(2014, 10, 31, 19, 0, tzinfo=UTC),
-            collect_datetime=datetime(2014, 11, 5, 17, 30, tzinfo=UTC)
+            collect_datetime=datetime(2014, 11, 5, 17, 30, tzinfo=UTC),
         )
         future = OrderRoundFactory(
             open_for_orders=datetime(2014, 11, 10, 0, 0, tzinfo=UTC),
             closed_for_orders=datetime(2014, 11, 14, 19, 0, tzinfo=UTC),
-            collect_datetime=datetime(2014, 11, 19, 17, 30, tzinfo=UTC)
+            collect_datetime=datetime(2014, 11, 19, 17, 30, tzinfo=UTC),
         )
-        self.mock_datetime.now.return_value = datetime(2014, 11, 7, 0, 0,
-                                                       tzinfo=UTC)
+        self.mock_datetime.now.return_value = datetime(2014, 11, 7, 0, 0, tzinfo=UTC)
 
         ret = get_current_order_round()
         self.assertEqual(ret, future)
@@ -96,23 +101,22 @@ class TestGetCurrentOrderRound(VokoTestCase):
         OrderRoundFactory(
             open_for_orders=datetime(2014, 12, 8, 0, 0, tzinfo=UTC),
             closed_for_orders=datetime(2014, 12, 12, 19, 0, tzinfo=UTC),
-            collect_datetime=datetime(2014, 12, 17, 17, 30, tzinfo=UTC)
+            collect_datetime=datetime(2014, 12, 17, 17, 30, tzinfo=UTC),
         )
         # October 24
         OrderRoundFactory(
             open_for_orders=datetime(2014, 11, 24, 0, 0, tzinfo=UTC),
             closed_for_orders=datetime(2014, 11, 28, 19, 0, tzinfo=UTC),
-            collect_datetime=datetime(2014, 12, 3, 17, 30, tzinfo=UTC)
+            collect_datetime=datetime(2014, 12, 3, 17, 30, tzinfo=UTC),
         )
         # October 10
         future1 = OrderRoundFactory(
             open_for_orders=datetime(2014, 11, 10, 0, 0, tzinfo=UTC),
             closed_for_orders=datetime(2014, 11, 14, 19, 0, tzinfo=UTC),
-            collect_datetime=datetime(2014, 11, 19, 17, 30, tzinfo=UTC)
+            collect_datetime=datetime(2014, 11, 19, 17, 30, tzinfo=UTC),
         )
 
-        self.mock_datetime.now.return_value = datetime(2014, 11, 1, 0, 0,
-                                                       tzinfo=UTC)
+        self.mock_datetime.now.return_value = datetime(2014, 11, 1, 0, 0, tzinfo=UTC)
 
         ret = get_current_order_round()
         self.assertEqual(ret, future1)
@@ -131,13 +135,10 @@ class TestUpdateOrderTotals(VokoTestCase):
         self.order = OrderFactory(order_round=self.round)
 
     def test_that_sold_out_product_is_removed(self):
-        product = ProductFactory(order_round=self.round,
-                                 maximum_total_order=10)
+        product = ProductFactory(order_round=self.round, maximum_total_order=10)
         self.assertEqual(10, product.amount_available)
 
-        order1 = OrderFactory(order_round=self.round,
-                              finalized=True,
-                              paid=True)
+        order1 = OrderFactory(order_round=self.round, finalized=True, paid=True)
         OrderProductFactory(order=order1, product=product, amount=10)
 
         self.assertEqual(10, product.amount_ordered)
@@ -152,13 +153,10 @@ class TestUpdateOrderTotals(VokoTestCase):
 
     def test_that_order_amount_is_decreased(self):
         # 10 available
-        product = ProductFactory(order_round=self.round,
-                                 maximum_total_order=10)
+        product = ProductFactory(order_round=self.round, maximum_total_order=10)
         self.assertEqual(10, product.amount_available)
 
-        order1 = OrderFactory(order_round=self.round,
-                              finalized=True,
-                              paid=True)
+        order1 = OrderFactory(order_round=self.round, finalized=True, paid=True)
         OrderProductFactory(order=order1, product=product, amount=8)
 
         # 8 ordered, leaves 2
@@ -167,8 +165,7 @@ class TestUpdateOrderTotals(VokoTestCase):
 
         # attempt to order 5
         order2 = OrderFactory(order_round=self.round)
-        order2_product = OrderProductFactory(order=order2, product=product,
-                                             amount=5)
+        order2_product = OrderProductFactory(order=order2, product=product, amount=5)
 
         update_totals_for_products_with_max_order_amounts(order2)
 
@@ -182,8 +179,7 @@ class TestUpdateOrderTotals(VokoTestCase):
         ProductStockFactory(product=product, amount=10)
         self.assertEqual(10, product.amount_available)
 
-        order1 = OrderFactory(order_round=self.round, finalized=True,
-                              paid=True)
+        order1 = OrderFactory(order_round=self.round, finalized=True, paid=True)
         OrderProductFactory(order=order1, product=product, amount=10)
 
         # 10 ordered, 0 remain
@@ -204,8 +200,7 @@ class TestUpdateOrderTotals(VokoTestCase):
         ProductStockFactory(product=product, amount=10)
         self.assertEqual(10, product.amount_available)
 
-        order1 = OrderFactory(order_round=self.round, finalized=True,
-                              paid=True)
+        order1 = OrderFactory(order_round=self.round, finalized=True, paid=True)
         OrderProductFactory(order=order1, product=product, amount=8)
 
         # 8 ordered, leaves 2
@@ -214,8 +209,7 @@ class TestUpdateOrderTotals(VokoTestCase):
 
         # attempt to order 5
         order2 = OrderFactory(order_round=self.round)
-        order2_product = OrderProductFactory(order=order2, product=product,
-                                             amount=5)
+        order2_product = OrderProductFactory(order=order2, product=product, amount=5)
 
         update_totals_for_products_with_max_order_amounts(order2)
 
@@ -225,7 +219,6 @@ class TestUpdateOrderTotals(VokoTestCase):
 
 
 class TestGetLastOrderRound(VokoTestCase):
-
     def setUp(self):
         now = datetime.now(tz=UTC)
 
@@ -236,31 +229,56 @@ class TestGetLastOrderRound(VokoTestCase):
         self.next_order_round = OrderRoundFactory(
             open_for_orders=now + timedelta(days=6),
             closed_for_orders=now + timedelta(days=9),
-            collect_datetime=now + timedelta(days=10))
+            collect_datetime=now + timedelta(days=10),
+        )
         # An old order round, to check previous round logic
         self.old_order_round = OrderRoundFactory(
             open_for_orders=now - timedelta(days=18),
             closed_for_orders=now - timedelta(days=14),
-            collect_datetime=now - timedelta(days=13))
+            collect_datetime=now - timedelta(days=13),
+        )
         # The current rouder round
         self.cur_order_round = OrderRoundFactory(
             open_for_orders=now - timedelta(days=1),
             closed_for_orders=now + timedelta(days=3),
-            collect_datetime=now + timedelta(days=4))
+            collect_datetime=now + timedelta(days=4),
+        )
         # A future order round, to check next round logic
         self.future_order_round = OrderRoundFactory(
             open_for_orders=now + timedelta(days=16),
             closed_for_orders=now + timedelta(days=19),
-            collect_datetime=now + timedelta(days=20))
+            collect_datetime=now + timedelta(days=20),
+        )
         # The previous order round
         self.prev_order_round = OrderRoundFactory(
             open_for_orders=now - timedelta(days=8),
             closed_for_orders=now - timedelta(days=4),
-            collect_datetime=now - timedelta(days=3))
+            collect_datetime=now - timedelta(days=3),
+        )
 
     def test_latest_order_round_is_returned(self):
-        self.assertTrue(get_last_order_round() == self.prev_order_round)
-        self.assertFalse(get_last_order_round() == self.cur_order_round)
-        self.assertFalse(get_last_order_round() == self.next_order_round)
-        self.assertFalse(get_last_order_round() == self.old_order_round)
-        self.assertFalse(get_last_order_round() == self.future_order_round)
+        self.assertTrue(get_latest_order_round() == self.prev_order_round)
+        self.assertFalse(get_latest_order_round() == self.cur_order_round)
+        self.assertFalse(get_latest_order_round() == self.next_order_round)
+        self.assertFalse(get_latest_order_round() == self.old_order_round)
+        self.assertFalse(get_latest_order_round() == self.future_order_round)
+
+
+class TestAutomaticOrderRoundCreation(VokoTestCase):
+    def test_new_order_round_batch_needed(self):
+        """Test that a new order round batch is created when the last round is than 30 days away."""
+        self.round = OrderRoundFactory(
+            open_for_orders=datetime.now(tz=UTC) + timedelta(days=30),
+        )
+        order_rounds = create_orderround_batch()
+        self.assertTrue(len(order_rounds) > 0)
+        last_day = get_last_day_of_next_quarter()
+        self.assertTrue(last_day > order_rounds[-1].open_for_orders.date() + timedelta(days=7))
+
+    def test_no_new_order_round_batch_needed(self):
+        """Test that no new order round batch is created when the last round is more than 30 days away."""
+        self.round = OrderRoundFactory(
+            open_for_orders=datetime.now(tz=UTC) + timedelta(days=32),
+        )
+        order_rounds = create_orderround_batch()
+        self.assertEqual(len(order_rounds), 0)
