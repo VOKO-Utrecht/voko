@@ -92,22 +92,20 @@ This improved Docker setup includes:
 2. Run: `git clone https://github.com/VOKO-Utrecht/voko.git`
 3. Run: `cd voko`
 4. Run: `uv sync --dev`
-6. In vokou/settings/development.py: \
-        - Uncomment config for sqlite3 \
-        - Comment the config for postgresql
+6. Run: `cd webapp`
 
 
 ### Set up sqlite database, create superuser and automatically create first order round
-    uv run python webapp/manage.py makemigrations --settings=vokou.settings.development
-    uv run python webapp/manage.py migrate --settings=vokou.settings.development
-    uv run python webapp/manage.py createsuperuser --settings=vokou.settings.development
-    uv run python webapp/manage.py runcrons --force --settings=vokou.settings.development
+    uv run python manage.py makemigrations --settings=vokou.settings.development
+    uv run python manage.py migrate --settings=vokou.settings.development
+    uv run python manage.py createsuperuser --settings=vokou.settings.development
+    uv run python manage.py runcrons --force --settings=vokou.settings.development
 
 ### Run tests
     uv run python manage.py test --settings=vokou.settings.testing
 
 ### Run development server
-    uv run python webapp/manage.py runserver --settings=vokou.settings.development
+    uv run python manage.py runserver --settings=vokou.settings.development
 
 ### Adding user
 1. Register as new user at: http://localhost:8000/accounts/register/
