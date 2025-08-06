@@ -266,7 +266,7 @@ class TestGetLastOrderRound(VokoTestCase):
 
 class TestAutomaticOrderRoundCreation(VokoTestCase):
     def test_new_order_round_batch_needed(self):
-        """Test that a new order round batch is created when the last round is than 30 days away."""
+        """Test that a new order round batch is created when the last round is less than 30 days away."""
         self.round = OrderRoundFactory(
             open_for_orders=datetime.now(tz=UTC) + timedelta(days=30),
         )
