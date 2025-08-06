@@ -226,7 +226,7 @@ def get_last_day_of_next_quarter():
     """
     now = datetime.now(pytz.UTC)
     current_quarter = (now.month - 1) // 3 + 1
-    next_quarter = current_quarter + 2
+    next_quarter = current_quarter + 1
 
     # Handle year rollover
     year = now.year
