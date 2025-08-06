@@ -271,11 +271,8 @@ def create_orderround_batch():
         return []
 
     # Adjust start date to the configured open day of the week
-    if start_date.weekday() < config.ORDERROUND_OPEN_DAY_OF_WEEK:  # Ensure it starts on the configured day
-        start_date += timedelta(days=config.ORDERROUND_OPEN_DAY_OF_WEEK - start_date.weekday())
-    elif start_date.weekday() > config.ORDERROUND_OPEN_DAY_OF_WEEK:
-        start_date -= timedelta(days=start_date.weekday() - config.ORDERROUND_OPEN_DAY_OF_WEEK)
-
+    days_until_target = (config.ORDERROUND_OPEN_DAY_OF_WEEK - start_date.weekday()) % 7
+    start_date += timedelta(days=days_until_target)
     # Calculate the end date for the next quarter
     # This will be the last day of the next quarter
     end_date = get_last_day_of_next_quarter()
