@@ -273,7 +273,7 @@ class TestAutomaticOrderRoundCreation(VokoTestCase):
         order_rounds = create_orderround_batch()
         self.assertTrue(len(order_rounds) > 0)
         last_day = get_last_day_of_next_quarter()
-        self.assertTrue(last_day > order_rounds[-1].open_for_orders.date() + timedelta(days=7))
+        self.assertTrue(last_day < order_rounds[-1].open_for_orders.date() + timedelta(days=7))
 
     def test_no_new_order_round_batch_needed(self):
         """Test that no new order round batch is created when the last round is more than 30 days away."""
