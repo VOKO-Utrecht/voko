@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django_nose",
     "tinymce",
     "django_extensions",
     "braces",
@@ -118,8 +117,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 EMAIL_SUBJECT_PREFIX = "[Voko Admin] "
 
-TEST_RUNNER = "django_nose.NoseTestSuiteRunner"
-
 MOLLIE_API_KEY = "SETME"
 
 BASE_URL = "https://leden.vokoutrecht.nl"
@@ -173,7 +170,11 @@ CONSTANCE_CONFIG = {
     "UNSUBSCRIBE_FORM_URL": ("", "Unsubscribe form URL", str),
     # automated orderround creation
     "AUTO_CREATE_ORDERROUNDS": (False, "Automatically create new order rounds", bool),
-    "ORDERROUND_OPEN_DAY_OF_WEEK": (6, "Day of week when order rounds open (0=Monday, 6=Sunday). Follows Python's datetime.weekday() convention.", int),
+    "ORDERROUND_OPEN_DAY_OF_WEEK": (
+        6,
+        "Day of week when order rounds open (0=Monday, 6=Sunday). Follows Python's datetime.weekday() convention.",
+        int,
+    ),
     "ORDERROUND_INTERVAL_WEEKS": (2, "Interval between order rounds in weeks", int),
     "ORDERROUND_OPEN_HOUR": (12, "Hour when order rounds open (24h format)", int),
     "ORDERROUND_DURATION_HOURS": (63, "How long order rounds stay open (hours)", int),
