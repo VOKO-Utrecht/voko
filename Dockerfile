@@ -7,21 +7,31 @@ ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONFAULTHANDLER 1
+ENV TZ="Europe/Amsterdam"
 
-# Install pipenv
-RUN pip install pipenv
+# Install system dependencies including PostgreSQL client and timezone data
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    tzdata \
+    && rm -rf /var/lib/apt/lists/*
+
+# Configure timezone
+RUN ln -snf /usr/share/zoneinfo/Europe/Amsterdam /etc/localtime && echo Europe/Amsterdam > /etc/timezone
+
+# Install uv
+RUN pip install uv
 
 # Set work directory
 WORKDIR /code
 
 # Copy dependencies & files
-COPY ./Pipfile /code/
+COPY ./pyproject.toml /code/
 
 ARG CACHEBUST=1
 # Recreate lock file
-RUN pipenv lock
+RUN uv lock
 # Install dependencies
-RUN pipenv install --dev
+RUN uv sync --dev
 
 # Install application into container
 COPY . .
