@@ -217,7 +217,7 @@ def calculate_next_orderround_dates(open_date):
     return open_datetime, close_datetime, collect_datetime
 
 
-def get_first_and_last_day_of_next_quarter():
+def get_quarter_end_dates():
     """
     Get the last day of the current quarter and the last day of the next quarter as date objects.
 
@@ -269,7 +269,7 @@ def create_orderround_batch():
         list[models.OrderRound]: The order round batches created
     """
     # Get the last day of the current and next quarter
-    last_day_current_quarter, last_day_next_quarter = get_first_and_last_day_of_next_quarter()
+    last_day_current_quarter, last_day_next_quarter = get_quarter_end_dates()
 
     # Check if we should create a new order round batch
     last_round = get_last_order_round()
