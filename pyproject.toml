@@ -23,7 +23,7 @@ dependencies = [
     "django-picklefield==2.1.1",
     "psycopg2-binary==2.9.9",
     "Django==3.2.25",
-    "gunicorn==22.0.0",
+    "gunicorn==23.0.0",
     "python-dateutil==2.8.2",
     "tzlocal>=5.2",
     "freezegun>=1.5.5",
