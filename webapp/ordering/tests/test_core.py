@@ -279,7 +279,7 @@ class TestAutomaticOrderRoundCreation(VokoTestCase):
     def test_create_orderround_batch_one_order_round_no_more_in_quarter(self):
         """Test when there's one order round but no more planned for rest of current quarter"""
         # Create an existing order round early in the quarter
-        existing_round = OrderRoundFactory(
+        _ = OrderRoundFactory(
             open_for_orders=datetime(2024, 1, 8, 8, 0, tzinfo=UTC),  # Early January
             closed_for_orders=datetime(2024, 1, 12, 8, 0, tzinfo=UTC),
             collect_datetime=datetime(2024, 1, 17, 18, 0, tzinfo=UTC),
