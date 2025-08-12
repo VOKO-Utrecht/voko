@@ -26,6 +26,7 @@ dependencies = [
     "gunicorn==22.0.0",
     "python-dateutil==2.8.2",
     "tzlocal>=5.2",
+    "freezegun>=1.5.5",
 ]
 
 [project.optional-dependencies]

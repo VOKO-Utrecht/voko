@@ -1,11 +1,14 @@
 from datetime import datetime, timedelta
 from pytz import UTC
+from freezegun import freeze_time
+from constance import config
 from ordering.core import (
     get_current_order_round,
     get_latest_order_round,
     update_totals_for_products_with_max_order_amounts,
     create_orderround_batch,
-    get_last_day_of_next_quarter,
+    get_quarter_end_dates,
+    get_last_order_round,
 )
 from ordering.models import OrderProduct
 from ordering.tests.factories import (
@@ -265,20 +268,73 @@ class TestGetLastOrderRound(VokoTestCase):
 
 
 class TestAutomaticOrderRoundCreation(VokoTestCase):
-    def test_new_order_round_batch_needed(self):
-        """Test that a new order round batch is created when the last round is less than 30 days away."""
-        self.round = OrderRoundFactory(
-            open_for_orders=datetime.now(tz=UTC) + timedelta(days=30),
-        )
-        order_rounds = create_orderround_batch()
-        self.assertTrue(len(order_rounds) > 0)
-        last_day = get_last_day_of_next_quarter()
-        self.assertTrue(last_day < order_rounds[-1].open_for_orders.date() + timedelta(days=14))
+    @freeze_time("2025-09-18")
+    def test_create_orderround_batch_no_order_rounds_yet(self):
+        """Test creating order rounds when no order rounds exist yet"""
+        # When there are no order rounds, should create from next week to end of current quarter
+        result = create_orderround_batch()
 
-    def test_no_new_order_round_batch_needed(self):
-        """Test that no new order round batch is created when the last round is more than 30 days away."""
-        self.round = OrderRoundFactory(
-            open_for_orders=datetime.now(tz=UTC) + timedelta(days=32),
+        self.assertEqual(len(result), 1)  # Only one order round should fit in this period
+
+    def test_create_orderround_batch_one_order_round_no_more_in_quarter(self):
+        """Test when there's one order round but no more planned for rest of current quarter"""
+        # Create an existing order round early in the quarter
+        _ = OrderRoundFactory(
+            open_for_orders=datetime(2024, 1, 8, 8, 0, tzinfo=UTC),  # Early January
+            closed_for_orders=datetime(2024, 1, 12, 8, 0, tzinfo=UTC),
+            collect_datetime=datetime(2024, 1, 17, 18, 0, tzinfo=UTC),
         )
-        order_rounds = create_orderround_batch()
-        self.assertEqual(len(order_rounds), 0)
+
+        result = create_orderround_batch()
+
+        # Should create order rounds from January 22 (2 weeks after Jan 8) to end of Q1
+        # This should create multiple order rounds to fill the gap
+        self.assertGreater(len(result), 0)
+
+        # Get last ourder round
+        last_round = get_last_order_round()
+
+        # Last order round should be before next quarter
+        last_day_current_quarter, _ = get_quarter_end_dates()
+        self.assertGreater(last_day_current_quarter, last_round.closed_for_orders.date())
+
+    @freeze_time("2024-02-01")
+    def test_create_orderround_batch_next_quarter_far_away(self):
+        """Test when order rounds are planned for this quarter but next quarter is far away"""
+        # Set test date to early February so next quarter (Q2) is more than 31 days away
+
+        # Create order rounds that go close to end of Q1
+        OrderRoundFactory(
+            open_for_orders=datetime(2024, 3, 25, 8, 0, tzinfo=UTC),  # Near end of Q1
+            closed_for_orders=datetime(2024, 3, 29, 8, 0, tzinfo=UTC),
+            collect_datetime=datetime(2024, 4, 3, 18, 0, tzinfo=UTC),
+        )
+
+        result = create_orderround_batch()
+
+        # Should not create any new order rounds since next quarter is far away
+        # and current quarter is already covered
+        self.assertEqual(len(result), 0)
+
+    @freeze_time("2025-09-02")
+    def test_create_orderround_batch_next_quarter_close(self):
+        """Test when order rounds are planned for this quarter and next quarter is close"""
+        # Set test date to late March so next quarter (Q2) is less than 31 days away
+
+        # Create order rounds that go to end of Q1
+        existing_round = OrderRoundFactory(
+            open_for_orders=datetime(2025, 9, 28, 12, 0, tzinfo=UTC)  # Recent round in Q1
+        )
+
+        result = create_orderround_batch()
+
+        # Should create order rounds for next quarter (Q2) since it's less than 31 days away
+        self.assertGreater(len(result), 0)
+
+        # New order rounds should start in Q2 (April 1, 2024 onwards)
+        first_round = result[0]
+        expected_start = existing_round.open_for_orders.date() + timedelta(weeks=config.ORDERROUND_INTERVAL_WEEKS)
+
+        self.assertEqual(first_round.open_for_orders.date(), expected_start)
+        # Should be in Q2 (April or later)
+        self.assertGreaterEqual(first_round.open_for_orders.month, 10)
