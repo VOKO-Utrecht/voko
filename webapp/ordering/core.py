@@ -217,36 +217,48 @@ def calculate_next_orderround_dates(open_date):
     return open_datetime, close_datetime, collect_datetime
 
 
-def get_last_day_of_next_quarter():
+def get_first_and_last_day_of_next_quarter():
     """
-    Get the last day of the next quarter as a datetime object.
+    Get the last day of the current quarter and the last day of the next quarter as date objects.
 
     Returns:
-        datetime: Last day of next quarter
+        tuple: (last_day_current_quarter, last_day_next_quarter)
     """
     now = datetime.now(pytz.UTC)
     current_quarter = (now.month - 1) // 3 + 1
     next_quarter = current_quarter + 1
 
-    # Handle year rollover
+    # Handle year rollover for next quarter
     year = now.year
     if next_quarter > 4:
         next_quarter = 1
         year += 1
 
-    # Calculate last month of next quarter
-    last_month_of_quarter = next_quarter * 3
+    # Calculate last month of current quarter
+    last_month_of_current_quarter = current_quarter * 3
 
-    # Get first day of the month after the quarter
-    if last_month_of_quarter == 12:
+    # Get first day of the month after current quarter
+    if last_month_of_current_quarter == 12:
+        next_month_first_day = date(now.year + 1, 1, 1)
+    else:
+        next_month_first_day = date(now.year, last_month_of_current_quarter + 1, 1)
+
+    # Last day of current quarter
+    last_day_of_current_quarter = next_month_first_day - timedelta(days=1)
+
+    # Calculate last month of next quarter
+    last_month_of_next_quarter = next_quarter * 3
+
+    # Get first day of the month after next quarter
+    if last_month_of_next_quarter == 12:
         next_month_first_day = date(year + 1, 1, 1)
     else:
-        next_month_first_day = date(year, last_month_of_quarter + 1, 1)
+        next_month_first_day = date(year, last_month_of_next_quarter + 1, 1)
 
-    # Last day of quarter is one day before first day of next month
-    last_day_of_quarter = next_month_first_day - timedelta(days=1)
+    # Last day of next quarter
+    last_day_of_next_quarter = next_month_first_day - timedelta(days=1)
 
-    return last_day_of_quarter
+    return last_day_of_current_quarter, last_day_of_next_quarter
 
 
 def create_orderround_batch():
@@ -256,17 +268,29 @@ def create_orderround_batch():
     Returns:
         list[models.OrderRound]: The order round batches created
     """
+    # Get the last day of the current and next quarter
+    last_day_current_quarter, last_day_next_quarter = get_first_and_last_day_of_next_quarter()
+
     # Check if we should create a new order round batch
     last_round = get_last_order_round()
-    now = datetime.now(pytz.UTC)
+    current_date = datetime.now(pytz.UTC).date()
 
-    # If there's no last round, we start from next week
+    # If there's no last round, we start from next week and end at the last day of the current quarter
     if last_round is None:
-        start_date = now.date() + timedelta(days=7)
-    # If the last order round is less than a month from now, we need new round starting two weeks after the last round
-    elif last_round.open_for_orders < now + timedelta(days=31):
+        start_date = current_date + timedelta(days=7)
+        end_date = last_day_current_quarter
+    # If the last round is not just before the next quarter, create a batch to fill the current quarter
+    elif (
+        last_round.open_for_orders.date() + timedelta(weeks=config.ORDERROUND_INTERVAL_WEEKS)
+        <= last_day_current_quarter
+    ):
         start_date = last_round.open_for_orders.date() + timedelta(weeks=config.ORDERROUND_INTERVAL_WEEKS)
-    # If the last order round is more than a month from now, we dont create a new round batch
+        end_date = last_day_current_quarter
+    # If the next quarter is less than ORDERROUND_CREATE_DAYS_AHEAD away, create a new batch for the next quarter
+    elif last_day_current_quarter < current_date + timedelta(days=config.ORDERROUND_CREATE_DAYS_AHEAD):
+        start_date = last_round.open_for_orders.date() + timedelta(weeks=config.ORDERROUND_INTERVAL_WEEKS)
+        end_date = last_day_next_quarter
+    # If none of these match, we don't need a new order round batch.
     else:
         return []
 
@@ -275,7 +299,6 @@ def create_orderround_batch():
     start_date += timedelta(days=days_until_target)
     # Calculate the end date for the next quarter
     # This will be the last day of the next quarter
-    end_date = get_last_day_of_next_quarter()
     order_rounds = []
     while start_date <= end_date:
         open_datetime, close_datetime, collect_datetime = calculate_next_orderround_dates(start_date)
