@@ -38,57 +38,9 @@ packages = ["webapp"]
 
 [dependency-groups]
 dev = [
-    { include-group = "test" },
-    { include-group = "lint" },
-]
-test = [
     "fake-factory==0.7.4",
     "factory-boy==3.2.1",
     "mock==1.0.1",
     "django-debug-toolbar==3.8.1",
     "debugpy==1.6.6",
 ]
-lint = [
-    "ruff>=0.8.4",
-]
-
-[tool.pytest.ini_options]
-addopts = [
-    "--durations=10",
-]
-
-[tool.mypy]
-warn_unused_configs = true
-
-[tool.ruff]
-line-length = 120
-
-[tool.ruff.lint]
-select = ["ALL"]
-
-[tool.ruff.lint.flake8-annotations]
-allow-star-arg-any = true
-
-[tool.ruff.lint.pydocstyle]
-convention = "google"
-
-# Tox configuration for testing with Django and linting with ruff
-[tool.tox]
-min_version = "4.22"
-requires = [
-    "tox>=4.22",
-    "tox-uv",
-]
-env_list = [
-    "testing",
-    "linting",
-]
-
-[tool.tox.env.testing]
-dependency_groups = [ "test" ]
-change_dir = "webapp"
-commands = [ [ "python", "manage.py", "test", "--settings=vokou.settings.testing", { replace = "posargs", default = [], extend = true } ] ]
-
-[tool.tox.env.linting]
-dependency_groups = [ "lint" ]
-commands = [ [ "ruff", "check", { replace = "posargs", default = [ "webapp" ], extend = true } ] ]
