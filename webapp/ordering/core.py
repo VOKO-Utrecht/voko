@@ -301,24 +301,25 @@ def create_orderround_batch():
     # This will be the last day of the next quarter
     order_rounds = []
     while start_date <= end_date:
-        open_datetime, close_datetime, collect_datetime = calculate_next_orderround_dates(start_date)
+        if start_date > current_date:
+            open_datetime, close_datetime, collect_datetime = calculate_next_orderround_dates(start_date)
 
-        # Get default pickup location and transport coordinator
-        pickup_location = models.PickupLocation.objects.filter(is_default=True).first()
-        transport_coordinator = VokoUser.objects.filter(pk=config.ORDERROUND_TRANSPORT_COORDINATOR).first()
+            # Get default pickup location and transport coordinator
+            pickup_location = models.PickupLocation.objects.filter(is_default=True).first()
+            transport_coordinator = VokoUser.objects.filter(pk=config.ORDERROUND_TRANSPORT_COORDINATOR).first()
 
-        order_round = models.OrderRound.objects.create(
-            open_for_orders=open_datetime,
-            closed_for_orders=close_datetime,
-            collect_datetime=collect_datetime,
-            markup_percentage=config.MARKUP_PERCENTAGE,
-            pickup_location=pickup_location,
-            transport_coordinator=transport_coordinator,
-        )
+            order_round = models.OrderRound.objects.create(
+                open_for_orders=open_datetime,
+                closed_for_orders=close_datetime,
+                collect_datetime=collect_datetime,
+                markup_percentage=config.MARKUP_PERCENTAGE,
+                pickup_location=pickup_location,
+                transport_coordinator=transport_coordinator,
+            )
 
-        order_rounds.append(order_round)
+            order_rounds.append(order_round)
 
-        log_event(event="Auto-created order round #%d" % order_round.pk)
+            log_event(event="Auto-created order round #%d" % order_round.pk)
 
         start_date += timedelta(weeks=config.ORDERROUND_INTERVAL_WEEKS)
 
