@@ -5,20 +5,45 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  tests:
+  lint:
+    name: Run linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "latest"
+          enable-cache: false
+
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+        
+      - name: run linting
+        run: uvx --with=tox-uv tox -e linting
+    
+  test:
     name: Run tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v3
+
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.8'
-      - name: Install uv
-        run: python -m pip install --upgrade uv
-      - name: Install dependencies
-        run: uv sync --dev
-      - name: Run tests
-        working-directory: webapp
-        run: uv run python manage.py test --settings=vokou.settings.testing
+          version: "latest"
+          enable-cache: false
+
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: run testing
+        run: uvx --with=tox-uv tox -e testing
+
