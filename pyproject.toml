@@ -85,12 +85,10 @@ env_list = [
 ]
 
 [tool.tox.env.testing]
-runner = "uv-venv-lock-runner"
 dependency_groups = [ "test" ]
 change_dir = "webapp"
 commands = [ [ "python", "manage.py", "test", "--settings=vokou.settings.testing", { replace = "posargs", default = [], extend = true } ] ]
 
 [tool.tox.env.linting]
-runner = "uv-venv-lock-runner"
 dependency_groups = [ "lint" ]
 commands = [ [ "ruff", "check", { replace = "posargs", default = [ "webapp" ], extend = true } ] ]
