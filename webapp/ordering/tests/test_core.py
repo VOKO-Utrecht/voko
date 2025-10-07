@@ -7,8 +7,6 @@ from ordering.core import (
     get_latest_order_round,
     update_totals_for_products_with_max_order_amounts,
     create_orderround_batch,
-    get_quarter_end_dates,
-    get_last_order_round,
 )
 from ordering.models import OrderProduct
 from ordering.tests.factories import (
