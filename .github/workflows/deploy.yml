@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - tobias/create-github-actions-for-deployment
   workflow_dispatch:
     inputs:
       branch:
@@ -20,36 +21,35 @@ jobs:
   deploy-test:
     name: Deploy to test environment
     runs-on: ubuntu-latest
-    environment: test
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-
-    
     steps:
       - name: Deploy to test server
         uses: appleboy/ssh-action@v1.0.3
         with:
           key: ${{ secrets.SSH_KEY }}
+          username: voko_acc
+          host: leden.vokoutrecht.nl
           script: |
             # Run the deploy script with the specified branch
             if [ "${{ github.event_name }}" = "push" ]; then
               # Auto-deploy to test environment on push to main
-              $HOME/scripts/deploy.sh -b main
+              $HOME/scripts/deploy.sh -b 'tobias/create-github-actions-for-deployment'
             else
               # Manual deploy with specified branch
               $HOME/scripts/deploy.sh -b ${{ github.event.inputs.branch }}
             fi
 
-  deploy-production:
-    name: Deploy to production environment
-    runs-on: ubuntu-latest
-    environment: production
-    if: github.event_name == 'push'
+  # deploy-production:
+  #   name: Deploy to production environment
+  #   runs-on: ubuntu-latest
+  #   environment: production
+  #   if: github.event_name == 'push'
     
-    steps:
-      - name: Deploy to production server
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            # Run the deploy script with the specified branch
-            $HOME/scripts/deploy.sh -b ${{ github.event.inputs.branch }}
+  #   steps:
+  #     - name: Deploy to production server
+  #       uses: appleboy/ssh-action@v1.0.3
+  #       with:
+  #         key: ${{ secrets.SSH_KEY }}
+  #         script: |
+  #           # Run the deploy script with the specified branch
+  #           $HOME/scripts/deploy.sh -b ${{ github.event.inputs.branch }}
