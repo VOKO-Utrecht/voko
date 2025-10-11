@@ -275,23 +275,21 @@ def create_orderround_batch():
     last_round = get_last_order_round()
     current_date = datetime.now(pytz.UTC).date()
 
-    # If there's no last round, we start from next week and end at the last day of the current quarter
+    # Determine start date based on whether there's a last round
     if last_round is None:
         start_date = current_date + timedelta(days=7)
-        end_date = last_day_current_quarter
-    # If the last round is not just before the next quarter, create a batch to fill the current quarter
-    elif (
-        last_round.open_for_orders.date() + timedelta(weeks=config.ORDERROUND_INTERVAL_WEEKS)
-        <= last_day_current_quarter
-    ):
-        start_date = last_round.open_for_orders.date() + timedelta(weeks=config.ORDERROUND_INTERVAL_WEEKS)
-        end_date = last_day_current_quarter
-    # If the next quarter is less than ORDERROUND_CREATE_DAYS_AHEAD away, create a new batch for the next quarter
-    elif last_day_current_quarter < current_date + timedelta(days=config.ORDERROUND_CREATE_DAYS_AHEAD):
-        start_date = last_round.open_for_orders.date() + timedelta(weeks=config.ORDERROUND_INTERVAL_WEEKS)
-        end_date = last_day_next_quarter
-    # If none of these match, we don't need a new order round batch.
     else:
+        start_date = last_round.open_for_orders.date() + timedelta(weeks=config.ORDERROUND_INTERVAL_WEEKS)
+
+    # Determine end date based on proximity to next quarter
+    if last_day_current_quarter < current_date + timedelta(days=config.ORDERROUND_CREATE_DAYS_AHEAD):
+        # Next quarter is close, create batch for next quarter
+        end_date = last_day_next_quarter
+    elif last_round is None or start_date <= last_day_current_quarter:
+        # Fill current quarter
+        end_date = last_day_current_quarter
+    else:
+        # No new order round batch needed
         return []
 
     # Adjust start date to the configured open day of the week
