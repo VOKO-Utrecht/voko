@@ -52,4 +52,4 @@ jobs:
           host: leden.vokoutrecht.nl
           script: |
             # Run the deploy script with the specified branch
-            $HOME/scripts/deploy.sh -b ${{ github.event.inputs.branch }}
+            $HOME/scripts/deploy_prod.sh
