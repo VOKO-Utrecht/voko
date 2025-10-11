@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - tobias/create-github-actions-for-deployment
   workflow_dispatch:
     inputs:
       branch:
@@ -21,7 +20,7 @@ jobs:
   deploy-test:
     name: Deploy to test environment
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch'
     steps:
       - name: Deploy to test server
         uses: appleboy/ssh-action@v1.0.3
@@ -39,17 +38,18 @@ jobs:
               $HOME/scripts/deploy.sh -b ${{ github.event.inputs.branch }}
             fi
 
-  # deploy-production:
-  #   name: Deploy to production environment
-  #   runs-on: ubuntu-latest
-  #   environment: production
-  #   if: github.event_name == 'push'
-    
-  #   steps:
-  #     - name: Deploy to production server
-  #       uses: appleboy/ssh-action@v1.0.3
-  #       with:
-  #         key: ${{ secrets.SSH_KEY }}
-  #         script: |
-  #           # Run the deploy script with the specified branch
-  #           $HOME/scripts/deploy.sh -b ${{ github.event.inputs.branch }}
+  deploy-production:
+    name: Deploy to production environment
+    runs-on: ubuntu-latest
+    environment: production
+    if: github.event_name == 'push'
+    steps:
+      - name: Deploy to production server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          username: voko
+          host: leden.vokoutrecht.nl
+          script: |
+            # Run the deploy script with the specified branch
+            $HOME/scripts/deploy.sh -b ${{ github.event.inputs.branch }}
