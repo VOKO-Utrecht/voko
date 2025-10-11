@@ -284,7 +284,8 @@ class ConfirmTransactionView(LoginRequiredMixin, MollieMixin, TemplateView):
             log_event(
                 event=("Payment failed in confirm view"),
                 user=payment.order.user,
-                extra=("payment_id=%s, order_id=%s, amount=%s, status=%s") % (payment.id, payment.order.id, payment.amount, status),
+                extra=("payment_id=%s, order_id=%s, amount=%s, status=%s") % (payment.id, payment.order.id,
+                                                                              payment.amount, status),
             )
 
         context['payment_succeeded'] = success
@@ -330,7 +331,8 @@ class PaymentWebHook(MollieMixin, View):
         log_event(
             event=("[DEBUG] Webhook Mollie status fetched"),
             user=payment.order.user,
-            extra=("mollie_id=%s, status=%s, is_paid=%s, order_id=%s") % (payment.mollie_id, status, success, payment.order.id),
+            extra=("mollie_id=%s, status=%s, is_paid=%s, order_id=%s") % (payment.mollie_id, status, success,
+                                                                          payment.order.id),
         )
 
         if not success:
