@@ -3,6 +3,14 @@ Django based custom web application for food collective www.vokoutrecht.nl.
 
 ![example workflow](https://github.com/VOKO-Utrecht/voko/actions/workflows/ci.yml/badge.svg)
 
+## Deployment
+
+This project includes automated deployment workflows:
+- **Test environment**: Automatically deploys when pushing to `main` branch
+- **Production environment**: Manual deployment via GitHub Actions workflow dispatch
+
+For complete deployment setup instructions, see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
 ## Some notes
 1. The code base needs cleaning up and adding of tests.
 2. License: GNU GPLv3

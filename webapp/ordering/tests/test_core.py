@@ -7,8 +7,6 @@ from ordering.core import (
     get_latest_order_round,
     update_totals_for_products_with_max_order_amounts,
     create_orderround_batch,
-    get_quarter_end_dates,
-    get_last_order_round,
 )
 from ordering.models import OrderProduct
 from ordering.tests.factories import (
@@ -268,35 +266,21 @@ class TestGetLastOrderRound(VokoTestCase):
 
 
 class TestAutomaticOrderRoundCreation(VokoTestCase):
-    @freeze_time("2025-09-18")
+    @freeze_time("2025-08-25")
     def test_create_orderround_batch_no_order_rounds_yet(self):
         """Test creating order rounds when no order rounds exist yet"""
-        # When there are no order rounds, should create from next week to end of current quarter
+        # When there are no order rounds, should create from next week to end of next quarter
         result = create_orderround_batch()
 
-        self.assertEqual(len(result), 1)  # Only one order round should fit in this period
+        self.assertEqual(len(result), 2)  # Two order rounds should be created
 
-    def test_create_orderround_batch_one_order_round_no_more_in_quarter(self):
-        """Test when there's one order round but no more planned for rest of current quarter"""
-        # Create an existing order round early in the quarter
-        _ = OrderRoundFactory(
-            open_for_orders=datetime(2024, 1, 8, 8, 0, tzinfo=UTC),  # Early January
-            closed_for_orders=datetime(2024, 1, 12, 8, 0, tzinfo=UTC),
-            collect_datetime=datetime(2024, 1, 17, 18, 0, tzinfo=UTC),
-        )
-
+    @freeze_time("2025-09-18")
+    def test_create_orderround_batch_no_order_rounds_yet_next_quarter_close(self):
+        """Test creating order rounds when no order rounds exist yet but next quarter is close"""
+        # When there are no order rounds and next quarter is close, should create from next week to end of next quarter
         result = create_orderround_batch()
 
-        # Should create order rounds from January 22 (2 weeks after Jan 8) to end of Q1
-        # This should create multiple order rounds to fill the gap
-        self.assertGreater(len(result), 0)
-
-        # Get last ourder round
-        last_round = get_last_order_round()
-
-        # Last order round should be before next quarter
-        last_day_current_quarter, _ = get_quarter_end_dates()
-        self.assertGreater(last_day_current_quarter, last_round.closed_for_orders.date())
+        self.assertEqual(len(result), 7)  # Seven order rounds should be created
 
     @freeze_time("2024-02-01")
     def test_create_orderround_batch_next_quarter_far_away(self):
