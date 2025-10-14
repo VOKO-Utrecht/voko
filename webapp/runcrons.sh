@@ -3,4 +3,4 @@
 
 cd /home/voko/voko
 
-uv run python webapp/manage.py runcrons --settings=vokou.settings.production 
+uv run --env-file .env python webapp/manage.py runcrons --settings=vokou.settings.production 
