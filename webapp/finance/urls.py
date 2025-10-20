@@ -2,19 +2,19 @@ from django.urls import path
 from django.views.generic import RedirectView
 from finance import views, admin_views
 
-urlpatterns = (    
-    url(r'^pay/cancel/$',
-        views.CancelPaymentView.as_view(),
-        name="finance.cancelpayment"),
-    url(r'^pay/transaction/create/$',
-        views.CreateTransactionView.as_view(),
-        name="finance.createtransaction"),
-    url(r'^pay/transaction/confirm/$',
-        views.ConfirmTransactionView.as_view(),
-        name="finance.confirmtransaction"),
-    url(r'^pay/transaction/callback/$',
-        views.PaymentWebHook.as_view(),
-        name="finance.callback"),
+urlpatterns = (
+    path('pay/cancel/',
+         views.CancelPaymentView.as_view(),
+         name="finance.cancelpayment"),
+    path('pay/transaction/create/',
+         views.CreateTransactionView.as_view(),
+         name="finance.createtransaction"),
+    path('pay/transaction/confirm/',
+         views.ConfirmTransactionView.as_view(),
+         name="finance.confirmtransaction"),
+    path('pay/transaction/callback/',
+         views.PaymentWebHook.as_view(),
+         name="finance.callback"),
 
 
     # Admin views
