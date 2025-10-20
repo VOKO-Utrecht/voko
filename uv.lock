@@ -71,16 +71,17 @@ wheels = [
 
 [[package]]
 name = "django"
-version = "3.2.25"
+version = "4.2.16"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asgiref" },
-    { name = "pytz" },
+    { name = "backports-zoneinfo" },
     { name = "sqlparse" },
+    { name = "tzdata", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ec/68/0e744f07b57bfdf99abbb6b3eb14fcba188867021c05f4a104e04f6d56b8/Django-3.2.25.tar.gz", hash = "sha256:7ca38a78654aee72378594d63e51636c04b8e28574f5505dff630895b5472777", size = 9836336, upload-time = "2024-03-04T08:57:02.257Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/65/d8/a607ee443b54a4db4ad28902328b906ae6218aa556fb9b3ac45c0bcb313d/Django-4.2.16.tar.gz", hash = "sha256:6f1616c2786c408ce86ab7e10f792b8f15742f7b7b7460243929cb371e7f1dad", size = 10436023, upload-time = "2024-09-03T14:02:02.046Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/30/8e/cc23c762c5dcd1d367d73cf006a326e0df2bd0e785cba18b658b39904c1e/Django-3.2.25-py3-none-any.whl", hash = "sha256:a52ea7fcf280b16f7b739cec38fa6d3f8953a5456986944c3ca97e79882b4e38", size = 7890550, upload-time = "2024-03-04T08:56:47.529Z" },
+    { url = "https://files.pythonhosted.org/packages/94/2c/6b6c7e493d5ea789416918658ebfa16be7a64c77610307497ed09a93c8c4/Django-4.2.16-py3-none-any.whl", hash = "sha256:1ddc333a16fc139fd253035a1606bb24261951bbc3a6ca256717fa06cc41a898", size = 7992936, upload-time = "2024-09-03T14:01:55.363Z" },
 ]
 
 [[package]]
@@ -110,16 +111,14 @@ wheels = [
 
 [[package]]
 name = "django-constance"
-version = "2.9.1"
+version = "3.1.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/3d/d1/07c31ee700fa1ccaa45bf4416562e4ae8b22a96d9db0968d918eecbc25be/django-constance-2.9.1.tar.gz", hash = "sha256:4c6a96a5f2cbce1bc3fa41aa20566b6ee26fbd896c9f91f996518a3a0904f6c8", size = 32201, upload-time = "2022-08-11T11:57:47.669Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/18/fa/2d36b56feebe5f44558c5f30fbfc40f8627662aed894d5efffc89e1ac861/django_constance-2.9.1-py3-none-any.whl", hash = "sha256:bf0b392efa18a1f3f464eddb7eb36ac5c02598354a5e31d0d4ce4fc8b535694b", size = 62781, upload-time = "2022-08-11T11:57:39.394Z" },
-]
-
-[package.optional-dependencies]
-database = [
+dependencies = [
     { name = "django-picklefield" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/93/67/f610b34cb8829aa2a2743ea1a25537305c11a544a71f330af178aad1a0b1/django-constance-3.1.0.tar.gz", hash = "sha256:2b96e51de63751ef63f8f92f74e0f6aea30fb6453f3a736c21e1f8b3f6cf0b4f", size = 36806, upload-time = "2023-08-21T21:36:35.453Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/83/13/efb68bd759aab4f8f1de5863f9e63f93fdd532ca6743c41e14a396256f98/django_constance-3.1.0-py3-none-any.whl", hash = "sha256:6242486a346e396d765a9333d17f3101c8613cabc92e0b98dcb70c2a391bc53b", size = 63041, upload-time = "2023-08-21T21:35:43.59Z" },
 ]
 
 [[package]]
@@ -149,26 +148,26 @@ wheels = [
 
 [[package]]
 name = "django-extensions"
-version = "3.1.2"
+version = "3.2.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cf/e2/832eca76b860b2c0fc67e8b6b8b173e6f3ebb2f4c015d94f011e6f4c911b/django-extensions-3.1.2.tar.gz", hash = "sha256:081828e985485662f62a22340c1506e37989d14b927652079a5b7cd84a82368b", size = 613633, upload-time = "2021-04-05T12:09:21.417Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8a/f1/318684c9466968bf9a9c221663128206e460c1a67f595055be4b284cde8a/django-extensions-3.2.3.tar.gz", hash = "sha256:44d27919d04e23b3f40231c4ab7af4e61ce832ef46d610cc650d53e68328410a", size = 277216, upload-time = "2023-06-05T17:09:01.447Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a4/cc/f5439ec50d3a026ea657da3883bba7fec494182a961cfc98f2de2a0746ac/django_extensions-3.1.2-py3-none-any.whl", hash = "sha256:17f85f4dcdd5eea09b8c4f0bad8f0370bf2db6d03e61b431fa7103fee29888de", size = 223281, upload-time = "2021-04-05T12:09:19.708Z" },
+    { url = "https://files.pythonhosted.org/packages/a7/7e/ba12b9660642663f5273141018d2bec0a1cae1711f4f6d1093920e157946/django_extensions-3.2.3-py3-none-any.whl", hash = "sha256:9600b7562f79a92cbf1fde6403c04fee314608fefbb595502e34383ae8203401", size = 229868, upload-time = "2023-06-05T17:08:58.197Z" },
 ]
 
 [[package]]
 name = "django-hijack"
-version = "3.2.6"
+version = "3.6.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d1/85/0bc1e66460bc9fc4ce0e3dbee58b63c4abfd3c514b4b7cb4fb039494d2dd/django-hijack-3.2.6.tar.gz", hash = "sha256:a6df02875c6a653eeb2c0768391587c3ffe711613b8f6cd9e56b9ba62f0b44d9", size = 266670, upload-time = "2022-12-27T14:51:51.63Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5a/b4/060df2d828d6c569824976ce83fe63c8a742459b006f35acd0d7e1a2acdc/django_hijack-3.6.2.tar.gz", hash = "sha256:c300bbf4de81d5240fc468038d76fb3729dea053743ac6f9aea994c1f9ba2870", size = 14205, upload-time = "2024-10-18T21:00:47.708Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/05/be/3f7f259d5903b77286c88c622d132120496eef7e89c585bffb7af3e585bc/django_hijack-3.2.6-py3-none-any.whl", hash = "sha256:c453d9d37208d7cd78f9b679831ec60ff03160c88bb87e9ac1f49e5c4ada3874", size = 36878, upload-time = "2022-12-27T14:51:49.901Z" },
+    { url = "https://files.pythonhosted.org/packages/e9/23/5b161cabf3db5a99852e92b3017a38b20554f9c40ab1d0390163ee77ef0d/django_hijack-3.6.2-py3-none-any.whl", hash = "sha256:8e36b136fd5a60c2f01606837e406877d6260610bffc3219f6fe0a5d56018fab", size = 31345, upload-time = "2024-10-18T21:00:46.063Z" },
 ]
 
 [[package]]
@@ -185,26 +184,26 @@ wheels = [
 
 [[package]]
 name = "django-picklefield"
-version = "2.1.1"
+version = "3.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/df/48/3c8a333b11312d73fb93dce589ae5a979e5334a5f5ee9918e580b88ddd96/django-picklefield-2.1.1.tar.gz", hash = "sha256:67a5e156343e3b032cac2f65565f0faa81635a99c7da74b0f07a0f5db467b646", size = 9380, upload-time = "2020-01-28T15:06:20.714Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9f/37/449e9425a33eed4dfe39baf43cc2643f3d5ecd47dca4545d705b3f5ccc1a/django-picklefield-3.2.tar.gz", hash = "sha256:aa463f5d79d497dbe789f14b45180f00a51d0d670067d0729f352a3941cdfa4d", size = 9520, upload-time = "2024-04-05T02:23:03.965Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/86/fc/fe95b99101f9c1ec4c2c8c09268139c17bcfe180c76a6cfcc85d20bd5841/django_picklefield-2.1.1-py2.py3-none-any.whl", hash = "sha256:e03cb181b7161af38ad6b573af127e4fe9b7cc2c455b42c1ec43eaad525ade0a", size = 9370, upload-time = "2020-01-28T15:06:18.808Z" },
+    { url = "https://files.pythonhosted.org/packages/52/f9/1502538efa2d4cd3a88ff806cdbd08b1c681dd828d05b6dbc8bcb50a8586/django_picklefield-3.2-py3-none-any.whl", hash = "sha256:e9a73539d110f69825d9320db18bcb82e5189ff48dbed41821c026a20497764c", size = 9533, upload-time = "2024-04-05T02:23:01.86Z" },
 ]
 
 [[package]]
 name = "django-recaptcha"
-version = "3.0.0"
+version = "4.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/06/0e/b124478374ec4607c65936bec9da4705ca2b7116af399f6836e22a1d7248/django-recaptcha-3.0.0.tar.gz", hash = "sha256:253197051288923cae675d7eff91b619e3775311292a5dbaf27a8a55ffebc670", size = 22063, upload-time = "2022-02-07T21:44:22.724Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d4/6b/6edf89da076b2d1ea042e14f116de80be18d25b17af158038d5fc14c00bb/django-recaptcha-4.0.0.tar.gz", hash = "sha256:5316438f97700c431d65351470d1255047e3f2cd9af0f2f13592b637dad9213e", size = 22907, upload-time = "2023-11-16T15:29:08.601Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/18/dd/b266aa9e695e4b0fc13a2bd06533cd671a71be46f72342c2222fa3d5b290/django_recaptcha-3.0.0-py3-none-any.whl", hash = "sha256:1aed69fd6ac8fd9e99e52665392ae6748f8b6339ace656fad779fe0c6c915a52", size = 22080, upload-time = "2022-02-07T21:44:21.009Z" },
+    { url = "https://files.pythonhosted.org/packages/28/d7/09cefb2b4a7dc9ed8a6aabb176ea86eb904a8f73671358436e4b0aa81b93/django_recaptcha-4.0.0-py3-none-any.whl", hash = "sha256:0d912d5c7c009df4e47accd25029133d47a74342dbd2a8edc2877b6bffa971a3", size = 21915, upload-time = "2023-11-16T15:29:06.79Z" },
 ]
 
 [[package]]
@@ -534,7 +533,7 @@ dependencies = [
     { name = "django" },
     { name = "django-bootstrap5" },
     { name = "django-braces" },
-    { name = "django-constance", extra = ["database"] },
+    { name = "django-constance" },
     { name = "django-cron" },
     { name = "django-extensions" },
     { name = "django-hijack" },
@@ -567,16 +566,16 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "django", specifier = "==3.2.25" },
+    { name = "django", specifier = "==4.2.16" },
     { name = "django-bootstrap5", specifier = "==23.3" },
     { name = "django-braces", specifier = "==1.14.0" },
-    { name = "django-constance", extras = ["database"], specifier = "==2.9.1" },
+    { name = "django-constance", extras = ["database"], specifier = "==3.1.0" },
     { name = "django-cron", specifier = "==0.6.0" },
-    { name = "django-extensions", specifier = "==3.1.2" },
-    { name = "django-hijack", specifier = "==3.2.6" },
+    { name = "django-extensions", specifier = "==3.2.3" },
+    { name = "django-hijack", specifier = "==3.6.2" },
     { name = "django-nose", specifier = "==1.4.7" },
-    { name = "django-picklefield", specifier = "==2.1.1" },
-    { name = "django-recaptcha", specifier = "==3.0.0" },
+    { name = "django-picklefield", specifier = "==3.2.0" },
+    { name = "django-recaptcha", specifier = "==4.0.0" },
     { name = "django-tinymce", specifier = "==4.1.0" },
     { name = "freezegun", specifier = ">=1.5.5" },
     { name = "gunicorn", specifier = "==22.0.0" },
