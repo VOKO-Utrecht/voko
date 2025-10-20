@@ -1,5 +1,5 @@
 *
 !*.sh
 !*.py
-!Pipfile
-!Pipfile.lock
+!pyproject.toml
+!uv.lock

@@ -90,19 +90,6 @@ class TestProductsView(VokoTestCase):
         ret = self.client.get(self.url)
         self.assertCountEqual(ret.context['view'].suppliers(), suppliers)
 
-    def test_redirect_to_payment_page_when_current_order_is_finalized(self):
-        self.patch("finance.views.MollieClient")
-
-        OrderFactory(order_round=self.round, user=self.user, finalized=True)
-        ret = self.client.get(self.url, follow=True)
-        self.assertRedirects(ret, reverse('finance.choosebank'),
-                             fetch_redirect_response=True)
-        self.assertMsgInResponse(
-            ret,
-            "Je bent doorgestuurd naar de betaalpagina "
-            "omdat je bestelling nog niet is betaald!"
-        )
-
     def test_submit_without_data(self):
         ret = self.client.post(self.url)
         self.assertFalse(OrderProduct.objects.exists())

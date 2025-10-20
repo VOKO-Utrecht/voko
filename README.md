@@ -3,6 +3,14 @@ Django based custom web application for food collective www.vokoutrecht.nl.
 
 ![example workflow](https://github.com/VOKO-Utrecht/voko/actions/workflows/ci.yml/badge.svg)
 
+## Deployment
+
+This project includes automated deployment workflows:
+- **Test environment**: Automatically deploys when pushing to `main` branch
+- **Production environment**: Manual deployment via GitHub Actions workflow dispatch
+
+For complete deployment setup instructions, see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
 ## Some notes
 1. The code base needs cleaning up and adding of tests.
 2. License: GNU GPLv3
@@ -10,59 +18,102 @@ Django based custom web application for food collective www.vokoutrecht.nl.
 
 
 # Development environment using Docker
-### Get the code
-1. Run: `git clone https://github.com/VOKO-Utrecht/voko.git`
-2. Run: cd voko
+### Quick Setup (Recommended)
+**Option 1: Using make (if you have make installed)**
+```bash
+git clone https://github.com/VOKO-Utrecht/voko.git
+cd voko
+make setup
+```
 
-### Initiate the database
-1. Run: docker-compose up db
-2. Wait until db is ready to accept connections
-3. Press CTRL-C to stop the db container again
-_first time postgress restarts which confuses Django_
+**Option 2: Using docker-compose directly**
+```bash
+git clone https://github.com/VOKO-Utrecht/voko.git
+cd voko
+docker-compose up
+```
 
-### Start voko website and run migrations
-1. Run: docker-compose up -d
-2. Run: docker exec -it voko_web_1 bash
-3. Run: ./manage.py makemigrations --settings=vokou.settings.development
-4. Run: ./manage.py migrate --settings=vokou.settings.development
-5. Run: exit
+Then:
+4. Wait for the setup to complete (you'll see "Starting development server...")
+5. Go to: http://127.0.0.1:8000
+6. Login with: `admin@voko.local` / `admin123`
 
-### Create superuser in the voko web container
-1. Run: docker exec -it voko_web_1 bash
-2. Run: ./manage.py createsuperuser --settings=vokou.settings.development
-3. _follow the prompts_
-4. Run: exit
+That's it! The setup automatically:
+- Creates and initializes the database
+- Runs all migrations
+- Creates a superuser account if it does not exist
+- Starts the development server
 
-In your browser go to: http://127.0.0.1:8000/admin/ordering/orderround/
+You can also visit the main site at: http://127.0.0.1:8000/
 
-Login as the super user just created \
-Use the admin site to create an order round (otherwise you get an ugly error going to the main site --FIXTHIS)
+### Common Commands
+If you have make installed, you can use these convenient commands:
+- `make setup` - Complete setup (build and start)
+- `make up` - Start services
+- `make down` - Stop services
+- `make logs` - View logs
+- `make shell` - Access Django shell
+- `make test` - Run tests
+- `make validate` - Check if setup is working
+- `make reset` - Reset database (deletes all data)
+- `make help` - Show all available commands
 
+#### Customizing the auto-setup
+You can customize the automatically created superuser by setting environment variables:
+- `DJANGO_SUPERUSER_EMAIL` (default: admin@voko.local)
+- `DJANGO_SUPERUSER_FIRST_NAME` (default: Admin)
+- `DJANGO_SUPERUSER_LAST_NAME` (default: User)
+- `DJANGO_SUPERUSER_PASSWORD` (default: admin123)
+
+For convenience, you can copy `.env.example` to `.env` and modify the values there:
+```bash
+cp .env.example .env
+# Edit .env file with your preferred values
+```
+
+Or set them directly when starting:
+```bash
+DJANGO_SUPERUSER_EMAIL=myemail@example.com DJANGO_SUPERUSER_PASSWORD=mypassword docker-compose up
+```
+
+### Troubleshooting
+- If you get database connection errors, make sure the database is fully started by running `docker-compose up db` first, waiting for it to be ready, then stopping it and running `docker-compose up` again.
+- If you need to reset the database, run: `docker-compose down -v` (this will delete all data)
+- To access the Django shell: `docker exec -it voko_web bash` then `./manage.py shell --settings=vokou.settings.development`
+- To view logs: `docker-compose logs web` or `docker-compose logs db`
+- To validate your setup is working: `./validate_setup.sh`
+
+## What's New in This Setup?
+This improved Docker setup includes:
+- **Automated superuser creation**: No need to manually create admin accounts
+- **Automatic sample data creation**: Creates a sample supplier and order round
+- **One-command setup**: Just run `docker-compose up` or `make setup`
+- **Health checks**: Ensures database is ready before starting the web server
+- **Validation script**: Check if everything is working correctly
+- **Convenient Make commands**: Easy-to-use shortcuts for common tasks
+- **Environment variable support**: Customize superuser credentials and other settings
+- **Better error handling**: More robust startup process
 
 
 # Development environment without Docker
-1. Run: pip install --user pipenv
+1. Run: pip install --user uv
 2. Run: `git clone https://github.com/VOKO-Utrecht/voko.git`
 3. Run: `cd voko`
-4. Run: `pipenv install --dev`
-5. Run: `pipenv shell`
-6. In vokou/settings/development.py: \
-        - Uncomment config for sqlite3 \
-        - Comment the config for postgresql
+4. Sync environment: `uv sync --dev`
+6. Active environment: `source .venv/bin/activate`
 
 
-### Set up sqlite database
-    cd webapp
-    ./manage.py migrate --settings=vokou.settings.development
-    ./manage.py createsuperuser --settings=vokou.settings.development
+### Set up sqlite database, create superuser and automatically create first order round
+    python manage.py makemigrations --settings=vokou.settings.development
+    python manage.py migrate --settings=vokou.settings.development
+    python manage.py createsuperuser --settings=vokou.settings.development
+    python manage.py runcrons --force --settings=vokou.settings.development
 
 ### Run tests
-    cd webapp
-    ./runtests.sh
+    python manage.py test --settings=vokou.settings.testing
 
 ### Run development server
-    cd webapp
-    ./manage.py runserver --settings=vokou.settings.development
+    python manage.py runserver --settings=vokou.settings.development
 
 ### Adding user
 1. Register as new user at: http://localhost:8000/accounts/register/

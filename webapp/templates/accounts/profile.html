@@ -103,6 +103,22 @@
                                 {{ user.userprofile.particularities|default:"-" }}
                             </div>
                         </div>
+                        <div class="row mt-3">
+                            <hr>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                Ontvangt e-mail wanneer een bestelronde wordt geopend:
+                            </div>    
+                            <div class="col">
+                                {% if user.userprofile.orderround_mail_optout %}
+                                Nee
+                                {% else %}
+                                Ja
+                                {% endif %}
+                            </div>    
+                        </div>
+
                     </div>
                 </div>
                 <div class="d-flex justify-content-between">

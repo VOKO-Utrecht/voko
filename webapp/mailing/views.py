@@ -19,7 +19,8 @@ class PreviewMailView(StaffuserRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(PreviewMailView, self).get_context_data(**kwargs)
 
-        users = VokoUser.objects.filter(id__in=self.request.session.get('mailing_user_ids'))
+        users = VokoUser.objects.filter(id__in=self.request.session.get('mailing_user_ids'))\
+                        .order_by("first_name", "last_name")
         sleeping_users = SleepingVokoUser.objects.filter(id__in=self.request.session.get('mailing_user_ids'))
 
         context['mailing_users'] = list(users) + list(sleeping_users)

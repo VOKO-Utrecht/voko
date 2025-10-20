@@ -501,10 +501,6 @@ class ProductAdminMain(GroupRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         ctx = super(ProductAdminMain, self).get_context_data()
         ctx['current_order_round'] = get_current_order_round()
-        ctx['last_ten_orders_with_notes'] = Order.objects.filter(
-            user_notes__isnull=False).order_by('-id')[:10]
-        ctx['last_ten_orders_with_notes'] = Order.objects.filter(
-            user_notes__isnull=False).order_by('-id')[:10]
         return ctx
 
     def get_queryset(self):
@@ -532,7 +528,9 @@ class RedirectToMailingView(GroupRequiredMixin, DetailView):
 
         if kwargs['mailing_type'] == "round-open":
             mailing_id = 11  # Order round open
-            queryset = VokoUser.objects.filter(can_activate=True)
+            queryset = VokoUser.objects.filter(Q(can_activate=True)
+                                               & (Q(userprofile__isnull=True)
+                                                  | Q(userprofile__orderround_mail_optout=False)))
 
         user_ids = [user.pk for user in queryset]
         request.session['mailing_user_ids'] = user_ids

@@ -12,7 +12,7 @@
       {% else %}
       <p>
       <strong>Hieronder zie je de producten in je "winkelmandje".</strong><br/>
-      Door op de rode knop onderaan deze pagina te klikken wordt je bestelling <strong>geplaatst</strong> en
+      Door op de groene knop onderaan deze pagina te klikken wordt je bestelling <strong>geplaatst</strong> en
       ga je naar de betalingspagina.</p>
       <p>
           Als je een product niet hebt kunnen bestellen (zie eventuele melding bovenaan deze pagina) of als je
@@ -81,19 +81,9 @@
   </table>
 </div>
 
-<form action="" method="post">{% csrf_token %}
+<form action="{% url 'finance.createtransaction' %}" method="post">{% csrf_token %}
 
     <div class="row">
-        <div class="col-md-6">
-            <div class="panel panel-info">
-                <!-- <div class="panel-heading">Feedback</div> -->
-                    <div class="panel-body">
-                    <p>We willen graag van je horen wat je van de producten en de bestelprocedure van vorige bestelronde vond.
-                        (je mag dit vak ook leeglaten).</p>
-                    <textarea class="form-control" rows="2" name="notes" placeholder="Opmerkingen?"></textarea>
-                </div>
-            </div>
-        </div>
         {% if object.order_round.get_pickup_location %}
             <div class="col-md-6">
                 <div class="panel panel-danger">
