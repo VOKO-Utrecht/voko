@@ -29,6 +29,7 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "ordering.context_processors.pickup_locations",
+                "vokou.context_processors.organization",
             ],
         },
     },
@@ -96,6 +97,15 @@ DJANGO_CRON_DELETE_LOGS_OLDER_THAN = 365
 
 ROOT_URLCONF = "vokou.urls"
 WSGI_APPLICATION = "vokou.wsgi.application"
+
+# Organization-specific settings for VOKO Utrecht
+ORGANIZATION_NAME = "VOKO Utrecht"
+ORGANIZATION_SHORT_NAME = "VOKO Utrecht"
+ORGANIZATION_LEGAL_NAME = "Stichting Financiën VOKO Utrecht"
+ORGANIZATION_KVK = "61879584"
+ORGANIZATION_EMAIL = "info@vokoutrecht.nl"
+ORGANIZATION_SUPPLIER_EMAIL = "boeren@vokoutrecht.nl"
+ORGANIZATION_WEBSITE = "https://www.vokoutrecht.nl"
 
 # Internationalization
 
