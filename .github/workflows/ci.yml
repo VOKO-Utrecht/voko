@@ -26,7 +26,6 @@ jobs:
           python-version-file: "pyproject.toml"
         
       - name: Run tests
-        working-directory: webapp
         run: uv run pytest webapp/ --ds=vokou.settings.testing
     
   lint:
