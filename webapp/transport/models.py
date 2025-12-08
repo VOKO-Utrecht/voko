@@ -33,6 +33,7 @@ class Ride(TimeStampedModel):
     class Meta:
         verbose_name = "Ride"
         verbose_name_plural = "Rides"
+        unique_together = ["order_round", "route"]
 
     id = models.AutoField(primary_key=True)
     order_round = models.ForeignKey(
