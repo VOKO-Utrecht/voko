@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.forms import TimeInput
 from distribution.models import Shift
 from django.utils.translation import ugettext_lazy as _
 import datetime
@@ -49,9 +50,9 @@ class ShiftAdmin(admin.ModelAdmin):
         css = {
             'all': ('css/shiftadmin.css',),
         }
-    list_display = ["date_long_str", "start_str", "end_str", "members_names"]
+    list_display = ["date_long_str", "start_str", "end_str", "members_names", "order_round"]
     ordering = ("-order_round__collect_datetime", "start")
-    list_filter = (RecentListFilter,)
+    list_filter = (RecentListFilter, ("order_round", admin.RelatedOnlyFieldListFilter),)
 
     # Show only members who are in the distribution group
     def formfield_for_manytomany(self, db_field, request, **kwargs):
@@ -65,7 +66,17 @@ class ShiftAdmin(admin.ModelAdmin):
         form = super(ShiftAdmin, self).get_form(request, obj, **kwargs)
         order_round_field = form.base_fields['order_round']
         order_round_field.label_from_instance = format_order_round
+        # Allow %H:%M only for begin and end
+        start_field = form.base_fields["start"]
+        start_field.input_formats = [start_field.widget.format]
+        end_field = form.base_fields["end"]
+        end_field.input_formats = [end_field.widget.format]
         return form
+
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        if db_field.name == 'start' or db_field.name == 'end':
+            kwargs['widget'] = TimeInput(format='%H:%M')
+        return super().formfield_for_dbfield(db_field, **kwargs)
 
 
 admin.site.register(Shift, ShiftAdmin)
