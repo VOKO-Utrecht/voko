@@ -75,7 +75,7 @@ docker-runserver:
 
 # Run tests
 docker-test:
-	docker exec voko_web uv run python manage.py test --settings=vokou.settings.testing
+	docker exec voko_web uv run pytest webapp/ --ds=vokou.settings.testing
 
 # Reset database (WARNING: deletes all data)
 docker-reset:
@@ -108,7 +108,7 @@ runcrons:
 # test
 test:
 	@echo "Running tests..."
-	uv run python webapp/manage.py test --settings=vokou.settings.testing
+	uv run pytest webapp/ --ds=vokou.settings.testing 
 
 # start webapp
 start-webapp:

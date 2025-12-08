@@ -44,13 +44,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django_nose",
     "tinymce",
     "django_extensions",
     "braces",
     "django_bootstrap5",
     "django_cron",
-    "captcha",
+    "django_recaptcha",
     "mailing",
     "accounts",
     "log",
@@ -102,7 +101,6 @@ WSGI_APPLICATION = "vokou.wsgi.application"
 LANGUAGE_CODE = "nl-nl"
 TIME_ZONE = "Europe/Amsterdam"
 USE_I18N = True
-USE_L10N = False
 USE_TZ = True
 DECIMAL_SEPARATOR = ","
 DATETIME_FORMAT = "j F Y, H:i"
@@ -117,8 +115,6 @@ LOGIN_REDIRECT_URL = "/"
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 EMAIL_SUBJECT_PREFIX = "[Voko Admin] "
-
-TEST_RUNNER = "django_nose.NoseTestSuiteRunner"
 
 MOLLIE_API_KEY = "SETME"
 
