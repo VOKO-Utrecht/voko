@@ -12,7 +12,7 @@ class Shift(TimeStampedModel):
     class Meta:
         verbose_name = "Shift"
         verbose_name_plural = "Shifts"
-        ordering = ["start"],
+        ordering = ["start"]
         unique_together = ["start", "end", "order_round"]
 
     id = models.AutoField(primary_key=True)
@@ -39,15 +39,15 @@ class Shift(TimeStampedModel):
 
     @property
     def date_long_str(self):
-        return self.date.strftime("%-d %b %Y")
+        return self.date.strftime("%d %b %Y")
 
     @property
     def start_str(self):
-        return self.start.strftime("%-H:%M")
+        return self.start.strftime("%H:%M")
 
     @property
     def end_str(self):
-        return self.end.strftime("%-H:%M")
+        return self.end.strftime("%H:%M")
 
     @property
     def distribution_coordinator(self):
