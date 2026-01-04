@@ -29,15 +29,8 @@ jobs:
           username: voko_acc
           host: leden.vokoutrecht.nl
           script: |
-            # Run the deploy script with the specified branch
-            if [ "${{ github.event_name }}" = "push" ]; then
-              # Auto-deploy to test environment on push to main
-              $HOME/scripts/deploy.sh -b 'tobias/create-github-actions-for-deployment'
-            else
-              # Manual deploy with specified branch
-              $HOME/scripts/deploy.sh -b ${{ github.event.inputs.branch }}
-            fi
-
+            git pull
+            $HOME/scripts/deploy.sh -b ${{ github.event.inputs.branch }}
   deploy-production:
     name: Deploy to production environment
     runs-on: ubuntu-latest
@@ -51,5 +44,5 @@ jobs:
           username: voko
           host: leden.vokoutrecht.nl
           script: |
-            # Run the deploy script with the specified branch
+            git pull
             $HOME/scripts/deploy_prod.sh
