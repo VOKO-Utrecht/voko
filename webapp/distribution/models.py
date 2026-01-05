@@ -26,7 +26,7 @@ class Shift(TimeStampedModel):
         settings.AUTH_USER_MODEL, related_name="distribution_shifts"
     )
     start = models.TimeField(help_text="When this shift starts (hh:mm)")
-    end = models.TimeField(help_text="When this shifts ends (hh:mm)")
+    end = models.TimeField(help_text="When this shift ends (hh:mm)")
     slug = models.SlugField(unique=True, editable=False, max_length=100)
 
     @property
