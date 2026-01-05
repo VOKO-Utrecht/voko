@@ -72,8 +72,13 @@ class Shift(TimeStampedModel):
         return key_collectors
 
     def clean(self):
+        # If start or end is not set, defer to field-level validation
+        if self.start is None or self.end is None:
+            return
         if self.start >= self.end:
-            raise ValidationError(f"De starttijd ({self.start_str}) van de shift ligt na de eindtijd ({self.end_str})")
+            raise ValidationError(
+                f"De starttijd ({self.start}) van de shift ligt na de eindtijd ({self.end})"
+            )
 
     def save(self, **kwargs):
         self.slug = slugify(self)
