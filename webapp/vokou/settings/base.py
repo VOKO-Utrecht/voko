@@ -90,6 +90,7 @@ CRON_CLASSES = [
     "ordering.cron.SendDistributionMails",
     "ordering.cron.SendRideCostsRequestMails",
     "ordering.cron.AutoCreateOrderRoundBatch",
+    "accounts.cron.DeleteInactiveAccounts",
 ]
 
 DJANGO_CRON_DELETE_LOGS_OLDER_THAN = 365
@@ -126,7 +127,7 @@ BASE_URL = "https://leden.vokoutrecht.nl"
 DEFAULT_FROM_EMAIL = "VOKO Utrecht <info@vokoutrecht.nl>"
 
 TINYMCE_DEFAULT_CONFIG = {
-    "plugins": "table,xhtmlxtras,paste,searchreplace",
+    "plugins": "table,paste,searchreplace",
     "theme_advanced_buttons3_add": "cite,abbr",
     "cleanup_on_startup": True,
     "custom_undo_redo_levels": 10,
