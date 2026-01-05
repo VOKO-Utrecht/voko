@@ -1,4 +1,3 @@
-from django.db import DatabaseError
 from django_cron import CronJobBase, Schedule
 from django.db.models import Q
 import log
