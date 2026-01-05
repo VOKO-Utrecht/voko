@@ -8,7 +8,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/dev/ref/settings/
 """
 
-from .base import *
+import os
+
+from .base import *  # noqa: F401, F403
 import socket
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -21,7 +23,7 @@ DATABASES = {
     # SQLite for local development without Docker
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db-acc.sqlite3"),
+        "NAME": os.path.join(BASE_DIR, "db-acc.sqlite3"),  # noqa: F405
     }
 }
 
@@ -32,10 +34,10 @@ ADMIN_USER_LIST_COUNT = 20
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = "/tmp/app-messages"
 
-INSTALLED_APPS += [
+INSTALLED_APPS += [  # noqa: F405
     "debug_toolbar",
 ]
-MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware"] + MIDDLEWARE
+MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware"] + MIDDLEWARE  # noqa: F405
 
 # Getting the correct internal IP when running in Docker
 hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
@@ -73,7 +75,7 @@ DEBUG_TOOLBAR_CONFIG = {
 MOLLIE_API_KEY = "test_mMpjV4xanRPNgvnC7JmPvM84Vz8WJ2"
 
 # Override Constance config for development
-CONSTANCE_CONFIG = CONSTANCE_CONFIG.copy()
+CONSTANCE_CONFIG = CONSTANCE_CONFIG.copy()  # noqa: F405
 CONSTANCE_CONFIG["AUTO_CREATE_ORDERROUNDS"] = (
     os.environ.get("AUTO_CREATE_ORDERROUNDS", "True").lower() == "true",
     "Automatically create new order rounds",
@@ -87,6 +89,6 @@ if os.environ.get("RUN_MAIN"):
     print("Attached!")
 
 try:
-    from .local import *
+    from .local import *  # noqa: F401, F403
 except ImportError:
     pass

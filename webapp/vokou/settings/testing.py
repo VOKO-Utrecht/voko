@@ -1,14 +1,14 @@
-from .development import *
+import os
+
+from .development import *  # noqa: F401, F403
 
 # Faster backend, useful while devving / testing
-PASSWORD_HASHERS = (
-    'django.contrib.auth.hashers.MD5PasswordHasher',
-)
+PASSWORD_HASHERS = ("django.contrib.auth.hashers.MD5PasswordHasher",)
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),  # noqa: F405
     }
 }
 
@@ -19,8 +19,9 @@ DEBUG = False
 class DisableMigrations(object):
     def __contains__(self, item):
         return True
- 
+
     def __getitem__(self, item):
         return
- 
+
+
 MIGRATION_MODULES = DisableMigrations()

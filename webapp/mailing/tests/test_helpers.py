@@ -15,9 +15,7 @@ class RenderMailTemplateTest(TestCase):
     def test_renders_subject(self):
         """Test subject is rendered with context."""
         template = MailTemplate.objects.create(
-            title="Test",
-            subject="Hello {{ user.first_name }}",
-            html_body="<p>Body</p>"
+            title="Test", subject="Hello {{ user.first_name }}", html_body="<p>Body</p>"
         )
         user = VokoUserFactory.create(first_name="Jan")
 
@@ -28,9 +26,7 @@ class RenderMailTemplateTest(TestCase):
     def test_renders_html_body(self):
         """Test HTML body is rendered with context."""
         template = MailTemplate.objects.create(
-            title="Test",
-            subject="Test",
-            html_body="<p>Hello {{ user.first_name }} {{ user.last_name }}</p>"
+            title="Test", subject="Test", html_body="<p>Hello {{ user.first_name }} {{ user.last_name }}</p>"
         )
         user = VokoUserFactory.create(first_name="Jan", last_name="Janssen")
 
@@ -43,9 +39,7 @@ class RenderMailTemplateTest(TestCase):
     def test_renders_plain_text(self):
         """Test plain text is generated from HTML."""
         template = MailTemplate.objects.create(
-            title="Test",
-            subject="Test",
-            html_body="<p>Hello <strong>World</strong></p>"
+            title="Test", subject="Test", html_body="<p>Hello <strong>World</strong></p>"
         )
 
         subject, html, plain, from_email = render_mail_template(template)
@@ -59,10 +53,7 @@ class RenderMailTemplateTest(TestCase):
     def test_renders_from_email(self):
         """Test from_email is rendered."""
         template = MailTemplate.objects.create(
-            title="Test",
-            subject="Test",
-            html_body="<p>Body</p>",
-            from_email="noreply@vokoutrecht.nl"
+            title="Test", subject="Test", html_body="<p>Body</p>", from_email="noreply@vokoutrecht.nl"
         )
 
         subject, html, plain, from_email = render_mail_template(template)
@@ -72,10 +63,7 @@ class RenderMailTemplateTest(TestCase):
     def test_renders_from_email_with_template_variable(self):
         """Test from_email can use template variables."""
         template = MailTemplate.objects.create(
-            title="Test",
-            subject="Test",
-            html_body="<p>Body</p>",
-            from_email="{{ user.email }}"
+            title="Test", subject="Test", html_body="<p>Body</p>", from_email="{{ user.email }}"
         )
         user = VokoUserFactory.create(email="user@example.com")
 
@@ -89,10 +77,7 @@ class GetTemplateByIdTest(TestCase):
 
     def test_returns_template(self):
         """Test returns template when found."""
-        template = MailTemplate.objects.create(
-            title="Test Template",
-            html_body="<p>Test</p>"
-        )
+        template = MailTemplate.objects.create(title="Test Template", html_body="<p>Test</p>")
 
         result = get_template_by_id(template.id)
 
@@ -117,21 +102,17 @@ class GetTemplateByIdTest(TestCase):
 class MailUserTest(TestCase):
     """Tests for the mail_user function."""
 
-    @mock.patch('mailing.helpers.log')
+    @mock.patch("mailing.helpers.log")
     def test_sends_email(self, mock_log):
         """Test mail_user sends email."""
-        user = VokoUserFactory.create(
-            first_name="Jan",
-            last_name="Janssen",
-            email="jan@example.com"
-        )
+        user = VokoUserFactory.create(first_name="Jan", last_name="Janssen", email="jan@example.com")
 
         mail_user(
             user,
             subject="Test Subject",
             html_body="<p>Test HTML</p>",
             plain_body="Test Plain",
-            from_email="from@example.com"
+            from_email="from@example.com",
         )
 
         # Check email was sent
@@ -140,49 +121,33 @@ class MailUserTest(TestCase):
         self.assertEqual(sent_mail.subject, "Test Subject")
         self.assertIn("jan@example.com", sent_mail.to[0])
 
-    @mock.patch('mailing.helpers.log')
+    @mock.patch("mailing.helpers.log")
     def test_logs_event(self, mock_log):
         """Test mail_user logs the event."""
         user = VokoUserFactory.create()
 
-        mail_user(
-            user,
-            subject="Test Subject",
-            html_body="<p>Test</p>",
-            plain_body="Test",
-            from_email=""
-        )
+        mail_user(user, subject="Test Subject", html_body="<p>Test</p>", plain_body="Test", from_email="")
 
         mock_log.log_event.assert_called_once()
 
-    @mock.patch('mailing.helpers.log')
+    @mock.patch("mailing.helpers.log")
     @override_settings(DEFAULT_FROM_EMAIL="default@vokoutrecht.nl")
     def test_uses_default_from_email(self, mock_log):
         """Test uses DEFAULT_FROM_EMAIL when from_email is empty."""
         user = VokoUserFactory.create()
 
-        mail_user(
-            user,
-            subject="Test Subject",
-            html_body="<p>Test</p>",
-            plain_body="Test",
-            from_email=""
-        )
+        mail_user(user, subject="Test Subject", html_body="<p>Test</p>", plain_body="Test", from_email="")
 
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].from_email, "default@vokoutrecht.nl")
 
-    @mock.patch('mailing.helpers.log')
+    @mock.patch("mailing.helpers.log")
     def test_uses_custom_from_email(self, mock_log):
         """Test uses custom from_email when provided."""
         user = VokoUserFactory.create()
 
         mail_user(
-            user,
-            subject="Test Subject",
-            html_body="<p>Test</p>",
-            plain_body="Test",
-            from_email="custom@vokoutrecht.nl"
+            user, subject="Test Subject", html_body="<p>Test</p>", plain_body="Test", from_email="custom@vokoutrecht.nl"
         )
 
         self.assertEqual(len(mail.outbox), 1)

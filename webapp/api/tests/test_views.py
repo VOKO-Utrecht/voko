@@ -4,11 +4,9 @@ from datetime import timedelta
 from decimal import Decimal
 
 from django.contrib.auth.models import Group
-from django.test import TestCase
 from django.utils import timezone
 
 from vokou.testing import VokoTestCase
-from accounts.tests.factories import VokoUserFactory
 from ordering.models import OrderRound
 
 

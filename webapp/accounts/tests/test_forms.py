@@ -2,7 +2,6 @@
 from unittest import mock
 
 from django.test import TestCase
-from django.contrib.auth.models import Group
 
 from accounts.forms import (
     VokoUserCreationForm,
@@ -12,9 +11,8 @@ from accounts.forms import (
     PasswordResetForm,
     ChangeProfileForm,
 )
-from accounts.models import VokoUser, UserProfile
+from accounts.models import UserProfile
 from accounts.tests.factories import VokoUserFactory
-from vokou.testing import VokoTestCase
 
 
 class VokoUserCreationFormTest(TestCase):
@@ -146,7 +144,7 @@ class VokoUserFinishFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn("notes", form.errors)
 
-    @mock.patch('accounts.forms.mail_admins')
+    @mock.patch("accounts.forms.mail_admins")
     def test_save_activates_user(self, mock_mail):
         """Test save activates the user."""
         data = {
@@ -162,7 +160,7 @@ class VokoUserFinishFormTest(TestCase):
         self.assertTrue(user.is_active)
         self.assertIsNotNone(user.activated)
 
-    @mock.patch('accounts.forms.mail_admins')
+    @mock.patch("accounts.forms.mail_admins")
     def test_save_creates_user_profile(self, mock_mail):
         """Test save creates a UserProfile."""
         data = {
@@ -180,7 +178,7 @@ class VokoUserFinishFormTest(TestCase):
         self.assertEqual(profile.phone_number, "0612345678")
         self.assertEqual(profile.notes, "Test notes")
 
-    @mock.patch('accounts.forms.mail_admins')
+    @mock.patch("accounts.forms.mail_admins")
     def test_save_sets_password(self, mock_mail):
         """Test save sets the password correctly."""
         data = {
@@ -214,6 +212,7 @@ class VokoUserChangeFormTest(TestCase):
         """Test user with balance cannot be set to sleeping."""
         # Create a balance for the user
         from finance.models import Balance
+
         Balance.objects.create(user=self.user, type="CR", amount=10.00)
 
         data = {
