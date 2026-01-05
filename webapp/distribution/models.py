@@ -77,7 +77,7 @@ class Shift(TimeStampedModel):
             return
         if self.start >= self.end:
             raise ValidationError(
-                f"De starttijd ({self.start}) van de shift ligt na de eindtijd ({self.end})"
+                f"De starttijd ({self.start_str}) van de shift ligt na de eindtijd ({self.end_str})"
             )
 
     def save(self, **kwargs):
