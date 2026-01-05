@@ -68,9 +68,9 @@ class ShiftAdmin(admin.ModelAdmin):
         order_round_field.label_from_instance = format_order_round
         # Allow %H:%M only for begin and end
         start_field = form.base_fields["start"]
-        start_field.input_formats = [start_field.widget.format]
+        start_field.input_formats = ["%H:%M"]
         end_field = form.base_fields["end"]
-        end_field.input_formats = [end_field.widget.format]
+        end_field.input_formats = ["%H:%M"]
         return form
 
     def formfield_for_dbfield(self, db_field, **kwargs):
