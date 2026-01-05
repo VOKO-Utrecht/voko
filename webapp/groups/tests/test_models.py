@@ -33,10 +33,7 @@ class GroupExtModelTest(TestCase):
     def test_email_can_be_set(self):
         """Test email can be set."""
         group = Group.objects.create(name="Test Group")
-        group_ext = GroupExt.objects.create(
-            group=group,
-            email="group@vokoutrecht.nl"
-        )
+        group_ext = GroupExt.objects.create(group=group, email="group@vokoutrecht.nl")
 
         self.assertEqual(group_ext.email, "group@vokoutrecht.nl")
 

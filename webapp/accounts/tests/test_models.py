@@ -3,22 +3,18 @@ from datetime import datetime, timedelta
 from unittest import mock
 
 import pytz
-from django.test import TestCase, override_settings
-from django.core import mail
+from django.test import TestCase
 from django.contrib.auth.models import Group
 
 from accounts.models import (
     Address,
     UserProfile,
     VokoUser,
-    VokoUserManager,
-    EmailConfirmation,
     PasswordResetRequest,
     ReadOnlyVokoUser,
     SleepingVokoUser,
 )
 from accounts.tests.factories import VokoUserFactory, AddressFactory
-from vokou.testing import VokoTestCase
 
 
 class AddressModelTest(TestCase):
@@ -26,15 +22,8 @@ class AddressModelTest(TestCase):
 
     def test_str_representation(self):
         """Test string representation of Address."""
-        address = Address.objects.create(
-            street_and_number="Oudegracht 123",
-            zip_code="3511AB",
-            city="Utrecht"
-        )
-        self.assertEqual(
-            str(address),
-            "Oudegracht 123 - 3511AB, Utrecht"
-        )
+        address = Address.objects.create(street_and_number="Oudegracht 123", zip_code="3511AB", city="Utrecht")
+        self.assertEqual(str(address), "Oudegracht 123 - 3511AB, Utrecht")
 
     def test_address_with_empty_fields(self):
         """Test address can be created with minimal fields."""
@@ -76,10 +65,7 @@ class VokoUserManagerTest(TestCase):
     def test_create_user(self):
         """Test creating a regular user."""
         user = VokoUser.objects.create_user(
-            email="test@example.com",
-            first_name="Test",
-            last_name="User",
-            password="testpassword123"
+            email="test@example.com", first_name="Test", last_name="User", password="testpassword123"
         )
         self.assertEqual(user.email, "test@example.com")
         self.assertEqual(user.first_name, "Test")
@@ -92,20 +78,13 @@ class VokoUserManagerTest(TestCase):
     def test_create_user_without_email_raises_error(self):
         """Test creating a user without email raises ValueError."""
         with self.assertRaises(ValueError) as context:
-            VokoUser.objects.create_user(
-                email="",
-                first_name="Test",
-                last_name="User"
-            )
+            VokoUser.objects.create_user(email="", first_name="Test", last_name="User")
         self.assertIn("email address", str(context.exception))
 
     def test_create_superuser(self):
         """Test creating a superuser."""
         user = VokoUser.objects.create_superuser(
-            email="admin@example.com",
-            first_name="Admin",
-            last_name="User",
-            password="adminpassword123"
+            email="admin@example.com", first_name="Admin", last_name="User", password="adminpassword123"
         )
         self.assertEqual(user.email, "admin@example.com")
         self.assertTrue(user.is_active)
@@ -116,11 +95,7 @@ class VokoUserManagerTest(TestCase):
 
     def test_email_normalization(self):
         """Test that email is normalized."""
-        user = VokoUser.objects.create_user(
-            email="Test@EXAMPLE.COM",
-            first_name="Test",
-            last_name="User"
-        )
+        user = VokoUser.objects.create_user(email="Test@EXAMPLE.COM", first_name="Test", last_name="User")
         # Email should be normalized (lowercase domain)
         self.assertEqual(user.email, "Test@example.com")
 
@@ -128,9 +103,7 @@ class VokoUserManagerTest(TestCase):
         """Test that default queryset excludes sleeping users."""
         active_user = VokoUserFactory.create(is_asleep=False)
         sleeping_user = VokoUser.objects.create_user(
-            email="sleeping@example.com",
-            first_name="Sleeping",
-            last_name="User"
+            email="sleeping@example.com", first_name="Sleeping", last_name="User"
         )
         sleeping_user.is_asleep = True
         sleeping_user.save()
@@ -190,26 +163,18 @@ class VokoUserModelTest(TestCase):
         self.assertIn("Group1", flat)
         self.assertIn("Group2", flat)
 
-    @mock.patch('accounts.models.mail_admins')
+    @mock.patch("accounts.models.mail_admins")
     def test_save_sends_mail_on_create(self, mock_mail_admins):
         """Test that creating a user sends mail to admins."""
-        user = VokoUser(
-            email="new@example.com",
-            first_name="New",
-            last_name="User"
-        )
+        user = VokoUser(email="new@example.com", first_name="New", last_name="User")
         user.set_password("test123")
         user.save()
         mock_mail_admins.assert_called_once()
 
     def test_save_creates_email_confirmation(self):
         """Test that saving a new user creates EmailConfirmation."""
-        user = VokoUser.objects.create_user(
-            email="test@example.com",
-            first_name="Test",
-            last_name="User"
-        )
-        self.assertTrue(hasattr(user, 'email_confirmation'))
+        user = VokoUser.objects.create_user(email="test@example.com", first_name="Test", last_name="User")
+        self.assertTrue(hasattr(user, "email_confirmation"))
         self.assertIsNotNone(user.email_confirmation)
 
     def test_username_field_is_email(self):
@@ -237,20 +202,16 @@ class EmailConfirmationModelTest(TestCase):
 
     def test_str_representation(self):
         """Test string representation of EmailConfirmation."""
-        user = VokoUserFactory.create(
-            first_name="Jan",
-            last_name="Janssen",
-            email="jan@example.com"
-        )
+        user = VokoUserFactory.create(first_name="Jan", last_name="Janssen", email="jan@example.com")
         confirmation = user.email_confirmation
         str_repr = str(confirmation)
         self.assertIn("Jan Janssen", str_repr)
         self.assertIn("jan@example.com", str_repr)
         self.assertIn("False", str_repr)  # Not confirmed
 
-    @mock.patch('accounts.models.get_template_by_id')
-    @mock.patch('accounts.models.render_mail_template')
-    @mock.patch('accounts.models.mail_user')
+    @mock.patch("accounts.models.get_template_by_id")
+    @mock.patch("accounts.models.render_mail_template")
+    @mock.patch("accounts.models.mail_user")
     def test_send_confirmation_mail(self, mock_mail_user, mock_render, mock_get_template):
         """Test send_confirmation_mail calls mail functions."""
         mock_template = mock.Mock()
@@ -314,9 +275,9 @@ class PasswordResetRequestModelTest(TestCase):
         self.assertIn("Used: False", str_repr)
         self.assertIn("Usable: True", str_repr)
 
-    @mock.patch('accounts.models.get_template_by_id')
-    @mock.patch('accounts.models.render_mail_template')
-    @mock.patch('accounts.models.mail_user')
+    @mock.patch("accounts.models.get_template_by_id")
+    @mock.patch("accounts.models.render_mail_template")
+    @mock.patch("accounts.models.mail_user")
     def test_send_email(self, mock_mail_user, mock_render, mock_get_template):
         """Test send_email calls mail functions."""
         mock_template = mock.Mock()
@@ -350,9 +311,7 @@ class ProxyModelsTest(TestCase):
 
         # Create a sleeping user
         sleeping_user = VokoUser.objects.create_user(
-            email="sleeping@example.com",
-            first_name="Sleeping",
-            last_name="User"
+            email="sleeping@example.com", first_name="Sleeping", last_name="User"
         )
         sleeping_user.is_asleep = True
         sleeping_user.save()

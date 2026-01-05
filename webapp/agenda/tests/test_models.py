@@ -12,10 +12,7 @@ class PersistentEventModelTest(TestCase):
 
     def test_str_representation(self):
         """Test string representation of PersistentEvent."""
-        event = PersistentEvent.objects.create(
-            title="General Assembly",
-            date=date(2024, 6, 15)
-        )
+        event = PersistentEvent.objects.create(title="General Assembly", date=date(2024, 6, 15))
         self.assertEqual(str(event), "General Assembly - 2024-06-15")
 
     def test_default_fields(self):
@@ -27,32 +24,19 @@ class PersistentEventModelTest(TestCase):
 
     def test_short_description(self):
         """Test short description field."""
-        event = PersistentEvent.objects.create(
-            title="Test",
-            short_description="A brief description"
-        )
+        event = PersistentEvent.objects.create(title="Test", short_description="A brief description")
         self.assertEqual(event.short_description, "A brief description")
 
     def test_long_description_html(self):
         """Test long description can contain HTML."""
         html = "<p>A <strong>detailed</strong> description</p>"
-        event = PersistentEvent.objects.create(
-            title="Test",
-            long_description=html
-        )
+        event = PersistentEvent.objects.create(title="Test", long_description=html)
         self.assertEqual(event.long_description, html)
 
     def test_address_relationship(self):
         """Test address can be linked."""
-        address = Address.objects.create(
-            street_and_number="123 Main St",
-            zip_code="3512AB",
-            city="Utrecht"
-        )
-        event = PersistentEvent.objects.create(
-            title="Test",
-            address=address
-        )
+        address = Address.objects.create(street_and_number="123 Main St", zip_code="3512AB", city="Utrecht")
+        event = PersistentEvent.objects.create(title="Test", address=address)
         self.assertEqual(event.address, address)
 
     def test_address_can_be_null(self):
@@ -72,18 +56,12 @@ class TransientEventModelTest(TestCase):
 
     def test_str_representation(self):
         """Test string representation of TransientEvent."""
-        event = TransientEvent(
-            title="Transport Ride",
-            date=date(2024, 6, 15)
-        )
+        event = TransientEvent(title="Transport Ride", date=date(2024, 6, 15))
         self.assertEqual(str(event), "Transport Ride - 2024-06-15")
 
     def test_save_does_nothing(self):
         """Test save method doesn't persist (managed=False model)."""
-        event = TransientEvent(
-            title="Test",
-            date=date(2024, 6, 15)
-        )
+        event = TransientEvent(title="Test", date=date(2024, 6, 15))
         # Should not raise an exception
         event.save()
 
@@ -102,18 +80,12 @@ class TransientEventModelTest(TestCase):
 
     def test_org_model_field(self):
         """Test org_model stores original model name."""
-        event = TransientEvent(
-            title="Test",
-            org_model="distribution.Shift"
-        )
+        event = TransientEvent(title="Test", org_model="distribution.Shift")
         self.assertEqual(event.org_model, "distribution.Shift")
 
     def test_org_id_field(self):
         """Test org_id stores original model ID."""
-        event = TransientEvent(
-            title="Test",
-            org_id=42
-        )
+        event = TransientEvent(title="Test", org_id=42)
         self.assertEqual(event.org_id, 42)
 
     def test_full_event_data(self):
@@ -125,7 +97,7 @@ class TransientEventModelTest(TestCase):
             short_description="Morning shift",
             is_shift=True,
             org_model="distribution.Shift",
-            org_id=123
+            org_id=123,
         )
 
         self.assertEqual(event.title, "Distribution Shift")

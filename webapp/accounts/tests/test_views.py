@@ -3,9 +3,8 @@ from datetime import datetime, timedelta
 from unittest import mock
 
 import pytz
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from django.urls import reverse
-from django.contrib.auth.models import Group
 
 from accounts.models import (
     VokoUser,
@@ -79,13 +78,11 @@ class RegisterViewTest(VokoTestCase):
         self.assertTemplateUsed(response, "accounts/register.html")
 
     @override_settings(CAPTCHA_ENABLED=False)
-    @mock.patch('accounts.models.mail_admins')
-    @mock.patch('accounts.models.mail_user')
-    @mock.patch('accounts.models.get_template_by_id')
-    @mock.patch('accounts.models.render_mail_template')
-    def test_successful_registration(
-        self, mock_render, mock_get_template, mock_mail_user, mock_mail_admins
-    ):
+    @mock.patch("accounts.models.mail_admins")
+    @mock.patch("accounts.models.mail_user")
+    @mock.patch("accounts.models.get_template_by_id")
+    @mock.patch("accounts.models.render_mail_template")
+    def test_successful_registration(self, mock_render, mock_get_template, mock_mail_user, mock_mail_admins):
         """Test successful registration creates user."""
         mock_render.return_value = ("Subject", "<html>", "text", "from@example.com")
         data = {
@@ -100,10 +97,8 @@ class RegisterViewTest(VokoTestCase):
     @override_settings(CAPTCHA_ENABLED=False)
     def test_registration_sends_confirmation_email(self):
         """Test registration sends confirmation email."""
-        with mock.patch('accounts.models.mail_admins'):
-            with mock.patch.object(
-                EmailConfirmation, 'send_confirmation_mail'
-            ) as mock_send:
+        with mock.patch("accounts.models.mail_admins"):
+            with mock.patch.object(EmailConfirmation, "send_confirmation_mail") as mock_send:
                 data = {
                     "email": "newuser@example.com",
                     "first_name": "New",
@@ -148,20 +143,14 @@ class LogoutViewTest(VokoTestCase):
 class EmailConfirmViewTest(VokoTestCase):
     """Tests for the EmailConfirmView."""
 
-    @mock.patch('accounts.models.mail_admins')
+    @mock.patch("accounts.models.mail_admins")
     def test_confirm_email(self, mock_mail):
         """Test confirming email works."""
-        user = VokoUser.objects.create_user(
-            email="test@example.com",
-            first_name="Test",
-            last_name="User"
-        )
+        user = VokoUser.objects.create_user(email="test@example.com", first_name="Test", last_name="User")
         confirmation = user.email_confirmation
         self.assertFalse(confirmation.is_confirmed)
 
-        response = self.client.get(
-            reverse("confirm_email", kwargs={"pk": confirmation.token})
-        )
+        response = self.client.get(reverse("confirm_email", kwargs={"pk": confirmation.token}))
         self.assertEqual(response.status_code, 200)
 
         confirmation.refresh_from_db()
@@ -175,41 +164,31 @@ class EmailConfirmViewTest(VokoTestCase):
         confirmation.is_confirmed = True
         confirmation.save()
 
-        response = self.client.get(
-            reverse("confirm_email", kwargs={"pk": confirmation.token})
-        )
+        response = self.client.get(reverse("confirm_email", kwargs={"pk": confirmation.token}))
         self.assertEqual(response.status_code, 404)
 
 
 class FinishRegistrationViewTest(VokoTestCase):
     """Tests for the FinishRegistration view."""
 
-    @mock.patch('accounts.models.mail_admins')
+    @mock.patch("accounts.models.mail_admins")
     def test_finish_registration_page(self, mock_mail):
         """Test finish registration page renders for eligible user."""
-        user = VokoUser.objects.create_user(
-            email="test@example.com",
-            first_name="Test",
-            last_name="User"
-        )
+        user = VokoUser.objects.create_user(email="test@example.com", first_name="Test", last_name="User")
         user.email_confirmation.is_confirmed = True
         user.email_confirmation.save()
         user.can_activate = True
         user.save()
 
-        response = self.client.get(
-            reverse("finish_registration", kwargs={"pk": user.email_confirmation.token})
-        )
+        response = self.client.get(reverse("finish_registration", kwargs={"pk": user.email_confirmation.token}))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "accounts/activate.html")
 
     @suppressWarnings
-    @mock.patch('accounts.models.mail_admins')
+    @mock.patch("accounts.models.mail_admins")
     def test_finish_registration_invalid_token(self, mock_mail):
         """Test finish registration with invalid token returns 404."""
-        response = self.client.get(
-            reverse("finish_registration", kwargs={"pk": "invalid-token"})
-        )
+        response = self.client.get(reverse("finish_registration", kwargs={"pk": "invalid-token"}))
         self.assertEqual(response.status_code, 404)
 
     @suppressWarnings
@@ -219,9 +198,7 @@ class FinishRegistrationViewTest(VokoTestCase):
         user.email_confirmation.is_confirmed = True
         user.email_confirmation.save()
 
-        response = self.client.get(
-            reverse("finish_registration", kwargs={"pk": user.email_confirmation.token})
-        )
+        response = self.client.get(reverse("finish_registration", kwargs={"pk": user.email_confirmation.token}))
         self.assertEqual(response.status_code, 404)
 
 
@@ -266,11 +243,12 @@ class OverViewTest(VokoTestCase):
         from ordering.models import OrderRound
         from datetime import datetime, timedelta
         import pytz
+
         now = datetime.now(pytz.utc)
         return OrderRound.objects.create(
             open_for_orders=now - timedelta(days=1),
             closed_for_orders=now + timedelta(days=1),
-            collect_datetime=now + timedelta(days=2)
+            collect_datetime=now + timedelta(days=2),
         )
 
     def test_overview_requires_login(self):
@@ -305,17 +283,17 @@ class RequestPasswordResetViewTest(VokoTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "accounts/passwordreset.html")
 
-    @mock.patch('accounts.views.log')
+    @mock.patch("accounts.views.log")
     def test_password_reset_for_existing_user(self, mock_log):
         """Test password reset creates request for existing user."""
-        user = VokoUserFactory.create(email="test@example.com")
-        with mock.patch.object(PasswordResetRequest, 'send_email') as mock_send:
+        VokoUserFactory.create(email="test@example.com")  # noqa: F841
+        with mock.patch.object(PasswordResetRequest, "send_email") as mock_send:
             data = {"email": "test@example.com"}
             response = self.client.post(reverse("password_reset"), data)
             self.assertEqual(response.status_code, 302)
             mock_send.assert_called_once()
 
-    @mock.patch('accounts.views.log')
+    @mock.patch("accounts.views.log")
     def test_password_reset_for_nonexistent_user(self, mock_log):
         """Test password reset for non-existent user doesn't fail."""
         data = {"email": "nonexistent@example.com"}
@@ -342,9 +320,7 @@ class PasswordResetViewTest(VokoTestCase):
 
     def test_password_reset_page_renders(self):
         """Test password reset page renders for valid token."""
-        response = self.client.get(
-            reverse("reset_pass", kwargs={"pk": self.reset_request.token})
-        )
+        response = self.client.get(reverse("reset_pass", kwargs={"pk": self.reset_request.token}))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "accounts/passwordreset_reset.html")
 
@@ -354,9 +330,7 @@ class PasswordResetViewTest(VokoTestCase):
         self.reset_request.created = datetime.now(pytz.utc) - timedelta(hours=25)
         self.reset_request.save()
 
-        response = self.client.get(
-            reverse("reset_pass", kwargs={"pk": self.reset_request.token})
-        )
+        response = self.client.get(reverse("reset_pass", kwargs={"pk": self.reset_request.token}))
         self.assertEqual(response.status_code, 404)
 
     @suppressWarnings
@@ -365,9 +339,7 @@ class PasswordResetViewTest(VokoTestCase):
         self.reset_request.is_used = True
         self.reset_request.save()
 
-        response = self.client.get(
-            reverse("reset_pass", kwargs={"pk": self.reset_request.token})
-        )
+        response = self.client.get(reverse("reset_pass", kwargs={"pk": self.reset_request.token}))
         self.assertEqual(response.status_code, 404)
 
     def test_successful_password_reset(self):
@@ -376,10 +348,7 @@ class PasswordResetViewTest(VokoTestCase):
             "password1": "newpassword123",
             "password2": "newpassword123",
         }
-        response = self.client.post(
-            reverse("reset_pass", kwargs={"pk": self.reset_request.token}),
-            data
-        )
+        response = self.client.post(reverse("reset_pass", kwargs={"pk": self.reset_request.token}), data)
         self.assertEqual(response.status_code, 302)
 
         # Verify password was changed
@@ -396,10 +365,7 @@ class PasswordResetViewTest(VokoTestCase):
             "password1": "newpassword123",
             "password2": "differentpassword",
         }
-        response = self.client.post(
-            reverse("reset_pass", kwargs={"pk": self.reset_request.token}),
-            data
-        )
+        response = self.client.post(reverse("reset_pass", kwargs={"pk": self.reset_request.token}), data)
         self.assertEqual(response.status_code, 200)
 
 

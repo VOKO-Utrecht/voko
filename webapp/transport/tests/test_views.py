@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
-from unittest import mock
 
 import pytz
-from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth.models import Group
 
 from transport.models import Route, Ride
 from ordering.models import OrderRound, PickupLocation
@@ -21,10 +18,7 @@ class ScheduleViewTest(VokoTestCase):
         """Set up test data."""
         self.now = datetime.now(pytz.utc)
         self.address = AddressFactory.create()
-        self.pickup_location = PickupLocation.objects.create(
-            name="Test Location",
-            address=self.address
-        )
+        self.pickup_location = PickupLocation.objects.create(name="Test Location", address=self.address)
 
     def _create_order_round(self, days_offset=1):
         """Create an order round."""
@@ -32,18 +26,13 @@ class ScheduleViewTest(VokoTestCase):
             open_for_orders=self.now - timedelta(days=2),
             closed_for_orders=self.now - timedelta(days=1),
             collect_datetime=self.now + timedelta(days=days_offset),
-            pickup_location=self.pickup_location
+            pickup_location=self.pickup_location,
         )
 
     def _create_ride(self, order_round, driver, codriver):
         """Create a ride."""
         route = Route.objects.create(name="Test Route {}".format(order_round.id))
-        return Ride.objects.create(
-            order_round=order_round,
-            route=route,
-            driver=driver,
-            codriver=codriver
-        )
+        return Ride.objects.create(order_round=order_round, route=route, driver=driver, codriver=codriver)
 
     def test_schedule_requires_login(self):
         """Test schedule page requires login."""
@@ -134,26 +123,18 @@ class RideViewTest(VokoTestCase):
         """Set up test data."""
         self.now = datetime.now(pytz.utc)
         self.address = AddressFactory.create()
-        self.pickup_location = PickupLocation.objects.create(
-            name="Test Location",
-            address=self.address
-        )
+        self.pickup_location = PickupLocation.objects.create(name="Test Location", address=self.address)
         self.order_round = OrderRound.objects.create(
             open_for_orders=self.now - timedelta(days=2),
             closed_for_orders=self.now - timedelta(days=1),
             collect_datetime=self.now + timedelta(days=1),
-            pickup_location=self.pickup_location
+            pickup_location=self.pickup_location,
         )
         self.route = Route.objects.create(name="Test Route")
 
     def _create_ride(self, driver, codriver):
         """Create a ride."""
-        return Ride.objects.create(
-            order_round=self.order_round,
-            route=self.route,
-            driver=driver,
-            codriver=codriver
-        )
+        return Ride.objects.create(order_round=self.order_round, route=self.route, driver=driver, codriver=codriver)
 
     def test_ride_requires_login(self):
         """Test ride page requires login."""
@@ -265,15 +246,10 @@ class CarsViewTest(VokoTestCase):
     def test_cars_shows_users_sharing_cars(self):
         """Test cars page shows users who share cars."""
         self.login(group="Transport")
-        
+
         # Create user with car
         user_with_car = VokoUserFactory.create()
-        UserProfile.objects.create(
-            user=user_with_car,
-            shares_car=True,
-            car_neighborhood="Centrum",
-            car_type="Station"
-        )
+        UserProfile.objects.create(user=user_with_car, shares_car=True, car_neighborhood="Centrum", car_type="Station")
 
         # Create user without car
         user_without_car = VokoUserFactory.create()

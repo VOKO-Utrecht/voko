@@ -34,21 +34,14 @@ class UserIsInvolvedWithShiftMixinTest(TestCase):
         self.factory = RequestFactory()
         self.now = datetime.now(pytz.utc)
         self.address = AddressFactory.create()
-        self.pickup_location = PickupLocation.objects.create(
-            name="Test Location",
-            address=self.address
-        )
+        self.pickup_location = PickupLocation.objects.create(name="Test Location", address=self.address)
         self.order_round = OrderRound.objects.create(
             open_for_orders=self.now - timedelta(days=2),
             closed_for_orders=self.now - timedelta(days=1),
             collect_datetime=self.now + timedelta(days=1),
-            pickup_location=self.pickup_location
+            pickup_location=self.pickup_location,
         )
-        self.shift = Shift.objects.create(
-            order_round=self.order_round,
-            start=time(14, 0),
-            end=time(16, 0)
-        )
+        self.shift = Shift.objects.create(order_round=self.order_round, start=time(14, 0), end=time(16, 0))
         self.member = VokoUserFactory.create()
         self.shift.members.add(self.member)
 
@@ -57,9 +50,9 @@ class UserIsInvolvedWithShiftMixinTest(TestCase):
         request = self.factory.get("/")
         request.user = self.member
 
-        view = MockView(self.shift)
+        MockView(self.shift)  # noqa: F841
         # Should not raise - member is in shift.members
-        with mock.patch.object(UserIsInvolvedWithShiftMixin, 'dispatch', return_value="success"):
+        with mock.patch.object(UserIsInvolvedWithShiftMixin, "dispatch", return_value="success"):
             pass
 
     def test_uitdeelcoordinatoren_group_is_allowed(self):
@@ -71,7 +64,7 @@ class UserIsInvolvedWithShiftMixinTest(TestCase):
         request = self.factory.get("/")
         request.user = user
 
-        view = MockView(self.shift)
+        MockView(self.shift)  # noqa: F841
         # Group members are allowed
 
     def test_unauthorized_user_is_denied(self):

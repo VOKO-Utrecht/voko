@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
 
-from django.test import TestCase
 from django.urls import reverse
-from django.utils import timezone
 import pytz
 
 from vokou.testing import VokoTestCase
@@ -34,11 +32,7 @@ class NewsitemsViewTest(VokoTestCase):
         """Test published items appear in context."""
         self.login()
         now = datetime.now(pytz.utc)
-        item = Newsitem.objects.create(
-            title="Published News",
-            publish=True,
-            publish_date=now - timedelta(days=1)
-        )
+        item = Newsitem.objects.create(title="Published News", publish=True, publish_date=now - timedelta(days=1))
 
         response = self.client.get(reverse("view_newsitems"))
         self.assertIn(item, response.context["newsitems"])
@@ -46,10 +40,7 @@ class NewsitemsViewTest(VokoTestCase):
     def test_hides_unpublished_items(self):
         """Test unpublished items do not appear."""
         self.login()
-        item = Newsitem.objects.create(
-            title="Unpublished News",
-            publish=False
-        )
+        item = Newsitem.objects.create(title="Unpublished News", publish=False)
 
         response = self.client.get(reverse("view_newsitems"))
         self.assertNotIn(item, response.context["newsitems"])
@@ -58,11 +49,7 @@ class NewsitemsViewTest(VokoTestCase):
         """Test future-dated items do not appear."""
         self.login()
         future = datetime.now(pytz.utc) + timedelta(days=7)
-        item = Newsitem.objects.create(
-            title="Future News",
-            publish=True,
-            publish_date=future.date()
-        )
+        item = Newsitem.objects.create(title="Future News", publish=True, publish_date=future.date())
 
         response = self.client.get(reverse("view_newsitems"))
         self.assertNotIn(item, response.context["newsitems"])
@@ -71,11 +58,7 @@ class NewsitemsViewTest(VokoTestCase):
         """Test items older than 1 year do not appear."""
         self.login()
         old_date = datetime.now(pytz.utc) - timedelta(days=400)
-        item = Newsitem.objects.create(
-            title="Old News",
-            publish=True,
-            publish_date=old_date.date()
-        )
+        item = Newsitem.objects.create(title="Old News", publish=True, publish_date=old_date.date())
 
         response = self.client.get(reverse("view_newsitems"))
         self.assertNotIn(item, response.context["newsitems"])
@@ -86,14 +69,10 @@ class NewsitemsViewTest(VokoTestCase):
         now = datetime.now(pytz.utc)
 
         old_item = Newsitem.objects.create(
-            title="Older News",
-            publish=True,
-            publish_date=(now - timedelta(days=30)).date()
+            title="Older News", publish=True, publish_date=(now - timedelta(days=30)).date()
         )
         new_item = Newsitem.objects.create(
-            title="Newer News",
-            publish=True,
-            publish_date=(now - timedelta(days=1)).date()
+            title="Newer News", publish=True, publish_date=(now - timedelta(days=1)).date()
         )
 
         response = self.client.get(reverse("view_newsitems"))
@@ -107,14 +86,10 @@ class NewsitemsViewTest(VokoTestCase):
         self.login()
         now = datetime.now(pytz.utc)
         item = Newsitem.objects.create(
-            title="Specific News",
-            publish=True,
-            publish_date=(now - timedelta(days=1)).date()
+            title="Specific News", publish=True, publish_date=(now - timedelta(days=1)).date()
         )
 
-        response = self.client.get(
-            reverse("view_newsitem", kwargs={"pk": item.pk})
-        )
+        response = self.client.get(reverse("view_newsitem", kwargs={"pk": item.pk}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["newsitem"], item)
 
@@ -122,15 +97,11 @@ class NewsitemsViewTest(VokoTestCase):
         """Test viewing non-existent newsitem shows first published."""
         self.login()
         now = datetime.now(pytz.utc)
-        existing = Newsitem.objects.create(
-            title="Existing News",
-            publish=True,
-            publish_date=(now - timedelta(days=1)).date()
+        Newsitem.objects.create(  # noqa: F841
+            title="Existing News", publish=True, publish_date=(now - timedelta(days=1)).date()
         )
 
-        response = self.client.get(
-            reverse("view_newsitem", kwargs={"pk": 99999})
-        )
+        response = self.client.get(reverse("view_newsitem", kwargs={"pk": 99999}))
         self.assertEqual(response.status_code, 200)
         # Should fall back to first item
         self.assertIn("newsitem", response.context)

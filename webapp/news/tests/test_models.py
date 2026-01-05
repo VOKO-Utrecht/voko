@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime, timedelta
-
 from django.test import TestCase
-from django.utils import timezone
-import pytz
 
 from news.models import Newsitem
 
@@ -13,9 +9,7 @@ class NewsitemModelTest(TestCase):
 
     def test_str_representation(self):
         """Test string representation of Newsitem."""
-        item = Newsitem.objects.create(
-            title="Test News Article"
-        )
+        item = Newsitem.objects.create(title="Test News Article")
         self.assertEqual(str(item), "Test News Article")
 
     def test_default_publish_is_false(self):
@@ -55,18 +49,12 @@ class NewsitemModelTest(TestCase):
     def test_can_store_html_content(self):
         """Test HTML content can be stored."""
         html = "<h1>Title</h1><p>Paragraph with <strong>bold</strong></p>"
-        item = Newsitem.objects.create(
-            title="Test",
-            content=html
-        )
+        item = Newsitem.objects.create(title="Test", content=html)
         self.assertEqual(item.content, html)
 
     def test_can_store_summary(self):
         """Test summary field stores data."""
-        item = Newsitem.objects.create(
-            title="Test",
-            summary="This is a short summary"
-        )
+        item = Newsitem.objects.create(title="Test", summary="This is a short summary")
         self.assertEqual(item.summary, "This is a short summary")
 
     def test_summary_can_be_blank(self):

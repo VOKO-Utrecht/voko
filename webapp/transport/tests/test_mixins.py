@@ -34,24 +34,18 @@ class UserIsInvolvedMixinTest(TestCase):
         self.factory = RequestFactory()
         self.now = datetime.now(pytz.utc)
         self.address = AddressFactory.create()
-        self.pickup_location = PickupLocation.objects.create(
-            name="Test Location",
-            address=self.address
-        )
+        self.pickup_location = PickupLocation.objects.create(name="Test Location", address=self.address)
         self.order_round = OrderRound.objects.create(
             open_for_orders=self.now - timedelta(days=2),
             closed_for_orders=self.now - timedelta(days=1),
             collect_datetime=self.now + timedelta(days=1),
-            pickup_location=self.pickup_location
+            pickup_location=self.pickup_location,
         )
         self.route = Route.objects.create(name="Test Route")
         self.driver = VokoUserFactory.create()
         self.codriver = VokoUserFactory.create()
         self.ride = Ride.objects.create(
-            order_round=self.order_round,
-            route=self.route,
-            driver=self.driver,
-            codriver=self.codriver
+            order_round=self.order_round, route=self.route, driver=self.driver, codriver=self.codriver
         )
 
     def test_driver_is_allowed(self):
@@ -61,9 +55,9 @@ class UserIsInvolvedMixinTest(TestCase):
 
         view = MockView(self.ride)
         # Should not raise
-        with mock.patch.object(UserIsInvolvedMixin, 'dispatch', return_value=None) as mock_dispatch:
+        with mock.patch.object(UserIsInvolvedMixin, "dispatch", return_value=None) as mock_dispatch:
             mock_dispatch.return_value = "success"
-            result = UserIsInvolvedMixin.dispatch(view, request)
+            UserIsInvolvedMixin.dispatch(view, request)  # noqa: F841
             # If we get here without exception, driver is allowed
 
     def test_codriver_is_allowed(self):
@@ -71,9 +65,9 @@ class UserIsInvolvedMixinTest(TestCase):
         request = self.factory.get("/")
         request.user = self.codriver
 
-        view = MockView(self.ride)
+        MockView(self.ride)  # noqa: F841
         # Should not raise
-        with mock.patch.object(UserIsInvolvedMixin, 'dispatch', return_value="success"):
+        with mock.patch.object(UserIsInvolvedMixin, "dispatch", return_value="success"):
             pass  # If we get here, codriver would be allowed
 
     def test_distribution_coordinator_is_allowed(self):
@@ -85,7 +79,7 @@ class UserIsInvolvedMixinTest(TestCase):
         request = self.factory.get("/")
         request.user = coordinator
 
-        view = MockView(self.ride)
+        MockView(self.ride)  # noqa: F841
         # The mixin checks request.user against ride coordinators
 
     def test_transport_coordinator_is_allowed(self):
@@ -97,7 +91,7 @@ class UserIsInvolvedMixinTest(TestCase):
         request = self.factory.get("/")
         request.user = coordinator
 
-        view = MockView(self.ride)
+        MockView(self.ride)  # noqa: F841
         # The mixin checks request.user against ride coordinators
 
     def test_transportcoordinatoren_group_is_allowed(self):
@@ -109,7 +103,7 @@ class UserIsInvolvedMixinTest(TestCase):
         request = self.factory.get("/")
         request.user = user
 
-        view = MockView(self.ride)
+        MockView(self.ride)  # noqa: F841
         # Group members are allowed
 
     def test_admin_group_is_allowed(self):
@@ -121,7 +115,7 @@ class UserIsInvolvedMixinTest(TestCase):
         request = self.factory.get("/")
         request.user = user
 
-        view = MockView(self.ride)
+        MockView(self.ride)  # noqa: F841
         # Admin group members are allowed
 
     def test_unauthorized_user_is_denied(self):

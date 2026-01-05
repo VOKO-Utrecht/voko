@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
-from unittest import mock
 
 import pytz
 from django.test import TestCase
 from django.utils.text import slugify
 
 from transport.models import Route, Ride
-from ordering.models import Supplier, OrderRound, PickupLocation
+from ordering.models import OrderRound, PickupLocation
 from accounts.tests.factories import VokoUserFactory, AddressFactory
-from ordering.tests.factories import OrderRoundFactory, SupplierFactory
-from vokou.testing import VokoTestCase
+from ordering.tests.factories import SupplierFactory
 
 
 class RouteModelTest(TestCase):
@@ -56,15 +54,12 @@ class RideModelTest(TestCase):
         """Set up test data."""
         self.now = datetime.now(pytz.utc)
         self.address = AddressFactory.create()
-        self.pickup_location = PickupLocation.objects.create(
-            name="Test Location",
-            address=self.address
-        )
+        self.pickup_location = PickupLocation.objects.create(name="Test Location", address=self.address)
         self.order_round = OrderRound.objects.create(
             open_for_orders=self.now - timedelta(days=2),
             closed_for_orders=self.now - timedelta(days=1),
             collect_datetime=self.now + timedelta(days=1),
-            pickup_location=self.pickup_location
+            pickup_location=self.pickup_location,
         )
         self.route = Route.objects.create(name="Test Route")
         self.driver = VokoUserFactory.create()
@@ -73,48 +68,30 @@ class RideModelTest(TestCase):
     def test_str_representation(self):
         """Test string representation of Ride."""
         ride = Ride.objects.create(
-            order_round=self.order_round,
-            route=self.route,
-            driver=self.driver,
-            codriver=self.codriver
+            order_round=self.order_round, route=self.route, driver=self.driver, codriver=self.codriver
         )
-        expected = "{}-{}".format(
-            self.order_round.collect_datetime.strftime("%Y-%m-%d"),
-            self.route
-        )
+        expected = "{}-{}".format(self.order_round.collect_datetime.strftime("%Y-%m-%d"), self.route)
         self.assertEqual(str(ride), expected)
 
     def test_slug_generated_on_save(self):
         """Test slug is auto-generated."""
         ride = Ride.objects.create(
-            order_round=self.order_round,
-            route=self.route,
-            driver=self.driver,
-            codriver=self.codriver
+            order_round=self.order_round, route=self.route, driver=self.driver, codriver=self.codriver
         )
-        expected_slug = slugify("{}-{}".format(
-            self.order_round.collect_datetime.strftime("%Y-%m-%d"),
-            self.route
-        ))
+        expected_slug = slugify("{}-{}".format(self.order_round.collect_datetime.strftime("%Y-%m-%d"), self.route))
         self.assertEqual(ride.slug, expected_slug)
 
     def test_date_property(self):
         """Test date property returns order_round collect_datetime."""
         ride = Ride.objects.create(
-            order_round=self.order_round,
-            route=self.route,
-            driver=self.driver,
-            codriver=self.codriver
+            order_round=self.order_round, route=self.route, driver=self.driver, codriver=self.codriver
         )
         self.assertEqual(ride.date, self.order_round.collect_datetime)
 
     def test_date_str_property(self):
         """Test date_str property returns formatted date."""
         ride = Ride.objects.create(
-            order_round=self.order_round,
-            route=self.route,
-            driver=self.driver,
-            codriver=self.codriver
+            order_round=self.order_round, route=self.route, driver=self.driver, codriver=self.codriver
         )
         expected = self.order_round.collect_datetime.strftime("%Y-%m-%d")
         self.assertEqual(ride.date_str, expected)
@@ -126,10 +103,7 @@ class RideModelTest(TestCase):
         self.order_round.save()
 
         ride = Ride.objects.create(
-            order_round=self.order_round,
-            route=self.route,
-            driver=self.driver,
-            codriver=self.codriver
+            order_round=self.order_round, route=self.route, driver=self.driver, codriver=self.codriver
         )
         self.assertEqual(ride.distribution_coordinator, coordinator)
 
@@ -140,20 +114,14 @@ class RideModelTest(TestCase):
         self.order_round.save()
 
         ride = Ride.objects.create(
-            order_round=self.order_round,
-            route=self.route,
-            driver=self.driver,
-            codriver=self.codriver
+            order_round=self.order_round, route=self.route, driver=self.driver, codriver=self.codriver
         )
         self.assertEqual(ride.transport_coordinator, coordinator)
 
     def test_as_event_returns_transient_event(self):
         """Test as_event returns a TransientEvent."""
         ride = Ride.objects.create(
-            order_round=self.order_round,
-            route=self.route,
-            driver=self.driver,
-            codriver=self.codriver
+            order_round=self.order_round, route=self.route, driver=self.driver, codriver=self.codriver
         )
         event = ride.as_event()
 
@@ -171,10 +139,7 @@ class RideModelTest(TestCase):
         self.route.suppliers.add(supplier_in_route)
 
         ride = Ride.objects.create(
-            order_round=self.order_round,
-            route=self.route,
-            driver=self.driver,
-            codriver=self.codriver
+            order_round=self.order_round, route=self.route, driver=self.driver, codriver=self.codriver
         )
 
         # The property filters based on route suppliers

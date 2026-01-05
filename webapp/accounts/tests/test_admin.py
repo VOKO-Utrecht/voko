@@ -3,7 +3,6 @@ from unittest import mock
 
 from django.test import TestCase
 from django.contrib.admin.sites import AdminSite
-from django.contrib.auth.models import Group
 from django.contrib.messages.storage.fallback import FallbackStorage
 
 from accounts.admin import (
@@ -13,7 +12,7 @@ from accounts.admin import (
     VokoUserAdmin,
     HasPaidFilter,
 )
-from accounts.models import VokoUser, UserProfile, Address
+from accounts.models import VokoUser, UserProfile
 from accounts.tests.factories import VokoUserFactory, AddressFactory
 from finance.models import Balance
 
@@ -34,13 +33,11 @@ class MockRequest:
 class EnableUserActionTest(TestCase):
     """Tests for the enable_user admin action."""
 
-    @mock.patch('accounts.admin.get_template_by_id')
-    @mock.patch('accounts.admin.render_mail_template')
-    @mock.patch('accounts.admin.mail_user')
-    @mock.patch('accounts.admin.log')
-    def test_enable_user_sends_activation_mail(
-        self, mock_log, mock_mail_user, mock_render, mock_get_template
-    ):
+    @mock.patch("accounts.admin.get_template_by_id")
+    @mock.patch("accounts.admin.render_mail_template")
+    @mock.patch("accounts.admin.mail_user")
+    @mock.patch("accounts.admin.log")
+    def test_enable_user_sends_activation_mail(self, mock_log, mock_mail_user, mock_render, mock_get_template):
         """Test enable_user sends activation email."""
         mock_template = mock.Mock()
         mock_get_template.return_value = mock_template
@@ -92,7 +89,7 @@ class EnableUserActionTest(TestCase):
 class ForceConfirmEmailActionTest(TestCase):
     """Tests for the force_confirm_email admin action."""
 
-    @mock.patch('accounts.admin.log')
+    @mock.patch("accounts.admin.log")
     def test_force_confirm_email(self, mock_log):
         """Test force_confirm_email confirms email."""
         user = VokoUserFactory.create()
@@ -114,21 +111,9 @@ class AnonymizeUserActionTest(TestCase):
 
     def test_anonymize_user_with_zero_balance(self):
         """Test anonymize_user anonymizes user with zero balance."""
-        user = VokoUserFactory.create(
-            email="original@example.com",
-            first_name="Original",
-            last_name="Name"
-        )
-        address = AddressFactory.create(
-            street_and_number="Original Street 123",
-            city="Original City"
-        )
-        UserProfile.objects.create(
-            user=user,
-            address=address,
-            phone_number="0612345678",
-            notes="Original notes"
-        )
+        user = VokoUserFactory.create(email="original@example.com", first_name="Original", last_name="Name")
+        address = AddressFactory.create(street_and_number="Original Street 123", city="Original City")
+        UserProfile.objects.create(user=user, address=address, phone_number="0612345678", notes="Original notes")
 
         request = MockRequest()
         queryset = VokoUser.objects.filter(pk=user.pk)
@@ -154,11 +139,7 @@ class AnonymizeUserActionTest(TestCase):
 
     def test_anonymize_user_with_positive_balance_fails(self):
         """Test anonymize_user fails for user with positive balance."""
-        user = VokoUserFactory.create(
-            email="original@example.com",
-            first_name="Original",
-            last_name="Name"
-        )
+        user = VokoUserFactory.create(email="original@example.com", first_name="Original", last_name="Name")
         Balance.objects.create(user=user, type="CR", amount=10.00)
 
         request = MockRequest()
@@ -174,11 +155,7 @@ class AnonymizeUserActionTest(TestCase):
 
     def test_anonymize_user_without_profile(self):
         """Test anonymize_user handles user without profile."""
-        user = VokoUserFactory.create(
-            email="original@example.com",
-            first_name="Original",
-            last_name="Name"
-        )
+        user = VokoUserFactory.create(email="original@example.com", first_name="Original", last_name="Name")
 
         request = MockRequest()
         queryset = VokoUser.objects.filter(pk=user.pk)
@@ -201,12 +178,9 @@ class HasPaidFilterTest(TestCase):
         # Create order round
         from datetime import datetime
         import pytz
+
         now = datetime.now(pytz.utc)
-        order_round = OrderRound.objects.create(
-            open_for_orders=now,
-            closed_for_orders=now,
-            collect_datetime=now
-        )
+        order_round = OrderRound.objects.create(open_for_orders=now, closed_for_orders=now, collect_datetime=now)
 
         # Create user with payment
         user_paid = VokoUserFactory.create()
@@ -217,13 +191,8 @@ class HasPaidFilterTest(TestCase):
         user_not_paid = VokoUserFactory.create()
 
         # Test filter
-        filter_instance = HasPaidFilter(
-            request=None,
-            params={'has_paid': 'yes'},
-            model=VokoUser,
-            model_admin=None
-        )
-        filter_instance.used_parameters = {'has_paid': 'yes'}
+        filter_instance = HasPaidFilter(request=None, params={"has_paid": "yes"}, model=VokoUser, model_admin=None)
+        filter_instance.used_parameters = {"has_paid": "yes"}
 
         queryset = VokoUser.objects.all()
         filtered = filter_instance.queryset(None, queryset)
@@ -238,12 +207,9 @@ class HasPaidFilterTest(TestCase):
 
         from datetime import datetime
         import pytz
+
         now = datetime.now(pytz.utc)
-        order_round = OrderRound.objects.create(
-            open_for_orders=now,
-            closed_for_orders=now,
-            collect_datetime=now
-        )
+        order_round = OrderRound.objects.create(open_for_orders=now, closed_for_orders=now, collect_datetime=now)
 
         # Create user with payment
         user_paid = VokoUserFactory.create()
@@ -254,13 +220,8 @@ class HasPaidFilterTest(TestCase):
         user_not_paid = VokoUserFactory.create()
 
         # Test filter
-        filter_instance = HasPaidFilter(
-            request=None,
-            params={'has_paid': 'no'},
-            model=VokoUser,
-            model_admin=None
-        )
-        filter_instance.used_parameters = {'has_paid': 'no'}
+        filter_instance = HasPaidFilter(request=None, params={"has_paid": "no"}, model=VokoUser, model_admin=None)
+        filter_instance.used_parameters = {"has_paid": "no"}
 
         queryset = VokoUser.objects.all()
         filtered = filter_instance.queryset(None, queryset)

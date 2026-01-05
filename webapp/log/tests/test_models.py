@@ -21,10 +21,7 @@ class EventLogModelTest(TestCase):
     def test_operator_field(self):
         """Test operator field stores the user who performed action."""
         operator = VokoUserFactory.create()
-        log = EventLog.objects.create(
-            event="Admin action",
-            operator=operator
-        )
+        log = EventLog.objects.create(event="Admin action", operator=operator)
         self.assertEqual(log.operator, operator)
 
     def test_operator_can_be_null(self):
@@ -35,10 +32,7 @@ class EventLogModelTest(TestCase):
     def test_user_field(self):
         """Test user field stores the user affected by action."""
         user = VokoUserFactory.create()
-        log = EventLog.objects.create(
-            event="User action",
-            user=user
-        )
+        log = EventLog.objects.create(event="User action", user=user)
         self.assertEqual(log.user, user)
 
     def test_user_can_be_null(self):
@@ -48,10 +42,7 @@ class EventLogModelTest(TestCase):
 
     def test_extra_field(self):
         """Test extra field stores additional data."""
-        log = EventLog.objects.create(
-            event="Complex event",
-            extra="{'detail': 'additional info', 'count': 42}"
-        )
+        log = EventLog.objects.create(event="Complex event", extra="{'detail': 'additional info', 'count': 42}")
         self.assertEqual(log.extra, "{'detail': 'additional info', 'count': 42}")
 
     def test_extra_can_be_null(self):
@@ -76,10 +67,7 @@ class EventLogModelTest(TestCase):
         user = VokoUserFactory.create()
 
         log = EventLog.objects.create(
-            operator=operator,
-            user=user,
-            event="User profile updated by admin",
-            extra="Changed: first_name, last_name"
+            operator=operator, user=user, event="User profile updated by admin", extra="Changed: first_name, last_name"
         )
 
         self.assertEqual(log.operator, operator)
@@ -90,31 +78,21 @@ class EventLogModelTest(TestCase):
     def test_operator_logs_related_name(self):
         """Test operator can access their logs via related name."""
         operator = VokoUserFactory.create()
-        log = EventLog.objects.create(
-            operator=operator,
-            event="Admin action"
-        )
+        log = EventLog.objects.create(operator=operator, event="Admin action")
 
         self.assertIn(log, operator.operator_logs.all())
 
     def test_user_logs_related_name(self):
         """Test user can access logs about them via related name."""
         user = VokoUserFactory.create()
-        log = EventLog.objects.create(
-            user=user,
-            event="User event"
-        )
+        log = EventLog.objects.create(user=user, event="User event")
 
         self.assertIn(log, user.user_logs.all())
 
     def test_deleting_operator_sets_null(self):
         """Test deleting operator sets log.operator to null."""
         operator = VokoUserFactory.create()
-        log = EventLog.objects.create(
-            operator=operator,
-            event="Admin action"
-        )
-        operator_id = operator.pk
+        log = EventLog.objects.create(operator=operator, event="Admin action")
 
         operator.delete()
         log.refresh_from_db()
@@ -124,10 +102,7 @@ class EventLogModelTest(TestCase):
     def test_deleting_user_sets_null(self):
         """Test deleting user sets log.user to null."""
         user = VokoUserFactory.create()
-        log = EventLog.objects.create(
-            user=user,
-            event="User event"
-        )
+        log = EventLog.objects.create(user=user, event="User event")
 
         user.delete()
         log.refresh_from_db()

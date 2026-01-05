@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta, time
-from unittest import mock
 
 import pytz
-from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth.models import Group
 
 from distribution.models import Shift
 from ordering.models import OrderRound, PickupLocation
@@ -20,10 +17,7 @@ class ScheduleViewTest(VokoTestCase):
         """Set up test data."""
         self.now = datetime.now(pytz.utc)
         self.address = AddressFactory.create()
-        self.pickup_location = PickupLocation.objects.create(
-            name="Test Location",
-            address=self.address
-        )
+        self.pickup_location = PickupLocation.objects.create(name="Test Location", address=self.address)
 
     def _create_order_round(self, days_offset=1):
         """Create an order round."""
@@ -31,16 +25,12 @@ class ScheduleViewTest(VokoTestCase):
             open_for_orders=self.now - timedelta(days=2),
             closed_for_orders=self.now - timedelta(days=1),
             collect_datetime=self.now + timedelta(days=days_offset),
-            pickup_location=self.pickup_location
+            pickup_location=self.pickup_location,
         )
 
     def _create_shift(self, order_round, start=time(14, 0), end=time(16, 0)):
         """Create a shift."""
-        return Shift.objects.create(
-            order_round=order_round,
-            start=start,
-            end=end
-        )
+        return Shift.objects.create(order_round=order_round, start=start, end=end)
 
     def test_schedule_requires_login(self):
         """Test schedule page requires login."""
@@ -117,24 +107,17 @@ class ShiftViewTest(VokoTestCase):
         """Set up test data."""
         self.now = datetime.now(pytz.utc)
         self.address = AddressFactory.create()
-        self.pickup_location = PickupLocation.objects.create(
-            name="Test Location",
-            address=self.address
-        )
+        self.pickup_location = PickupLocation.objects.create(name="Test Location", address=self.address)
         self.order_round = OrderRound.objects.create(
             open_for_orders=self.now - timedelta(days=2),
             closed_for_orders=self.now - timedelta(days=1),
             collect_datetime=self.now + timedelta(days=1),
-            pickup_location=self.pickup_location
+            pickup_location=self.pickup_location,
         )
 
     def _create_shift(self, start=time(14, 0), end=time(16, 0)):
         """Create a shift."""
-        return Shift.objects.create(
-            order_round=self.order_round,
-            start=start,
-            end=end
-        )
+        return Shift.objects.create(order_round=self.order_round, start=start, end=end)
 
     def test_shift_requires_login(self):
         """Test shift page requires login."""
