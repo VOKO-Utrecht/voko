@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='shift',
             name='end',
-            field=models.TimeField(help_text='When this shifts ends (hh:mm)'),
+            field=models.TimeField(help_text='When this shift ends (hh:mm)'),
         ),
         migrations.AlterField(
             model_name='shift',
