@@ -95,7 +95,7 @@ class MailOrderLists(CronJobBase):
 
     When: order round is not open and open date is in the past (so order round is closed and in the past)
     Every supplier with orders receives email with .csv file attached containing order details
-    Copy is send to boeren@vokoutrecht.nl
+    Copy is sent to supplier contact email (settings.ORGANIZATION_SUPPLIER_EMAIL)
     Send only once per order round
     """
 
@@ -177,8 +177,15 @@ class MailOrderLists(CronJobBase):
             in_mem_file.seek(0)  # Why is this here twice?
 
             # Generate mail
-            subject = "VOKO Utrecht - Bestellijst voor %s" % order_round.collect_datetime.strftime("%d %B %Y")
-            from_email = "VOKO Utrecht Boerencontact <boeren@vokoutrecht.nl>"
+            from django.conf import settings
+            subject = "%s - Bestellijst voor %s" % (
+                settings.ORGANIZATION_NAME,
+                order_round.collect_datetime.strftime("%d %B %Y")
+            )
+            from_email = "%s Boerencontact <%s>" % (
+                settings.ORGANIZATION_NAME,
+                settings.ORGANIZATION_SUPPLIER_EMAIL
+            )
             to = "%s <%s>" % (supplier.name, supplier.email)
 
             text_content = """
@@ -192,14 +199,17 @@ De bestelling is in CSV-formaat, dit is te openen in bijvoorbeeld Excel.
 Dit is een geautomatiseerd bericht, maar reageren is gewoon mogelijk.
 
 Vriendelijke groeten,
-VOKO Utrecht
-""" % (supplier, order_round.pk, order_round.collect_datetime.strftime("%d %B %Y"))
+%s
+""" % (supplier, order_round.pk, order_round.collect_datetime.strftime("%d %B %Y"), settings.ORGANIZATION_NAME)
 
+            cc_email = "%s Boerencontact <%s>" % (settings.ORGANIZATION_NAME, settings.ORGANIZATION_SUPPLIER_EMAIL)
             msg = EmailMultiAlternatives(
-                subject, text_content, from_email, [to], cc=["VOKO Utrecht Boerencontact <boeren@vokoutrecht.nl>"]
+                subject, text_content, from_email, [to], cc=[cc_email]
             )
 
-            msg.attach("voko_utrecht_bestelling_ronde_%d.csv" % order_round.pk, in_mem_file.read(), "text/csv")
+            # Use organization short name for filename (lowercase, no spaces)
+            org_slug = settings.ORGANIZATION_SHORT_NAME.lower().replace(" ", "_")
+            msg.attach(f"{org_slug}_bestelling_ronde_{order_round.pk}.csv", in_mem_file.read(), "text/csv")
             msg.send()
 
 
