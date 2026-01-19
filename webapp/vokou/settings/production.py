@@ -20,4 +20,6 @@ ADMINS = (
 
 ALLOWED_HOSTS = ("ldn.vokoutrecht.nl", "leden.vokoutrecht.nl", "acc.vokoutrecht.nl", "dev.vokoutrecht.nl", "127.0.0.1")
 
+CSRF_TRUSTED_ORIGINS = ["https://leden.vokoutrecht.nl"]
+
 MOLLIE_API_KEY = os.environ["MOLLIE_API_KEY"]
