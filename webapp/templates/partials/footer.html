@@ -71,11 +71,9 @@
         </section>
         <!-- Section: Links  -->
 
-        <!-- Copyright -->
         <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.1)">Publieke website:
-            <a class="text-dark" href="{{ org_website }}">{{ org_website|slice:"8:" }}</a>
+            <a class="text-dark" href="{{ org_website }}">{{ org_website|cut:"https://"|cut:"http://" }}</a>
         </div>
-        <!-- Copyright -->
     </footer>
     <!-- Footer -->
 </div>
