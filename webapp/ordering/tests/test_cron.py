@@ -79,16 +79,22 @@ class TestPickupReminderJob(VokoTestCase):
 
             MailOrderLists.do(self)
 
+            # Verify email was sent
             self.assertTrue(mock_msg.send.called)
 
+            # Verify organization settings are used in email
             call_args = mock_email_class.call_args
             subject = call_args[0][0]
             from_email = call_args[0][2]
 
+            # Subject should contain organization name
             self.assertIn(settings.ORGANIZATION_NAME, subject)
+
+            # From email should contain organization name and supplier email
             self.assertIn(settings.ORGANIZATION_NAME, from_email)
             self.assertIn(settings.ORGANIZATION_SUPPLIER_EMAIL, from_email)
 
+            # Attachment filename should contain org slug
             attach_call_args = mock_msg.attach.call_args
             filename = attach_call_args[0][0]
             org_slug = settings.ORGANIZATION_SHORT_NAME.lower().replace(" ", "_")
