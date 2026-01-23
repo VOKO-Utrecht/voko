@@ -4,6 +4,7 @@ from datetime import datetime
 
 import pytz
 from constance import config
+from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.db.models.aggregates import Sum
 from django_cron import CronJobBase, Schedule
@@ -11,7 +12,12 @@ from log import log_event
 
 from ordering.models import Supplier
 
-from .core import create_orderround_batch, get_current_order_round, get_latest_order_round, get_next_order_round
+from .core import (
+    create_orderround_batch,
+    get_current_order_round,
+    get_latest_order_round,
+    get_next_order_round,
+)
 
 
 def fix_decimal_separator(decimal_value):
@@ -49,7 +55,9 @@ class SendOrderReminders(CronJobBase):
         hours_before_closing = int(closing_delta.total_seconds() / 60 / 60)
         print("Hours before closing (rounded): %s" % hours_before_closing)
 
-        if (hours_before_closing <= order_round.reminder_hours_before_closing) and order_round.reminder_sent is False:
+        if (
+            hours_before_closing <= order_round.reminder_hours_before_closing
+        ) and order_round.reminder_sent is False:
             print("Sending reminders!")
             order_round.send_reminder_mails()
 
@@ -81,7 +89,8 @@ class SendPickupReminders(CronJobBase):
         print("Hours before collecting: %s" % hours_before_collecting)
 
         if (
-            hours_before_collecting <= order_round.reminder_hours_before_pickup and hours_before_collecting > 0
+            hours_before_collecting <= order_round.reminder_hours_before_pickup
+            and hours_before_collecting > 0
         ) and order_round.pickup_reminder_sent is False:
             print("Sending pickup reminders!")
             order_round.send_pickup_reminder_mails()
@@ -95,7 +104,7 @@ class MailOrderLists(CronJobBase):
 
     When: order round is not open and open date is in the past (so order round is closed and in the past)
     Every supplier with orders receives email with .csv file attached containing order details
-    Copy is send to boeren@vokoutrecht.nl
+    Copy is sent to supplier contact email (settings.ORGANIZATION_SUPPLIER_EMAIL)
     Send only once per order round
     """
 
@@ -126,7 +135,10 @@ class MailOrderLists(CronJobBase):
         for supplier in Supplier.objects.all():
             if not supplier.has_orders_in_current_order_round():
                 print(("No orders for supplier %s" % supplier))
-                log_event(event="Supplier %s has no orders in current round, " "so not sending order list." % supplier)
+                log_event(
+                    event="Supplier %s has no orders in current round, "
+                    "so not sending order list." % supplier
+                )
                 continue
 
             print(("Generating lists for supplier %s" % supplier))
@@ -136,7 +148,16 @@ class MailOrderLists(CronJobBase):
             csv_writer = csv.writer(in_mem_file, delimiter=";", quotechar="|")
 
             # Write header row
-            csv_writer.writerow(["Aantal", "Eenheid", "Product", "Omschrijving", "Inkoopprijs Euro", "Subtotaal"])
+            csv_writer.writerow(
+                [
+                    "Aantal",
+                    "Eenheid",
+                    "Product",
+                    "Omschrijving",
+                    "Inkoopprijs Euro",
+                    "Subtotaal",
+                ]
+            )
 
             ordered_products = (
                 supplier.products.exclude(orderproducts=None)
@@ -169,16 +190,23 @@ class MailOrderLists(CronJobBase):
                 )
 
             # Write 'total' row
-            total = fix_decimal_separator(sum([obj.amount_sum * obj.base_price for obj in ordered_products]))
+            total = fix_decimal_separator(
+                sum([obj.amount_sum * obj.base_price for obj in ordered_products])
+            )
             csv_writer.writerow([])
             csv_writer.writerow(["TOTAAL", "", "", "", "", total])
 
             in_mem_file.seek(0)
             in_mem_file.seek(0)  # Why is this here twice?
 
-            # Generate mail
-            subject = "VOKO Utrecht - Bestellijst voor %s" % order_round.collect_datetime.strftime("%d %B %Y")
-            from_email = "VOKO Utrecht Boerencontact <boeren@vokoutrecht.nl>"
+            subject = "%s - Bestellijst voor %s" % (
+                settings.ORGANIZATION_NAME,
+                order_round.collect_datetime.strftime("%d %B %Y"),
+            )
+            from_email = "%s Boerencontact <%s>" % (
+                settings.ORGANIZATION_NAME,
+                settings.ORGANIZATION_SUPPLIER_EMAIL,
+            )
             to = "%s <%s>" % (supplier.name, supplier.email)
 
             text_content = """
@@ -192,14 +220,29 @@ De bestelling is in CSV-formaat, dit is te openen in bijvoorbeeld Excel.
 Dit is een geautomatiseerd bericht, maar reageren is gewoon mogelijk.
 
 Vriendelijke groeten,
-VOKO Utrecht
-""" % (supplier, order_round.pk, order_round.collect_datetime.strftime("%d %B %Y"))
-
-            msg = EmailMultiAlternatives(
-                subject, text_content, from_email, [to], cc=["VOKO Utrecht Boerencontact <boeren@vokoutrecht.nl>"]
+%s
+""" % (
+                supplier,
+                order_round.pk,
+                order_round.collect_datetime.strftime("%d %B %Y"),
+                settings.ORGANIZATION_NAME,
             )
 
-            msg.attach("voko_utrecht_bestelling_ronde_%d.csv" % order_round.pk, in_mem_file.read(), "text/csv")
+            cc_email = "%s Boerencontact <%s>" % (
+                settings.ORGANIZATION_NAME,
+                settings.ORGANIZATION_SUPPLIER_EMAIL,
+            )
+            msg = EmailMultiAlternatives(
+                subject, text_content, from_email, [to], cc=[cc_email]
+            )
+
+            # Use organization short name for filename (lowercase, no spaces)
+            org_slug = settings.ORGANIZATION_SHORT_NAME.lower().replace(" ", "_")
+            msg.attach(
+                f"{org_slug}_bestelling_ronde_{order_round.pk}.csv",
+                in_mem_file.read(),
+                "text/csv",
+            )
             msg.send()
 
 
@@ -250,7 +293,10 @@ class SendPrepareRideMails(CronJobBase):
         if order_round.is_open:
             next_order_round = get_next_order_round()
             print("Next order round: %s" % next_order_round)
-            if next_order_round is not None and next_order_round.prepare_ride_mails_sent is False:
+            if (
+                next_order_round is not None
+                and next_order_round.prepare_ride_mails_sent is False
+            ):
                 print("Sending prepare ride mails!")
                 next_order_round.send_prepare_ride_mails()
 
@@ -282,7 +328,10 @@ class SendRideCostsRequestMails(CronJobBase):
         print("Hours since closing (rounded): %s" % hours_since_collecting)
 
         # Only send the mails if collecting time is less than 48 hours
-        if hours_since_collecting < 48 and last_order_round.ridecosts_request_mails_sent is False:
+        if (
+            hours_since_collecting < 48
+            and last_order_round.ridecosts_request_mails_sent is False
+        ):
             print("Sending ride costs request mails!")
             last_order_round.send_ridecosts_request_mails()
 

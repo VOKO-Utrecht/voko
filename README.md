@@ -1,7 +1,31 @@
 # VOKO
-Django based custom web application for food collective www.vokoutrecht.nl.
+Django based custom web application for food collectives (Voedselkollektieven).
+
+Originally built for [VOKO Utrecht](https://www.vokoutrecht.nl), this codebase is designed to be organization-agnostic and can be used by other food collectives.
 
 ![example workflow](https://github.com/VOKO-Utrecht/voko/actions/workflows/ci.yml/badge.svg)
+
+## Multi-Organization Support
+
+This codebase supports multiple organizations through environment variables. All organization-specific settings (name, email, website, etc.) can be configured without code changes.
+
+See the [PR #405](https://github.com/VOKO-Utrecht/voko/pull/405) description for the full architecture and migration guide.
+
+### Quick Configuration for Your Organization
+
+Set these environment variables to customize for your organization:
+
+```bash
+ORGANIZATION_NAME=Your Organization Name
+ORGANIZATION_SHORT_NAME=Your Org
+ORGANIZATION_LEGAL_NAME=Your Legal Entity Name
+ORGANIZATION_KVK=12345678
+ORGANIZATION_EMAIL=info@yourorg.nl
+ORGANIZATION_SUPPLIER_EMAIL=suppliers@yourorg.nl
+ORGANIZATION_WEBSITE=https://www.yourorg.nl
+```
+
+If not set, these default to VOKO Utrecht values for backwards compatibility.
 
 ## Deployment
 
@@ -9,7 +33,9 @@ This project includes automated deployment workflows:
 - **Test environment**: Automatically deploys when pushing to `main` branch
 - **Production environment**: Manual deployment via GitHub Actions workflow dispatch
 
-For complete deployment setup instructions, see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+For production deployments, use `vokou.settings.container` which reads all configuration from environment variables.
+
+For container deployment, use `vokou.settings.container` and see `.env.example` for all available configuration options.
 
 ## Some notes
 1. The code base needs cleaning up and adding of tests.

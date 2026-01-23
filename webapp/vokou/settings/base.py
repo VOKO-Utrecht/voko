@@ -1,7 +1,5 @@
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from pathlib import Path
-
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 PROJECT_DIR = Path(__file__).parent.parent.parent
@@ -29,6 +27,7 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "ordering.context_processors.pickup_locations",
+                "vokou.context_processors.organization",
             ],
         },
     },
@@ -97,6 +96,21 @@ DJANGO_CRON_DELETE_LOGS_OLDER_THAN = 365
 ROOT_URLCONF = "vokou.urls"
 WSGI_APPLICATION = "vokou.wsgi.application"
 
+# Organization-specific settings (from environment, with VOKO Utrecht defaults)
+ORGANIZATION_NAME = os.environ.get("ORGANIZATION_NAME", "VOKO Utrecht")
+ORGANIZATION_SHORT_NAME = os.environ.get("ORGANIZATION_SHORT_NAME", "VOKO Utrecht")
+ORGANIZATION_LEGAL_NAME = os.environ.get(
+    "ORGANIZATION_LEGAL_NAME", "Stichting Financiën VOKO Utrecht"
+)
+ORGANIZATION_KVK = os.environ.get("ORGANIZATION_KVK", "61879584")
+ORGANIZATION_EMAIL = os.environ.get("ORGANIZATION_EMAIL", "info@vokoutrecht.nl")
+ORGANIZATION_SUPPLIER_EMAIL = os.environ.get(
+    "ORGANIZATION_SUPPLIER_EMAIL", "boeren@vokoutrecht.nl"
+)
+ORGANIZATION_WEBSITE = os.environ.get(
+    "ORGANIZATION_WEBSITE", "https://www.vokoutrecht.nl"
+)
+
 # Internationalization
 
 LANGUAGE_CODE = "nl-nl"
@@ -120,10 +134,12 @@ EMAIL_SUBJECT_PREFIX = "[Voko Admin] "
 
 TEST_RUNNER = "django_nose.NoseTestSuiteRunner"
 
-MOLLIE_API_KEY = "SETME"
+MOLLIE_API_KEY = os.environ.get("MOLLIE_API_KEY", "SETME")
 
-BASE_URL = "https://leden.vokoutrecht.nl"
-DEFAULT_FROM_EMAIL = "VOKO Utrecht <info@vokoutrecht.nl>"
+BASE_URL = os.environ.get("BASE_URL", "https://leden.vokoutrecht.nl")
+DEFAULT_FROM_EMAIL = os.environ.get(
+    "DEFAULT_FROM_EMAIL", "VOKO Utrecht <info@vokoutrecht.nl>"
+)
 
 TINYMCE_DEFAULT_CONFIG = {
     "plugins": "table,xhtmlxtras,paste,searchreplace",
@@ -178,13 +194,29 @@ CONSTANCE_CONFIG = {
         "Day of week when order rounds open (0=Monday, 6=Sunday). Follows Python's datetime.weekday() convention.",
         int,
     ),
-    "ORDERROUND_CREATE_DAYS_AHEAD": (31, "Days in advance to create order round batch", int),
+    "ORDERROUND_CREATE_DAYS_AHEAD": (
+        31,
+        "Days in advance to create order round batch",
+        int,
+    ),
     "ORDERROUND_INTERVAL_WEEKS": (2, "Interval between order rounds in weeks", int),
     "ORDERROUND_OPEN_HOUR": (12, "Hour when order rounds open (24h format)", int),
     "ORDERROUND_DURATION_HOURS": (63, "How long order rounds stay open (hours)", int),
-    "ORDERROUND_COLLECT_DAYS_AFTER": (0, "Days after closing when products can be collected", int),
-    "ORDERROUND_COLLECT_HOUR": (18, "Hour when products can be collected (24h format)", int),
-    "ORDERROUND_TRANSPORT_COORDINATOR": (986, "Default transport coordinator user ID", int),
+    "ORDERROUND_COLLECT_DAYS_AFTER": (
+        0,
+        "Days after closing when products can be collected",
+        int,
+    ),
+    "ORDERROUND_COLLECT_HOUR": (
+        18,
+        "Hour when products can be collected (24h format)",
+        int,
+    ),
+    "ORDERROUND_TRANSPORT_COORDINATOR": (
+        986,
+        "Default transport coordinator user ID",
+        int,
+    ),
 }
 
 CONSTANCE_CONFIG_FIELDSETS = {

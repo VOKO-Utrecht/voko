@@ -60,9 +60,9 @@
                         <h3>Stichting</h3>
                         <hr class="mb-2 mt-0"
                             style="width: 100%; height: 2px" />
-                        <p class="lh-lg">Stichting Financiën VOKO Utrecht<br>
-                        KVK: 61879584<br>
-                        e-mail: <a href="mailto:info@vokoutrecht.nl">info@vokoutrecht.nl</a></p>
+                        <p class="lh-lg">{{ org_legal_name }}<br>
+                        KVK: {{ org_kvk }}<br>
+                        e-mail: <a href="mailto:{{ org_email }}">{{ org_email }}</a></p>
                     </div>
                     <!-- Grid column -->
                 </div>
@@ -71,11 +71,9 @@
         </section>
         <!-- Section: Links  -->
 
-        <!-- Copyright -->
         <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.1)">Publieke website:
-            <a class="text-dark" href="https://www.vokoutrecht.nl">www.vokoutrecht.nl</a>
+            <a class="text-dark" href="{{ org_website }}">{{ org_website|cut:"https://"|cut:"http://" }}</a>
         </div>
-        <!-- Copyright -->
     </footer>
     <!-- Footer -->
 </div>
