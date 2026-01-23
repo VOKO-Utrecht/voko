@@ -1,4 +1,6 @@
-from .base import *
+import os
+
+from .base import *  # noqa: F401, F403
 
 
 def strtobool(val):
@@ -18,7 +20,7 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "false").lower() in ("true", "1", "yes")
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ["POSTGRES_DB"],
+        "NAME": os.environ.get("POSTGRES_NAME", "postgres"),
         "USER": os.environ["POSTGRES_USER"],
         "PASSWORD": os.environ["POSTGRES_PASSWORD"],
         "HOST": os.environ["POSTGRES_HOST"],
@@ -40,7 +42,8 @@ ADMINS = [
 ]
 
 BASE_URL = os.environ.get("BASE_URL", BASE_URL)
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
+_raw_allowed_hosts = os.environ.get("ALLOWED_HOSTS", "")
+ALLOWED_HOSTS = [h.strip() for h in _raw_allowed_hosts.split(",") if h.strip()]
 
 MOLLIE_API_KEY = os.environ.get("MOLLIE_API_KEY", "SETME")
 

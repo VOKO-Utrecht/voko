@@ -9,7 +9,7 @@ Originally built for [VOKO Utrecht](https://www.vokoutrecht.nl), this codebase i
 
 This codebase supports multiple organizations through environment variables. All organization-specific settings (name, email, website, etc.) can be configured without code changes.
 
-See [docs/REFACTORING_PLAN.md](docs/REFACTORING_PLAN.md) for the full architecture and migration guide.
+See the [PR #405](https://github.com/VOKO-Utrecht/voko/pull/405) description for the full architecture and migration guide.
 
 ### Quick Configuration for Your Organization
 
@@ -35,7 +35,7 @@ This project includes automated deployment workflows:
 
 For production deployments, use `vokou.settings.container` which reads all configuration from environment variables.
 
-For complete deployment setup instructions, see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+For container deployment, use `vokou.settings.container` and see `.env.example` for all available configuration options.
 
 ## Some notes
 1. The code base needs cleaning up and adding of tests.
