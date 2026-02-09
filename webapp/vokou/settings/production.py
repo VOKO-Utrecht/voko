@@ -1,22 +1,22 @@
-from .base import *
+import os
+
+from .base import *  # noqa: F401, F403
 
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'voko',
-        'USER': 'voko',
-        'PASSWORD': os.environ['DB_PASSWORD'],
-        'HOST': 'localhost',
-        }
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "voko",
+        "USER": "voko",
+        "PASSWORD": os.environ["DB_PASSWORD"],
+        "HOST": "localhost",
     }
+}
 
 SERVER_EMAIL = "info@vokoutrecht.nl"
 
-ADMINS = (
-    ("Voko Utrecht", os.getenv('ADMIN_EMAIL', "info@vokoutrecht.nl")),
-)
+ADMINS = (("Voko Utrecht", os.getenv("ADMIN_EMAIL", "info@vokoutrecht.nl")),)
 
 ALLOWED_HOSTS = ("ldn.vokoutrecht.nl", "leden.vokoutrecht.nl", "acc.vokoutrecht.nl", "dev.vokoutrecht.nl", "127.0.0.1")
 
