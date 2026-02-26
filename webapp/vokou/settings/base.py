@@ -178,7 +178,7 @@ CONSTANCE_CONFIG = {
         "Day of week when order rounds open (0=Monday, 6=Sunday). Follows Python's datetime.weekday() convention.",
         int,
     ),
-    "ORDERROUND_CREATE_DAYS_AHEAD": (31, "Days in advance to create order round batch", int),
+    "ORDERROUND_CREATE_DAYS_AHEAD": (31, "Days in advance to create order rounds", int),
     "ORDERROUND_INTERVAL_WEEKS": (2, "Interval between order rounds in weeks", int),
     "ORDERROUND_OPEN_HOUR": (12, "Hour when order rounds open (24h format)", int),
     "ORDERROUND_DURATION_HOURS": (63, "How long order rounds stay open (hours)", int),

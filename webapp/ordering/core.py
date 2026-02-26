@@ -1,5 +1,5 @@
 import re
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 
 import pytz
 from accounts.models import VokoUser
@@ -217,63 +217,17 @@ def calculate_next_orderround_dates(open_date):
     return open_datetime, close_datetime, collect_datetime
 
 
-def get_quarter_end_dates():
+def create_orderround_ahead():
     """
-    Get the last day of the current quarter and the last day of the next quarter as date objects.
+    Create order rounds until ORDERROUND_CREATE_DAYS_AHEAD days from today.
 
     Returns:
-        tuple: (last_day_current_quarter, last_day_next_quarter)
+        list[models.OrderRound]: The order rounds created
     """
-    now = datetime.now(pytz.UTC)
-    current_quarter = (now.month - 1) // 3 + 1
-    next_quarter = current_quarter + 1
-
-    # Handle year rollover for next quarter
-    year = now.year
-    if next_quarter > 4:
-        next_quarter = 1
-        year += 1
-
-    # Calculate last month of current quarter
-    last_month_of_current_quarter = current_quarter * 3
-
-    # Get first day of the month after current quarter
-    if last_month_of_current_quarter == 12:
-        next_month_first_day = date(now.year + 1, 1, 1)
-    else:
-        next_month_first_day = date(now.year, last_month_of_current_quarter + 1, 1)
-
-    # Last day of current quarter
-    last_day_of_current_quarter = next_month_first_day - timedelta(days=1)
-
-    # Calculate last month of next quarter
-    last_month_of_next_quarter = next_quarter * 3
-
-    # Get first day of the month after next quarter
-    if last_month_of_next_quarter == 12:
-        next_month_first_day = date(year + 1, 1, 1)
-    else:
-        next_month_first_day = date(year, last_month_of_next_quarter + 1, 1)
-
-    # Last day of next quarter
-    last_day_of_next_quarter = next_month_first_day - timedelta(days=1)
-
-    return last_day_of_current_quarter, last_day_of_next_quarter
-
-
-def create_orderround_batch():
-    """
-    Create a new order round batch automatically based on configuration.
-
-    Returns:
-        list[models.OrderRound]: The order round batches created
-    """
-    # Get the last day of the current and next quarter
-    last_day_current_quarter, last_day_next_quarter = get_quarter_end_dates()
-
-    # Check if we should create a new order round batch
-    last_round = get_last_order_round()
     current_date = datetime.now(pytz.UTC).date()
+    end_date = current_date + timedelta(days=config.ORDERROUND_CREATE_DAYS_AHEAD)
+
+    last_round = get_last_order_round()
 
     # Determine start date based on whether there's a last round
     if last_round is None:
@@ -281,28 +235,19 @@ def create_orderround_batch():
     else:
         start_date = last_round.open_for_orders.date() + timedelta(weeks=config.ORDERROUND_INTERVAL_WEEKS)
 
-    # Determine end date based on proximity to next quarter
-    if last_day_current_quarter < current_date + timedelta(days=config.ORDERROUND_CREATE_DAYS_AHEAD):
-        # Next quarter is close, create batch for next quarter
-        end_date = last_day_next_quarter
-    elif last_round is None or start_date <= last_day_current_quarter:
-        # Fill current quarter
-        end_date = last_day_current_quarter
-    else:
-        # No new order round batch needed
+    # If the next round would already be beyond the horizon, nothing to do
+    if start_date > end_date:
         return []
 
     # Adjust start date to the configured open day of the week
     days_until_target = (config.ORDERROUND_OPEN_DAY_OF_WEEK - start_date.weekday()) % 7
     start_date += timedelta(days=days_until_target)
-    # Calculate the end date for the next quarter
-    # This will be the last day of the next quarter
+
     order_rounds = []
     while start_date <= end_date:
         if start_date > current_date:
             open_datetime, close_datetime, collect_datetime = calculate_next_orderround_dates(start_date)
 
-            # Get default pickup location and transport coordinator
             pickup_location = models.PickupLocation.objects.filter(is_default=True).first()
             transport_coordinator = VokoUser.objects.filter(pk=config.ORDERROUND_TRANSPORT_COORDINATOR).first()
 

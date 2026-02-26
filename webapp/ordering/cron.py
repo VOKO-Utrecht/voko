@@ -11,7 +11,7 @@ from log import log_event
 
 from ordering.models import Supplier
 
-from .core import create_orderround_batch, get_current_order_round, get_latest_order_round, get_next_order_round
+from .core import create_orderround_ahead, get_current_order_round, get_latest_order_round, get_next_order_round
 
 
 def fix_decimal_separator(decimal_value):
@@ -329,23 +329,23 @@ class AutoCreateOrderRoundBatch(CronJobBase):
     code = "ordering.auto_create_orderrounds"
 
     def do(self):
-        print("AutoCreateOrderRoundBatch cron job running...")
+        print("AutoCreateOrderRounds cron job running...")
 
         if not config.AUTO_CREATE_ORDERROUNDS:
             print("Auto-creation disabled in config")
             return
         try:
-            order_round_batch = create_orderround_batch()
-            if order_round_batch:
+            order_rounds = create_orderround_ahead()
+            if order_rounds:
                 print(
-                    f"Successfully created {len(order_round_batch)} new order rounds."
-                    f" The first one starts on {order_round_batch[0].open_for_orders}."
-                    f" The last order round is on {order_round_batch[-1].open_for_orders}."
+                    f"Successfully created {len(order_rounds)} new order rounds."
+                    f" The first one starts on {order_rounds[0].open_for_orders}."
+                    f" The last order round is on {order_rounds[-1].open_for_orders}."
                 )
             else:
-                print("No new order round batch needed at this time")
+                print("No new order rounds needed at this time")
         except Exception as e:
-            print("Error creating order round batch: %s" % str(e))
+            print("Error creating order rounds: %s" % str(e))
             import traceback
 
             traceback.print_exc()
