@@ -1,6 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 from .views import Members
 
-urlpatterns = (
-    url(r'^members/$', Members.as_view(), name="groups_members"),
-)
+urlpatterns = (path("members/", Members.as_view(), name="groups_members"),)
