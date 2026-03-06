@@ -89,6 +89,8 @@ CRON_CLASSES = [
     "ordering.cron.SendDistributionMails",
     "ordering.cron.SendRideCostsRequestMails",
     "ordering.cron.AutoCreateOrderRoundBatch",
+    "accounts.cron.WarnDormantMembers",
+    "accounts.cron.DeleteDormantMembers",
 ]
 
 DJANGO_CRON_DELETE_LOGS_OLDER_THAN = 365
@@ -156,6 +158,7 @@ CONSTANCE_CONFIG = {
     "DISTRIBUTION_MAIL": (84, "Distribution info mail", int),
     "PICKUP_REMINDER_MAIL": (107, "Order pickup reminder mail", int),
     "RIDECOSTS_REQUEST_MAIL": (108, "Ride costs request mail", int),
+    "SLEEPING_MEMBER_WARNING_MAIL": (1, "Sleeping member deletion warning mail", int),
     # group ids
     "ADMIN_GROUP": (1, "Admin Group", int),
     "TRANSPORT_GROUP": (2, "Transport Group", int),
@@ -196,6 +199,7 @@ CONSTANCE_CONFIG_FIELDSETS = {
         "DISTRIBUTION_MAIL",
         "PICKUP_REMINDER_MAIL",
         "RIDECOSTS_REQUEST_MAIL",
+        "SLEEPING_MEMBER_WARNING_MAIL",
     ),
     "Group Ids": (
         "TRANSPORT_GROUP",
