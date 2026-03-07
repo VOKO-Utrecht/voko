@@ -1,5 +1,5 @@
-from captcha.fields import ReCaptchaField
-from captcha.widgets import ReCaptchaV2Checkbox
+from django_recaptcha.fields import ReCaptchaField
+from django_recaptcha.widgets import ReCaptchaV2Checkbox
 from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
@@ -20,8 +20,7 @@ class VokoUserCreationForm(forms.ModelForm):
         fields = ("email", "first_name", "last_name")
 
     if settings.CAPTCHA_ENABLED:
-        captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(
-            api_params={'hl': 'cl', 'onload': 'onLoadFunc'}))
+        captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "cl", "onload": "onLoadFunc"}))
 
     def save(self, commit=True):
         # Create user
@@ -41,40 +40,22 @@ class VokoUserFinishForm(forms.ModelForm):
         model = VokoUser
         fields = ()
 
-    phone_number = forms.CharField(
-        label="Telefoonnummer",
-        widget=forms.TextInput,
-        required=False,
-        max_length=25
-    )
+    phone_number = forms.CharField(label="Telefoonnummer", widget=forms.TextInput, required=False, max_length=25)
 
-    password1 = forms.CharField(
-        label="Wachtwoord",
-        widget=forms.PasswordInput
-    )
-    password2 = forms.CharField(
-        label="Wachtwoord (bevestiging)",
-        widget=forms.PasswordInput
-    )
+    password1 = forms.CharField(label="Wachtwoord", widget=forms.PasswordInput)
+    password2 = forms.CharField(label="Wachtwoord (bevestiging)", widget=forms.PasswordInput)
 
-    notes = forms.CharField(
-        label="Antwoorden op bovenstaande vragen",
-        widget=forms.Textarea
-    )
+    notes = forms.CharField(label="Antwoorden op bovenstaande vragen", widget=forms.Textarea)
 
-    has_drivers_license = forms.BooleanField(
-        label='Ik heb een rijbewijs',
-        required=False
-    )
+    has_drivers_license = forms.BooleanField(label="Ik heb een rijbewijs", required=False)
 
     accept_terms_and_privacy = forms.BooleanField(
-        label="Ik heb het Reglement en het Privacy Statement van "
-              "VOKO Utrecht gelezen en ga met beiden akkoord.",
-        required=True
+        label="Ik heb het Reglement en het Privacy Statement van VOKO Utrecht gelezen en ga met beiden akkoord.",
+        required=True,
     )
 
     def clean_password2(self):
-        """ Check that the two password entries match """
+        """Check that the two password entries match"""
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
 
@@ -89,13 +70,15 @@ class VokoUserFinishForm(forms.ModelForm):
     @staticmethod
     def _notify_admins_about_activated_user(user):
         # This is most likely temporary
-        message = """Hoi!
+        message = (
+            """Hoi!
 
 Gebruiker %s heeft zojuist zijn/haar registratie afgerond..
-""" % user
+"""
+            % user
+        )
 
-        mail_admins("Gebruiker %s is geactiveerd" % user, message,
-                    fail_silently=True)
+        mail_admins("Gebruiker %s is geactiveerd" % user, message, fail_silently=True)
 
     def save(self, commit=True):
         with transaction.atomic():
@@ -109,9 +92,7 @@ Gebruiker %s heeft zojuist zijn/haar registratie afgerond..
                 user.save()
 
             UserProfile.objects.create(
-                user=user,
-                notes=self.cleaned_data['notes'],
-                phone_number=self.cleaned_data['phone_number']
+                user=user, notes=self.cleaned_data["notes"], phone_number=self.cleaned_data["phone_number"]
             )
 
             self._notify_admins_about_activated_user(user)
@@ -139,8 +120,7 @@ class VokoUserChangeForm(forms.ModelForm):
             user = self.instance
             balance = user.balance.credit() or -user.balance.debit()
             if balance:
-                raise forms.ValidationError(
-                    f"Lid kan niet worden gedeactiveerd omdat de balans € { balance:.2f} is.")
+                raise forms.ValidationError(f"Lid kan niet worden gedeactiveerd omdat de balans € {balance:.2f} is.")
 
 
 class RequestPasswordResetForm(forms.Form):
@@ -148,14 +128,8 @@ class RequestPasswordResetForm(forms.Form):
 
 
 class PasswordResetForm(forms.Form):
-    password1 = forms.CharField(
-        label="Wachtwoord",
-        widget=forms.PasswordInput
-    )
-    password2 = forms.CharField(
-        label="Wachtwoord (bevestiging)",
-        widget=forms.PasswordInput
-    )
+    password1 = forms.CharField(label="Wachtwoord", widget=forms.PasswordInput)
+    password2 = forms.CharField(label="Wachtwoord (bevestiging)", widget=forms.PasswordInput)
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -172,67 +146,48 @@ class PasswordResetForm(forms.Form):
 class ChangeProfileForm(forms.ModelForm):
     class Meta:
         model = VokoUser
-        fields = ('first_name', 'last_name', )
+        fields = (
+            "first_name",
+            "last_name",
+        )
 
-    phone_number = forms.CharField(
-        label="Telefoonnummer",
-        widget=forms.TextInput,
-        required=False
-    )
+    phone_number = forms.CharField(label="Telefoonnummer", widget=forms.TextInput, required=False)
 
-    has_drivers_license = forms.BooleanField(
-        label='Ik heb een rijbewijs',
-        required=False
-    )
+    has_drivers_license = forms.BooleanField(label="Ik heb een rijbewijs", required=False)
 
     contact_person = forms.ModelChoiceField(
         queryset=Group.objects.all(),
         label="Contactpersoon voor",
         required=False,
-        help_text=("Dit zet je contactgegevens op contactpagina van leden"
-                   "site.")
+        help_text=("Dit zet je contactgegevens op contactpagina van ledensite."),
     )
 
     password1 = forms.CharField(
-        label="Wachtwoord (alleen invullen als je deze wilt wijzigen)",
-        widget=forms.PasswordInput,
-        required=False
+        label="Wachtwoord (alleen invullen als je deze wilt wijzigen)", widget=forms.PasswordInput, required=False
     )
     password2 = forms.CharField(
-        label=("Wachtwoord (bevestiging; alleen invullen "
-               "als je deze wilt wijzigen)"),
+        label=("Wachtwoord (bevestiging; alleen invullen als je deze wilt wijzigen)"),
         widget=forms.PasswordInput,
-        required=False
+        required=False,
     )
 
     shares_car = forms.BooleanField(
-        label=("Ik heb een redelijk grote auto die leden kunnen lenen voor "
-               "transport"),
+        label=("Ik heb een redelijk grote auto die leden kunnen lenen voor transport"),
         required=False,
-        help_text=("Dit zet je contactgegevens op transport pagina's van de "
-                   "ledensite")
+        help_text=("Dit zet je contactgegevens op transport pagina's van de ledensite"),
     )
-    car_neighborhood = forms.CharField(
-        label="Buurt waar de auto staat",
-        widget=forms.TextInput,
-        required=False
-    )
-    car_type = forms.CharField(
-        label="Type auto",
-        widget=forms.TextInput,
-        required=False
-    )
+    car_neighborhood = forms.CharField(label="Buurt waar de auto staat", widget=forms.TextInput, required=False)
+    car_type = forms.CharField(label="Type auto", widget=forms.TextInput, required=False)
     particularities = forms.CharField(
         label="Bijzonderheden",
         required=False,
         widget=forms.Textarea,
-        help_text=("Informatie over beschikbaarheid of andere bijzonderheden."
-                   "Zichtbaar voor andere VOKO leden.")
+        help_text=("Informatie over beschikbaarheid of andere bijzonderheden.Zichtbaar voor andere VOKO leden."),
     )
     orderround_mail_optout = forms.BooleanField(
         label=("Ik wil geen e-mails ontvangen wanneer een bestelronde wordt geopend"),
         required=False,
-        help_text=("Je krijgt geen e-mail meer wanneer een bestelronde wordt geopend")
+        help_text=("Je krijgt geen e-mail meer wanneer een bestelronde wordt geopend"),
     )
 
     # TODO: Notes and e-mail address cannot be changed atm.
@@ -240,27 +195,19 @@ class ChangeProfileForm(forms.ModelForm):
     def __init__(self, data=None, *args, **kwargs):
         super(ChangeProfileForm, self).__init__(data=data, *args, **kwargs)
         # This is hacky. Should use Inline Formset.
-        self.fields['phone_number'].initial = (
-            self.instance.userprofile.phone_number)
-        self.fields['has_drivers_license'].initial = (
-            self.instance.userprofile.has_drivers_license)
-        self.fields['contact_person'].initial = (
-            self.instance.userprofile.contact_person)
-        self.fields['shares_car'].initial = (
-            self.instance.userprofile.shares_car)
-        self.fields['car_neighborhood'].initial = (
-            self.instance.userprofile.car_neighborhood)
-        self.fields['car_type'].initial = (
-            self.instance.userprofile.car_type)
-        self.fields['particularities'].initial = (
-            self.instance.userprofile.particularities)
-        self.fields['orderround_mail_optout'].initial = (
-            self.instance.userprofile.orderround_mail_optout)
+        self.fields["phone_number"].initial = self.instance.userprofile.phone_number
+        self.fields["has_drivers_license"].initial = self.instance.userprofile.has_drivers_license
+        self.fields["contact_person"].initial = self.instance.userprofile.contact_person
+        self.fields["shares_car"].initial = self.instance.userprofile.shares_car
+        self.fields["car_neighborhood"].initial = self.instance.userprofile.car_neighborhood
+        self.fields["car_type"].initial = self.instance.userprofile.car_type
+        self.fields["particularities"].initial = self.instance.userprofile.particularities
+        self.fields["orderround_mail_optout"].initial = self.instance.userprofile.orderround_mail_optout
 
         # If shares car, set more fields as required
-        if data and data.get('shares_car', None) is not None:
-            self.fields['car_neighborhood'].required = True
-            self.fields['car_type'].required = True
+        if data and data.get("shares_car", None) is not None:
+            self.fields["car_neighborhood"].required = True
+            self.fields["car_type"].required = True
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -280,21 +227,19 @@ class ChangeProfileForm(forms.ModelForm):
             # Update user
             user = super(ChangeProfileForm, self).save()
 
-            if self.cleaned_data['password1']:
+            if self.cleaned_data["password1"]:
                 user.set_password(self.cleaned_data["password1"])
 
             # Profile
             userprofile = user.userprofile
-            userprofile.phone_number = self.cleaned_data['phone_number']
-            userprofile.has_drivers_license = (
-                self.cleaned_data['has_drivers_license'])
-            userprofile.contact_person = self.cleaned_data['contact_person']
-            userprofile.shares_car = self.cleaned_data['shares_car']
-            userprofile.car_neighborhood = (
-                self.cleaned_data['car_neighborhood'])
-            userprofile.car_type = self.cleaned_data['car_type']
-            userprofile.particularities = self.cleaned_data['particularities']
-            userprofile.orderround_mail_optout = self.cleaned_data['orderround_mail_optout']
+            userprofile.phone_number = self.cleaned_data["phone_number"]
+            userprofile.has_drivers_license = self.cleaned_data["has_drivers_license"]
+            userprofile.contact_person = self.cleaned_data["contact_person"]
+            userprofile.shares_car = self.cleaned_data["shares_car"]
+            userprofile.car_neighborhood = self.cleaned_data["car_neighborhood"]
+            userprofile.car_type = self.cleaned_data["car_type"]
+            userprofile.particularities = self.cleaned_data["particularities"]
+            userprofile.orderround_mail_optout = self.cleaned_data["orderround_mail_optout"]
 
             if commit:
                 user.save()

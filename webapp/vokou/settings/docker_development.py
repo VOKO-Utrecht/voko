@@ -10,7 +10,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 
 import os
 
-from .development import *  # noqa: F403
+from .development import *  # noqa: F401, F403
 
 DATABASES = {
     # PostgreSQL for Docker development

@@ -1,5 +1,5 @@
 from braces.views import LoginRequiredMixin, GroupRequiredMixin
-from django.views.generic import (DetailView, ListView)
+from django.views.generic import DetailView, ListView
 from transport import models
 from django.db.models import Q
 import datetime
@@ -15,9 +15,7 @@ class Schedule(LoginRequiredMixin, ListView):
     def get_queryset(self):
         user = self.request.user
 
-        if (user.groups.filter(
-            name__in=['Transportcoordinatoren', 'Admin']
-        ).exists()):
+        if user.groups.filter(name__in=["Transportcoordinatoren", "Admin"]).exists():
             rides = models.Ride.objects.all()
         else:
             rides = models.Ride.objects.filter(
@@ -29,12 +27,10 @@ class Schedule(LoginRequiredMixin, ListView):
 
         rides = rides.order_by("-order_round__collect_datetime", "route")
 
-        if (user.groups.filter(name='Admin').exists()):
+        if user.groups.filter(name="Admin").exists():
             return rides
         else:
-            return rides.filter(
-                order_round__collect_datetime__gte=datetime.date.today()
-            )
+            return rides.filter(order_round__collect_datetime__gte=datetime.date.today())
 
 
 class Ride(LoginRequiredMixin, UserIsInvolvedMixin, DetailView):
@@ -43,24 +39,25 @@ class Ride(LoginRequiredMixin, UserIsInvolvedMixin, DetailView):
 
 
 class Cars(LoginRequiredMixin, GroupRequiredMixin, ListView):
-    group_required = ('Transport', 'Admin')
-    queryset = VokoUser.objects.filter(
-        is_active=True,
-        userprofile__shares_car__exact=True
-    )
+    group_required = ("Transport", "Admin")
+    queryset = VokoUser.objects.filter(is_active=True, userprofile__shares_car__exact=True)
     template_name = "transport/cars.html"
 
 
 class Members(LoginRequiredMixin, GroupRequiredMixin, ListView):
-    group_required = ('Transport', 'Admin')
-    queryset = VokoUser.objects.filter(
-        is_active=True,
-        groups__id=config.TRANSPORT_GROUP).order_by("first_name", "last_name")
+    group_required = ("Transport", "Admin")
     template_name = "transport/members.html"
+
+    def get_queryset(self):
+        return VokoUser.objects.filter(is_active=True, groups__id=config.TRANSPORT_GROUP).order_by(
+            "first_name", "last_name"
+        )
 
 
 class Groupmanager(LoginRequiredMixin, GroupRequiredMixin, GroupmanagerFormView):
-    group_required = ('Transportcoordinatoren', 'Transport', 'Admin')
+    group_required = ("Transportcoordinatoren", "Transport", "Admin")
     template_name = "transport/group_mgr.html"
     success_url = "/transport/groupmanager"
-    group_pk = config.TRANSPORT_GROUP
+
+    def get_group_pk(self):
+        return config.TRANSPORT_GROUP

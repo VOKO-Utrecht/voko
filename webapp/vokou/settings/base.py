@@ -44,13 +44,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django_nose",
     "tinymce",
     "django_extensions",
     "braces",
     "django_bootstrap5",
     "django_cron",
-    "captcha",
+    "django_recaptcha",
     "mailing",
     "accounts",
     "log",
@@ -102,7 +101,6 @@ WSGI_APPLICATION = "vokou.wsgi.application"
 LANGUAGE_CODE = "nl-nl"
 TIME_ZONE = "Europe/Amsterdam"
 USE_I18N = True
-USE_L10N = False
 USE_TZ = True
 DECIMAL_SEPARATOR = ","
 DATETIME_FORMAT = "j F Y, H:i"
@@ -117,8 +115,6 @@ LOGIN_REDIRECT_URL = "/"
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 EMAIL_SUBJECT_PREFIX = "[Voko Admin] "
-
-TEST_RUNNER = "django_nose.NoseTestSuiteRunner"
 
 MOLLIE_API_KEY = "SETME"
 
@@ -178,11 +174,11 @@ CONSTANCE_CONFIG = {
         "Day of week when order rounds open (0=Monday, 6=Sunday). Follows Python's datetime.weekday() convention.",
         int,
     ),
-    "ORDERROUND_CREATE_DAYS_AHEAD": (31, "Days in advance to create order round batch", int),
+    "ORDERROUND_CREATE_DAYS_AHEAD": (31, "Days in advance to create order rounds", int),
     "ORDERROUND_INTERVAL_WEEKS": (2, "Interval between order rounds in weeks", int),
     "ORDERROUND_OPEN_HOUR": (12, "Hour when order rounds open (24h format)", int),
-    "ORDERROUND_DURATION_HOURS": (63, "How long order rounds stay open (hours)", int),
-    "ORDERROUND_COLLECT_DAYS_AFTER": (0, "Days after closing when products can be collected", int),
+    "ORDERROUND_DURATION_HOURS": (39, "How long order rounds stay open (hours)", int),
+    "ORDERROUND_COLLECT_DAYS_AFTER": (1, "Days after closing when products can be collected", int),
     "ORDERROUND_COLLECT_HOUR": (18, "Hour when products can be collected (24h format)", int),
     "ORDERROUND_TRANSPORT_COORDINATOR": (986, "Default transport coordinator user ID", int),
 }

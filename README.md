@@ -110,7 +110,7 @@ This improved Docker setup includes:
     python manage.py runcrons --force --settings=vokou.settings.development
 
 ### Run tests
-    python manage.py test --settings=vokou.settings.testing
+    pytest webapp/ --ds=vokou.settings.testing 
 
 ### Run development server
     python manage.py runserver --settings=vokou.settings.development

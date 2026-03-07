@@ -5,14 +5,13 @@ from uuid import uuid4
 import pytz
 from constance import config
 from django.conf import settings
-from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
-                                        PermissionsMixin)
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import mail_admins
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 from mailing.helpers import get_template_by_id, mail_user, render_mail_template
 
@@ -37,12 +36,8 @@ class UserProfile(TimeStampedModel):
         verbose_name_plural = "ledenprofielen"
 
     id = models.AutoField(primary_key=True)
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, related_name="userprofile", on_delete=models.CASCADE
-    )
-    address = models.ForeignKey(
-        Address, null=True, blank=True, on_delete=models.CASCADE
-    )
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="userprofile", on_delete=models.CASCADE)
+    address = models.ForeignKey(Address, null=True, blank=True, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=25, blank=True)
     notes = models.TextField(
         blank=True,
@@ -59,12 +54,8 @@ class UserProfile(TimeStampedModel):
     )
     shares_car = models.BooleanField(
         default=False,
-        verbose_name=(
-            "Ik heb een redelijk grote auto die leden kunnen lenen " "voor transport"
-        ),
-        help_text=(
-            "Dit zet je contactgegevens op transport pagina's van de " "ledensite"
-        ),
+        verbose_name=("Ik heb een redelijk grote auto die leden kunnen lenen voor transport"),
+        help_text=("Dit zet je contactgegevens op transport pagina's van de ledensite"),
     )
     car_neighborhood = models.CharField(max_length=100, blank=True)
     car_type = models.CharField(max_length=100, blank=True)
@@ -150,13 +141,9 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-    is_asleep = models.BooleanField(
-        default=False, verbose_name="Sleeping (inactive) member"
-    )
+    is_asleep = models.BooleanField(default=False, verbose_name="Sleeping (inactive) member")
 
-    activated = models.DateTimeField(
-        null=True, editable=False, help_text="When account was activated"
-    )
+    activated = models.DateTimeField(null=True, editable=False, help_text="When account was activated")
 
     objects = VokoUserManager()
 
@@ -167,9 +154,7 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
         return self.email
 
     def is_coordinator(self):
-        return self.groups.filter(
-            name__in=["Uitdeelcoordinatoren", "Transportcoordinatoren"]
-        )
+        return self.groups.filter(name__in=["Uitdeelcoordinatoren", "Transportcoordinatoren"])
 
     def __str__(self):
         return self.get_full_name()
