@@ -1,5 +1,8 @@
+import csv
+
 from django import forms
 from django.contrib import admin
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import path
 
@@ -20,7 +23,7 @@ class MailTemplateAdmin(admin.ModelAdmin):
     list_filter = ["is_active", "tags"]
     filter_horizontal = ["tags"]
     ordering = ("-id", "modified")
-    actions = ["apply_tags_action"]
+    actions = ["apply_tags_action", "export_as_csv"]
 
     def get_tags(self, obj):
         return ", ".join(tag.name for tag in obj.tags.all())
@@ -30,6 +33,23 @@ class MailTemplateAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         custom = [path("apply-tags/", self.admin_site.admin_view(self.apply_tags_view), name="mailing_apply_tags")]
         return custom + urls
+
+    @admin.action(description="Export selected templates as CSV")
+    def export_as_csv(self, request, queryset):
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="mail_templates.csv"'
+        writer = csv.writer(response)
+        writer.writerow(["id", "title", "subject", "from_email", "is_active", "tags"])
+        for template in queryset.prefetch_related("tags"):
+            writer.writerow([
+                template.id,
+                template.title,
+                template.subject,
+                template.from_email,
+                template.is_active,
+                ", ".join(tag.name for tag in template.tags.all()),
+            ])
+        return response
 
     @admin.action(description="Add tags to selected templates")
     def apply_tags_action(self, request, queryset):
