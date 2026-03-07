@@ -12,6 +12,7 @@ import api.urls
 import distribution.urls
 import groups.urls
 import news.urls
+import pages.urls
 from vokou.views import HomeView, PrivacyStatementView, RegulationsView
 
 urlpatterns = [
@@ -29,6 +30,7 @@ urlpatterns = [
     path("distribution/", include(distribution.urls)),
     path("tinymce/", include("tinymce.urls")),
     path("hijack/", include("hijack.urls")),
+    path("pages/", include(pages.urls)),
     path("regulations/", RegulationsView.as_view(), name="regulations"),
     path("privacy/", PrivacyStatementView.as_view(), name="privacy"),
     path("", HomeView.as_view(), name="home"),
