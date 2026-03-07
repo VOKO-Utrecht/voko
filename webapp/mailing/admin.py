@@ -23,7 +23,7 @@ class MailTemplateAdmin(admin.ModelAdmin):
     list_filter = ["is_active", "tags"]
     filter_horizontal = ["tags"]
     ordering = ("-id", "modified")
-    actions = ["apply_tags_action", "export_as_csv"]
+    actions = ["apply_tags_action", "export_as_csv", "set_active", "set_inactive"]
 
     def get_tags(self, obj):
         return ", ".join(tag.name for tag in obj.tags.all())
@@ -50,6 +50,16 @@ class MailTemplateAdmin(admin.ModelAdmin):
                 ", ".join(tag.name for tag in template.tags.all()),
             ])
         return response
+
+    @admin.action(description="Set selected templates to active")
+    def set_active(self, request, queryset):
+        updated = queryset.update(is_active=True)
+        self.message_user(request, f"{updated} template(s) set to active.")
+
+    @admin.action(description="Set selected templates to inactive")
+    def set_inactive(self, request, queryset):
+        updated = queryset.update(is_active=False)
+        self.message_user(request, f"{updated} template(s) set to inactive.")
 
     @admin.action(description="Add tags to selected templates")
     def apply_tags_action(self, request, queryset):
