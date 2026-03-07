@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.urls import include, path
+from django.views.generic import RedirectView
 from django.contrib import admin
 import accounts.urls
 import docs.urls
@@ -13,7 +14,7 @@ import distribution.urls
 import groups.urls
 import news.urls
 import pages.urls
-from vokou.views import HomeView, PrivacyStatementView, RegulationsView
+from vokou.views import HomeView, RegulationsView
 
 urlpatterns = [
     path("admin/mailing/", include(mailing.urls)),
@@ -32,7 +33,7 @@ urlpatterns = [
     path("hijack/", include("hijack.urls")),
     path("pages/", include(pages.urls)),
     path("regulations/", RegulationsView.as_view(), name="regulations"),
-    path("privacy/", PrivacyStatementView.as_view(), name="privacy"),
+    path("privacy/", RedirectView.as_view(url="/pages/privacy-statement/", permanent=True), name="privacy"),
     path("", HomeView.as_view(), name="home"),
 ]
 

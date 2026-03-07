@@ -7,9 +7,5 @@ class HomeView(View):
         return redirect('overview')
 
 
-class PrivacyStatementView(TemplateView):
-    template_name = 'privacy_statement.html'
-
-
 class RegulationsView(TemplateView):
     template_name = 'regulations.html'
