@@ -36,3 +36,13 @@ class MailTemplateModelTest(TestCase):
             title="Test", html_body="<p>Test</p>", from_email="custom@vokoutrecht.nl"
         )
         self.assertEqual(template.from_email, "custom@vokoutrecht.nl")
+
+    def test_is_active_default_true(self):
+        """Test that is_active defaults to True."""
+        template = MailTemplate.objects.create(title="Test", html_body="<p>Test</p>")
+        self.assertTrue(template.is_active)
+
+    def test_is_active_can_be_set_false(self):
+        """Test that templates can be marked inactive."""
+        template = MailTemplate.objects.create(title="Test", html_body="<p>Test</p>", is_active=False)
+        self.assertFalse(template.is_active)

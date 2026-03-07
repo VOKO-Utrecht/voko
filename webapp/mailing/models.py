@@ -9,6 +9,7 @@ class MailTemplate(TimeStampedModel):
     subject = models.CharField(max_length=100, default="VOKO Utrecht - ")
     from_email = models.CharField(max_length=100, default="", blank=True)
     html_body = HTMLField()
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return "%s (%s)" % (self.title, self.subject)
