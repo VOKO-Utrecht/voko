@@ -1,0 +1,137 @@
+---
+- name: Install nginx and GeoIP2 module
+  apt:
+    name:
+      - nginx
+      - libnginx-mod-http-geoip2
+      - libmaxminddb0
+      - mmdb-bin
+    state: present
+    update_cache: true
+
+- name: Install geoipupdate (MaxMind database updater)
+  block:
+    - name: Add MaxMind apt key
+      apt_key:
+        url: https://packagecloud.io/maxmind/ppa/gpgkey
+        state: present
+
+    - name: Add MaxMind apt repository
+      apt_repository:
+        repo: "deb https://packagecloud.io/maxmind/ppa/ubuntu/ {{ ansible_distribution_release }} main"
+        state: present
+        filename: maxmind
+
+    - name: Install geoipupdate
+      apt:
+        name: geoipupdate
+        state: present
+        update_cache: true
+
+- name: Configure MaxMind GeoIP updater
+  template:
+    src: GeoIP.conf.j2
+    dest: /etc/GeoIP.conf
+    mode: "0640"
+
+- name: Download GeoIP2 databases (initial run)
+  command: geoipupdate
+  args:
+    creates: /var/lib/GeoIP/GeoLite2-Country.mmdb
+  register: geoipupdate_result
+  failed_when: geoipupdate_result.rc != 0
+
+- name: Schedule weekly GeoIP2 database updates
+  cron:
+    name: geoipupdate
+    weekday: "3"
+    hour: "3"
+    minute: "0"
+    job: /usr/bin/geoipupdate
+    user: root
+
+- name: Create nginx geoip2 config
+  template:
+    src: geoip2.conf.j2
+    dest: /etc/nginx/conf.d/geoip2.conf
+    mode: "0644"
+  notify: reload nginx
+
+- name: Deploy nginx vhosts
+  template:
+    src: voko.conf.j2
+    dest: "/etc/nginx/sites-available/voko_{{ item.env_name }}.conf"
+    mode: "0644"
+  vars:
+    env_name: "{{ item.env_name }}"
+    domain: "{{ item.domain }}"
+    app_port: "{{ item.app_port }}"
+    static_dir: "{{ item.static_dir }}"
+    media_dir: "{{ item.media_dir }}"
+    cache_immutable: "{{ item.cache_immutable }}"
+    static_expires: "{{ item.static_expires }}"
+  loop:
+    - env_name: prod
+      domain: "{{ prod_domain }}"
+      app_port: 8000
+      static_dir: "{{ prod_static_dir }}"
+      media_dir: "{{ prod_media_dir }}"
+      cache_immutable: true
+      static_expires: 30d
+    - env_name: acc
+      domain: "{{ acc_domain }}"
+      app_port: 8001
+      static_dir: "{{ acc_static_dir }}"
+      media_dir: "{{ acc_media_dir }}"
+      cache_immutable: false
+      static_expires: 1d
+  notify: reload nginx
+
+- name: Enable vhosts
+  file:
+    src: "/etc/nginx/sites-available/voko_{{ item }}.conf"
+    dest: "/etc/nginx/sites-enabled/voko_{{ item }}.conf"
+    state: link
+  loop:
+    - prod
+    - acc
+  notify: reload nginx
+
+- name: Remove default nginx vhost
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: reload nginx
+
+- name: Create static/media directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: "0755"
+  loop:
+    - "{{ prod_static_dir }}"
+    - "{{ prod_media_dir }}"
+    - "{{ acc_static_dir }}"
+    - "{{ acc_media_dir }}"
+
+- name: Allow deploy users to write to static/media dirs
+  acl:
+    path: "{{ item.path }}"
+    entity: "{{ item.user }}"
+    etype: user
+    permissions: rwx
+    default: true
+    state: present
+  loop:
+    - { path: "{{ prod_static_dir }}", user: "{{ prod_user }}" }
+    - { path: "{{ prod_media_dir }}", user: "{{ prod_user }}" }
+    - { path: "{{ acc_static_dir }}", user: "{{ acc_user }}" }
+    - { path: "{{ acc_media_dir }}", user: "{{ acc_user }}" }
+
+- name: Enable and start nginx
+  service:
+    name: nginx
+    state: started
+    enabled: true

@@ -1,0 +1,26 @@
+#!/bin/bash
+set -e
+
+BACKUP_DIR="{{ backup_dir }}"
+RETAIN_DAYS="{{ backup_retain_days }}"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+echo "=== VOKO Backup: $(date) ==="
+
+# Prod backup
+PROD_FILE="$BACKUP_DIR/prod_${TIMESTAMP}.sql.gz"
+echo "Backing up production database..."
+docker exec voko_db_prod pg_dump -U voko voko | gzip > "$PROD_FILE"
+echo "Production backup written to $PROD_FILE"
+
+# Acc backup
+ACC_FILE="$BACKUP_DIR/acc_${TIMESTAMP}.sql.gz"
+echo "Backing up acceptance database..."
+docker exec voko_db_acc pg_dump -U voko_acc voko_acc | gzip > "$ACC_FILE"
+echo "Acceptance backup written to $ACC_FILE"
+
+# Clean up old backups
+echo "Removing backups older than $RETAIN_DAYS days..."
+find "$BACKUP_DIR" -name "*.sql.gz" -mtime "+$RETAIN_DAYS" -delete
+
+echo "=== Backup complete ==="

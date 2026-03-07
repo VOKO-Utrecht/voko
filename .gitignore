@@ -7,3 +7,4 @@ webapp/media
 .vscode
 *.env
 data/*
+infra/ansible/vars/vault.yml

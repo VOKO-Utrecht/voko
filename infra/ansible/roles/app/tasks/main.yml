@@ -1,0 +1,90 @@
+---
+- name: Create backup directory
+  file:
+    path: "{{ backup_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Clone repo for prod user (if not already present)
+  become_user: "{{ prod_user }}"
+  git:
+    repo: "{{ git_repo }}"
+    dest: "{{ prod_repo_dir }}"
+    version: main
+    force: false
+  ignore_errors: true  # Will already exist on re-runs; deploy script handles updates
+
+- name: Clone repo for acc user (if not already present)
+  become_user: "{{ acc_user }}"
+  git:
+    repo: "{{ git_repo }}"
+    dest: "{{ acc_repo_dir }}"
+    version: main
+    force: false
+  ignore_errors: true
+
+- name: Deploy prod .env file
+  template:
+    src: env_prod.j2
+    dest: "{{ prod_repo_dir }}/.env"
+    owner: "{{ prod_user }}"
+    group: "{{ prod_user }}"
+    mode: "0600"
+
+- name: Deploy acc .env file
+  template:
+    src: env_acc.j2
+    dest: "{{ acc_repo_dir }}/.env"
+    owner: "{{ acc_user }}"
+    group: "{{ acc_user }}"
+    mode: "0600"
+
+- name: Create scripts directory for prod user
+  file:
+    path: "/home/{{ prod_user }}/scripts"
+    state: directory
+    owner: "{{ prod_user }}"
+    group: "{{ prod_user }}"
+    mode: "0755"
+
+- name: Create scripts directory for acc user
+  file:
+    path: "/home/{{ acc_user }}/scripts"
+    state: directory
+    owner: "{{ acc_user }}"
+    group: "{{ acc_user }}"
+    mode: "0755"
+
+- name: Deploy prod deploy script
+  template:
+    src: deploy_prod.sh.j2
+    dest: "/home/{{ prod_user }}/scripts/deploy_prod.sh"
+    owner: "{{ prod_user }}"
+    group: "{{ prod_user }}"
+    mode: "0750"
+
+- name: Deploy acc deploy script
+  template:
+    src: deploy_acc.sh.j2
+    dest: "/home/{{ acc_user }}/scripts/deploy.sh"
+    owner: "{{ acc_user }}"
+    group: "{{ acc_user }}"
+    mode: "0750"
+
+- name: Deploy backup script
+  template:
+    src: backup.sh.j2
+    dest: /usr/local/bin/voko-backup.sh
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Schedule daily database backups
+  cron:
+    name: voko db backup
+    hour: "2"
+    minute: "30"
+    job: /usr/local/bin/voko-backup.sh >> /var/log/voko-backup.log 2>&1
+    user: root

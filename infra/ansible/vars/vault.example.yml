@@ -1,0 +1,30 @@
+---
+# Copy this file to vault.yml and fill in real values.
+# Encrypt with: ansible-vault encrypt vault.yml
+# Edit later with: ansible-vault edit vault.yml
+
+# SSH public key for GitHub Actions (the key stored in the SSH_KEY GitHub secret)
+github_deploy_key_pub: "ssh-ed25519 AAAA..."
+
+# MaxMind GeoLite2 credentials (free account at https://www.maxmind.com)
+maxmind_account_id: "123456"
+maxmind_license_key: "your_license_key_here"
+
+# Production secrets
+prod_django_secret_key: "change-me-to-a-long-random-string"
+prod_postgres_password: "change-me-strong-password"
+prod_mollie_api_key: "live_..."
+prod_recaptcha_site_key: ""
+prod_recaptcha_secret_key: ""
+prod_admin_email: "info@vokoutrecht.nl"
+
+# Acceptance secrets
+acc_django_secret_key: "change-me-to-a-long-random-string"
+acc_postgres_password: "change-me-strong-password"
+acc_mollie_api_key: "test_..."
+acc_recaptcha_site_key: ""
+acc_recaptcha_secret_key: ""
+acc_admin_email: "info@vokoutrecht.nl"
+
+# Certbot / Let's Encrypt
+certbot_email: "info@vokoutrecht.nl"
