@@ -1,5 +1,5 @@
 from braces.views import LoginRequiredMixin, GroupRequiredMixin
-from django.views.generic import (DetailView, ListView)
+from django.views.generic import DetailView, ListView
 from distribution import models
 import datetime
 from distribution.mixins import UserIsInvolvedWithShiftMixin
@@ -14,20 +14,20 @@ class Schedule(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(Schedule, self).get_context_data(**kwargs)
         # helper to hide/show ride details
-        context['isCoordinator'] = self.request.user.groups.filter(name='Uitdeelcoordinatoren').exists()
+        context["isCoordinator"] = self.request.user.groups.filter(name="Uitdeelcoordinatoren").exists()
         return context
 
     def get_queryset(self):
         user = self.request.user
 
-        if (user.groups.filter(name='Uitdeelcoordinatoren').exists()):
+        if user.groups.filter(name="Uitdeelcoordinatoren").exists():
             shifts = models.Shift.objects.all()
         else:
             shifts = models.Shift.objects.filter(members__in=[user])
 
-        return shifts.filter(
-            order_round__collect_datetime__gte=datetime.date.today()
-        ).order_by("order_round__collect_datetime", "start")
+        return shifts.filter(order_round__collect_datetime__gte=datetime.date.today()).order_by(
+            "order_round__collect_datetime", "start"
+        )
 
 
 class Shift(LoginRequiredMixin, UserIsInvolvedWithShiftMixin, DetailView):
@@ -36,15 +36,19 @@ class Shift(LoginRequiredMixin, UserIsInvolvedWithShiftMixin, DetailView):
 
 
 class Members(LoginRequiredMixin, GroupRequiredMixin, ListView):
-    group_required = ('Uitdeelcoordinatoren', 'Uitdeel', 'Admin')
-    queryset = VokoUser.objects.filter(
-        is_active=True,
-        groups__id=config.DISTRIBUTION_GROUP).order_by("first_name", "last_name")
+    group_required = ("Uitdeelcoordinatoren", "Uitdeel", "Admin")
     template_name = "distribution/members.html"
+
+    def get_queryset(self):
+        return VokoUser.objects.filter(is_active=True, groups__id=config.DISTRIBUTION_GROUP).order_by(
+            "first_name", "last_name"
+        )
 
 
 class Groupmanager(LoginRequiredMixin, GroupRequiredMixin, GroupmanagerFormView):
-    group_required = ('Uitdeelcoordinatoren', 'Admin')
+    group_required = ("Uitdeelcoordinatoren", "Admin")
     template_name = "distribution/group_mgr.html"
     success_url = "/distribution/groupmanager"
-    group_pk = config.DISTRIBUTION_GROUP
+
+    def get_group_pk(self):
+        return config.DISTRIBUTION_GROUP

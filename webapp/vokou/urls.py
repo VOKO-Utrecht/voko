@@ -1,7 +1,6 @@
 from django.conf import settings
-from django.conf.urls import include, url
+from django.urls import include, path
 from django.contrib import admin
-from django.urls import path
 import accounts.urls
 import docs.urls
 import transport.urls
@@ -16,27 +15,28 @@ import news.urls
 from vokou.views import HomeView, PrivacyStatementView, RegulationsView
 
 urlpatterns = [
-    url(r'^admin/mailing/', include(mailing.urls)),
-    path('admin/', admin.site.urls),
-    url(r'^accounts/', include(accounts.urls)),
-    url(r'^ordering/admin/', include(ordering.admin_urls)),
-    url(r'^ordering/', include(ordering.urls)),
-    url(r'^finance/', include(finance.urls)),
-    url(r'^docs/', include(docs.urls)),
-    url(r'^transport/', include(transport.urls)),
-    url(r'^groups/', include(groups.urls)),
-    url(r'^news/', include(news.urls)),
-    url(r'^api/', include(api.urls)),
-    url(r'^distribution/', include(distribution.urls)),
-    url(r'^tinymce/', include('tinymce.urls')),
-    url(r'^hijack/', include('hijack.urls')),
-    url(r'^regulations/', RegulationsView.as_view(), name="regulations"),
-    url(r'^privacy/', PrivacyStatementView.as_view(), name="privacy"),
-    url(r'^$', HomeView.as_view(), name="home"),
+    path("admin/mailing/", include(mailing.urls)),
+    path("admin/", admin.site.urls),
+    path("accounts/", include(accounts.urls)),
+    path("ordering/admin/", include(ordering.admin_urls)),
+    path("ordering/", include(ordering.urls)),
+    path("finance/", include(finance.urls)),
+    path("docs/", include(docs.urls)),
+    path("transport/", include(transport.urls)),
+    path("groups/", include(groups.urls)),
+    path("news/", include(news.urls)),
+    path("api/", include(api.urls)),
+    path("distribution/", include(distribution.urls)),
+    path("tinymce/", include("tinymce.urls")),
+    path("hijack/", include("hijack.urls")),
+    path("regulations/", RegulationsView.as_view(), name="regulations"),
+    path("privacy/", PrivacyStatementView.as_view(), name="privacy"),
+    path("", HomeView.as_view(), name="home"),
 ]
 
 if settings.DEBUG:
     import debug_toolbar
+
     urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
+        path("__debug__/", include(debug_toolbar.urls)),
     ]

@@ -1,34 +1,30 @@
 from datetime import timedelta, datetime
 from django.conf import settings
 from django.urls import reverse
-from mock import MagicMock
+from unittest.mock import MagicMock
 from pytz import UTC
 from accounts.tests.factories import VokoUserFactory
 from finance.models import Payment, Balance
 from finance.tests.factories import PaymentFactory
 from ordering.models import Order
-from ordering.tests.factories import (OrderRoundFactory, OrderFactory)
+from ordering.tests.factories import OrderRoundFactory, OrderFactory
 from vokou.testing import VokoTestCase, suppressWarnings
 
 
 class FinanceTestCase(VokoTestCase):
     def setUp(self):
         self.mollie_client = self.patch("finance.views.MollieClient")
-        self.mollie_client.return_value.issuers.all.return_value = \
-            MagicMock()
+        self.mollie_client.return_value.issuers.all.return_value = MagicMock()
 
         self.user = VokoUserFactory.create()
-        self.user.set_password('secret')
+        self.user.set_password("secret")
         self.user.is_active = True
         self.user.save()
-        self.client.login(username=self.user.email, password='secret')
+        self.client.login(username=self.user.email, password="secret")
 
-        self.mock_create_credit = self.patch(
-            "finance.models.Payment.create_and_link_credit")
-        self.mock_mail_confirmation = self.patch(
-            "ordering.models.Order.mail_confirmation")
-        self.mock_failure_notification = self.patch(
-            "ordering.models.Order.mail_failure_notification")
+        self.mock_create_credit = self.patch("finance.models.Payment.create_and_link_credit")
+        self.mock_mail_confirmation = self.patch("ordering.models.Order.mail_confirmation")
+        self.mock_failure_notification = self.patch("ordering.models.Order.mail_failure_notification")
         # TODO figure out why this mock breaks all ConfirmTransaction tests
         # self.mock_complete_after_payment = self.patch(
         #     "ordering.models.Order.complete_after_payment")
@@ -40,51 +36,62 @@ class FinanceTestCase(VokoTestCase):
                 if item == "id":
                     return "transaction_id"
 
-        self.mollie_client.return_value.payments.create.return_value = (
-            FakePaymentResult())
+        self.mollie_client.return_value.payments.create.return_value = FakePaymentResult()
 
 
 class TestCreateTransaction(FinanceTestCase):
     def setUp(self):
         super(TestCreateTransaction, self).setUp()
-        self.url = reverse('finance.createtransaction')
+        self.url = reverse("finance.createtransaction")
 
-        self.order = OrderFactory(user=self.user,
-                                  finalized=True,
-                                  paid=False)
+        self.order = OrderFactory(user=self.user, finalized=True, paid=False)
 
     def test_that_ideal_transaction_is_created(self):
-        self.client.post(self.url, {'bank': 'EXAMPLE_BANK', })
+        self.client.post(
+            self.url,
+            {
+                "bank": "EXAMPLE_BANK",
+            },
+        )
         self.mollie_client.return_value.payments.create.assert_called_once_with(  # noqa
-            {'amount': {
-                'currency': 'EUR',
-                'value': "{0:.2f}".format(
-                    self.order.total_price_to_pay_with_balances_taken_into_account())}, # noqa
-                'description': 'VOKO Utrecht %d' % self.order.id,
-                'method': 'ideal',
-                'webhookUrl': settings.BASE_URL + reverse('finance.callback'),
-                'redirectUrl': (settings.BASE_URL
-                                + reverse("finance.confirmtransaction")
-                                + "?order=%d" % self.order.id),
-                'metadata': {'order_id': self.order.id}}
+            {
+                "amount": {
+                    "currency": "EUR",
+                    "value": "{0:.2f}".format(self.order.total_price_to_pay_with_balances_taken_into_account()),
+                },  # noqa
+                "description": "VOKO Utrecht %d" % self.order.id,
+                "method": "ideal",
+                "webhookUrl": settings.BASE_URL + reverse("finance.callback"),
+                "redirectUrl": (
+                    settings.BASE_URL + reverse("finance.confirmtransaction") + "?order=%d" % self.order.id
+                ),
+                "metadata": {"order_id": self.order.id},
+            }
         )
 
     def test_that_payment_object_is_created_when_ideal(self):
         assert Payment.objects.count() == 0
 
-        self.client.post(self.url, {'bank': "EXAMPLE_BANK", })
+        self.client.post(
+            self.url,
+            {
+                "bank": "EXAMPLE_BANK",
+            },
+        )
         payment = Payment.objects.get()
 
-        self.assertEqual(
-            payment.amount,
-            self.order.total_price_to_pay_with_balances_taken_into_account()
-        )
+        self.assertEqual(payment.amount, self.order.total_price_to_pay_with_balances_taken_into_account())
         self.assertEqual(payment.order, self.order)
         self.assertEqual(payment.mollie_id, "transaction_id")
         self.assertEqual(payment.balance, None)
 
     def test_that_user_is_redirected_to_bank_url(self):
-        ret = self.client.post(self.url, {'bank': "EXAMPLE_BANK", })
+        ret = self.client.post(
+            self.url,
+            {
+                "bank": "EXAMPLE_BANK",
+            },
+        )
         self.assertEqual(ret.status_code, 302)
         self.assertEqual(ret.url, "http://bank.url")
 
@@ -108,18 +115,21 @@ class TestCreateTransaction(FinanceTestCase):
         self.order.order_round = order_round
         self.order.save()
 
-        ret = self.client.post(self.url, {'bank': "EXAMPLE_BANK", })
-        self.assertRedirects(ret, reverse('view_products'))
+        ret = self.client.post(
+            self.url,
+            {
+                "bank": "EXAMPLE_BANK",
+            },
+        )
+        self.assertRedirects(ret, reverse("view_products"))
 
 
 class TestConfirmTransaction(FinanceTestCase):
     def setUp(self):
         super(TestConfirmTransaction, self).setUp()
-        self.url = reverse('finance.confirmtransaction')
+        self.url = reverse("finance.confirmtransaction")
 
-        self.order = OrderFactory(user=self.user,
-                                  finalized=True,
-                                  paid=False)
+        self.order = OrderFactory(user=self.user, finalized=True, paid=False)
 
         self.payment = PaymentFactory(order=self.order)
         self.client.login()
@@ -135,31 +145,26 @@ class TestConfirmTransaction(FinanceTestCase):
 
     def test_mollie_payment_is_obtained(self):
         self.client.get(self.url, {"order": self.order.id})
-        self.mollie_client.return_value.payments.get.assert_called_once_with(
-            self.payment.mollie_id)
+        self.mollie_client.return_value.payments.get.assert_called_once_with(self.payment.mollie_id)
 
     def test_ispaid_is_called_on_mollie_payment(self):
         self.client.get(self.url, {"order": self.order.id})
-        self.mollie_client.return_value.payments.get.\
-            return_value.is_paid.assert_called_once_with()
+        self.mollie_client.return_value.payments.get.return_value.is_paid.assert_called_once_with()
 
     def test_context_when_payment_has_failed(self):
-        self.mollie_client.return_value.payments.get.\
-            return_value.is_paid.return_value = False
+        self.mollie_client.return_value.payments.get.return_value.is_paid.return_value = False
         ret = self.client.get(self.url, {"order": self.order.id})
-        self.assertEqual(ret.context[0]['payment_succeeded'], False)
+        self.assertEqual(ret.context[0]["payment_succeeded"], False)
 
     def test_context_when_payment_has_succeeded(self):
-        self.mollie_client.return_value.payments.get.\
-            return_value.is_paid.return_value = True
+        self.mollie_client.return_value.payments.get.return_value.is_paid.return_value = True
         ret = self.client.get(self.url, {"order": self.order.id})
-        self.assertEqual(ret.context[0]['payment_succeeded'], True)
+        self.assertEqual(ret.context[0]["payment_succeeded"], True)
 
     def test_payment_object_is_updated_on_success(self):
         self.assertFalse(self.payment.succeeded)
 
-        self.mollie_client.return_value.payments.get. \
-            return_value.is_paid.return_value = True
+        self.mollie_client.return_value.payments.get.return_value.is_paid.return_value = True
         self.client.get(self.url, {"order": self.order.id})
 
         # get new object reference
@@ -169,8 +174,7 @@ class TestConfirmTransaction(FinanceTestCase):
     def test_payment_object_is_not_updated_on_failure(self):
         self.assertFalse(self.payment.succeeded)
 
-        self.mollie_client.return_value.payments.get. \
-            return_value.is_paid.return_value = False
+        self.mollie_client.return_value.payments.get.return_value.is_paid.return_value = False
         self.client.get(self.url, {"order": self.order.id})
 
         # get new object reference
@@ -178,8 +182,7 @@ class TestConfirmTransaction(FinanceTestCase):
         self.assertFalse(payment.succeeded)
 
     def test_payment_and_order_status_after_successful_payment(self):
-        self.mollie_client.return_value.payments.get. \
-            return_value.is_paid.return_value = True
+        self.mollie_client.return_value.payments.get.return_value.is_paid.return_value = True
         self.client.get(self.url, {"order": self.order.id})
 
         payment = Payment.objects.get()
@@ -189,10 +192,11 @@ class TestConfirmTransaction(FinanceTestCase):
 
         debit = Balance.objects.get()
         self.assertEqual(debit.user, payment.order.user)
-        self.assertEqual(debit.type, 'DR')
+        self.assertEqual(debit.type, "DR")
         self.assertEqual(debit.amount, payment.order.total_price)
-        self.assertEqual(debit.notes, 'Debit van %s voor bestelling #%s' %
-                         (payment.order.total_price, payment.order.id))
+        self.assertEqual(
+            debit.notes, "Debit van %s voor bestelling #%s" % (payment.order.total_price, payment.order.id)
+        )
         self.mock_mail_confirmation.assert_called_once_with()
 
     def test_nothing_is_changed_when_payment_already_confirmed(self):
@@ -201,10 +205,9 @@ class TestConfirmTransaction(FinanceTestCase):
         self.client.get(self.url, {"order": self.order.id})
 
         ret = self.client.get(self.url, {"order": self.order.id})
-        self.assertEqual(ret.context[0]['payment_succeeded'], True)
+        self.assertEqual(ret.context[0]["payment_succeeded"], True)
 
-        self.assertFalse(self.mollie_client.return_value.payments.get.
-                         return_value.is_paid.called)
+        self.assertFalse(self.mollie_client.return_value.payments.get.return_value.is_paid.called)
 
         self.assertFalse(self.mock_create_credit.called)
         self.assertFalse(self.mock_mail_confirmation.called)
@@ -214,12 +217,10 @@ class TestPaymentWebhook(FinanceTestCase):
     def setUp(self):
         super(TestPaymentWebhook, self).setUp()
 
-        self.order = OrderFactory(user=self.user,
-                                  finalized=True,
-                                  paid=False)
+        self.order = OrderFactory(user=self.user, finalized=True, paid=False)
         self.payment = PaymentFactory(order=self.order)
 
-        self.url = reverse('finance.callback')
+        self.url = reverse("finance.callback")
 
     @suppressWarnings
     def test_required_post_parameters_bad(self):
@@ -231,8 +232,7 @@ class TestPaymentWebhook(FinanceTestCase):
         self.assertEqual(ret.status_code, 200)
 
     def test_unsuccessful_payment(self):
-        self.mollie_client.return_value.payments.get. \
-            return_value.is_paid.return_value = False
+        self.mollie_client.return_value.payments.get.return_value.is_paid.return_value = False
         ret = self.client.post(self.url, {"id": self.payment.mollie_id})
 
         payment = Payment.objects.get(id=self.payment.id)
@@ -247,8 +247,7 @@ class TestPaymentWebhook(FinanceTestCase):
         self.assertEqual(ret.content, b"")
 
     def test_successful_payment(self):
-        self.mollie_client.return_value.payments.get. \
-            return_value.is_paid.return_value = True
+        self.mollie_client.return_value.payments.get.return_value.is_paid.return_value = True
         ret = self.client.post(self.url, {"id": self.payment.mollie_id})
 
         payment = Payment.objects.get(id=self.payment.id)
@@ -264,8 +263,7 @@ class TestPaymentWebhook(FinanceTestCase):
 
     def test_order_is_completed_when_order_paid_is_false(self):
         assert self.order.paid is False
-        self.mollie_client.return_value.payments.get. \
-            return_value.is_paid.return_value = True
+        self.mollie_client.return_value.payments.get.return_value.is_paid.return_value = True
         self.client.post(self.url, {"id": self.payment.mollie_id})
 
         # self.mock_complete_after_payment.assert_called_once_with()
@@ -279,8 +277,7 @@ class TestPaymentWebhook(FinanceTestCase):
 
         assert self.order.paid is False
 
-        self.mollie_client.return_value.payments.get. \
-            return_value.is_paid.return_value = True
+        self.mollie_client.return_value.payments.get.return_value.is_paid.return_value = True
         self.client.post(self.url, {"id": self.payment.mollie_id})
 
         payment = Payment.objects.get()
@@ -293,17 +290,15 @@ class TestPaymentWebhook(FinanceTestCase):
 
 class TestCancelPaymentView(VokoTestCase):
     def setUp(self):
-        self.url = reverse('finance.cancelpayment')
+        self.url = reverse("finance.cancelpayment")
 
         self.user = VokoUserFactory.create()
-        self.user.set_password('secret')
+        self.user.set_password("secret")
         self.user.is_active = True
         self.user.save()
-        self.client.login(username=self.user.email, password='secret')
+        self.client.login(username=self.user.email, password="secret")
 
-        self.order = OrderFactory(user=self.user,
-                                  finalized=True,
-                                  paid=False)
+        self.order = OrderFactory(user=self.user, finalized=True, paid=False)
 
     def test_order_finalized_is_set_to_false(self):
         self.client.get(self.url)
@@ -312,6 +307,4 @@ class TestCancelPaymentView(VokoTestCase):
 
     def test_redirect_to_finish_order(self):
         ret = self.client.get(self.url)
-        self.assertRedirects(ret, "%s" %
-                             reverse('finish_order', args=(self.order.id,)),
-                             fetch_redirect_response=False)
+        self.assertRedirects(ret, "%s" % reverse("finish_order", args=(self.order.id,)), fetch_redirect_response=False)

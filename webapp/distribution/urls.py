@@ -1,10 +1,10 @@
-from django.conf.urls import url
+from django.urls import path
 from .views import Schedule, Shift
 from distribution.views import Members, Groupmanager
 
 urlpatterns = (
-    url(r'^schedule/$', Schedule.as_view(), name="distribution_schedule"),
-    url(r'^shift/(?P<slug>[-\w]+)/$', Shift.as_view(), name="shift"),
-    url(r'^members/$', Members.as_view(), name="distribution_members"),
-    url(r'^groupmanager/$', Groupmanager.as_view(), name="distribution_groupmanager")
+    path("schedule/", Schedule.as_view(), name="distribution_schedule"),
+    path("shift/<slug:slug>/", Shift.as_view(), name="shift"),
+    path("members/", Members.as_view(), name="distribution_members"),
+    path("groupmanager/", Groupmanager.as_view(), name="distribution_groupmanager"),
 )

@@ -1,10 +1,10 @@
-from django.conf.urls import url
+from django.urls import path
 from .views import Schedule, Ride, Cars, Groupmanager, Members
 
 urlpatterns = (
-    url(r'^schedule/$', Schedule.as_view(), name="schedule"),
-    url(r'^ride/(?P<slug>[-\w]+)/$', Ride.as_view(), name="ride"),
-    url(r'^cars/$', Cars.as_view(), name="cars"),
-    url(r'^members/$', Members.as_view(), name="transport_members"),
-    url(r'^groupmanager/$', Groupmanager.as_view(), name="transport_groupmanager")
+    path("schedule/", Schedule.as_view(), name="schedule"),
+    path("ride/<slug:slug>/", Ride.as_view(), name="ride"),
+    path("cars/", Cars.as_view(), name="cars"),
+    path("members/", Members.as_view(), name="transport_members"),
+    path("groupmanager/", Groupmanager.as_view(), name="transport_groupmanager"),
 )
