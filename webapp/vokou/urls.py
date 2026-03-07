@@ -32,8 +32,16 @@ urlpatterns = [
     path("tinymce/", include("tinymce.urls")),
     path("hijack/", include("hijack.urls")),
     path("pages/", include(pages.urls)),
-    path("regulations/", RedirectView.as_view(url="/pages/huishoudelijk-reglement/", permanent=True), name="regulations"),
-    path("privacy/", RedirectView.as_view(url="/pages/privacy-statement/", permanent=True), name="privacy"),
+    path(
+        "regulations/",
+        RedirectView.as_view(url="/pages/huishoudelijk-reglement/", permanent=True),
+        name="regulations",
+    ),
+    path(
+        "privacy/",
+        RedirectView.as_view(url="/pages/privacy-statement/", permanent=True),
+        name="privacy",
+    ),
     path("", HomeView.as_view(), name="home"),
 ]
 
