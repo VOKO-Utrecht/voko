@@ -111,7 +111,7 @@ export_orders_for_financial_admin.short_description = "Exporteer voor financiël
 
 
 class OrderAdmin(DeleteDisabledMixin, admin.ModelAdmin):
-    list_display = ["id", "created", "order_round", "user", "finalized", "paid", "total_price"]
+    list_display = ["id", "modified", "order_round", "user", "finalized", "paid", "total_price"]
     ordering = ("-id",)
     # inlines = [OrderProductInline]  ## causes timeout
     list_filter = ("paid", "finalized", "order_round")
