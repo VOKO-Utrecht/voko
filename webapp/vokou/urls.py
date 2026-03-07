@@ -14,7 +14,7 @@ import distribution.urls
 import groups.urls
 import news.urls
 import pages.urls
-from vokou.views import HomeView, RegulationsView
+from vokou.views import HomeView
 
 urlpatterns = [
     path("admin/mailing/", include(mailing.urls)),
@@ -32,7 +32,7 @@ urlpatterns = [
     path("tinymce/", include("tinymce.urls")),
     path("hijack/", include("hijack.urls")),
     path("pages/", include(pages.urls)),
-    path("regulations/", RegulationsView.as_view(), name="regulations"),
+    path("regulations/", RedirectView.as_view(url="/pages/huishoudelijk-reglement/", permanent=True), name="regulations"),
     path("privacy/", RedirectView.as_view(url="/pages/privacy-statement/", permanent=True), name="privacy"),
     path("", HomeView.as_view(), name="home"),
 ]
