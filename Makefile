@@ -1,4 +1,4 @@
-.PHONY: help setup build up down restart logs logs-web logs-db shell db-shell clean test migrate superuser runserver validate reset
+.PHONY: help setup build up down restart logs logs-web logs-db shell db-shell clean test migrate superuser runserver validate reset metabase-up metabase-down
 
 # Default target
 help:
@@ -19,6 +19,8 @@ help:
 	@echo "  docker-runserver - Start development server in Docker"
 	@echo "  docker-test      - Run tests in Docker"
 	@echo "  docker-reset     - Reset database (WARNING: deletes all data)"
+	@echo "  metabase-up      - Start Metabase analytics (http://localhost:3000)"
+	@echo "  metabase-down    - Stop Metabase"
 	@echo ""
 	@echo "Local development commands:"
 	@echo "  migrate          - Make and run database migrations locally"
@@ -114,6 +116,15 @@ test:
 start-webapp:
 	@echo "Starting web application..."
 	uv run python webapp/manage.py runserver --settings=vokou.settings.development
+
+# Start Metabase analytics service
+metabase-up:
+	docker-compose up -d metabase
+	@echo "Metabase starting at http://localhost:3000 (may take ~30s)"
+
+# Stop Metabase
+metabase-down:
+	docker-compose stop metabase
 
 # Flush sqlite database
 flush:

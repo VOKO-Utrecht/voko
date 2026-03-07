@@ -18,6 +18,20 @@ services:
       retries: 5
       start_period: 10s
       
+  metabase:
+    image: metabase/metabase:latest
+    container_name: voko_metabase
+    ports:
+      - "3000:3000"
+    volumes:
+      - metabase_data:/metabase-data
+    environment:
+      - MB_DB_TYPE=h2
+      - MB_DB_FILE=/metabase-data/metabase.db
+    depends_on:
+      db:
+        condition: service_healthy
+
   web:
     build: .
     container_name: voko_web
@@ -44,3 +58,4 @@ services:
 
 volumes:
   db_data:
+  metabase_data:
