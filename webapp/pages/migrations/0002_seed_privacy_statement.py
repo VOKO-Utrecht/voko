@@ -1,7 +1,6 @@
 from django.db import migrations
 
-PRIVACY_CONTENT = """<h1>Privacy statement VOKO Utrecht</h1>
-<p>
+PRIVACY_CONTENT = """<p>
     VOKO Utrecht is een collectief van vrijwilligers. Om als collectief gezamenlijk te kunnen functioneren, verzamelen en gebruiken we de volgende gegevens van leden:
 </p>
 <ul>
