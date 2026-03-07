@@ -1,0 +1,14 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>Apply tags to {{ count }} template{{ count|pluralize }}</h1>
+<form method="post">
+    {% csrf_token %}
+    <p>Select tags to add to the selected templates:</p>
+    {{ form.as_p }}
+    <input type="hidden" name="selected_ids" value="{{ selected_ids }}">
+    <input type="submit" value="Apply tags" class="default">
+    <a href="{% url 'admin:mailing_mailtemplate_changelist' %}" class="button cancel-link">Cancel</a>
+</form>
+{% endblock %}
