@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "groups",
     "agenda",
     "news",
+    "pages",
     "constance.backends.database",
     "constance",
     "hijack",
