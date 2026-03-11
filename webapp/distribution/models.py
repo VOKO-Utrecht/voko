@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 from django_extensions.db.models import TimeStampedModel
 from django.conf import settings
@@ -12,6 +13,7 @@ class Shift(TimeStampedModel):
         verbose_name = "Shift"
         verbose_name_plural = "Shifts"
         ordering = ["start"]
+        unique_together = ["start", "end", "order_round"]
 
     id = models.AutoField(primary_key=True)
     order_round = models.ForeignKey(
@@ -23,8 +25,8 @@ class Shift(TimeStampedModel):
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name="distribution_shifts"
     )
-    start = models.TimeField(help_text="When this shift starts")
-    end = models.TimeField(help_text="When this shifts ends")
+    start = models.TimeField(help_text="When this shift starts (hh:mm)")
+    end = models.TimeField(help_text="When this shift ends (hh:mm)")
     slug = models.SlugField(unique=True, editable=False, max_length=100)
 
     @property
@@ -37,15 +39,15 @@ class Shift(TimeStampedModel):
 
     @property
     def date_long_str(self):
-        return self.date.strftime("%-d %b %Y")
+        return self.date.strftime("%d %b %Y")
 
     @property
     def start_str(self):
-        return self.start.strftime("%-H:%M")
+        return self.start.strftime("%H:%M")
 
     @property
     def end_str(self):
-        return self.end.strftime("%-H:%M")
+        return self.end.strftime("%H:%M")
 
     @property
     def distribution_coordinator(self):
@@ -68,6 +70,15 @@ class Shift(TimeStampedModel):
         for ride in next_order_round.rides.all():
             key_collectors.append({"route": ride.route, "codriver": ride.codriver})
         return key_collectors
+
+    def clean(self):
+        # If start or end is not set, defer to field-level validation
+        if self.start is None or self.end is None:
+            return
+        if self.start >= self.end:
+            raise ValidationError(
+                f"De starttijd ({self.start_str}) van de shift ligt na de eindtijd ({self.end_str})"
+            )
 
     def save(self, **kwargs):
         self.slug = slugify(self)
