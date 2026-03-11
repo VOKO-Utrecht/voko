@@ -163,13 +163,13 @@ h4.product-name a {
   color:#000;
 }
 
-@media all and (min-width: 900px) {
+@media all and (min-width: 992px) {
 	.navbar .nav-item .dropdown-menu{ display: none; }
 	.navbar .nav-item:hover .dropdown-menu{ display: block; }
 	.navbar .nav-item .dropdown-menu{ margin-top:0; }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 991.98px) {
 
     .navbar-brand {
         width: 210px;
