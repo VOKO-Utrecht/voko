@@ -1,0 +1,74 @@
+from django.db import migrations
+
+PRIVACY_CONTENT = """<p>
+    VOKO Utrecht is een collectief van vrijwilligers. Om als collectief gezamenlijk te kunnen functioneren, verzamelen en gebruiken we de volgende gegevens van leden:
+</p>
+<ul>
+    <li>voor- en achternaam,</li>
+    <li>e-mailadres,</li>
+    <li>telefoonnummer,</li>
+    <li>beschikking over een rijbewijs,</li>
+    <li>voorkeurswerkgroepen,</li>
+    <li>beschikbaarheid voor VOKO activiteiten per dagdeel,</li>
+    <li>beschikking over een voertuig dat gebruikt kan worden voor transport,</li>
+    <li>talenten die van pas kunnen komen binnen het VOKO.</li>
+</ul>
+<p>
+    We gebruiken deze gegevens voor de communicatie over- en coördinatie van het collectief, voor het indelen van leden in werkgroepen, voor het organiseren van transport en voor de administratie van de bestellingen.
+</p>
+<h2>Gegevens in het bestelsysteem</h2>
+<p>
+    De contact- en bestelgegevens worden bewaard in een eigen bestelsysteem, hiertoe hebben alleen geautoriseerde leden toegang. Deze gegevens worden gebruikt bij de communicatie over het functioneren van het collectief, de bestelronden, het transport en voor de (financiële) administratie.
+</p>
+<p>
+    Om de bestelde producten van de leveranciers te transporteren naar het ophaalpunt worden transportroosters opgesteld. Leden hebben uitsluitend inzicht in ritten waarbij zij zelf betrokken zijn. Van deze ritten worden de contactgegevens van ingeroosterde leden en transportcoördinatoren met elkaar gedeeld. Daarnaast worden contactgegevens van betreffende leveranciers gedeeld met deze leden. Ritten uit het verleden zijn ontoegankelijk. Leden die het transport coördineren of de financiële administratie bijhouden, hebben toegang tot het volledige transportrooster.
+</p>
+<p>
+    Om de bestellingen klaar te zetten tijdens uitdeelavonden worden overzichten per besteller uitgedraaid. De contactgegevens van bestellers staan op deze overzichten en kunnen gebruikt worden om laatkomers te contacteren. Bestellers zijn zelf verantwoordelijk voor het meenemen van het persoonlijke besteloverzicht, overzichten die aan het einde van de uitdeelavond overblijven worden weggegooid.
+</p>
+<p>
+    Om het aanbod en de samenwerking met onze leveranciers te verbeteren kunnen bestelgegevens gebruikt worden om de afname van verschillende producten bij verschillende leveranciers in kaart te brengen.
+</p>
+<p>
+    Betalingen lopen via een externe provider: Mollie. De betaalgegevens worden door Mollie bewaard. Stichting Financiën VOKO Utrecht is verantwoordelijk voor het beheer de financiën en kan de betaalgegevens bij Mollie inzien. Wanneer deze gegevens worden ingezien is dit uitsluitend ten behoeve van het voeren van een correcte boekhouding.
+</p>
+<h2>Werkgroepoverzichten</h2>
+<p>
+    Per werkgroep worden door de coördinatoren aparte overzichten met namen, e-mailadressen en telefoonnummers bijgehouden om informatie te verstrekken en de taken te coördineren.
+</p>
+<h2>Slapende leden</h2>
+<p>
+    Leden kunnen hun account in 'slaapstand' laten zetten wanneer ze verwachten binnen afzienbare tijd weer actief te worden. In dat geval blijft het account bestaan maar wordt het gedeactiveerd. Het lid ontvangt dan geen berichten en kan geen gebruik maken van de ledenwebsite. Doordat het account nog bestaat kan het op verzoek eenvoudig weer worden geactiveerd.
+</p>
+<h2>Uitschrijving</h2>
+<p>
+    Wanneer je je uitschrijft worden je persoonsgegevens uit het bestelsysteem en het betreffende werkgroepoverzicht verwijderd. Het kan zijn dat werkgroepoverzichten in clouddiensten bewaard worden (waarin oudere versies bewaard blijven).
+</p>"""
+
+
+def seed_privacy_page(apps, schema_editor):
+    Page = apps.get_model("pages", "Page")
+    Page.objects.get_or_create(
+        slug="privacy-statement",
+        defaults={
+            "title": "Privacy statement VOKO Utrecht",
+            "content": PRIVACY_CONTENT,
+            "published": True,
+        },
+    )
+
+
+def delete_privacy_page(apps, schema_editor):
+    Page = apps.get_model("pages", "Page")
+    Page.objects.filter(slug="privacy-statement").delete()
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ("pages", "0001_initial"),
+    ]
+
+    operations = [
+        migrations.RunPython(seed_privacy_page, delete_privacy_page),
+    ]

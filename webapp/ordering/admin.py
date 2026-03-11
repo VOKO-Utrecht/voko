@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from finance.models import Balance
 from vokou.admin import DeleteDisabledMixin
 
-from ordering.core import create_orderround_batch
+from ordering.core import create_orderround_ahead
 
 from .models import (
     DraftProduct,
@@ -42,21 +42,21 @@ def create_next_orderround_batch(modeladmin, request, queryset):
     """Admin action to manually create the next order round batch"""
 
     try:
-        order_round_batch = create_orderround_batch()
-        if order_round_batch:
+        order_rounds = create_orderround_ahead()
+        if order_rounds:
             messages.success(
                 request,
-                f"Successfully created {len(order_round_batch)} new order rounds."
-                f" The first one starts on {order_round_batch[0].open_for_orders}."
-                f" The last order round is on {order_round_batch[-1].open_for_orders}.",
+                f"Successfully created {len(order_rounds)} new order rounds."
+                f" The first one starts on {order_rounds[0].open_for_orders}."
+                f" The last order round is on {order_rounds[-1].open_for_orders}.",
             )
         else:
-            messages.warning(request, "No new order round batch needed at this time.")
+            messages.warning(request, "No new order rounds needed at this time.")
     except Exception as e:
-        messages.error(request, f"Failed to create order round batch: {str(e)}")
+        messages.error(request, f"Failed to create order rounds: {str(e)}")
 
 
-create_next_orderround_batch.short_description = "Create next order round batch automatically"
+create_next_orderround_batch.short_description = "Create order rounds ahead automatically"
 
 
 def dutch_decimal(value):
@@ -111,7 +111,7 @@ export_orders_for_financial_admin.short_description = "Exporteer voor financiël
 
 
 class OrderAdmin(DeleteDisabledMixin, admin.ModelAdmin):
-    list_display = ["id", "created", "order_round", "user", "finalized", "paid", "total_price"]
+    list_display = ["id", "modified", "order_round", "user", "finalized", "paid", "total_price"]
     ordering = ("-id",)
     # inlines = [OrderProductInline]  ## causes timeout
     list_filter = ("paid", "finalized", "order_round")

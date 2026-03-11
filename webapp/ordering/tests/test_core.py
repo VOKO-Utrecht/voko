@@ -6,7 +6,7 @@ from ordering.core import (
     get_current_order_round,
     get_latest_order_round,
     update_totals_for_products_with_max_order_amounts,
-    create_orderround_batch,
+    create_orderround_ahead,
 )
 from ordering.models import OrderProduct
 from ordering.tests.factories import (
@@ -267,58 +267,67 @@ class TestGetLastOrderRound(VokoTestCase):
 
 class TestAutomaticOrderRoundCreation(VokoTestCase):
     @freeze_time("2025-08-25")
-    def test_create_orderround_batch_no_order_rounds_yet(self):
-        """Test creating order rounds when no order rounds exist yet"""
-        # When there are no order rounds, should create from next week to end of next quarter
-        result = create_orderround_batch()
+    def test_create_orderround_ahead_no_order_rounds_yet(self):
+        """Test creating order rounds when no order rounds exist yet.
 
-        self.assertEqual(len(result), 2)  # Two order rounds should be created
+        Today is 2025-08-25 (Monday). With ORDERROUND_CREATE_DAYS_AHEAD=31,
+        the horizon is 2025-09-25. Start date is 2025-09-01 (Monday +7 days),
+        adjusted to next Sunday (ORDERROUND_OPEN_DAY_OF_WEEK=6): 2025-09-07.
+        Rounds: 2025-09-07, 2025-09-21. Next (2025-10-05) exceeds horizon.
+        """
+        result = create_orderround_ahead()
 
-    @freeze_time("2025-09-18")
-    def test_create_orderround_batch_no_order_rounds_yet_next_quarter_close(self):
-        """Test creating order rounds when no order rounds exist yet but next quarter is close"""
-        # When there are no order rounds and next quarter is close, should create from next week to end of next quarter
-        result = create_orderround_batch()
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].open_for_orders.date(), datetime(2025, 9, 7).date())
+        self.assertEqual(result[1].open_for_orders.date(), datetime(2025, 9, 21).date())
 
-        self.assertEqual(len(result), 7)  # Seven order rounds should be created
+    @freeze_time("2025-08-25")
+    def test_create_orderround_ahead_last_round_beyond_horizon(self):
+        """Test that no rounds are created when the last round is already beyond the horizon.
 
-    @freeze_time("2024-02-01")
-    def test_create_orderround_batch_next_quarter_far_away(self):
-        """Test when order rounds are planned for this quarter but next quarter is far away"""
-        # Set test date to early February so next quarter (Q2) is more than 31 days away
-
-        # Create order rounds that go close to end of Q1
+        Today is 2025-08-25, horizon is 2025-09-25.
+        Last round opens on 2025-09-14 (Sunday). Next would be 2025-09-28, which exceeds horizon.
+        """
         OrderRoundFactory(
-            open_for_orders=datetime(2024, 3, 25, 8, 0, tzinfo=UTC),  # Near end of Q1
-            closed_for_orders=datetime(2024, 3, 29, 8, 0, tzinfo=UTC),
-            collect_datetime=datetime(2024, 4, 3, 18, 0, tzinfo=UTC),
+            open_for_orders=datetime(2025, 9, 14, 12, 0, tzinfo=UTC),
+            closed_for_orders=datetime(2025, 9, 17, 3, 0, tzinfo=UTC),
+            collect_datetime=datetime(2025, 9, 17, 18, 0, tzinfo=UTC),
         )
 
-        result = create_orderround_batch()
+        result = create_orderround_ahead()
 
-        # Should not create any new order rounds since next quarter is far away
-        # and current quarter is already covered
         self.assertEqual(len(result), 0)
 
-    @freeze_time("2025-09-02")
-    def test_create_orderround_batch_next_quarter_close(self):
-        """Test when order rounds are planned for this quarter and next quarter is close"""
-        # Set test date to late March so next quarter (Q2) is less than 31 days away
+    @freeze_time("2025-08-25")
+    def test_create_orderround_ahead_one_round_fits(self):
+        """Test that exactly one round is created when only one fits within the horizon.
 
-        # Create order rounds that go to end of Q1
-        existing_round = OrderRoundFactory(
-            open_for_orders=datetime(2025, 9, 28, 12, 0, tzinfo=UTC)  # Recent round in Q1
+        Today is 2025-08-25, horizon is 2025-09-25.
+        Last round opens on 2025-09-07 (Sunday). Next is 2025-09-21, which fits.
+        The one after (2025-10-05) exceeds the horizon.
+        """
+        OrderRoundFactory(
+            open_for_orders=datetime(2025, 9, 7, 12, 0, tzinfo=UTC),
+            closed_for_orders=datetime(2025, 9, 9, 3, 0, tzinfo=UTC),
+            collect_datetime=datetime(2025, 9, 9, 18, 0, tzinfo=UTC),
         )
 
-        result = create_orderround_batch()
+        result = create_orderround_ahead()
 
-        # Should create order rounds for next quarter (Q2) since it's less than 31 days away
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].open_for_orders.date(), datetime(2025, 9, 21).date())
+
+    @freeze_time("2025-08-25")
+    def test_create_orderround_ahead_uses_interval_weeks(self):
+        """Test that new rounds use ORDERROUND_INTERVAL_WEEKS spacing from the last round."""
+        existing_round = OrderRoundFactory(
+            open_for_orders=datetime(2025, 9, 7, 12, 0, tzinfo=UTC),
+            closed_for_orders=datetime(2025, 9, 9, 3, 0, tzinfo=UTC),
+            collect_datetime=datetime(2025, 9, 9, 18, 0, tzinfo=UTC),
+        )
+
+        result = create_orderround_ahead()
+
         self.assertGreater(len(result), 0)
-
-        # New order rounds should start in Q2 (April 1, 2024 onwards)
-        first_round = result[0]
         expected_start = existing_round.open_for_orders.date() + timedelta(weeks=config.ORDERROUND_INTERVAL_WEEKS)
-
-        self.assertEqual(first_round.open_for_orders.date(), expected_start)
-        # Should be in Q2 (April or later)
-        self.assertGreaterEqual(first_round.open_for_orders.month, 10)
+        self.assertEqual(result[0].open_for_orders.date(), expected_start)
