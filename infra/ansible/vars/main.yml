@@ -1,0 +1,40 @@
+---
+# Server
+server_hostname: leden.vokoutrecht.nl
+server_timezone: Europe/Amsterdam
+
+# Deploy users
+prod_user: voko
+acc_user: voko_acc
+
+# SSH: restrict SSH to these IPs (set to [] to allow from anywhere)
+# Recommended: add your team's static IPs here
+ssh_allowed_ips: []
+
+# App directories on host (bind-mounted into containers)
+prod_static_dir: /srv/voko/prod/static
+prod_media_dir: /srv/voko/prod/media
+acc_static_dir: /srv/voko/acc/static
+acc_media_dir: /srv/voko/acc/media
+
+# Git repo
+git_repo: https://github.com/vokoutrecht/voko.git
+prod_repo_dir: "/home/{{ prod_user }}/voko"
+acc_repo_dir: "/home/{{ acc_user }}/voko"
+
+# Nginx / domains
+prod_domain: leden.vokoutrecht.nl
+acc_domain: acc.leden.vokoutrecht.nl
+
+# GeoIP2: countries allowed to access the site (ISO 3166-1 alpha-2 codes)
+allowed_countries:
+  - NL
+  - BE
+
+# Backups
+backup_dir: /var/backups/voko
+backup_retain_days: 30
+
+# GitHub Actions deploy key (public key to authorize on deploy users)
+# Set this in vault.yml
+# github_deploy_key_pub: "ssh-ed25519 AAAA..."

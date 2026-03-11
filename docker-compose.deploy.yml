@@ -1,0 +1,48 @@
+version: "3.8"
+
+# Shared deployment compose file for both production and acceptance.
+# All environment-specific values come from the .env file:
+#
+#   APP_ENV=prod          (used in container/volume names and host paths)
+#   APP_PORT=8000         (host port to expose gunicorn on)
+#   DJANGO_SETTINGS_MODULE=vokou.settings.production
+#   POSTGRES_NAME, POSTGRES_USER, POSTGRES_PASSWORD, etc.
+
+services:
+  db:
+    image: postgres:14
+    container_name: voko_db_${APP_ENV}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-voko}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  web:
+    build:
+      context: .
+      args:
+        DEV_DEPS: "false"
+    container_name: voko_web_${APP_ENV}
+    entrypoint: ["/code/docker-entrypoint.prod.sh"]
+    ports:
+      - "127.0.0.1:${APP_PORT}:8000"
+    volumes:
+      - /srv/voko/${APP_ENV}/static:/code/static
+      - /srv/voko/${APP_ENV}/media:/code/media
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+
+volumes:
+  db_data:
+    name: voko_${APP_ENV}_db_data

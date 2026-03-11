@@ -7,10 +7,11 @@ SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ["USER"],
-        "USER": os.environ["USER"],
-        "PASSWORD": os.environ["DB_PASSWORD"],
-        "HOST": "localhost",
+        "NAME": os.environ.get("POSTGRES_NAME", os.environ.get("USER")),
+        "USER": os.environ.get("POSTGRES_USER", os.environ.get("USER")),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", os.environ.get("DB_PASSWORD")),
+        "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
+        "PORT": 5432,
     }
 }
 
