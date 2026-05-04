@@ -34,7 +34,9 @@
                 {% if user.is_coordinator or 'Admin' in user.flat_groups or user.is_superuser %}
                 <td class="col-md-3">{{ account.userprofile.coordinator_remarks|default_if_none:"" }}</td>
                 <td class="col-md-1">
+                    {% if account.userprofile %}
                     <a href="{% url 'coordinator_remarks' account.userprofile.id %}"><span class="bi-pencil-fill"></span></a>
+                    {% endif %}
                 </td>   
                 {% endif %}        
                 <td class="col-md-1 text-center">{% if 'Uitdeelcoordinatoren' in account.flat_groups %}<span class="bi-check-lg"></span>{% endif %}</td>
