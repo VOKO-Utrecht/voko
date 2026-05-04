@@ -51,7 +51,7 @@ De bestelronde is gesloten. Je kunt geen producten toevoegen.
             <select class="form-control" name="product_category_{{ forloop.counter }}">
                 <option>Overig</option>
                 {% for cat in view.category_choices %}
-                <option {% if product.category == cat %}selected{% endif %}>{{ cat }}</option>
+                <option {% if product.category.strip|lower == cat|lower %}selected{% endif %}>{{ cat }}</option>
                 {% endfor %}
             </select>
         </td>

@@ -1093,7 +1093,7 @@ class DraftProduct(TimeStampedModel):
 
         if self.data["category"]:
             try:
-                prod.category = ProductCategory.objects.get(name__iexact=self.data["category"])
+                prod.category = ProductCategory.objects.get(name__iexact=self.data["category"].strip())
                 prod.save()
             except ProductCategory.DoesNotExist:
                 pass
