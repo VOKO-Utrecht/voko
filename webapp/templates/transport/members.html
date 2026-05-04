@@ -37,7 +37,7 @@
                 <td class="col-md-3">{{ account.userprofile.coordinator_remarks|default_if_none:"" }}</td>
                 <td class="col-md-1">
                     {% if account.userprofile %}
-                    <a href="{% url 'coordinator_remarks' account.userprofile.id %}"><span class="bi-pencil-fill"></span></a>
+                    <a href="{% url 'coordinator_remarks' account.userprofile.id %}?group=transport"><span class="bi-pencil-fill"></span></a>
                     {% endif %}
                 </td>   
                 {% endif %}        
