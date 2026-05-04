@@ -336,8 +336,14 @@ class Contact(LoginRequiredMixin, ListView):
 
 
 class EditCoordinatorRemarksView(LoginRequiredMixin, GroupRequiredMixin, UpdateView):
-    group_required = "Transportcoordinatoren"
+    group_required = ("Transportcoordinatoren", "Uitdeelcoordinatoren")
     template_name = "accounts/coordinator/remarks.html"
     model = UserProfile
     fields = ["coordinator_remarks"]
-    success_url = "/transport/members"  # make this dynamic depending on starting on transport or distribution
+    success_url = "/"
+
+    def get_success_url(self):
+        match self.request.GET.get("group", ""):
+            case "distribution": return "/distribution/members/"
+            case "transport": return "/transport/members/"
+            case _: return self.success_url
