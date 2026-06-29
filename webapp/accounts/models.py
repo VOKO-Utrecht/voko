@@ -145,6 +145,13 @@ class VokoUser(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
 
     activated = models.DateTimeField(null=True, editable=False, help_text="When account was activated")
 
+    deletion_warning_sent = models.DateTimeField(
+        null=True, blank=True, help_text="When deletion warning email was sent to this member"
+    )
+    deletion_token = models.CharField(
+        max_length=100, blank=True, default="", help_text="Token used in deletion warning email link"
+    )
+
     objects = VokoUserManager()
 
     def get_full_name(self):
