@@ -1,0 +1,18 @@
+# Production environment - managed by Ansible, do not edit manually
+APP_ENV=prod
+APP_PORT=8000
+
+DJANGO_SETTINGS_MODULE=vokou.settings.production
+DJANGO_SECRET_KEY={{ prod_django_secret_key }}
+
+POSTGRES_NAME=voko
+POSTGRES_USER=voko
+POSTGRES_PASSWORD={{ prod_postgres_password }}
+POSTGRES_HOST=db
+
+MOLLIE_API_KEY={{ prod_mollie_api_key }}
+RECAPTCHA_SITE_KEY={{ prod_recaptcha_site_key }}
+RECAPTCHA_SECRET_KEY={{ prod_recaptcha_secret_key }}
+ADMIN_EMAIL={{ prod_admin_email }}
+
+GUNICORN_WORKERS=3

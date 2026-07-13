@@ -1,0 +1,45 @@
+---
+- name: Set ufw default policy (deny incoming, allow outgoing)
+  community.general.ufw:
+    state: enabled
+    policy: deny
+    direction: incoming
+
+- name: Allow outgoing traffic
+  community.general.ufw:
+    policy: allow
+    direction: outgoing
+
+- name: Allow HTTP
+  community.general.ufw:
+    rule: allow
+    port: "80"
+    proto: tcp
+
+- name: Allow HTTPS
+  community.general.ufw:
+    rule: allow
+    port: "443"
+    proto: tcp
+
+# If ssh_allowed_ips is set, only allow SSH from those IPs.
+# Otherwise allow SSH from anywhere (not recommended for production).
+- name: Allow SSH from specific IPs only
+  community.general.ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
+    src: "{{ item }}"
+  loop: "{{ ssh_allowed_ips }}"
+  when: ssh_allowed_ips | length > 0
+
+- name: Allow SSH from anywhere (fallback if no IPs configured)
+  community.general.ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
+  when: ssh_allowed_ips | length == 0
+
+- name: Enable ufw
+  community.general.ufw:
+    state: enabled

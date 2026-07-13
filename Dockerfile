@@ -28,13 +28,14 @@ WORKDIR /code
 COPY ./pyproject.toml /code/
 
 ARG CACHEBUST=1
+ARG DEV_DEPS=true
 # Recreate lock file
 RUN uv lock
-# Install dependencies
-RUN uv sync --dev
+# Install dependencies (skip dev deps for production builds)
+RUN if [ "$DEV_DEPS" = "true" ]; then uv sync --dev; else uv sync --no-dev; fi
 
 # Install application into container
 COPY . .
 
-RUN ["chmod", "+x", "/code/docker-entrypoint.sh"]
+RUN chmod +x /code/docker-entrypoint.sh /code/docker-entrypoint.prod.sh
 ENTRYPOINT [ "/code/docker-entrypoint.sh" ]

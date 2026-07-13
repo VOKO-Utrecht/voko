@@ -1,0 +1,24 @@
+#!/bin/bash
+set -e
+
+REPO_DIR="{{ acc_repo_dir }}"
+COMPOSE_FILE="$REPO_DIR/docker-compose.deploy.yml"
+ENV_FILE="$REPO_DIR/.env"
+BRANCH="${1:-main}"
+
+echo "=== VOKO Acceptance Deploy: $(date) (branch: $BRANCH) ==="
+
+cd "$REPO_DIR"
+
+echo "Pulling branch $BRANCH..."
+git fetch origin
+git checkout "$BRANCH"
+git pull origin "$BRANCH"
+
+echo "Building Docker image..."
+docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" build --no-cache web
+
+echo "Starting services..."
+docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d
+
+echo "=== Deploy complete ==="

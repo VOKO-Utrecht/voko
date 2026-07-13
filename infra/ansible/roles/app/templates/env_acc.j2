@@ -1,0 +1,18 @@
+# Acceptance environment - managed by Ansible, do not edit manually
+APP_ENV=acc
+APP_PORT=8001
+
+DJANGO_SETTINGS_MODULE=vokou.settings.acceptance
+DJANGO_SECRET_KEY={{ acc_django_secret_key }}
+
+POSTGRES_NAME=voko_acc
+POSTGRES_USER=voko_acc
+POSTGRES_PASSWORD={{ acc_postgres_password }}
+POSTGRES_HOST=db
+
+MOLLIE_API_KEY={{ acc_mollie_api_key }}
+RECAPTCHA_SITE_KEY={{ acc_recaptcha_site_key }}
+RECAPTCHA_SECRET_KEY={{ acc_recaptcha_secret_key }}
+ADMIN_EMAIL={{ acc_admin_email }}
+
+GUNICORN_WORKERS=2

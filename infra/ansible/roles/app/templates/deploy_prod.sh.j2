@@ -1,0 +1,23 @@
+#!/bin/bash
+set -e
+
+REPO_DIR="{{ prod_repo_dir }}"
+COMPOSE_FILE="$REPO_DIR/docker-compose.deploy.yml"
+ENV_FILE="$REPO_DIR/.env"
+
+echo "=== VOKO Production Deploy: $(date) ==="
+
+cd "$REPO_DIR"
+
+echo "Pulling latest code from main..."
+git fetch origin
+git checkout main
+git pull origin main
+
+echo "Building Docker image..."
+docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" build --no-cache web
+
+echo "Starting services..."
+docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d
+
+echo "=== Deploy complete ==="

@@ -1,0 +1,14 @@
+# GeoIP2 country lookup
+# Placed in http context via conf.d include
+
+geoip2 /var/lib/GeoIP/GeoLite2-Country.mmdb {
+    auto_reload 5m;
+    $geoip2_data_country_code default=XX source=$remote_addr country iso_code;
+}
+
+map $geoip2_data_country_code $allowed_country {
+    default no;
+{% for country in allowed_countries %}
+    {{ country }} yes;
+{% endfor %}
+}

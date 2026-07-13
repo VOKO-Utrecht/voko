@@ -1,0 +1,39 @@
+---
+- name: Install certbot and nginx plugin
+  apt:
+    name:
+      - certbot
+      - python3-certbot-nginx
+    state: present
+    update_cache: true
+
+# Note: nginx must be running but vhosts don't need SSL yet for the initial cert request.
+# Certbot will temporarily handle port 80 via its standalone mode or use nginx plugin.
+
+- name: Obtain certificate for prod domain
+  command: >
+    certbot certonly --nginx
+    --non-interactive
+    --agree-tos
+    --email {{ certbot_email }}
+    -d {{ prod_domain }}
+  args:
+    creates: /etc/letsencrypt/live/{{ prod_domain }}/fullchain.pem
+
+- name: Obtain certificate for acc domain
+  command: >
+    certbot certonly --nginx
+    --non-interactive
+    --agree-tos
+    --email {{ certbot_email }}
+    -d {{ acc_domain }}
+  args:
+    creates: /etc/letsencrypt/live/{{ acc_domain }}/fullchain.pem
+
+- name: Schedule certbot auto-renewal (twice daily as recommended)
+  cron:
+    name: certbot renew
+    hour: "0,12"
+    minute: "0"
+    job: certbot renew --quiet --deploy-hook "systemctl reload nginx"
+    user: root

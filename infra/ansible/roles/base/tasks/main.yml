@@ -1,0 +1,99 @@
+---
+- name: Set hostname
+  hostname:
+    name: "{{ server_hostname }}"
+
+- name: Set timezone
+  community.general.timezone:
+    name: "{{ server_timezone }}"
+
+- name: Install base packages
+  apt:
+    name:
+      - curl
+      - wget
+      - git
+      - unzip
+      - htop
+      - ufw
+      - fail2ban
+      - unattended-upgrades
+      - apt-transport-https
+      - ca-certificates
+      - gnupg
+      - lsb-release
+      - python3-pip
+    state: present
+    update_cache: true
+
+- name: Enable unattended security upgrades
+  copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+      APT::Periodic::AutocleanInterval "7";
+    mode: "0644"
+
+- name: Create prod deploy user
+  user:
+    name: "{{ prod_user }}"
+    shell: /bin/bash
+    create_home: true
+    groups: []
+
+- name: Create acc deploy user
+  user:
+    name: "{{ acc_user }}"
+    shell: /bin/bash
+    create_home: true
+    groups: []
+
+- name: Create .ssh dir for prod user
+  file:
+    path: "/home/{{ prod_user }}/.ssh"
+    state: directory
+    owner: "{{ prod_user }}"
+    group: "{{ prod_user }}"
+    mode: "0700"
+
+- name: Create .ssh dir for acc user
+  file:
+    path: "/home/{{ acc_user }}/.ssh"
+    state: directory
+    owner: "{{ acc_user }}"
+    group: "{{ acc_user }}"
+    mode: "0700"
+
+- name: Authorize GitHub Actions deploy key for prod user
+  authorized_key:
+    user: "{{ prod_user }}"
+    key: "{{ github_deploy_key_pub }}"
+    state: present
+
+- name: Authorize GitHub Actions deploy key for acc user
+  authorized_key:
+    user: "{{ acc_user }}"
+    key: "{{ github_deploy_key_pub }}"
+    state: present
+
+- name: Harden SSH config
+  template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    mode: "0600"
+    validate: /usr/sbin/sshd -t -f %s
+  notify: restart sshd
+
+- name: Configure fail2ban
+  template:
+    src: fail2ban_jail.local.j2
+    dest: /etc/fail2ban/jail.local
+    mode: "0644"
+  notify: restart fail2ban
+
+- name: Enable and start fail2ban
+  service:
+    name: fail2ban
+    state: started
+    enabled: true
