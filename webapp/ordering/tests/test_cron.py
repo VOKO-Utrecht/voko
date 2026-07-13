@@ -1,5 +1,6 @@
 from vokou.testing import VokoTestCase
 from ordering.cron import SendPickupReminders, MailOrderLists
+from ordering.models import Product
 from datetime import datetime, timedelta
 from pytz import UTC
 from unittest.mock import patch
@@ -60,3 +61,38 @@ class TestPickupReminderJob(VokoTestCase):
 
             MailOrderLists.do(self)
             self.assertTrue(mock_mail.called)
+
+    def test_unordered_products_are_deleted_when_order_is_placed(self):
+        with patch("django.core.mail.EmailMultiAlternatives.send"):
+            now = datetime.now(tz=UTC)
+            self.order_round = OrderRoundFactory(
+                open_for_orders=now - timedelta(days=4),
+                closed_for_orders=now - timedelta(days=1),
+                collect_datetime=now + timedelta(hours=1),
+            )
+            ordered_product = ProductFactory(order_round=self.order_round, maximum_total_order=10)
+            unordered_product = ProductFactory(order_round=self.order_round)
+
+            order = OrderFactory(order_round=self.order_round, finalized=True, paid=True)
+            OrderProductFactory(order=order, product=ordered_product, amount=1)
+
+            MailOrderLists.do(self)
+
+            self.assertTrue(Product.objects.filter(pk=ordered_product.pk).exists())
+            self.assertFalse(Product.objects.filter(pk=unordered_product.pk).exists())
+
+    def test_products_with_only_unpaid_orders_are_deleted_when_order_is_placed(self):
+        with patch("django.core.mail.EmailMultiAlternatives.send"):
+            now = datetime.now(tz=UTC)
+            self.order_round = OrderRoundFactory(
+                open_for_orders=now - timedelta(days=4),
+                closed_for_orders=now - timedelta(days=1),
+                collect_datetime=now + timedelta(hours=1),
+            )
+            product = ProductFactory(order_round=self.order_round)
+            unpaid_order = OrderFactory(order_round=self.order_round, finalized=True, paid=False)
+            OrderProductFactory(order=unpaid_order, product=product, amount=1)
+
+            MailOrderLists.do(self)
+
+            self.assertFalse(Product.objects.filter(pk=product.pk).exists())

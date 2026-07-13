@@ -9,7 +9,7 @@ from django.db.models.aggregates import Sum
 from django_cron import CronJobBase, Schedule
 from log import log_event
 
-from ordering.models import Supplier
+from ordering.models import Product, Supplier
 
 from .core import create_orderround_ahead, get_current_order_round, get_latest_order_round, get_next_order_round
 
@@ -122,6 +122,13 @@ class MailOrderLists(CronJobBase):
         # To prevent mail loops
         order_round.order_placed = True
         order_round.save()
+
+        # Remove products that were never ordered (no paid order items)
+        deleted_count, _ = Product.objects.filter(order_round=order_round).exclude(
+            orderproducts__order__paid=True
+        ).delete()
+        if deleted_count:
+            log_event(event="Deleted %d unordered products from order round %d" % (deleted_count, order_round.pk))
 
         for supplier in Supplier.objects.all():
             if not supplier.has_orders_in_current_order_round():
