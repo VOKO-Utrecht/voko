@@ -33,6 +33,9 @@ class Ride(TimeStampedModel):
     class Meta:
         verbose_name = "Ride"
         verbose_name_plural = "Rides"
+        # Ensure we don't create multiple rides (and thus identical slugs)
+        # for the same order_round (which determines date_str) and route.
+        unique_together = ["order_round", "route"]
 
     id = models.AutoField(primary_key=True)
     order_round = models.ForeignKey(
