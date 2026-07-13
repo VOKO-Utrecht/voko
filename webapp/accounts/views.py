@@ -21,7 +21,7 @@ from django.contrib.auth.models import Group
 from django.db import transaction
 from django.db.models import Q
 from django.http import Http404
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.views.generic import (DetailView, FormView, ListView, TemplateView,
                                   UpdateView, View)
 from ordering.core import get_or_create_order
@@ -333,6 +333,19 @@ class Contact(LoginRequiredMixin, ListView):
             my_group = {"group": group, "contact": contact}
             queryset.append(my_group)
         return queryset
+
+
+class CancelDeletionView(View):
+    def get(self, request, token, *args, **kwargs):
+        try:
+            user = VokoUser.objects.get(deletion_token=token)
+        except VokoUser.DoesNotExist:
+            raise Http404
+
+        user.deletion_warning_sent = None
+        user.deletion_token = ""
+        user.save()
+        return render(request, "accounts/cancel_deletion_success.html")
 
 
 class EditCoordinatorRemarksView(LoginRequiredMixin, GroupRequiredMixin, UpdateView):

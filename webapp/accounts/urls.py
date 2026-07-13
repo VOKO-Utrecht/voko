@@ -21,6 +21,11 @@ urlpatterns = (
     path("contact/", views.Contact.as_view(), name="contact"),
     path("orderHistory/", views.OrderHistory.as_view(), name="order_history"),
     re_path(
+        r"^cancel-deletion/(?P<token>[0-9a-zA-Z\-]+)$",
+        views.CancelDeletionView.as_view(),
+        name="cancel_deletion",
+    ),
+    re_path(
         r"^profile/remarks/(?P<pk>[0-9a-zA-Z\-]+)$",
         views.EditCoordinatorRemarksView.as_view(),
         name="coordinator_remarks",
